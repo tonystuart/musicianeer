@@ -1,4 +1,4 @@
-package com.example.afs.musicmaker.analyzer;
+package com.example.afs.musicpad.analyzer;
 
 public final class KeyScore implements Comparable<KeyScore> {
   private int naturals;

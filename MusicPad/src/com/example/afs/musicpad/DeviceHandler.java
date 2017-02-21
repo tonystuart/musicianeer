@@ -41,22 +41,24 @@ public class DeviceHandler extends Task {
   private static final char ENTER = 'c';
   private static final int MAX_LENGTH = 5;
 
-  private String device;
+  private int deviceId;
+  private String deviceName;
   private Thread deviceReader;
 
   private StringBuilder left = new StringBuilder();
   private StringBuilder right = new StringBuilder();
   private StringBuilder currentField;
 
-  protected DeviceHandler(MessageBroker messageBroker, String device) {
+  protected DeviceHandler(MessageBroker messageBroker, int deviceId, String deviceName) {
     super(messageBroker);
-    this.device = device;
+    this.deviceId = deviceId;
+    this.deviceName = deviceName;
   }
 
   @Override
   public void start() {
     super.start();
-    deviceReader = new Thread(() -> run(), device);
+    deviceReader = new Thread(() -> run(), deviceName);
     deviceReader.start();
   }
 
@@ -151,19 +153,19 @@ public class DeviceHandler extends Task {
     //System.out.println("onKeyPress: keyCode=" + keyCode + ", charCode=" + charCode);
     if (currentField == null) {
       if ('1' <= charCode && charCode <= '9') {
-        message = new DigitPressed(charCode);
+        message = new DigitPressed(deviceId, charCode);
       } else if (charCode == '/') {
         message = new PageUp();
       } else if (charCode == '*') {
         message = new PageDown();
       } else if (charCode == '-') {
-        message = new PageLeft();
+        message = new PageLeft(deviceId);
       } else if (charCode == '+') {
-        message = new PageRight();
+        message = new PageRight(deviceId);
       } else if (charCode == '0') {
-        message = new BendDown();
+        message = new BendDown(deviceId);
       } else if (charCode == ENTER) {
-        message = new BendUp();
+        message = new BendUp(deviceId);
       } else if (charCode == '.') {
         currentField = left;
       }
@@ -187,7 +189,7 @@ public class DeviceHandler extends Task {
     //System.out.println("onKeyRelease: keyCode=" + keyCode + ", charCode=" + charCode);
     if (currentField == null) {
       if ('1' <= charCode && charCode <= '9') {
-        message = new DigitReleased(charCode);
+        message = new DigitReleased(deviceId, charCode);
       }
     }
     if (message != null) {
@@ -200,7 +202,10 @@ public class DeviceHandler extends Task {
     if (currentField == left) {
       currentField = right;
     } else {
-      message = new Command(parseInteger(left.toString()), parseInteger(right.toString()));
+      if (right.length() == 0) {
+        right.append("-1");
+      }
+      message = new Command(deviceId, parseInteger(left.toString()), parseInteger(right.toString()));
       clear();
     }
     return message;
@@ -217,7 +222,7 @@ public class DeviceHandler extends Task {
   }
 
   private void run() {
-    try (FileInputStream inputStream = new FileInputStream(device)) {
+    try (FileInputStream inputStream = new FileInputStream(deviceName)) {
       capture(inputStream, 1);
       byte[] buffer = new byte[16];
       while (!isTerminated()) {

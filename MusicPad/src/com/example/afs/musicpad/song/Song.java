@@ -132,7 +132,7 @@ public class Song {
     if (priorNote == null) {
       ticksPerMeasure = Default.BEATS_PER_MEASURE * Default.TICKS_PER_BEAT;
     } else {
-      ticksPerMeasure = priorNote.getBeatsPerMeasure() * Default.TICKS_PER_BEAT;
+      ticksPerMeasure = priorNote.getTicksPerMeasure();
     }
     return ticksPerMeasure;
   }

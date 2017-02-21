@@ -1,4 +1,4 @@
-package com.example.afs.musicmaker.analyzer;
+package com.example.afs.musicpad.analyzer;
 
 import com.example.afs.musicpad.song.Midi;
 

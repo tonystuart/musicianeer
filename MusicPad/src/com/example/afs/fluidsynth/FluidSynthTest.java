@@ -13,7 +13,6 @@ public class FluidSynthTest {
 
   public static void main(String[] args) throws Exception {
     System.loadLibrary(FluidSynth.NATIVE_LIBRARY_NAME);
-    int rc = FluidSynth.capture(0, 0);
     long settings = FluidSynth.newFluidSettings();
     long synth = FluidSynth.newFluidSynth(settings);
     FluidSynth.fluidSettingsSetstr(settings, "audio.driver", "alsa");

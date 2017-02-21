@@ -7,7 +7,7 @@
 // This program is made available on an "as is" basis, without
 // warranties or conditions of any kind, either express or implied.
 
-package com.example.afs.musicmaker.analyzer;
+package com.example.afs.musicpad.analyzer;
 
 import com.example.afs.musicpad.song.Instruments;
 

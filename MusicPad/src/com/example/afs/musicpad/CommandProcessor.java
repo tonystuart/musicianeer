@@ -10,8 +10,11 @@
 package com.example.afs.musicpad;
 
 import java.io.File;
+import java.util.Random;
 
-import com.example.afs.musicmaker.analyzer.Analyzer;
+import com.example.afs.musicpad.analyzer.Analyzer;
+import com.example.afs.musicpad.analyzer.Concurrency;
+import com.example.afs.musicpad.analyzer.ConcurrencyAnalyzer;
 import com.example.afs.musicpad.message.Command;
 import com.example.afs.musicpad.song.MusicLibrary;
 import com.example.afs.musicpad.song.Song;
@@ -67,29 +70,45 @@ public class CommandProcessor extends Task {
 
   private MusicLibrary musicLibrary;
 
+  private Random random = new Random();
+
+  private Song currentSong;
+
   protected CommandProcessor(MessageBroker messageBroker, MusicLibrary musicLibrary) {
     super(messageBroker);
     this.musicLibrary = musicLibrary;
-    subscribe(Command.class, message -> onCommand(message.getCommand(), message.getOperand()));
+    subscribe(Command.class, message -> onCommand(message.getDeviceId(), message.getCommand(), message.getOperand()));
   }
 
-  private void onCommand(int command, int operand) {
+  private void onCommand(int deviceId, int command, int operand) {
     System.out.println("CommandProcessor.onCommand: command=" + command + ", operand=" + operand);
     switch (command) {
     case 1:
       selectSong(operand);
       break;
+    case 2:
+      selectChannel(deviceId, operand);
+      break;
     }
   }
 
+  private void selectChannel(int deviceId, int channel) {
+    ConcurrencyAnalyzer concurrencyAnalyzer = new ConcurrencyAnalyzer();
+    Concurrency concurrency = concurrencyAnalyzer.getConcurrency(currentSong.getNotes(), channel);
+    System.out.println(concurrency);
+  }
+
   private void selectSong(int songIndex) {
+    if (songIndex == -1) {
+      songIndex = random.nextInt(musicLibrary.size());
+    }
     if (songIndex < musicLibrary.size()) {
       File midiFile = musicLibrary.getMidiFile(songIndex);
       SongBuilder songBuilder = new SongBuilder();
-      Song song = songBuilder.createSong(midiFile);
-      System.out.println("Selecting song #" + songIndex + ": " + song.getName());
-      Analyzer.displaySemitoneCounts(song);
-      Analyzer.displayKey(song);
+      currentSong = songBuilder.createSong(midiFile);
+      System.out.println("Selecting song #" + songIndex + ": " + currentSong.getName());
+      Analyzer.displaySemitoneCounts(currentSong);
+      Analyzer.displayKey(currentSong);
     } else {
       System.out.println("Song " + songIndex + " is out of range");
     }

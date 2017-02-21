@@ -9,7 +9,7 @@
 
 package com.example.afs.musicpad.song;
 
-import com.example.afs.musicmaker.analyzer.Names;
+import com.example.afs.musicpad.analyzer.Names;
 
 public class Note extends Item<Note> {
 
@@ -186,13 +186,12 @@ public class Note extends Item<Note> {
     return group;
   }
 
-  public int getMidiNote() {
-    return midiNote;
+  public int getMeasure() {
+    return (int) (tick / getTicksPerMeasure());
   }
 
-  public long getNextMeasure() {
-    int ticksPerMeasure = getTicksPerMeasure();
-    return ((tick + (ticksPerMeasure - 1)) / ticksPerMeasure) * ticksPerMeasure;
+  public int getMidiNote() {
+    return midiNote;
   }
 
   public int getProgram() {
@@ -204,7 +203,12 @@ public class Note extends Item<Note> {
     return SortOrder.NOTE.ordinal();
   }
 
-  public long getThisMeasure() {
+  public long getTickOfNextMeasure() {
+    int ticksPerMeasure = getTicksPerMeasure();
+    return ((tick + (ticksPerMeasure - 1)) / ticksPerMeasure) * ticksPerMeasure;
+  }
+
+  public long getTickOfThisMeasure() {
     int ticksPerMeasure = getTicksPerMeasure();
     return (tick / ticksPerMeasure) * ticksPerMeasure;
   }

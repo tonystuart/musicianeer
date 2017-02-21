@@ -13,4 +13,19 @@ import com.example.afs.musicpad.util.MessageBroker.Message;
 
 public class PageLeft implements Message {
 
+  private int deviceId;
+
+  public PageLeft(int deviceId) {
+    this.deviceId = deviceId;
+  }
+
+  public int getDeviceId() {
+    return deviceId;
+  }
+
+  @Override
+  public String toString() {
+    return "PageLeft [deviceId=" + deviceId + "]";
+  }
+
 }

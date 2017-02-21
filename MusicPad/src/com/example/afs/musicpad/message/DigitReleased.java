@@ -13,15 +13,21 @@ import com.example.afs.musicpad.util.MessageBroker.Message;
 
 public class DigitReleased implements Message {
 
+  private int deviceId;
   private char charCode;
 
-  public DigitReleased(char charCode) {
+  public DigitReleased(int deviceId, char charCode) {
+    this.deviceId = deviceId;
     this.charCode = charCode;
+  }
+
+  public int getDeviceId() {
+    return deviceId;
   }
 
   @Override
   public String toString() {
-    return "DigitReleased [charCode=" + charCode + "]";
+    return "DigitReleased [deviceId=" + deviceId + ", charCode=" + charCode + "]";
   }
 
   protected char getCharCode() {

@@ -19,6 +19,7 @@ import com.example.afs.musicpad.util.Task;
 
 public class DeviceManager extends Task {
 
+  private int nextId;
   private Map<String, DeviceHandler> deviceHandlers = new HashMap<>();
 
   public DeviceManager(MessageBroker messageBroker) {
@@ -29,7 +30,7 @@ public class DeviceManager extends Task {
 
   private void onDeviceAttach(String newDevice) {
     System.out.println("DeviceManager.onDeviceAttach: adding newDevice=" + newDevice);
-    DeviceHandler deviceHandler = new DeviceHandler(getMessageBroker(), newDevice);
+    DeviceHandler deviceHandler = new DeviceHandler(getMessageBroker(), nextId++, newDevice);
     deviceHandlers.put(newDevice, deviceHandler);
     deviceHandler.start();
   }

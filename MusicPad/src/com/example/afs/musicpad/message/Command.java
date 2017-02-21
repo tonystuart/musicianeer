@@ -13,10 +13,12 @@ import com.example.afs.musicpad.util.MessageBroker.Message;
 
 public class Command implements Message {
 
+  private int deviceId;
   private int command;
   private int operand;
 
-  public Command(int command, int operand) {
+  public Command(int deviceId, int command, int operand) {
+    this.deviceId = deviceId;
     this.command = command;
     this.operand = operand;
   }
@@ -25,13 +27,17 @@ public class Command implements Message {
     return command;
   }
 
+  public int getDeviceId() {
+    return deviceId;
+  }
+
   public int getOperand() {
     return operand;
   }
 
   @Override
   public String toString() {
-    return "Command [command=" + command + ", operand=" + operand + "]";
+    return "Command [deviceId=" + deviceId + ", command=" + command + ", operand=" + operand + "]";
   }
 
 }

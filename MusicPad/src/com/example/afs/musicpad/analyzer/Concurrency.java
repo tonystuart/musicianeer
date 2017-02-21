@@ -7,25 +7,29 @@
 // This program is made available on an "as is" basis, without
 // warranties or conditions of any kind, either express or implied.
 
-package com.example.afs.musicpad.message;
+package com.example.afs.musicpad.analyzer;
 
-import com.example.afs.musicpad.util.MessageBroker.Message;
+public class Concurrency {
 
-public class BendDown implements Message {
+  private int occupancy;
+  private int polyphony;
 
-  private int deviceId;
-
-  public BendDown(int deviceId) {
-    this.deviceId = deviceId;
+  public Concurrency(int occupancy, int polyphony) {
+    this.occupancy = occupancy;
+    this.polyphony = polyphony;
   }
 
-  public int getDeviceId() {
-    return deviceId;
+  public int getOccupancy() {
+    return occupancy;
+  }
+
+  public int getPolyphony() {
+    return polyphony;
   }
 
   @Override
   public String toString() {
-    return "BendDown [deviceId=" + deviceId + "]";
+    return "Concurrency [occupancy=" + occupancy + ", polyphony=" + polyphony + "]";
   }
 
 }
