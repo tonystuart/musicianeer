@@ -76,6 +76,11 @@ public class SongListener implements Listener {
   }
 
   @Override
+  public void onChannelUtilization(int channel, int occupancy, int polyphony) {
+    song.setChannelUtilization(channel, occupancy, polyphony);
+  }
+
+  @Override
   public void onLyrics(long tick, String lyrics) {
     song.add(new Lyric(tick, lyrics));
   }

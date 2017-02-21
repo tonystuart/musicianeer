@@ -1,11 +1,9 @@
 package com.example.afs.musicpad.song;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public class Group {
-
-  public static class GroupNotes extends HashMap<Integer, NoteProperties> {
-  }
 
   public static class NoteProperties {
     private long tick;
@@ -29,36 +27,75 @@ public class Group {
     public int getVelocity() {
       return velocity;
     }
-
   }
 
-  private GroupNotes[] channelGroupNotes = new GroupNotes[Midi.CHANNELS];
+  private static class Details {
+    private long gapTicks;
+    private long previousTick;
+    private long polyphonyTicks;
+    private Map<Integer, NoteProperties> groupNotes = new HashMap<>();
+  }
+
+  private Details[] channelDetails = new Details[Midi.CHANNELS];
 
   public Group() {
     for (int i = 0; i < Midi.CHANNELS; i++) {
-      channelGroupNotes[i] = new GroupNotes();
+      channelDetails[i] = new Details();
     }
   }
 
   public void add(long tick, int channel, int note, int velocity, int instrument) {
+    Details details = channelDetails[channel];
     NoteProperties noteProperties = new NoteProperties(tick, instrument, velocity);
-    channelGroupNotes[channel].put(note, noteProperties);
+
+    int activeNoteCount = details.groupNotes.size();
+    if (activeNoteCount == 0) {
+      details.gapTicks += tick - details.previousTick;
+    } else {
+      details.polyphonyTicks += activeNoteCount * (tick - details.previousTick);
+    }
+    details.previousTick = tick;
+
+    details.groupNotes.put(note, noteProperties);
   }
 
   public boolean allNotesAreOff(int channel) {
-    return channelGroupNotes[channel].size() == 0;
+    return channelDetails[channel].groupNotes.size() == 0;
   }
 
   public NoteProperties get(int channel, int note) {
-    return channelGroupNotes[channel].get(note);
+    return channelDetails[channel].groupNotes.get(note);
   }
 
-  public GroupNotes getGroupNotes(int channel) {
-    return channelGroupNotes[channel];
+  public int getOccupancy(int channel) {
+    int occupancy = 0;
+    Details details = channelDetails[channel];
+    long totalTicks = details.previousTick;
+    if (totalTicks != 0) {
+      long occupancyTicks = totalTicks - details.gapTicks;
+      occupancy = (int) ((occupancyTicks * 100) / totalTicks);
+    }
+    return occupancy;
+  }
+
+  public int getPolyphony(int channel) {
+    int polyphony = 0;
+    Details details = channelDetails[channel];
+    long totalTicks = details.previousTick;
+    long occupancyTicks = totalTicks - details.gapTicks;
+    if (occupancyTicks != 0) {
+      polyphony = (int) ((details.polyphonyTicks * 100) / occupancyTicks);
+    }
+    return polyphony;
   }
 
   public void remove(long tick, int channel, int note) {
-    channelGroupNotes[channel].remove(note);
-  }
+    Details details = channelDetails[channel];
 
+    int activeNoteCount = details.groupNotes.size();
+    details.polyphonyTicks += activeNoteCount * (tick - details.previousTick);
+    details.previousTick = tick;
+
+    details.groupNotes.remove(note);
+  }
 }

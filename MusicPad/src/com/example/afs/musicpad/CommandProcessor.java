@@ -13,8 +13,6 @@ import java.io.File;
 import java.util.Random;
 
 import com.example.afs.musicpad.analyzer.Analyzer;
-import com.example.afs.musicpad.analyzer.Concurrency;
-import com.example.afs.musicpad.analyzer.ConcurrencyAnalyzer;
 import com.example.afs.musicpad.message.Command;
 import com.example.afs.musicpad.song.MusicLibrary;
 import com.example.afs.musicpad.song.Song;
@@ -93,9 +91,6 @@ public class CommandProcessor extends Task {
   }
 
   private void selectChannel(int deviceId, int channel) {
-    ConcurrencyAnalyzer concurrencyAnalyzer = new ConcurrencyAnalyzer();
-    Concurrency concurrency = concurrencyAnalyzer.getConcurrency(currentSong.getNotes(), channel);
-    System.out.println(concurrency);
   }
 
   private void selectSong(int songIndex) {
