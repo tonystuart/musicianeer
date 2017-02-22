@@ -24,7 +24,7 @@ public class Song {
   private TreeSet<Lyric> lyrics = new TreeSet<>();
   private ChannelPrograms channelPrograms = new ChannelPrograms();
   private int[] occupancy = new int[Midi.CHANNELS];
-  private int[] polyphony = new int[Midi.CHANNELS];
+  private int[] concurrency = new int[Midi.CHANNELS];
   private int[] channelNoteCount = new int[Midi.CHANNELS];
   private int[][] commonNoteCount = new int[Midi.CHANNELS][Midi.SEMITONES_PER_OCTAVE];
   private int[][] distinctNoteCount = new int[Midi.CHANNELS][Midi.NOTES];
@@ -120,12 +120,12 @@ public class Song {
     return set;
   }
 
-  public int getOccupancy(int channel) {
-    return occupancy[channel];
+  public int[] getOccupancy() {
+    return occupancy;
   }
 
-  public int getPolyphony(int channel) {
-    return polyphony[channel];
+  public int[] getConcurrency() {
+    return concurrency;
   }
 
   public List<String> getProgramNames(int channel) {
@@ -161,9 +161,9 @@ public class Song {
     return (tick / ticksPerMeasure) * ticksPerMeasure;
   }
 
-  public void setChannelUtilization(int channel, int occupancy, int polyphony) {
+  public void setChannelUtilization(int channel, int occupancy, int concurrency) {
     this.occupancy[channel] = occupancy;
-    this.polyphony[channel] = polyphony;
+    this.concurrency[channel] = concurrency;
   }
 
   @Override

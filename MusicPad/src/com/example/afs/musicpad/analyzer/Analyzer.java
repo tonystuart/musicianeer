@@ -40,9 +40,10 @@ public class Analyzer {
   }
 
   public static void displaySemitoneCounts(Song song) {
-    // TODO: Song should not leak array implementation detail
     int[] noteCount = song.getChannelNoteCount();
     int[][] commonNoteCount = song.getCommonNoteCount();
+    int[] occupancy = song.getOccupancy();
+    int[] concurrency = song.getConcurrency();
     System.out.print("CHN   TOT OCC POL");
     for (int semitone = 0; semitone < Midi.SEMITONES_PER_OCTAVE; semitone++) {
       System.out.printf(" %3s", Names.getNoteName(semitone));
@@ -51,7 +52,7 @@ public class Analyzer {
     for (int channel = 0; channel < Midi.CHANNELS; channel++) {
       if (noteCount[channel] > 0) {
         if (channel != Midi.DRUM) {
-          System.out.printf("%3d %5d %3d %3d", channel, noteCount[channel], song.getOccupancy(channel), song.getPolyphony(channel));
+          System.out.printf("%3d %5d %3d %3d", channel, noteCount[channel], occupancy[channel], concurrency[channel]);
           for (int semitone = 0; semitone < Midi.SEMITONES_PER_OCTAVE; semitone++) {
             int count = commonNoteCount[channel][semitone];
             System.out.printf(" %3d", count);

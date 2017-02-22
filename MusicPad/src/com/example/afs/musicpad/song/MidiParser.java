@@ -18,7 +18,7 @@ public class MidiParser {
 
   public interface Listener {
 
-    void onChannelUtilization(int channel, int occupancy, int polyphony);
+    void onChannelUtilization(int channel, int occupancy, int concurrency);
 
     void onLyrics(long tick, String lyrics);
 
@@ -51,7 +51,7 @@ public class MidiParser {
       Sequence sequence = MidiSystem.getSequence(file);
       parse(sequence);
       for (int channel = 0; channel < Midi.CHANNELS; channel++) {
-        listener.onChannelUtilization(channel, group.getOccupancy(channel), group.getPolyphony(channel));
+        listener.onChannelUtilization(channel, group.getOccupancy(channel), group.getConcurrency(channel));
       }
     } catch (InvalidMidiDataException | IOException e) {
       throw new RuntimeException("Cannot parse " + fileName, e);

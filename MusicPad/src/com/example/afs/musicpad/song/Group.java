@@ -32,7 +32,7 @@ public class Group {
   private static class Details {
     private long gapTicks;
     private long previousTick;
-    private long polyphonyTicks;
+    private long concurrentTicks;
     private Map<Integer, NoteProperties> groupNotes = new HashMap<>();
   }
 
@@ -52,7 +52,7 @@ public class Group {
     if (activeNoteCount == 0) {
       details.gapTicks += tick - details.previousTick;
     } else {
-      details.polyphonyTicks += activeNoteCount * (tick - details.previousTick);
+      details.concurrentTicks += activeNoteCount * (tick - details.previousTick);
     }
     details.previousTick = tick;
 
@@ -78,22 +78,22 @@ public class Group {
     return occupancy;
   }
 
-  public int getPolyphony(int channel) {
-    int polyphony = 0;
+  public int getConcurrency(int channel) {
+    int concurrency = 0;
     Details details = channelDetails[channel];
     long totalTicks = details.previousTick;
     long occupancyTicks = totalTicks - details.gapTicks;
     if (occupancyTicks != 0) {
-      polyphony = (int) ((details.polyphonyTicks * 100) / occupancyTicks);
+      concurrency = (int) ((details.concurrentTicks * 100) / occupancyTicks);
     }
-    return polyphony;
+    return concurrency;
   }
 
   public void remove(long tick, int channel, int note) {
     Details details = channelDetails[channel];
 
     int activeNoteCount = details.groupNotes.size();
-    details.polyphonyTicks += activeNoteCount * (tick - details.previousTick);
+    details.concurrentTicks += activeNoteCount * (tick - details.previousTick);
     details.previousTick = tick;
 
     details.groupNotes.remove(note);

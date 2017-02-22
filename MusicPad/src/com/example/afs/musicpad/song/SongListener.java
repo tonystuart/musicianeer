@@ -76,8 +76,8 @@ public class SongListener implements Listener {
   }
 
   @Override
-  public void onChannelUtilization(int channel, int occupancy, int polyphony) {
-    song.setChannelUtilization(channel, occupancy, polyphony);
+  public void onChannelUtilization(int channel, int occupancy, int concurrency) {
+    song.setChannelUtilization(channel, occupancy, concurrency);
   }
 
   @Override
