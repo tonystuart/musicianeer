@@ -18,6 +18,9 @@ import com.example.afs.musicpad.song.Note;
 import com.example.afs.musicpad.util.DirectList;
 import com.example.afs.musicpad.util.RandomAccessList;
 
+// TODO: Integrate with Group
+// TODO: Use common note to eliminate effect of chord inversion
+
 public class ContourAnalyzer {
 
   public RandomAccessList<Contour> getContours(NavigableSet<Note> notes) {

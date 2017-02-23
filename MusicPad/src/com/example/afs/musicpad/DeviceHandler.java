@@ -172,6 +172,11 @@ public class DeviceHandler extends Task {
     } else {
       if ('0' <= charCode && charCode <= '9' && currentField.length() < MAX_LENGTH) {
         currentField.append(charCode);
+        if (currentField == left) {
+          System.out.println("left=" + left);
+        } else {
+          System.out.println("right=" + right);
+        }
       } else if (charCode == ENTER) {
         message = onOkay();
       } else {
@@ -200,10 +205,13 @@ public class DeviceHandler extends Task {
   private Message onOkay() {
     Message message = null;
     if (currentField == left) {
+      if (left.length() == 0) {
+        left.append("0");
+      }
       currentField = right;
     } else {
       if (right.length() == 0) {
-        right.append("-1");
+        right.append("0");
       }
       message = new Command(deviceId, parseInteger(left.toString()), parseInteger(right.toString()));
       clear();

@@ -67,15 +67,33 @@ import com.example.afs.musicpad.util.Task;
 public class CommandProcessor extends Task {
 
   private MusicLibrary musicLibrary;
-
   private Random random = new Random();
-
   private Song currentSong;
+  private int currentPageIndex = -1;
 
   protected CommandProcessor(MessageBroker messageBroker, MusicLibrary musicLibrary) {
     super(messageBroker);
     this.musicLibrary = musicLibrary;
     subscribe(Command.class, message -> onCommand(message.getDeviceId(), message.getCommand(), message.getOperand()));
+  }
+
+  private void listSongs(int pageNumber) {
+    int pageIndex;
+    if (pageNumber == 0) {
+      pageIndex = currentPageIndex + 1;
+      pageNumber = pageIndex + 1;
+    } else {
+      pageIndex = pageNumber - 1;
+    }
+    System.out.println("Page #" + pageNumber);
+    int base = pageIndex * 100;
+    int limit = Math.min(base + 100, musicLibrary.size());
+    for (int songIndex = base; songIndex < limit; songIndex++) {
+      int songNumber = songIndex + 1;
+      File midiFile = musicLibrary.getMidiFile(songIndex);
+      System.out.println("Song #" + songNumber + ": " + midiFile.getName());
+    }
+    currentPageIndex = pageIndex;
   }
 
   private void onCommand(int deviceId, int command, int operand) {
@@ -87,25 +105,32 @@ public class CommandProcessor extends Task {
     case 2:
       selectChannel(deviceId, operand);
       break;
+    case 3:
+      listSongs(operand);
+      break;
     }
   }
 
   private void selectChannel(int deviceId, int channel) {
   }
 
-  private void selectSong(int songIndex) {
-    if (songIndex == -1) {
+  private void selectSong(int songNumber) {
+    int songIndex;
+    if (songNumber == 0) {
       songIndex = random.nextInt(musicLibrary.size());
+      songNumber = songIndex + 1;
+    } else {
+      songIndex = songNumber - 1;
     }
     if (songIndex < musicLibrary.size()) {
       File midiFile = musicLibrary.getMidiFile(songIndex);
       SongBuilder songBuilder = new SongBuilder();
       currentSong = songBuilder.createSong(midiFile);
-      System.out.println("Selecting song #" + songIndex + ": " + currentSong.getName());
+      System.out.println("Selecting #" + songNumber + ": " + currentSong.getName());
       Analyzer.displaySemitoneCounts(currentSong);
       Analyzer.displayKey(currentSong);
     } else {
-      System.out.println("Song " + songIndex + " is out of range");
+      System.out.println("Song " + songNumber + " is out of range");
     }
   }
 

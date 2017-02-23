@@ -44,7 +44,7 @@ public class Analyzer {
     int[][] commonNoteCount = song.getCommonNoteCount();
     int[] occupancy = song.getOccupancy();
     int[] concurrency = song.getConcurrency();
-    System.out.print("CHN   TOT OCC POL");
+    System.out.print("CHN   TOT OCC CON");
     for (int semitone = 0; semitone < Midi.SEMITONES_PER_OCTAVE; semitone++) {
       System.out.printf(" %3s", Names.getNoteName(semitone));
     }
