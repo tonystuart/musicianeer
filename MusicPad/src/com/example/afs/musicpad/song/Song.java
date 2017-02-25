@@ -23,6 +23,7 @@ public class Song {
   private TreeSet<Text> texts = new TreeSet<>();
   private TreeSet<Lyric> lyrics = new TreeSet<>();
   private ChannelPrograms channelPrograms = new ChannelPrograms();
+  // TODO: Move these to a new class, e.g. Details
   private int[] occupancy = new int[Midi.CHANNELS];
   private int[] concurrency = new int[Midi.CHANNELS];
   private int[] channelNoteCount = new int[Midi.CHANNELS];
@@ -83,6 +84,10 @@ public class Song {
     return commonNoteCount;
   }
 
+  public int[] getConcurrency() {
+    return concurrency;
+  }
+
   public int[][] getDistinctNoteCount() {
     return distinctNoteCount;
   }
@@ -122,10 +127,6 @@ public class Song {
 
   public int[] getOccupancy() {
     return occupancy;
-  }
-
-  public int[] getConcurrency() {
-    return concurrency;
   }
 
   public List<String> getProgramNames(int channel) {

@@ -15,6 +15,20 @@ import com.example.afs.musicpad.song.Song;
 
 public class Analyzer {
 
+  public static void displayDrumCounts(Song song) {
+    int[] noteCount = song.getChannelNoteCount();
+    if (noteCount[Midi.DRUM] > 0) {
+      System.out.println("CHN 9 TOT " + noteCount[Midi.DRUM]);
+      int[][] distinctNoteCount = song.getDistinctNoteCount();
+      for (int drum = 0; drum < Midi.NOTES; drum++) {
+        int count = distinctNoteCount[Midi.DRUM][drum];
+        if (count > 0) {
+          System.out.printf("%3d [%s]\n", count, Instruments.getDrumName(drum));
+        }
+      }
+    }
+  }
+
   public static void displayKey(Song song) {
     int[] noteCount = song.getChannelNoteCount();
     int[][] commonNoteCount = song.getCommonNoteCount();
@@ -61,16 +75,5 @@ public class Analyzer {
         }
       }
     }
-    if (noteCount[Midi.DRUM] > 0) {
-      System.out.println("CHN 9 TOT " + noteCount[Midi.DRUM]);
-      int[][] distinctNoteCount = song.getDistinctNoteCount();
-      for (int drum = 0; drum < Midi.NOTES; drum++) {
-        int count = distinctNoteCount[Midi.DRUM][drum];
-        if (count > 0) {
-          System.out.printf("%3d [%s]\n", count, Instruments.getDrumName(drum));
-        }
-      }
-    }
   }
-
 }

@@ -10,10 +10,15 @@
 package com.example.afs.musicpad.util;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 public class DirectList<T> extends ArrayList<T> implements RandomAccessList<T> {
 
   public DirectList() {
+  }
+
+  public DirectList(Collection<T> items) {
+    super(items);
   }
 
   public DirectList(int count) {

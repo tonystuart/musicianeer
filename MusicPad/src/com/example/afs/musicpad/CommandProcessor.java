@@ -11,8 +11,11 @@ package com.example.afs.musicpad;
 
 import java.io.File;
 import java.util.Random;
+import java.util.TreeSet;
 
 import com.example.afs.musicpad.analyzer.Analyzer;
+import com.example.afs.musicpad.analyzer.ChordFinder;
+import com.example.afs.musicpad.analyzer.ChordFinder.Chord;
 import com.example.afs.musicpad.message.Command;
 import com.example.afs.musicpad.song.MusicLibrary;
 import com.example.afs.musicpad.song.Song;
@@ -112,6 +115,11 @@ public class CommandProcessor extends Task {
   }
 
   private void selectChannel(int deviceId, int channel) {
+    if (currentSong != null) {
+      ChordFinder chordFinder = new ChordFinder();
+      TreeSet<Chord> chords = chordFinder.getChords(currentSong.getNotes(), channel);
+      System.out.println("chords=" + chords);
+    }
   }
 
   private void selectSong(int songNumber) {

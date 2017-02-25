@@ -13,7 +13,7 @@ public abstract class Item<T extends Item<T>> implements Comparable<T> {
 
   protected long tick;
 
-  Item(long tick) {
+  protected Item(long tick) {
     this.tick = tick;
   }
 

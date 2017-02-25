@@ -205,7 +205,7 @@ public class Note extends Item<Note> {
 
   public long getTickOfNextMeasure() {
     int ticksPerMeasure = getTicksPerMeasure();
-    return ((tick + (ticksPerMeasure - 1)) / ticksPerMeasure) * ticksPerMeasure;
+    return ((tick + ticksPerMeasure) / ticksPerMeasure) * ticksPerMeasure;
   }
 
   public long getTickOfThisMeasure() {
