@@ -12,19 +12,25 @@ package com.example.afs.musicpad.message;
 import com.example.afs.musicpad.util.MessageBroker.Message;
 
 public class DeviceDetach implements Message {
-  private String oldDevice;
+  private int deviceId;
+  private String device;
 
-  public DeviceDetach(String oldDevice) {
-    this.oldDevice = oldDevice;
+  public DeviceDetach(int deviceId, String device) {
+    this.deviceId = deviceId;
+    this.device = device;
   }
 
-  public String getOldDevice() {
-    return oldDevice;
+  public String getDevice() {
+    return device;
+  }
+
+  public int getDeviceId() {
+    return deviceId;
   }
 
   @Override
   public String toString() {
-    return "DeviceDetach [oldDevice=" + oldDevice + "]";
+    return "DeviceDetach [deviceId=" + deviceId + ", device=" + device + "]";
   }
 
 }

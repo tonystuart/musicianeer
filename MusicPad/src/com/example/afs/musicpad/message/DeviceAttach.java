@@ -12,18 +12,24 @@ package com.example.afs.musicpad.message;
 import com.example.afs.musicpad.util.MessageBroker.Message;
 
 public class DeviceAttach implements Message {
-  private String newDevice;
+  private int deviceId;
+  private String device;
 
-  public DeviceAttach(String newDevice) {
-    this.newDevice = newDevice;
+  public DeviceAttach(int deviceId, String device) {
+    this.deviceId = deviceId;
+    this.device = device;
   }
 
-  public String getNewDevice() {
-    return newDevice;
+  public String getDevice() {
+    return device;
+  }
+
+  public int getDeviceId() {
+    return deviceId;
   }
 
   @Override
   public String toString() {
-    return "DeviceAttach [newDevice=" + newDevice + "]";
+    return "DeviceAttach [deviceId=" + deviceId + ", device=" + device + "]";
   }
 }

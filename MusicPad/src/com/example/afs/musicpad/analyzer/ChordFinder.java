@@ -82,7 +82,7 @@ public class ChordFinder {
     private int[] semitones;
 
     public ChordType(int root, ChordIntervals chordIntervals) {
-      name = Names.getNoteName(root) + chordIntervals.getName();
+      name = Names.getNoteName(root) + " " + chordIntervals.getName();
       int[] intervals = chordIntervals.getIntervals();
       semitones = new int[intervals.length];
       int semitone = root;

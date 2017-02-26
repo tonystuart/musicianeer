@@ -152,8 +152,8 @@ public class DeviceHandler extends Task {
     char charCode = mapKeyCode(keyCode);
     //System.out.println("onKeyPress: keyCode=" + keyCode + ", charCode=" + charCode);
     if (currentField == null) {
-      if ('1' <= charCode && charCode <= '9') {
-        message = new DigitPressed(deviceId, charCode);
+      if ('0' <= charCode && charCode <= '9') {
+        message = new DigitPressed(deviceId, charCode - '0');
       } else if (charCode == '/') {
         message = new PageUp();
       } else if (charCode == '*') {
@@ -193,8 +193,8 @@ public class DeviceHandler extends Task {
     char charCode = mapKeyCode(keyCode);
     //System.out.println("onKeyRelease: keyCode=" + keyCode + ", charCode=" + charCode);
     if (currentField == null) {
-      if ('1' <= charCode && charCode <= '9') {
-        message = new DigitReleased(deviceId, charCode);
+      if ('0' <= charCode && charCode <= '9') {
+        message = new DigitReleased(deviceId, charCode - '0');
       }
     }
     if (message != null) {

@@ -10,8 +10,10 @@
 package com.example.afs.musicpad;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 
 import com.example.afs.musicpad.message.DeviceAttach;
@@ -21,7 +23,9 @@ import com.example.afs.musicpad.util.Task;
 
 public class DeviceWatcher extends Task {
 
+  private int nextId;
   private Set<String> oldDevices = new HashSet<>();
+  private Map<String, Integer> deviceIds = new HashMap<>();
 
   public DeviceWatcher(MessageBroker messageBroker) {
     super(messageBroker, 1000);
@@ -34,13 +38,16 @@ public class DeviceWatcher extends Task {
     while (oldIterator.hasNext()) {
       String oldDevice = oldIterator.next();
       if (!newDevices.contains(oldDevice)) {
-        getMessageBroker().publish(new DeviceDetach(oldDevice));
+        int deviceId = deviceIds.remove(oldDevice);
+        getMessageBroker().publish(new DeviceDetach(deviceId, oldDevice));
         oldIterator.remove();
       }
     }
     for (String newDevice : newDevices) {
       if (!oldDevices.contains(newDevice)) {
-        getMessageBroker().publish(new DeviceAttach(newDevice));
+        int deviceId = nextId++;
+        getMessageBroker().publish(new DeviceAttach(deviceId, newDevice));
+        deviceIds.put(newDevice, deviceId);
         oldDevices.add(newDevice);
       }
     }

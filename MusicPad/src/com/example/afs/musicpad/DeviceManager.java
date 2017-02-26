@@ -19,18 +19,17 @@ import com.example.afs.musicpad.util.Task;
 
 public class DeviceManager extends Task {
 
-  private int nextId;
   private Map<String, DeviceHandler> deviceHandlers = new HashMap<>();
 
   public DeviceManager(MessageBroker messageBroker) {
     super(messageBroker);
-    subscribe(DeviceAttach.class, message -> onDeviceAttach(message.getNewDevice()));
-    subscribe(DeviceDetach.class, message -> onDeviceDetach(message.getOldDevice()));
+    subscribe(DeviceAttach.class, message -> onDeviceAttach(message.getDeviceId(), message.getDevice()));
+    subscribe(DeviceDetach.class, message -> onDeviceDetach(message.getDevice()));
   }
 
-  private void onDeviceAttach(String newDevice) {
+  private void onDeviceAttach(int deviceId, String newDevice) {
     System.out.println("DeviceManager.onDeviceAttach: adding newDevice=" + newDevice);
-    DeviceHandler deviceHandler = new DeviceHandler(getMessageBroker(), nextId++, newDevice);
+    DeviceHandler deviceHandler = new DeviceHandler(getMessageBroker(), deviceId, newDevice);
     deviceHandlers.put(newDevice, deviceHandler);
     deviceHandler.start();
   }

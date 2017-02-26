@@ -14,24 +14,24 @@ import com.example.afs.musicpad.util.MessageBroker.Message;
 public class DigitPressed implements Message {
 
   private int deviceId;
-  private char charCode;
+  private int digit;
 
-  public DigitPressed(int deviceId, char charCode) {
+  public DigitPressed(int deviceId, int digit) {
     this.deviceId = deviceId;
-    this.charCode = charCode;
+    this.digit = digit;
   }
 
   public int getDeviceId() {
     return deviceId;
   }
 
-  @Override
-  public String toString() {
-    return "DigitPressed [deviceId=" + deviceId + ", charCode=" + charCode + "]";
+  public int getDigit() {
+    return digit;
   }
 
-  protected char getCharCode() {
-    return charCode;
+  @Override
+  public String toString() {
+    return "DigitPressed [deviceId=" + deviceId + ", digit=" + digit + "]";
   }
 
 }
