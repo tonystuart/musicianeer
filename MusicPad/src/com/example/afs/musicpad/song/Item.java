@@ -23,10 +23,6 @@ public abstract class Item<T extends Item<T>> implements Comparable<T> {
     if (deltaTick != 0) {
       return deltaTick;
     }
-    int deltaSortOrder = this.getSortOrder() - that.getSortOrder();
-    if (deltaSortOrder != 0) {
-      return deltaSortOrder;
-    }
     return 0;
   }
 
@@ -47,8 +43,6 @@ public abstract class Item<T extends Item<T>> implements Comparable<T> {
     }
     return true;
   }
-
-  public abstract int getSortOrder();
 
   public long getTick() {
     return tick;

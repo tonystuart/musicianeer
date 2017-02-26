@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.NavigableSet;
 import java.util.Random;
 import java.util.Set;
 import java.util.TreeSet;
@@ -30,16 +31,19 @@ import com.example.afs.musicpad.message.DigitPressed;
 import com.example.afs.musicpad.message.DigitReleased;
 import com.example.afs.musicpad.message.PageLeft;
 import com.example.afs.musicpad.message.PageRight;
+import com.example.afs.musicpad.song.Default;
+import com.example.afs.musicpad.song.Line;
 import com.example.afs.musicpad.song.MusicLibrary;
 import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.song.SongBuilder;
+import com.example.afs.musicpad.song.Word;
 import com.example.afs.musicpad.util.MessageBroker;
+import com.example.afs.musicpad.util.RandomAccessList;
 import com.example.afs.musicpad.util.Task;
 
 // new things
 // zero/enter when not in command mode are modulation down/up1550000550
-// contour
-// save current recording
+// contour// save current recording
 // clear current recording
 // next four measures
 // previous four measures
@@ -89,14 +93,24 @@ public class CommandProcessor extends Task {
   public static class Settings {
     private int channel;
     private int page;
-    private ChordType[] chords;
+    private ChordType[] keyToChord;
+    private TreeSet<Chord> chords;
+    private Map<ChordType, String> chordToKey;
 
     public int getChannel() {
       return channel;
     }
 
-    public ChordType[] getChords() {
+    public TreeSet<Chord> getChords() {
       return chords;
+    }
+
+    public Map<ChordType, String> getChordToKey() {
+      return chordToKey;
+    }
+
+    public ChordType[] getKeyToChord() {
+      return keyToChord;
     }
 
     public int getPage() {
@@ -107,8 +121,16 @@ public class CommandProcessor extends Task {
       this.channel = channel;
     }
 
-    public void setChords(ChordType[] chords) {
+    public void setChords(TreeSet<Chord> chords) {
       this.chords = chords;
+    }
+
+    public void setChordToKey(Map<ChordType, String> chordToKey) {
+      this.chordToKey = chordToKey;
+    }
+
+    public void setKeyToChord(ChordType[] keyToChord) {
+      this.keyToChord = keyToChord;
     }
 
     public void setPage(int page) {
@@ -116,12 +138,13 @@ public class CommandProcessor extends Task {
     }
   }
 
+  private static final int OCTAVE_BASE = 48;
+
   private MusicLibrary musicLibrary;
   private Random random = new Random();
   private Song currentSong;
   private int currentPageIndex = -1;
   private Map<Integer, Settings> deviceSettings = new HashMap<>();
-
   private Synthesizer synthesizer = new Synthesizer();
 
   protected CommandProcessor(MessageBroker messageBroker, MusicLibrary musicLibrary) {
@@ -151,6 +174,54 @@ public class CommandProcessor extends Task {
       return deltaLength;
     }
     return 0;
+  }
+
+  private void doDisplaySong(int operand) {
+    if (currentSong != null) {
+      long ticksPerMeasure = currentSong.getTicksPerMeasure(1);
+      long gap = ticksPerMeasure / Default.GAP_BEAT_UNIT;
+      RandomAccessList<Line> lines = currentSong.getLines();
+      for (Line line : lines) {
+        for (Settings settings : deviceSettings.values()) {
+          TreeSet<Chord> chords = settings.getChords();
+          if (chords != null && chords.size() > 0) {
+            Map<ChordType, String> chordToKey = settings.getChordToKey();
+            long lastTick = -1;
+            ChordType lastChordType = null;
+            RandomAccessList<Word> words = line.getWords();
+            int wordCount = words.size();
+            for (int wordIndex = 0; wordIndex < wordCount; wordIndex++) {
+              Word word = words.get(wordIndex);
+              long tick = word.getTick();
+              if (lastTick == -1) {
+                lastTick = (tick / ticksPerMeasure) * ticksPerMeasure - gap;
+              }
+              NavigableSet<Chord> wordChords = chords.subSet(new Chord(lastTick), false, new Chord(tick), true);
+              for (Chord chord : wordChords) {
+                ChordType chordType = chord.getChordType();
+                if (chordType != lastChordType) {
+                  String key = chordToKey.get(chordType);
+                  String name = chordType.getName() + "(" + key + ")";
+                  if (wordIndex == 0) {
+                    System.out.print(name + " ");
+                  } else {
+                    System.out.print(" " + name);
+                  }
+                  lastChordType = chordType;
+                }
+              }
+              String text = word.getText();
+              if (text.startsWith("/") || text.startsWith("\\")) {
+                text = text.substring(1);
+              }
+              System.out.print(text);
+              lastTick = tick;
+            }
+            System.out.println();
+          }
+        }
+      }
+    }
   }
 
   private void doListSongs(int pageNumber) {
@@ -189,10 +260,28 @@ public class CommandProcessor extends Task {
         chordIndex++;
       }
       Arrays.sort(keyToChord, (o1, o2) -> compare(o1, o2));
+      Map<ChordType, String> chordToKey = new HashMap<>();
+      for (int i = 0; i < keyToChord.length; i++) {
+        chordToKey.put(keyToChord[i], Integer.toString(i));
+      }
       Settings settings = deviceSettings.get(deviceId);
       settings.setChannel(channel);
-      settings.setChords(keyToChord);
+      settings.setChords(chords);
+      settings.setKeyToChord(keyToChord);
+      settings.setChordToKey(chordToKey);
+      settings.setPage(0);
       System.out.println("chords.size=" + chords.size() + ", chordTypes.size=" + chordSet.size());
+      for (int i = 0; i < keyToChord.length; i++) {
+        System.out.println(i + " -> " + keyToChord[i].getName());
+      }
+    }
+  }
+
+  private void doSelectProgram(int deviceId, int operand) {
+    Settings settings = deviceSettings.get(deviceId);
+    if (settings != null) {
+      int channel = settings.getChannel();
+      synthesizer.changeProgram(channel, operand);
     }
   }
 
@@ -228,6 +317,12 @@ public class CommandProcessor extends Task {
     case 3:
       doListSongs(operand);
       break;
+    case 4:
+      doDisplaySong(operand);
+      break;
+    case 5:
+      doSelectProgram(deviceId, operand);
+      break;
     }
   }
 
@@ -241,14 +336,14 @@ public class CommandProcessor extends Task {
 
   private void OnDigit(int deviceId, int digit, DigitAction digitAction) {
     Settings settings = deviceSettings.get(deviceId);
-    ChordType[] chords = settings.getChords();
+    ChordType[] chords = settings.getKeyToChord();
     if (chords != null) {
       int page = settings.getPage();
       int chordIndex = page * 10 + digit;
       if (chordIndex < chords.length) {
         int channel = settings.getChannel();
         ChordType chordType = chords[chordIndex];
-        System.out.println(chordType);
+        //System.out.println(chordType);
         for (int semitone : chordType.getSemitones()) {
           try {
             Thread.sleep(0);
@@ -262,11 +357,11 @@ public class CommandProcessor extends Task {
   }
 
   private void OnDigitPressed(int deviceId, int digit) {
-    OnDigit(deviceId, digit, (channel, semitone) -> synthesizer.pressKey(channel, 60 + semitone, 92));
+    OnDigit(deviceId, digit, (channel, semitone) -> synthesizer.pressKey(channel, OCTAVE_BASE + semitone, 92));
   }
 
   private void OnDigitReleased(int deviceId, int digit) {
-    OnDigit(deviceId, digit, (channel, semitone) -> synthesizer.releaseKey(channel, 60 + semitone));
+    OnDigit(deviceId, digit, (channel, semitone) -> synthesizer.releaseKey(channel, OCTAVE_BASE + semitone));
   }
 
   private void onPageLeft(int deviceId) {
@@ -280,7 +375,7 @@ public class CommandProcessor extends Task {
   private void onPageRight(int deviceId) {
     Settings settings = deviceSettings.get(deviceId);
     int page = settings.getPage();
-    int limit = settings.getChords().length / 10;
+    int limit = settings.getKeyToChord().length / 10;
     if (page < limit) {
       settings.setPage(page + 1);
     }

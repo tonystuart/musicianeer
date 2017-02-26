@@ -9,31 +9,31 @@
 
 package com.example.afs.musicpad.song;
 
-public class Text extends Item<Text> {
+public class Word {
 
+  private long tick;
   private String text;
 
-  public Text(long tick) {
-    super(tick);
+  public Word(long tick) {
+    this.tick = tick;
   }
 
-  public Text(long tick, String text) {
-    super(tick);
+  public Word(long tick, String text) {
+    this.tick = tick;
     this.text = text;
-  }
-
-  @Override
-  public int getSortOrder() {
-    return SortOrder.TEXT.ordinal();
   }
 
   public String getText() {
     return text;
   }
 
+  public long getTick() {
+    return tick;
+  }
+
   @Override
   public String toString() {
-    return "Text [tick=" + tick + ", text=" + text + "]";
+    return "Word [tick=" + tick + ", text=" + text + "]";
   }
 
 }

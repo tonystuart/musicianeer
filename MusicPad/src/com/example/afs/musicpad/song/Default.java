@@ -16,5 +16,6 @@ public class Default {
   public static final int BEATS_PER_MINUTE = 120;
   public static final int BEAT_UNIT = 4;
   public static final long LONG_PRESS = 1000;
+  public static final int GAP_BEAT_UNIT = 64;
 
 }

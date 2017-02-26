@@ -198,11 +198,6 @@ public class Note extends Item<Note> {
     return program;
   }
 
-  @Override
-  public int getSortOrder() {
-    return SortOrder.NOTE.ordinal();
-  }
-
   public long getTickOfNextMeasure() {
     int ticksPerMeasure = getTicksPerMeasure();
     return ((tick + ticksPerMeasure) / ticksPerMeasure) * ticksPerMeasure;

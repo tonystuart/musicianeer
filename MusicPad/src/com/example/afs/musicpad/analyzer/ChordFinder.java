@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.NavigableSet;
 import java.util.TreeSet;
 
+import com.example.afs.musicpad.song.Default;
 import com.example.afs.musicpad.song.Item;
 import com.example.afs.musicpad.song.Midi;
 import com.example.afs.musicpad.song.Note;
@@ -34,17 +35,16 @@ public class ChordFinder {
       this.duration = duration;
     }
 
+    public Chord(long tick) {
+      super(tick);
+    }
+
     public ChordType getChordType() {
       return chordType;
     }
 
     public long getDuration() {
       return duration;
-    }
-
-    @Override
-    public int getSortOrder() {
-      return 0;
     }
 
     @Override
@@ -82,7 +82,7 @@ public class ChordFinder {
     private int[] semitones;
 
     public ChordType(int root, ChordIntervals chordIntervals) {
-      name = Names.getNoteName(root) + " " + chordIntervals.getName();
+      name = Names.getNoteName(root) + chordIntervals.getName();
       int[] intervals = chordIntervals.getIntervals();
       semitones = new int[intervals.length];
       int semitone = root;
@@ -116,16 +116,11 @@ public class ChordFinder {
         long tick = note.getTick();
         long duration = note.getDuration();
         if (chordIndex == 0) {
-          maxTick = tick + duration;
           int ticksPerMeasure = note.getTicksPerMeasure();
-          gap = ticksPerMeasure / 64;
-          // Put early chord notes back into proper measure
-          //nextMeasureTick = ((tick + gap + ticksPerMeasure) / ticksPerMeasure) * ticksPerMeasure;
-          nextMeasureTick = note.getTickOfNextMeasure();
-          long startingMeasure = tick / ticksPerMeasure;
           long endingTick = tick + duration;
-          long endingMeasure = endingTick / ticksPerMeasure;
           nextMeasureTick = ((endingTick + ticksPerMeasure) / ticksPerMeasure) * ticksPerMeasure;
+          gap = ticksPerMeasure / Default.GAP_BEAT_UNIT;
+          maxTick = tick + duration;
         }
         if ((maxTick + gap) < tick || tick > (nextMeasureTick - gap) || !contains(note.getMidiNote(), matches)) {
           isMatch = false;
@@ -250,18 +245,21 @@ public class ChordFinder {
   }
 
   public TreeSet<Chord> getChords(NavigableSet<Note> notes, int channel) {
+    int matchedNotes = 0;
     TreeSet<Chord> channelChords = new TreeSet<>();
     RandomAccessList<Note> channelNotes = getChannelNotes(notes, channel);
     int noteIndex = 0;
     while (noteIndex < channelNotes.size()) {
       int matchLength = findChord(channelChords, channelNotes, noteIndex);
       if (matchLength == 0) {
-        System.out.println("Skipping note=" + channelNotes.get(noteIndex));
+        //System.out.println("Skipping note=" + channelNotes.get(noteIndex));
         noteIndex++;
       } else {
+        matchedNotes += matchLength;
         noteIndex += matchLength;
       }
     }
+    System.out.println("Matched " + matchedNotes + " out of " + channelNotes.size() + " notes");
     return channelChords;
   }
 
@@ -271,7 +269,7 @@ public class ChordFinder {
     while (iterator.hasNext() && matchLength == 0) {
       ChordType chordType = iterator.next();
       matchLength = chordType.match(channelNotes, noteIndex);
-      System.out.println("noteIndex=" + noteIndex + ", chordType=" + chordType + ", matchLength=" + matchLength);
+      //System.out.println("noteIndex=" + noteIndex + ", chordType=" + chordType + ", matchLength=" + matchLength);
       if (matchLength > 0) {
         Note firstNote = channelNotes.get(noteIndex);
         Note lastNote = channelNotes.get(noteIndex + matchLength - 1);

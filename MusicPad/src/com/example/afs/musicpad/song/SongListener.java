@@ -66,8 +66,10 @@ public class SongListener implements Listener {
   private static final TimeSignature DEFAULT_TIME_SIGNATURE = new TimeSignature(Default.BEATS_PER_MEASURE, Default.BEAT_UNIT);
 
   private Song song;
+  private Line line;
   private NavigableMap<Long, Tempo> tempos = new TreeMap<>();
   private NavigableMap<Long, TimeSignature> timeSignatures = new TreeMap<>();
+  private long lastTick;
 
   public SongListener(Song song) {
     this.song = song;
@@ -76,13 +78,22 @@ public class SongListener implements Listener {
   }
 
   @Override
+  public void onBegin(String fileName) {
+  }
+
+  @Override
   public void onChannelUtilization(int channel, int occupancy, int concurrency) {
     song.setChannelUtilization(channel, occupancy, concurrency);
   }
 
   @Override
-  public void onLyrics(long tick, String lyrics) {
-    song.add(new Lyric(tick, lyrics));
+  public void onEnd(String fileName) {
+    processLineEnd();
+  }
+
+  @Override
+  public void onLyrics(long tick, String text) {
+    addWord(tick, text);
   }
 
   @Override
@@ -99,7 +110,7 @@ public class SongListener implements Listener {
 
   @Override
   public void onText(long tick, String text) {
-    song.add(new Text(tick, text));
+    addWord(tick, text);
   }
 
   @Override
@@ -110,6 +121,31 @@ public class SongListener implements Listener {
   @Override
   public String toString() {
     return "SongListener [song=" + song + ", tempos=" + tempos + ", timeSignatures=" + timeSignatures + "]";
+  }
+
+  private void addWord(long tick, String text) {
+    if (text.startsWith("/") || text.startsWith("\\") || tick < lastTick) {
+      processLineEnd();
+    }
+    if (line == null) {
+      line = new Line(tick);
+    }
+    Word word;
+    if (tick < lastTick) {
+      tick = lastTick + 1;
+      word = new Word(tick, "#" + text);
+    } else {
+      word = new Word(tick, text);
+    }
+    line.add(word);
+    lastTick = tick;
+  }
+
+  private void processLineEnd() {
+    if (line != null) {
+      song.add(line);
+      line = null;
+    }
   }
 
 }

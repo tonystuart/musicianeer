@@ -9,31 +9,33 @@
 
 package com.example.afs.musicpad.song;
 
-public class Lyric extends Item<Lyric> {
+import com.example.afs.musicpad.util.DirectList;
+import com.example.afs.musicpad.util.RandomAccessList;
 
-  private String lyric;
+public class Line {
 
-  public Lyric(long tick) {
-    super(tick);
+  private long tick;
+  private RandomAccessList<Word> words = new DirectList<>();
+
+  public Line(long tick) {
+    this.tick = tick;
   }
 
-  public Lyric(long tick, String lyrics) {
-    super(tick);
-    this.lyric = lyrics;
+  public void add(Word word) {
+    words.add(word);
   }
 
-  public String getLyric() {
-    return lyric;
+  public long getTick() {
+    return tick;
   }
 
-  @Override
-  public int getSortOrder() {
-    return SortOrder.LYRIC.ordinal();
+  public RandomAccessList<Word> getWords() {
+    return words;
   }
 
   @Override
   public String toString() {
-    return "Lyric [tick=" + tick + ", lyric=" + lyric + "]";
+    return "Line [tick=" + tick + ", words=" + words + "]";
   }
 
 }

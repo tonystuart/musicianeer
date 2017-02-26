@@ -15,13 +15,14 @@ import java.util.NavigableSet;
 import java.util.TreeSet;
 
 import com.example.afs.musicpad.song.Note.NoteBuilder;
+import com.example.afs.musicpad.util.DirectList;
+import com.example.afs.musicpad.util.RandomAccessList;
 
 public class Song {
 
   private String name;
   private TreeSet<Note> notes = new TreeSet<>();
-  private TreeSet<Text> texts = new TreeSet<>();
-  private TreeSet<Lyric> lyrics = new TreeSet<>();
+  private RandomAccessList<Line> lines = new DirectList<>();
   private ChannelPrograms channelPrograms = new ChannelPrograms();
   // TODO: Move these to a new class, e.g. Details
   private int[] occupancy = new int[Midi.CHANNELS];
@@ -38,8 +39,8 @@ public class Song {
     this.name = name;
   }
 
-  public void add(Lyric lyric) {
-    lyrics.add(lyric);
+  public void add(Line line) {
+    lines.add(line);
   }
 
   public void add(Note note) {
@@ -52,10 +53,6 @@ public class Song {
     commonNoteCount[channel][midiNote % Midi.SEMITONES_PER_OCTAVE]++;
     distinctNoteCount[channel][midiNote]++;
     modificationCount++;
-  }
-
-  public void add(Text text) {
-    texts.add(text);
   }
 
   public long append(Song newSong) {
@@ -82,15 +79,15 @@ public class Song {
 
   public int[][] getCommonNoteCount() {
     return commonNoteCount;
-  }
+  };
 
   public int[] getConcurrency() {
     return concurrency;
-  }
+  };
 
   public int[][] getDistinctNoteCount() {
     return distinctNoteCount;
-  }
+  };
 
   public long getLength() {
     long length;
@@ -100,42 +97,38 @@ public class Song {
       length = notes.last().getTick();
     }
     return length;
-  }
+  };
 
-  public TreeSet<Lyric> getLyrics() {
-    return lyrics;
-  }
+  public RandomAccessList<Line> getLines() {
+    return lines;
+  };
 
   public int getModificationCount() {
     return modificationCount;
-  }
+  };
 
   public String getName() {
     return name;
-  }
+  };
 
   public TreeSet<Note> getNotes() {
     return notes;
-  }
+  };
 
   public NavigableSet<Note> getNotes(long fromTick, long toTick) {
     Note firstNote = new Note(fromTick);
     Note lastNote = new Note(toTick);
     NavigableSet<Note> set = notes.subSet(firstNote, true, lastNote, false);
     return set;
-  }
+  };
 
   public int[] getOccupancy() {
     return occupancy;
-  }
+  };
 
   public List<String> getProgramNames(int channel) {
     return channelPrograms.getProgramNames(channel);
-  }
-
-  public TreeSet<Text> getTexts() {
-    return texts;
-  }
+  };
 
   public int getTicksPerMeasure(long tick) {
     int ticksPerMeasure;
@@ -146,29 +139,29 @@ public class Song {
       ticksPerMeasure = priorNote.getTicksPerMeasure();
     }
     return ticksPerMeasure;
-  }
+  };
 
   public void resetModificationCount() {
     modificationCount = 0;
-  }
+  };
 
   public long roundTickToNextMeasure(long tick) {
     int ticksPerMeasure = getTicksPerMeasure(tick);
     return ((tick + (ticksPerMeasure - 1)) / ticksPerMeasure) * ticksPerMeasure;
-  }
+  };
 
   public long roundTickToThisMeasure(long tick) {
     int ticksPerMeasure = getTicksPerMeasure(tick);
     return (tick / ticksPerMeasure) * ticksPerMeasure;
-  }
+  };
 
   public void setChannelUtilization(int channel, int occupancy, int concurrency) {
     this.occupancy[channel] = occupancy;
     this.concurrency[channel] = concurrency;
-  }
+  };
 
   @Override
   public String toString() {
     return "Song [name=" + name + ", channelNoteCount=" + Arrays.toString(channelNoteCount) + "]";
-  }
+  };
 }
