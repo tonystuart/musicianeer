@@ -7,18 +7,19 @@
 // This program is made available on an "as is" basis, without
 // warranties or conditions of any kind, either express or implied.
 
-package com.example.afs.musicpad.analyzer;
+package com.example.afs.musicpad.song;
 
-import com.example.afs.musicpad.song.Note;
-
-public class Contour {
-  private long tick;
-  private Note note;
+public class Contour extends Item<Contour> {
+  private int midiNote;
   private long duration;
 
-  public Contour(long tick, Note note, long duration) {
-    this.tick = tick;
-    this.note = note;
+  public Contour(long tick) {
+    super(tick);
+  }
+
+  public Contour(long tick, int midiNote, long duration) {
+    super(tick);
+    this.midiNote = midiNote;
     this.duration = duration;
   }
 
@@ -26,17 +27,18 @@ public class Contour {
     return duration;
   }
 
-  public Note getNote() {
-    return note;
+  public int getMidiNote() {
+    return midiNote;
   }
 
+  @Override
   public long getTick() {
     return tick;
   }
 
   @Override
   public String toString() {
-    return "Contour [tick=" + tick + ", note=" + note + ", duration=" + duration + "]";
+    return "Contour [tick=" + tick + ", note=" + midiNote + ", duration=" + duration + "]";
   }
 
 }

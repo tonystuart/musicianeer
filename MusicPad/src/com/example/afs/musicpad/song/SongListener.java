@@ -11,6 +11,7 @@ package com.example.afs.musicpad.song;
 
 import java.util.NavigableMap;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import com.example.afs.musicpad.song.MidiParser.Listener;
 
@@ -82,8 +83,13 @@ public class SongListener implements Listener {
   }
 
   @Override
-  public void onChannelUtilization(int channel, int occupancy, int concurrency) {
-    song.setChannelUtilization(channel, occupancy, concurrency);
+  public void onConcurrency(int channel, int concurrency) {
+    song.setConcurrency(channel, concurrency);
+  }
+
+  @Override
+  public void onContour(int channel, TreeSet<Contour> contour) {
+    song.setContour(channel, contour);
   }
 
   @Override
@@ -101,6 +107,11 @@ public class SongListener implements Listener {
     Tempo tempo = tempos.floorEntry(tick).getValue();
     TimeSignature timeSignature = timeSignatures.floorEntry(tick).getValue();
     song.add(new Note(tick, channel, note, velocity, duration, instrument, group, tempo.getQuarterNotesPerMinute(), timeSignature.getBeatsPerMeasure(), timeSignature.getBeatUnit()));
+  }
+
+  @Override
+  public void onOccupancy(int channel, int occupancy) {
+    song.setOccupancy(channel, occupancy);
   }
 
   @Override

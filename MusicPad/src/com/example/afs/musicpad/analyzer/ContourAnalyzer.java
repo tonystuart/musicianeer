@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.NavigableSet;
 import java.util.TreeSet;
 
+import com.example.afs.musicpad.song.Contour;
 import com.example.afs.musicpad.song.Default;
 import com.example.afs.musicpad.song.Note;
 import com.example.afs.musicpad.util.DirectList;
@@ -47,7 +48,7 @@ public class ContourAnalyzer {
         if (currentTickEvent != null) {
           long xduration = tickEvent.getTick() - xtick;
           if (xduration > Default.TICKS_PER_BEAT / 8) {
-            contours.add(new Contour(xtick, currentTickEvent.getNote(), xduration));
+            contours.add(new Contour(xtick, currentTickEvent.getNote().getMidiNote(), xduration));
           }
         }
         xtick = tickEvent.getTick();

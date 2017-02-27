@@ -2,6 +2,7 @@ package com.example.afs.musicpad.song;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.TreeSet;
 
 import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.MetaMessage;
@@ -20,13 +21,17 @@ public class MidiParser {
 
     void onBegin(String fileName);
 
-    void onChannelUtilization(int channel, int occupancy, int concurrency);
+    void onConcurrency(int channel, int concurrency);
+
+    void onContour(int channel, TreeSet<Contour> contour);
 
     void onEnd(String fileName);
 
     void onLyrics(long tick, String lyrics);
 
     void onNote(long tick, int channel, int note, int velocity, long duration, int instrument, int group);
+
+    void onOccupancy(int channel, int occupancy);
 
     void onTempoChange(long tick, int usecPerQuarterNote, int quarterNotesPerMinute);
 
@@ -56,7 +61,9 @@ public class MidiParser {
       listener.onBegin(fileName);
       parse(sequence);
       for (int channel = 0; channel < Midi.CHANNELS; channel++) {
-        listener.onChannelUtilization(channel, group.getOccupancy(channel), group.getConcurrency(channel));
+        listener.onOccupancy(channel, group.getOccupancy(channel));
+        listener.onConcurrency(channel, group.getConcurrency(channel));
+        listener.onContour(channel, group.getContour(channel));
       }
       listener.onEnd(fileName);
     } catch (InvalidMidiDataException | IOException e) {

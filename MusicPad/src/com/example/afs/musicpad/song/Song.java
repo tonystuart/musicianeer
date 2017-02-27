@@ -31,6 +31,7 @@ public class Song {
   private int[][] commonNoteCount = new int[Midi.CHANNELS][Midi.SEMITONES_PER_OCTAVE];
   private int[][] distinctNoteCount = new int[Midi.CHANNELS][Midi.NOTES];
   private int modificationCount;
+  private TreeSet<Contour>[] contours;
 
   public Song() {
   }
@@ -83,6 +84,10 @@ public class Song {
 
   public int[] getConcurrency() {
     return concurrency;
+  };
+
+  public TreeSet<Contour>[] getContours() {
+    return contours;
   };
 
   public int[][] getDistinctNoteCount() {
@@ -155,10 +160,17 @@ public class Song {
     return (tick / ticksPerMeasure) * ticksPerMeasure;
   };
 
-  public void setChannelUtilization(int channel, int occupancy, int concurrency) {
-    this.occupancy[channel] = occupancy;
+  public void setConcurrency(int channel, int concurrency) {
     this.concurrency[channel] = concurrency;
   };
+
+  public void setContour(int channel, TreeSet<Contour> contour) {
+    this.contours[channel] = contour;
+  }
+
+  public void setOccupancy(int channel, int occupancy) {
+    this.occupancy[channel] = occupancy;
+  }
 
   @Override
   public String toString() {

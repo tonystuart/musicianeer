@@ -24,6 +24,7 @@ import com.example.afs.musicpad.analyzer.Analyzer;
 import com.example.afs.musicpad.analyzer.ChordFinder;
 import com.example.afs.musicpad.analyzer.ChordFinder.Chord;
 import com.example.afs.musicpad.analyzer.ChordFinder.ChordType;
+import com.example.afs.musicpad.analyzer.Names;
 import com.example.afs.musicpad.message.Command;
 import com.example.afs.musicpad.message.DeviceAttach;
 import com.example.afs.musicpad.message.DeviceDetach;
@@ -31,6 +32,7 @@ import com.example.afs.musicpad.message.DigitPressed;
 import com.example.afs.musicpad.message.DigitReleased;
 import com.example.afs.musicpad.message.PageLeft;
 import com.example.afs.musicpad.message.PageRight;
+import com.example.afs.musicpad.song.Contour;
 import com.example.afs.musicpad.song.Default;
 import com.example.afs.musicpad.song.Line;
 import com.example.afs.musicpad.song.MusicLibrary;
@@ -96,6 +98,8 @@ public class CommandProcessor extends Task {
     private ChordType[] keyToChord;
     private TreeSet<Chord> chords;
     private Map<ChordType, String> chordToKey;
+    private int[] keyToContour;
+    private Map<Integer, String> contourToKey;
 
     public int getChannel() {
       return channel;
@@ -109,8 +113,16 @@ public class CommandProcessor extends Task {
       return chordToKey;
     }
 
+    public Map<Integer, String> getContourToKey() {
+      return contourToKey;
+    }
+
     public ChordType[] getKeyToChord() {
       return keyToChord;
+    }
+
+    public int[] getKeyToContour() {
+      return keyToContour;
     }
 
     public int getPage() {
@@ -129,8 +141,16 @@ public class CommandProcessor extends Task {
       this.chordToKey = chordToKey;
     }
 
+    public void setContourToKey(Map<Integer, String> contourToKey) {
+      this.contourToKey = contourToKey;
+    }
+
     public void setKeyToChord(ChordType[] keyToChord) {
       this.keyToChord = keyToChord;
+    }
+
+    public void setKeyToContour(int[] keyToContour) {
+      this.keyToContour = keyToContour;
     }
 
     public void setPage(int page) {
@@ -176,48 +196,93 @@ public class CommandProcessor extends Task {
     return 0;
   }
 
+  private void displayChordLyrics(Line line, TreeSet<Chord> chords, Map<ChordType, String> chordToKey) {
+    long ticksPerMeasure = currentSong.getTicksPerMeasure(1);
+    long gap = ticksPerMeasure / Default.GAP_BEAT_UNIT;
+    long lastTick = -1;
+    ChordType lastChordType = null;
+    RandomAccessList<Word> words = line.getWords();
+    int wordCount = words.size();
+    for (int wordIndex = 0; wordIndex < wordCount; wordIndex++) {
+      Word word = words.get(wordIndex);
+      long tick = word.getTick();
+      if (lastTick == -1) {
+        lastTick = (tick / ticksPerMeasure) * ticksPerMeasure - gap;
+      }
+
+      NavigableSet<Chord> wordChords = chords.subSet(new Chord(lastTick), false, new Chord(tick), true);
+      for (Chord chord : wordChords) {
+        ChordType chordType = chord.getChordType();
+        if (chordType != lastChordType) {
+          String key = chordToKey.get(chordType);
+          String name = chordType.getName() + "(" + key + ")";
+          if (wordIndex == 0) {
+            System.out.print(name + " ");
+          } else {
+            System.out.print(" " + name);
+          }
+          lastChordType = chordType;
+        }
+      }
+
+      String text = word.getText();
+      if (text.startsWith("/") || text.startsWith("\\")) {
+        text = text.substring(1);
+      }
+      System.out.print(text);
+      lastTick = tick;
+    }
+    System.out.println();
+  }
+
+  private void displayContourLyrics(Line line, TreeSet<Contour> contours, Map<Integer, String> contourToKey) {
+    long ticksPerMeasure = currentSong.getTicksPerMeasure(1);
+    long gap = ticksPerMeasure / Default.GAP_BEAT_UNIT;
+    long lastTick = -1;
+    RandomAccessList<Word> words = line.getWords();
+    int wordCount = words.size();
+    for (int wordIndex = 0; wordIndex < wordCount; wordIndex++) {
+      Word word = words.get(wordIndex);
+      long tick = word.getTick();
+      if (lastTick == -1) {
+        lastTick = (tick / ticksPerMeasure) * ticksPerMeasure - gap;
+      }
+
+      NavigableSet<Contour> wordContours = contours.subSet(new Contour(lastTick), false, new Contour(tick), true);
+      for (Contour contour : wordContours) {
+        int midiNote = contour.getMidiNote();
+        String key = contourToKey.get(midiNote);
+        String name = Names.getNoteName(midiNote) + "(" + key + ")";
+        if (wordIndex == 0) {
+          System.out.print(name + " ");
+        } else {
+          System.out.print(" " + name);
+        }
+      }
+
+      String text = word.getText();
+      if (text.startsWith("/") || text.startsWith("\\")) {
+        text = text.substring(1);
+      }
+      System.out.print(text);
+      lastTick = tick;
+    }
+    System.out.println();
+  }
+
   private void doDisplaySong(int operand) {
     if (currentSong != null) {
-      long ticksPerMeasure = currentSong.getTicksPerMeasure(1);
-      long gap = ticksPerMeasure / Default.GAP_BEAT_UNIT;
       RandomAccessList<Line> lines = currentSong.getLines();
       for (Line line : lines) {
         for (Settings settings : deviceSettings.values()) {
           TreeSet<Chord> chords = settings.getChords();
+          Map<Integer, String> contourToKey = settings.getContourToKey();
           if (chords != null && chords.size() > 0) {
             Map<ChordType, String> chordToKey = settings.getChordToKey();
-            long lastTick = -1;
-            ChordType lastChordType = null;
-            RandomAccessList<Word> words = line.getWords();
-            int wordCount = words.size();
-            for (int wordIndex = 0; wordIndex < wordCount; wordIndex++) {
-              Word word = words.get(wordIndex);
-              long tick = word.getTick();
-              if (lastTick == -1) {
-                lastTick = (tick / ticksPerMeasure) * ticksPerMeasure - gap;
-              }
-              NavigableSet<Chord> wordChords = chords.subSet(new Chord(lastTick), false, new Chord(tick), true);
-              for (Chord chord : wordChords) {
-                ChordType chordType = chord.getChordType();
-                if (chordType != lastChordType) {
-                  String key = chordToKey.get(chordType);
-                  String name = chordType.getName() + "(" + key + ")";
-                  if (wordIndex == 0) {
-                    System.out.print(name + " ");
-                  } else {
-                    System.out.print(" " + name);
-                  }
-                  lastChordType = chordType;
-                }
-              }
-              String text = word.getText();
-              if (text.startsWith("/") || text.startsWith("\\")) {
-                text = text.substring(1);
-              }
-              System.out.print(text);
-              lastTick = tick;
-            }
-            System.out.println();
+            displayChordLyrics(line, chords, chordToKey);
+          } else if (contourToKey != null) {
+            TreeSet<Contour> contours = currentSong.getContours()[settings.getChannel()];
+            displayContourLyrics(line, contours, contourToKey);
           }
         }
       }
@@ -243,7 +308,7 @@ public class CommandProcessor extends Task {
     currentPageIndex = pageIndex;
   }
 
-  private void doSelectChannel(int deviceId, int channel) {
+  private void doSelectChords(int deviceId, int channel) {
     if (currentSong != null) {
       ChordFinder chordFinder = new ChordFinder();
       TreeSet<Chord> chords = chordFinder.getChords(currentSong.getNotes(), channel);
@@ -270,9 +335,41 @@ public class CommandProcessor extends Task {
       settings.setKeyToChord(keyToChord);
       settings.setChordToKey(chordToKey);
       settings.setPage(0);
-      System.out.println("chords.size=" + chords.size() + ", chordTypes.size=" + chordSet.size());
+      System.out.println("chords.size=" + chords.size() + ", unique chords=" + chordSet.size());
       for (int i = 0; i < keyToChord.length; i++) {
         System.out.println(i + " -> " + keyToChord[i].getName());
+      }
+    }
+  }
+
+  private void doSelectContour(int deviceId, int channel) {
+    if (currentSong != null) {
+      TreeSet<Contour> contours = currentSong.getContours()[channel];
+      Set<Integer> contourSet = new HashSet<>();
+      for (Contour contour : contours) {
+        int midiNote = contour.getMidiNote();
+        contourSet.add(midiNote);
+      }
+      int contourIndex = 0;
+      int uniqueContourCount = contourSet.size();
+      int[] keyToContour = new int[uniqueContourCount];
+      for (int contour : contourSet) {
+        keyToContour[contourIndex] = contour;
+        contourIndex++;
+      }
+      Arrays.sort(keyToContour);
+      Map<Integer, String> contourToKey = new HashMap<>();
+      for (int i = 0; i < keyToContour.length; i++) {
+        contourToKey.put(keyToContour[i], Integer.toString(i));
+      }
+      Settings settings = deviceSettings.get(deviceId);
+      settings.setChannel(channel);
+      settings.setKeyToContour(keyToContour);
+      settings.setContourToKey(contourToKey);
+      settings.setPage(0);
+      System.out.println("contours.size=" + contours.size() + ", unique contours=" + contourSet.size());
+      for (int i = 0; i < keyToContour.length; i++) {
+        System.out.println(i + " -> " + Names.getNoteName(keyToContour[i]));
       }
     }
   }
@@ -312,7 +409,7 @@ public class CommandProcessor extends Task {
       doSelectSong(operand);
       break;
     case 2:
-      doSelectChannel(deviceId, operand);
+      doSelectChords(deviceId, operand);
       break;
     case 3:
       doListSongs(operand);
@@ -322,6 +419,9 @@ public class CommandProcessor extends Task {
       break;
     case 5:
       doSelectProgram(deviceId, operand);
+      break;
+    case 6:
+      doSelectContour(deviceId, operand);
       break;
     }
   }
@@ -336,7 +436,9 @@ public class CommandProcessor extends Task {
 
   private void OnDigit(int deviceId, int digit, DigitAction digitAction) {
     Settings settings = deviceSettings.get(deviceId);
+    // TODO: We need a common interface for Chord and Contour!
     ChordType[] chords = settings.getKeyToChord();
+    int[] contours = settings.getKeyToContour();
     if (chords != null) {
       int page = settings.getPage();
       int chordIndex = page * 10 + digit;
@@ -344,6 +446,7 @@ public class CommandProcessor extends Task {
         int channel = settings.getChannel();
         ChordType chordType = chords[chordIndex];
         //System.out.println(chordType);
+        // TODO: Be careful about using the word semitone when we mean midiNote
         for (int semitone : chordType.getSemitones()) {
           try {
             Thread.sleep(0);
@@ -352,6 +455,14 @@ public class CommandProcessor extends Task {
           }
           digitAction.onDigit(channel, semitone);
         }
+      }
+    } else if (contours != null) {
+      int page = settings.getPage();
+      int contourIndex = page * 10 + digit;
+      if (contourIndex < contours.length) {
+        int channel = settings.getChannel();
+        int midiNote = contours[contourIndex];
+        digitAction.onDigit(channel, midiNote);
       }
     }
   }
