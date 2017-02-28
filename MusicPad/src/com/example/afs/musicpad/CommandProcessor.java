@@ -281,7 +281,7 @@ public class CommandProcessor extends Task {
             Map<ChordType, String> chordToKey = settings.getChordToKey();
             displayChordLyrics(line, chords, chordToKey);
           } else if (contourToKey != null) {
-            TreeSet<Contour> contours = currentSong.getContours()[settings.getChannel()];
+            TreeSet<Contour> contours = currentSong.getContours(settings.getChannel());
             displayContourLyrics(line, contours, contourToKey);
           }
         }
@@ -344,7 +344,7 @@ public class CommandProcessor extends Task {
 
   private void doSelectContour(int deviceId, int channel) {
     if (currentSong != null) {
-      TreeSet<Contour> contours = currentSong.getContours()[channel];
+      TreeSet<Contour> contours = currentSong.getContours(channel);
       Set<Integer> contourSet = new HashSet<>();
       for (Contour contour : contours) {
         int midiNote = contour.getMidiNote();
@@ -453,7 +453,7 @@ public class CommandProcessor extends Task {
           } catch (InterruptedException e) {
             throw new RuntimeException(e);
           }
-          digitAction.onDigit(channel, semitone);
+          digitAction.onDigit(channel, OCTAVE_BASE + semitone);
         }
       }
     } else if (contours != null) {
@@ -468,11 +468,11 @@ public class CommandProcessor extends Task {
   }
 
   private void OnDigitPressed(int deviceId, int digit) {
-    OnDigit(deviceId, digit, (channel, semitone) -> synthesizer.pressKey(channel, OCTAVE_BASE + semitone, 92));
+    OnDigit(deviceId, digit, (channel, semitone) -> synthesizer.pressKey(channel, semitone, 92));
   }
 
   private void OnDigitReleased(int deviceId, int digit) {
-    OnDigit(deviceId, digit, (channel, semitone) -> synthesizer.releaseKey(channel, OCTAVE_BASE + semitone));
+    OnDigit(deviceId, digit, (channel, semitone) -> synthesizer.releaseKey(channel, semitone));
   }
 
   private void onPageLeft(int deviceId) {

@@ -45,6 +45,7 @@ public class Group {
     private long gapTicks;
     private long previousTick;
     private long concurrentTicks;
+    private NoteProperties currentHighestNote;
     private TreeSet<Contour> contour = new TreeSet<>();
     private Map<Integer, NoteProperties> groupNotes = new HashMap<>();
 
@@ -56,8 +57,16 @@ public class Group {
       return contour;
     }
 
+    public NoteProperties getCurrentHighestNote() {
+      return currentHighestNote;
+    }
+
     public long getGapTicks() {
       return gapTicks;
+    }
+
+    public Map<Integer, NoteProperties> getGroupNotes() {
+      return groupNotes;
     }
 
     public long getPreviousTick() {
@@ -66,6 +75,10 @@ public class Group {
 
     public void setConcurrentTicks(long concurrentTicks) {
       this.concurrentTicks = concurrentTicks;
+    }
+
+    public void setCurrentHighestNote(NoteProperties currentHighestNote) {
+      this.currentHighestNote = currentHighestNote;
     }
 
     public void setGapTicks(long gapTicks) {
@@ -78,8 +91,6 @@ public class Group {
   }
 
   private Details[] channelDetails = new Details[Midi.CHANNELS];
-  private NoteProperties currentHighestNote;
-  private long lastTick;
 
   public Group() {
     for (int i = 0; i < Midi.CHANNELS; i++) {
@@ -91,8 +102,9 @@ public class Group {
     Details details = channelDetails[channel];
     NoteProperties noteProperties = new NoteProperties(tick, midiNote, instrument, velocity);
     updateUtilizationOnAdd(tick, details);
-    details.groupNotes.put(midiNote, noteProperties);
+    details.getGroupNotes().put(midiNote, noteProperties);
     updateContour(tick, details);
+    details.setPreviousTick(tick);
   }
 
   public boolean allNotesAreOff(int channel) {
@@ -132,8 +144,9 @@ public class Group {
   public void remove(long tick, int channel, int midiNote) {
     Details details = channelDetails[channel];
     updateUtilizationOnRemove(tick, details);
-    details.groupNotes.remove(midiNote);
+    details.getGroupNotes().remove(midiNote);
     updateContour(tick, details);
+    details.setPreviousTick(tick);
   }
 
   private NoteProperties findHighestNote(Map<Integer, NoteProperties> groupNotes, long tick) {
@@ -147,32 +160,29 @@ public class Group {
   }
 
   private void updateContour(long tick, Details details) {
-    NoteProperties highestNote = findHighestNote(details.groupNotes, tick);
-    if (highestNote != currentHighestNote) {
-      if (currentHighestNote != null) {
-        long duration = tick - lastTick;
+    NoteProperties highestNote = findHighestNote(details.getGroupNotes(), tick);
+    if (highestNote != details.getCurrentHighestNote()) {
+      if (details.getCurrentHighestNote() != null) {
+        long duration = tick - details.getPreviousTick();
         if (duration > Default.TICKS_PER_BEAT / 8) {
-          details.getContour().add(new Contour(lastTick, currentHighestNote.getMidiNote(), duration));
+          details.getContour().add(new Contour(details.getPreviousTick(), details.getCurrentHighestNote().getMidiNote(), duration));
         }
       }
-      lastTick = tick;
-      currentHighestNote = highestNote;
+      details.setCurrentHighestNote(highestNote);
     }
   }
 
   private void updateUtilizationOnAdd(long tick, Details details) {
-    int activeNoteCount = details.groupNotes.size();
+    int activeNoteCount = details.getGroupNotes().size();
     if (activeNoteCount == 0) {
       details.setGapTicks(details.getGapTicks() + tick - details.getPreviousTick());
     } else {
       details.setConcurrentTicks(details.getConcurrentTicks() + activeNoteCount * (tick - details.getPreviousTick()));
     }
-    details.setPreviousTick(tick);
   }
 
   private void updateUtilizationOnRemove(long tick, Details details) {
-    int activeNoteCount = details.groupNotes.size();
+    int activeNoteCount = details.getGroupNotes().size();
     details.setConcurrentTicks(details.getConcurrentTicks() + activeNoteCount * (tick - details.getPreviousTick()));
-    details.setPreviousTick(tick);
   }
 }
