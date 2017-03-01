@@ -10,7 +10,6 @@
 package com.example.afs.musicpad;
 
 import com.example.afs.fluidsynth.FluidSynth;
-import com.example.afs.musicpad.song.MusicLibrary;
 import com.example.afs.musicpad.util.MessageBroker;
 
 public class MusicPad {

@@ -7,13 +7,18 @@
 // This program is made available on an "as is" basis, without
 // warranties or conditions of any kind, either express or implied.
 
-package com.example.afs.musicpad.song;
+package com.example.afs.musicpad.parser;
 
 import java.util.NavigableMap;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import com.example.afs.musicpad.song.MidiParser.Listener;
+import com.example.afs.musicpad.song.Contour;
+import com.example.afs.musicpad.song.Default;
+import com.example.afs.musicpad.song.Line;
+import com.example.afs.musicpad.song.Note;
+import com.example.afs.musicpad.song.Song;
+import com.example.afs.musicpad.song.Word;
 
 public class SongListener implements Listener {
 

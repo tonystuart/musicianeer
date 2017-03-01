@@ -1,6 +1,6 @@
 package com.example.afs.musicpad.analyzer;
 
-import com.example.afs.musicpad.song.Midi;
+import com.example.afs.musicpad.midi.Midi;
 
 public final class KeySignature {
   private String notes;

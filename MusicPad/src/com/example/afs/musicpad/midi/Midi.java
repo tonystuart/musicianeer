@@ -7,7 +7,7 @@
 // This program is made available on an "as is" basis, without
 // warranties or conditions of any kind, either express or implied.
 
-package com.example.afs.musicpad.song;
+package com.example.afs.musicpad.midi;
 
 // See https://www.midi.org/specifications/item/gm-level-1-sound-set
 

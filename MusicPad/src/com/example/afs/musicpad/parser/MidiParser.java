@@ -1,8 +1,7 @@
-package com.example.afs.musicpad.song;
+package com.example.afs.musicpad.parser;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.TreeSet;
 
 import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.MetaMessage;
@@ -13,32 +12,26 @@ import javax.sound.midi.Sequence;
 import javax.sound.midi.ShortMessage;
 import javax.sound.midi.Track;
 
-import com.example.afs.musicpad.song.Group.NoteProperties;
+import com.example.afs.musicpad.midi.Midi;
 
 public class MidiParser {
 
-  public interface Listener {
+  public static class ChannelDetails {
+    private Detail[] details = new Detail[Midi.CHANNELS];
 
-    void onBegin(String fileName);
+    public ChannelDetails() {
+      for (int i = 0; i < details.length; i++) {
+        details[i] = new Detail();
+      }
+    }
 
-    void onConcurrency(int channel, int concurrency);
+    public Detail getDetail(int channel) {
+      return details[channel];
+    }
 
-    void onContour(int channel, TreeSet<Contour> contour);
-
-    void onEnd(String fileName);
-
-    void onLyrics(long tick, String lyrics);
-
-    void onNote(long tick, int channel, int note, int velocity, long duration, int instrument, int group);
-
-    void onOccupancy(int channel, int occupancy);
-
-    void onTempoChange(long tick, int usecPerQuarterNote, int quarterNotesPerMinute);
-
-    void onText(long tick, String text);
-
-    void onTimeSignatureChange(long tick, int beatsPerMeasure, int beatUnit);
-
+    public NoteProperties getNoteProperties(int channel, int midiNote) {
+      return details[channel].getNoteProperties(midiNote);
+    }
   }
 
   private static final int USEC_PER_MINUTE = 60000000;
@@ -47,7 +40,7 @@ public class MidiParser {
   private Listener listener;
   private int defaultResolution;
   private int[] instruments = new int[Midi.CHANNELS];
-  private Group group = new Group();
+  private ChannelDetails channelDetails = new ChannelDetails();
 
   public MidiParser(Listener listener, int defaultResolution) {
     this.listener = listener;
@@ -61,9 +54,10 @@ public class MidiParser {
       listener.onBegin(fileName);
       parse(sequence);
       for (int channel = 0; channel < Midi.CHANNELS; channel++) {
-        listener.onOccupancy(channel, group.getOccupancy(channel));
-        listener.onConcurrency(channel, group.getConcurrency(channel));
-        listener.onContour(channel, group.getContour(channel));
+        Detail detail = channelDetails.getDetail(channel);
+        listener.onOccupancy(channel, detail.getOccupancy());
+        listener.onConcurrency(channel, detail.getConcurrency());
+        listener.onContour(channel, detail.getContour());
       }
       listener.onEnd(fileName);
     } catch (InvalidMidiDataException | IOException e) {
@@ -120,7 +114,7 @@ public class MidiParser {
   private void processNoteOff(long tick, ShortMessage message) {
     int channel = message.getChannel();
     int note = message.getData1();
-    NoteProperties noteProperties = group.get(channel, note);
+    NoteProperties noteProperties = channelDetails.getNoteProperties(channel, note);
     if (noteProperties != null) {
       int instrument = noteProperties.getInstrument();
       int velocity = noteProperties.getVelocity();
@@ -128,8 +122,9 @@ public class MidiParser {
       long duration = tick - start;
       if (duration > 0) {
         listener.onNote(start, channel, note, velocity, duration, instrument, groupIndex);
-        group.remove(tick, channel, note);
-        if (group.allNotesAreOff(channel)) {
+        Detail detail = channelDetails.getDetail(channel);
+        detail.remove(tick, note);
+        if (detail.allNotesAreOff()) {
           groupIndex++;
         }
       }
@@ -144,10 +139,11 @@ public class MidiParser {
       processNoteOff(tick, message);
       return;
     }
-    if (group.get(channel, note) != null) {
+    Detail detail = channelDetails.getDetail(channel);
+    if (detail.get(note) != null) {
       processNoteOff(tick, message);
     }
-    group.add(tick, channel, note, velocity, instruments[channel]);
+    detail.add(tick, note, velocity, instruments[channel]);
   }
 
   private void processShortMessage(long tick, ShortMessage message) {

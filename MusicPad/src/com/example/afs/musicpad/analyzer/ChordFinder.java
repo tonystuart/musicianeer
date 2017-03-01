@@ -16,9 +16,9 @@ import java.util.List;
 import java.util.NavigableSet;
 import java.util.TreeSet;
 
+import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.song.Default;
 import com.example.afs.musicpad.song.Item;
-import com.example.afs.musicpad.song.Midi;
 import com.example.afs.musicpad.song.Note;
 import com.example.afs.musicpad.util.DirectList;
 import com.example.afs.musicpad.util.RandomAccessList;

@@ -7,9 +7,12 @@
 // This program is made available on an "as is" basis, without
 // warranties or conditions of any kind, either express or implied.
 
-package com.example.afs.musicpad.song;
+package com.example.afs.musicpad.parser;
 
 import java.io.File;
+
+import com.example.afs.musicpad.song.Default;
+import com.example.afs.musicpad.song.Song;
 
 public class SongBuilder {
 

@@ -9,7 +9,7 @@
 
 package com.example.afs.musicpad.analyzer;
 
-import com.example.afs.musicpad.song.Instruments;
+import com.example.afs.musicpad.midi.Instruments;
 
 public class Names {
 

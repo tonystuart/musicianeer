@@ -14,6 +14,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import com.example.afs.musicpad.midi.Instruments;
+import com.example.afs.musicpad.midi.Midi;
+
 public class ChannelPrograms {
 
   public static class ChannelProgram {

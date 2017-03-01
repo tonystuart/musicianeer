@@ -10,6 +10,7 @@
 package com.example.afs.musicpad.song;
 
 import com.example.afs.musicpad.analyzer.Names;
+import com.example.afs.musicpad.midi.Midi;
 
 public class Note extends Item<Note> {
 
