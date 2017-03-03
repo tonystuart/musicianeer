@@ -38,7 +38,7 @@ public class Contour extends Item<Contour> {
 
   @Override
   public String toString() {
-    return "Contour [tick=" + tick + ", note=" + midiNote + ", duration=" + duration + "]";
+    return "Contour [tick=" + tick + ", midiNote=" + midiNote + ", duration=" + duration + "]";
   }
 
 }

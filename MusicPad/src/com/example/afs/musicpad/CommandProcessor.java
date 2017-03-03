@@ -209,7 +209,7 @@ public class CommandProcessor extends Task {
         lastTick = (tick / ticksPerMeasure) * ticksPerMeasure - gap;
       }
 
-      NavigableSet<Chord> wordChords = chords.subSet(new Chord(lastTick), false, new Chord(tick), true);
+      NavigableSet<Chord> wordChords = chords.subSet(new Chord(lastTick), false, new Chord(tick + gap), true);
       for (Chord chord : wordChords) {
         ChordType chordType = chord.getChordType();
         if (chordType != lastChordType) {
@@ -247,7 +247,7 @@ public class CommandProcessor extends Task {
         lastTick = (tick / ticksPerMeasure) * ticksPerMeasure - gap;
       }
 
-      NavigableSet<Contour> wordContours = contours.subSet(new Contour(lastTick), false, new Contour(tick), true);
+      NavigableSet<Contour> wordContours = contours.subSet(new Contour(lastTick), false, new Contour(tick + gap), true);
       for (Contour contour : wordContours) {
         int midiNote = contour.getMidiNote();
         String key = contourToKey.get(midiNote);
@@ -486,6 +486,7 @@ public class CommandProcessor extends Task {
   private void onPageRight(int deviceId) {
     Settings settings = deviceSettings.get(deviceId);
     int page = settings.getPage();
+    // TODO: Handle contour too
     int limit = settings.getKeyToChord().length / 10;
     if (page < limit) {
       settings.setPage(page + 1);

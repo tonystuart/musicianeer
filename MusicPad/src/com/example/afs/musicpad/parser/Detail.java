@@ -16,6 +16,7 @@ public class Detail {
   private TreeSet<Contour> contour = new TreeSet<>();
   private Map<Integer, ActiveNote> activeNotes = new HashMap<>();
   private int program;
+  private long xtick;
 
   public void add(long tick, int midiNote, int velocity) {
     int activeNoteCount = activeNotes.size();
@@ -26,15 +27,7 @@ public class Detail {
       concurrentTicks = concurrentTicks + activeNoteCount * deltaTick;
     }
     activeNotes.put(midiNote, new ActiveNote(tick, midiNote, program, velocity));
-    ActiveNote highestNote = findHighestNote(activeNotes);
-    if (highestNote != contourNote) {
-      if (contourNote != null) {
-        if (deltaTick > Default.TICKS_PER_BEAT / 8) {
-          contour.add(new Contour(previousTick, contourNote.getMidiNote(), deltaTick));
-        }
-      }
-      contourNote = highestNote;
-    }
+    updateContour(tick);
     previousTick = tick;
   }
 
@@ -43,6 +36,10 @@ public class Detail {
   }
 
   public ActiveNote get(int midiNote) {
+    return activeNotes.get(midiNote);
+  }
+
+  public ActiveNote getActiveNote(int midiNote) {
     return activeNotes.get(midiNote);
   }
 
@@ -60,10 +57,6 @@ public class Detail {
     return contour;
   }
 
-  public ActiveNote getActiveNote(int midiNote) {
-    return activeNotes.get(midiNote);
-  }
-
   public int getOccupancy() {
     int occupancy = 0;
     long totalTicks = previousTick;
@@ -79,15 +72,7 @@ public class Detail {
     int activeNoteCount = activeNotes.size();
     concurrentTicks = concurrentTicks + activeNoteCount * deltaTick;
     activeNotes.remove(midiNote);
-    ActiveNote highestNote = findHighestNote(activeNotes);
-    if (highestNote != contourNote) {
-      if (contourNote != null) {
-        if (deltaTick > Default.TICKS_PER_BEAT / 8) {
-          contour.add(new Contour(previousTick, contourNote.getMidiNote(), deltaTick));
-        }
-      }
-      contourNote = highestNote;
-    }
+    updateContour(tick);
     previousTick = tick;
   }
 
@@ -103,5 +88,19 @@ public class Detail {
       }
     }
     return highestNote;
+  }
+
+  private void updateContour(long tick) {
+    ActiveNote highestNote = findHighestNote(activeNotes);
+    if (highestNote != contourNote) {
+      if (contourNote != null) {
+        long xduration = tick - xtick;
+        if (xduration > Default.TICKS_PER_BEAT / 8) {
+          contour.add(new Contour(xtick, contourNote.getMidiNote(), xduration));
+        }
+      }
+      xtick = tick;
+      contourNote = highestNote;
+    }
   }
 }
