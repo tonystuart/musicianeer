@@ -9,21 +9,21 @@
 
 package com.example.afs.musicpad.parser;
 
-public class NoteProperties {
+public class ActiveNote {
   private long tick;
   private int midiNote;
-  private int instrument;
+  private int program;
   private int velocity;
 
-  public NoteProperties(long tick, int midiNote, int instrument, int velocity) {
+  public ActiveNote(long tick, int midiNote, int program, int velocity) {
     this.tick = tick;
     this.midiNote = midiNote;
-    this.instrument = instrument;
+    this.program = program;
     this.velocity = velocity;
   }
 
-  public int getInstrument() {
-    return instrument;
+  public int getProgram() {
+    return program;
   }
 
   public int getMidiNote() {
@@ -40,6 +40,6 @@ public class NoteProperties {
 
   @Override
   public String toString() {
-    return "NoteProperties [tick=" + tick + ", midiNote=" + midiNote + ", instrument=" + instrument + ", velocity=" + velocity + "]";
+    return "NoteProperties [tick=" + tick + ", midiNote=" + midiNote + ", program=" + program + ", velocity=" + velocity + "]";
   }
 }

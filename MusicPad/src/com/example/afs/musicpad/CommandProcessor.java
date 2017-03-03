@@ -396,6 +396,7 @@ public class CommandProcessor extends Task {
       System.out.println("Selecting #" + songNumber + ": " + currentSong.getName());
       Analyzer.displaySemitoneCounts(currentSong);
       Analyzer.displayKey(currentSong);
+      Analyzer.displayDrumCounts(currentSong);
     } else {
       System.out.println("Song " + songNumber + " is out of range");
     }

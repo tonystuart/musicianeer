@@ -21,7 +21,6 @@ public class SongBuilder {
     SongListener songListener = new SongListener(song);
     MidiParser midiParser = new MidiParser(songListener, Default.TICKS_PER_BEAT);
     midiParser.parse(file.getPath());
-    song.resetModificationCount();
     return song;
   }
 

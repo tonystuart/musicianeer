@@ -22,60 +22,14 @@ import com.example.afs.musicpad.song.Word;
 
 public class SongListener implements Listener {
 
-  public static class Tempo {
-    private int usecPerQuarterNote;
-    private int quarterNotesPerMinute;
-
-    public Tempo(int usecPerQuarterNote, int quarterNotesPerMinute) {
-      this.usecPerQuarterNote = usecPerQuarterNote;
-      this.quarterNotesPerMinute = quarterNotesPerMinute;
-    }
-
-    public int getQuarterNotesPerMinute() {
-      return quarterNotesPerMinute;
-    }
-
-    public int getUsecPerQuarterNote() {
-      return usecPerQuarterNote;
-    }
-
-    @Override
-    public String toString() {
-      return "Tempo [usecPerQuarterNote=" + usecPerQuarterNote + ", quarterNotesPerMinute=" + quarterNotesPerMinute + "]";
-    }
-  }
-
-  public static class TimeSignature {
-    private int beatsPerMeasure;
-    private int beatUnit;
-
-    public TimeSignature(int beatsPerMeasure, int beatUnit) {
-      this.beatsPerMeasure = beatsPerMeasure;
-      this.beatUnit = beatUnit;
-    }
-
-    public int getBeatsPerMeasure() {
-      return beatsPerMeasure;
-    }
-
-    public int getBeatUnit() {
-      return beatUnit;
-    }
-
-    @Override
-    public String toString() {
-      return "TimeSignature [beatsPerMeasure=" + beatsPerMeasure + ", beatUnit=" + beatUnit + "]";
-    }
-  }
-
   private static final Tempo DEFAULT_TEMPO = new Tempo(60000000 / Default.BEATS_PER_MINUTE, Default.BEATS_PER_MINUTE);
   private static final TimeSignature DEFAULT_TIME_SIGNATURE = new TimeSignature(Default.BEATS_PER_MEASURE, Default.BEAT_UNIT);
 
   private Song song;
   private Line line;
+  private long lastTick;
   private NavigableMap<Long, Tempo> tempos = new TreeMap<>();
   private NavigableMap<Long, TimeSignature> timeSignatures = new TreeMap<>();
-  private long lastTick;
 
   public SongListener(Song song) {
     this.song = song;
@@ -108,10 +62,10 @@ public class SongListener implements Listener {
   }
 
   @Override
-  public void onNote(long tick, int channel, int note, int velocity, long duration, int instrument, int group) {
+  public void onNote(long tick, int channel, int midiNote, int velocity, long duration, int program, int group) {
     Tempo tempo = tempos.floorEntry(tick).getValue();
     TimeSignature timeSignature = timeSignatures.floorEntry(tick).getValue();
-    song.add(new Note(tick, channel, note, velocity, duration, instrument, group, tempo.getQuarterNotesPerMinute(), timeSignature.getBeatsPerMeasure(), timeSignature.getBeatUnit()));
+    song.add(new Note(tick, channel, midiNote, velocity, duration, program, group, tempo.getQuarterNotesPerMinute(), timeSignature.getBeatsPerMeasure(), timeSignature.getBeatUnit()));
   }
 
   @Override

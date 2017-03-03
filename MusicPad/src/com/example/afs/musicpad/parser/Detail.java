@@ -12,21 +12,21 @@ public class Detail {
   private long gapTicks;
   private long previousTick;
   private long concurrentTicks;
-  private NoteProperties contourNote;
+  private ActiveNote contourNote;
   private TreeSet<Contour> contour = new TreeSet<>();
-  private Map<Integer, NoteProperties> groupNotes = new HashMap<>();
+  private Map<Integer, ActiveNote> activeNotes = new HashMap<>();
+  private int program;
 
-  public void add(long tick, int midiNote, int velocity, int instrument) {
-    NoteProperties noteProperties = new NoteProperties(tick, midiNote, instrument, velocity);
-    int activeNoteCount = groupNotes.size();
+  public void add(long tick, int midiNote, int velocity) {
+    int activeNoteCount = activeNotes.size();
     long deltaTick = tick - previousTick;
     if (activeNoteCount == 0) {
       gapTicks = gapTicks + deltaTick;
     } else {
       concurrentTicks = concurrentTicks + activeNoteCount * deltaTick;
     }
-    groupNotes.put(midiNote, noteProperties);
-    NoteProperties highestNote = findHighestNote(groupNotes);
+    activeNotes.put(midiNote, new ActiveNote(tick, midiNote, program, velocity));
+    ActiveNote highestNote = findHighestNote(activeNotes);
     if (highestNote != contourNote) {
       if (contourNote != null) {
         if (deltaTick > Default.TICKS_PER_BEAT / 8) {
@@ -39,11 +39,11 @@ public class Detail {
   }
 
   public boolean allNotesAreOff() {
-    return groupNotes.size() == 0;
+    return activeNotes.size() == 0;
   }
 
-  public NoteProperties get(int midiNote) {
-    return groupNotes.get(midiNote);
+  public ActiveNote get(int midiNote) {
+    return activeNotes.get(midiNote);
   }
 
   public int getConcurrency() {
@@ -60,8 +60,8 @@ public class Detail {
     return contour;
   }
 
-  public NoteProperties getNoteProperties(int midiNote) {
-    return groupNotes.get(midiNote);
+  public ActiveNote getActiveNote(int midiNote) {
+    return activeNotes.get(midiNote);
   }
 
   public int getOccupancy() {
@@ -76,10 +76,10 @@ public class Detail {
 
   public void remove(long tick, int midiNote) {
     long deltaTick = tick - previousTick;
-    int activeNoteCount = groupNotes.size();
+    int activeNoteCount = activeNotes.size();
     concurrentTicks = concurrentTicks + activeNoteCount * deltaTick;
-    groupNotes.remove(midiNote);
-    NoteProperties highestNote = findHighestNote(groupNotes);
+    activeNotes.remove(midiNote);
+    ActiveNote highestNote = findHighestNote(activeNotes);
     if (highestNote != contourNote) {
       if (contourNote != null) {
         if (deltaTick > Default.TICKS_PER_BEAT / 8) {
@@ -91,9 +91,13 @@ public class Detail {
     previousTick = tick;
   }
 
-  private NoteProperties findHighestNote(Map<Integer, NoteProperties> groupNotes) {
-    NoteProperties highestNote = null;
-    for (NoteProperties tickEvent : groupNotes.values()) {
+  public void setProgram(int program) {
+    this.program = program;
+  }
+
+  private ActiveNote findHighestNote(Map<Integer, ActiveNote> groupNotes) {
+    ActiveNote highestNote = null;
+    for (ActiveNote tickEvent : groupNotes.values()) {
       if (highestNote == null || tickEvent.getMidiNote() > highestNote.getMidiNote()) {
         highestNote = tickEvent;
       }

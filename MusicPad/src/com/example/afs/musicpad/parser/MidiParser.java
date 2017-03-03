@@ -16,30 +16,11 @@ import com.example.afs.musicpad.midi.Midi;
 
 public class MidiParser {
 
-  public static class ChannelDetails {
-    private Detail[] details = new Detail[Midi.CHANNELS];
-
-    public ChannelDetails() {
-      for (int i = 0; i < details.length; i++) {
-        details[i] = new Detail();
-      }
-    }
-
-    public Detail getDetail(int channel) {
-      return details[channel];
-    }
-
-    public NoteProperties getNoteProperties(int channel, int midiNote) {
-      return details[channel].getNoteProperties(midiNote);
-    }
-  }
-
   private static final int USEC_PER_MINUTE = 60000000;
 
   private int groupIndex;
   private Listener listener;
   private int defaultResolution;
-  private int[] instruments = new int[Midi.CHANNELS];
   private ChannelDetails channelDetails = new ChannelDetails();
 
   public MidiParser(Listener listener, int defaultResolution) {
@@ -113,17 +94,17 @@ public class MidiParser {
 
   private void processNoteOff(long tick, ShortMessage message) {
     int channel = message.getChannel();
-    int note = message.getData1();
-    NoteProperties noteProperties = channelDetails.getNoteProperties(channel, note);
-    if (noteProperties != null) {
-      int instrument = noteProperties.getInstrument();
-      int velocity = noteProperties.getVelocity();
-      long start = noteProperties.getTick();
+    int midiNote = message.getData1();
+    Detail detail = channelDetails.getDetail(channel);
+    ActiveNote activeNote = detail.getActiveNote(midiNote);
+    if (activeNote != null) {
+      int program = activeNote.getProgram();
+      int velocity = activeNote.getVelocity();
+      long start = activeNote.getTick();
       long duration = tick - start;
       if (duration > 0) {
-        listener.onNote(start, channel, note, velocity, duration, instrument, groupIndex);
-        Detail detail = channelDetails.getDetail(channel);
-        detail.remove(tick, note);
+        listener.onNote(start, channel, midiNote, velocity, duration, program, groupIndex);
+        detail.remove(tick, midiNote);
         if (detail.allNotesAreOff()) {
           groupIndex++;
         }
@@ -132,7 +113,7 @@ public class MidiParser {
   }
 
   private void processNoteOn(long tick, ShortMessage message) {
-    int note = message.getData1();
+    int midiNote = message.getData1();
     int velocity = message.getData2();
     int channel = message.getChannel();
     if (velocity == 0) {
@@ -140,10 +121,10 @@ public class MidiParser {
       return;
     }
     Detail detail = channelDetails.getDetail(channel);
-    if (detail.get(note) != null) {
+    if (detail.get(midiNote) != null) {
       processNoteOff(tick, message);
     }
-    detail.add(tick, note, velocity, instruments[channel]);
+    detail.add(tick, midiNote, velocity);
   }
 
   private void processShortMessage(long tick, ShortMessage message) {
@@ -153,9 +134,9 @@ public class MidiParser {
     } else if (command == ShortMessage.NOTE_ON) {
       processNoteOn(tick, message);
     } else if (command == ShortMessage.PROGRAM_CHANGE) {
-      int instrument = message.getData1();
+      int program = message.getData1();
       int channel = message.getChannel();
-      instruments[channel] = instrument;
+      channelDetails.getDetail(channel).setProgram(program);
     }
   }
 
