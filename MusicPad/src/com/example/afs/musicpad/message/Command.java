@@ -9,35 +9,14 @@
 
 package com.example.afs.musicpad.message;
 
-import com.example.afs.musicpad.util.MessageBroker.Message;
+public class Command {
 
-public class Command implements Message {
-
-  private int deviceId;
-  private int command;
-  private int operand;
-
-  public Command(int deviceId, int command, int operand) {
-    this.deviceId = deviceId;
-    this.command = command;
-    this.operand = operand;
-  }
-
-  public int getCommand() {
-    return command;
-  }
-
-  public int getDeviceId() {
-    return deviceId;
-  }
-
-  public int getOperand() {
-    return operand;
-  }
-
-  @Override
-  public String toString() {
-    return "Command [deviceId=" + deviceId + ", command=" + command + ", operand=" + operand + "]";
-  }
+  public static final int LIST_SONGS = 1;
+  public static final int SELECT_SONG = 2;
+  public static final int SELECT_NOTES = 3;
+  public static final int SELECT_CHORDS = 4;
+  public static final int SELECT_PROGRAM = 5;
+  public static final int PLAY = 6;
+  public static final int STOP = 7;
 
 }

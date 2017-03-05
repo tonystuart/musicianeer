@@ -9,20 +9,13 @@
 
 package com.example.afs.musicpad.message;
 
-import com.example.afs.musicpad.util.MessageBroker.Message;
 
 public class DigitPressed implements Message {
 
-  private int deviceId;
   private int digit;
 
-  public DigitPressed(int deviceId, int digit) {
-    this.deviceId = deviceId;
+  public DigitPressed(int digit) {
     this.digit = digit;
-  }
-
-  public int getDeviceId() {
-    return deviceId;
   }
 
   public int getDigit() {
@@ -31,7 +24,7 @@ public class DigitPressed implements Message {
 
   @Override
   public String toString() {
-    return "DigitPressed [deviceId=" + deviceId + ", digit=" + digit + "]";
+    return "DigitPressed [digit=" + digit + "]";
   }
 
 }

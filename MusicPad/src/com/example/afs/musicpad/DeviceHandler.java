@@ -9,250 +9,212 @@
 
 package com.example.afs.musicpad;
 
-import java.io.FileDescriptor;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.lang.reflect.Field;
+import java.util.Map;
+import java.util.NavigableSet;
+import java.util.TreeSet;
 
-import com.example.afs.fluidsynth.FluidSynth;
-import com.example.afs.musicpad.message.BendDown;
-import com.example.afs.musicpad.message.BendUp;
+import com.example.afs.fluidsynth.Synthesizer;
+import com.example.afs.musicpad.analyzer.ChordFinder.Chord;
+import com.example.afs.musicpad.analyzer.ChordFinder.ChordType;
+import com.example.afs.musicpad.analyzer.Names;
 import com.example.afs.musicpad.message.Command;
+import com.example.afs.musicpad.message.CommandEntered;
+import com.example.afs.musicpad.message.CommandForwarded;
 import com.example.afs.musicpad.message.DigitPressed;
 import com.example.afs.musicpad.message.DigitReleased;
-import com.example.afs.musicpad.message.PageDown;
-import com.example.afs.musicpad.message.PageLeft;
-import com.example.afs.musicpad.message.PageRight;
-import com.example.afs.musicpad.message.PageUp;
-import com.example.afs.musicpad.util.ByteArray;
-import com.example.afs.musicpad.util.MessageBroker;
-import com.example.afs.musicpad.util.MessageBroker.Message;
-import com.example.afs.musicpad.util.Task;
+import com.example.afs.musicpad.message.KeyPressed;
+import com.example.afs.musicpad.message.Message;
+import com.example.afs.musicpad.message.SongSelected;
+import com.example.afs.musicpad.player.ChordPlayer;
+import com.example.afs.musicpad.player.NotePlayer;
+import com.example.afs.musicpad.player.Player;
+import com.example.afs.musicpad.player.Player.Action;
+import com.example.afs.musicpad.song.Contour;
+import com.example.afs.musicpad.song.Default;
+import com.example.afs.musicpad.song.Line;
+import com.example.afs.musicpad.song.Song;
+import com.example.afs.musicpad.song.Word;
+import com.example.afs.musicpad.util.Broker;
+import com.example.afs.musicpad.util.BrokerTask;
+import com.example.afs.musicpad.util.RandomAccessList;
 
-// See /usr/include/linux/input.h
-// See https://www.kernel.org/doc/Documentation/input/input.txt
+public class DeviceHandler extends BrokerTask<Message> {
 
-public class DeviceHandler extends Task {
+  public interface DigitAction {
+    void onDigit(int channel, int semitone);
+  }
 
-  private static final int EV_KEY = 0x01;
-  private static final char NUM_LOCK = 'a';
-  private static final char BACK_SPACE = 'b';
-  private static final char ENTER = 'c';
-  private static final int MAX_LENGTH = 5;
+  private Player player;
+  private Song currentSong;
+  private Synthesizer synthesizer;
+  private DeviceReader deviceReader;
 
-  private int deviceId;
-  private String deviceName;
-  private Thread deviceReader;
-
-  private StringBuilder left = new StringBuilder();
-  private StringBuilder right = new StringBuilder();
-  private StringBuilder currentField;
-
-  protected DeviceHandler(MessageBroker messageBroker, int deviceId, String deviceName) {
+  protected DeviceHandler(Broker<Message> messageBroker, Synthesizer synthesizer, String deviceName) {
     super(messageBroker);
-    this.deviceId = deviceId;
-    this.deviceName = deviceName;
+    this.synthesizer = synthesizer;
+    this.deviceReader = new DeviceReader(getInputQueue(), deviceName);
+    delegate(CommandEntered.class, message -> onCommand(message.getCommand(), message.getParameter()));
+    delegate(KeyPressed.class, message -> OnKeyPressed(message.getKey()));
+    delegate(DigitPressed.class, message -> OnDigitPressed(message.getDigit()));
+    delegate(DigitReleased.class, message -> OnDigitReleased(message.getDigit()));
+    subscribe(SongSelected.class, message -> OnSongSelected(message.getSong()));
   }
 
   @Override
   public void start() {
     super.start();
-    deviceReader = new Thread(() -> run(), deviceName);
     deviceReader.start();
   }
 
-  private void capture(FileInputStream inputStream, int value) {
-    try {
-      Field f = FileDescriptor.class.getDeclaredField("fd");
-      if (f != null) {
-        f.setAccessible(true);
-        Integer fd = (Integer) f.get(inputStream.getFD());
-        if (fd != null) {
-          FluidSynth.capture(fd, value);
-        }
+  @Override
+  public void terminate() {
+    deviceReader.terminate();
+    super.terminate();
+  }
+
+  private void displayChordLyrics(Line line, TreeSet<Chord> chords, Map<ChordType, String> chordToKey) {
+    long ticksPerMeasure = currentSong.getTicksPerMeasure(1);
+    long gap = ticksPerMeasure / Default.GAP_BEAT_UNIT;
+    long lastTick = -1;
+    ChordType lastChordType = null;
+    RandomAccessList<Word> words = line.getWords();
+    int wordCount = words.size();
+    for (int wordIndex = 0; wordIndex < wordCount; wordIndex++) {
+      Word word = words.get(wordIndex);
+      long tick = word.getTick();
+      if (lastTick == -1) {
+        lastTick = (tick / ticksPerMeasure) * ticksPerMeasure - gap;
       }
-    } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException | IOException e) {
-      throw new RuntimeException(e);
-    }
-  }
 
-  private void clear() {
-    left.setLength(0);
-    right.setLength(0);
-    currentField = null;
-  }
-
-  private char mapKeyCode(short code) {
-    char value = 0;
-    switch (code) {
-    case 69:
-      value = NUM_LOCK;
-      break;
-    case 98:
-      value = '/';
-      break;
-    case 55:
-      value = '*';
-      break;
-    case 14:
-      value = BACK_SPACE;
-      break;
-    case 71:
-      value = '7';
-      break;
-    case 72:
-      value = '8';
-      break;
-    case 73:
-      value = '9';
-      break;
-    case 74:
-      value = '-';
-      break;
-    case 75:
-      value = '4';
-      break;
-    case 76:
-      value = '5';
-      break;
-    case 77:
-      value = '6';
-      break;
-    case 78:
-      value = '+';
-      break;
-    case 79:
-      value = '1';
-      break;
-    case 80:
-      value = '2';
-      break;
-    case 81:
-      value = '3';
-      break;
-    case 96:
-      value = ENTER;
-      break;
-    case 82:
-      value = '0';
-      break;
-    case 83:
-      value = '.';
-    }
-    return value;
-  }
-
-  private void onCancel() {
-    clear();
-  }
-
-  private void onKeyPress(short keyCode) {
-    Message message = null;
-    char charCode = mapKeyCode(keyCode);
-    //System.out.println("onKeyPress: keyCode=" + keyCode + ", charCode=" + charCode);
-    if (currentField == null) {
-      if ('0' <= charCode && charCode <= '9') {
-        message = new DigitPressed(deviceId, charCode - '0');
-      } else if (charCode == '/') {
-        message = new PageUp();
-      } else if (charCode == '*') {
-        message = new PageDown();
-      } else if (charCode == '-') {
-        message = new PageLeft(deviceId);
-      } else if (charCode == '+') {
-        message = new PageRight(deviceId);
-      } else if (charCode == '0') {
-        message = new BendDown(deviceId);
-      } else if (charCode == ENTER) {
-        message = new BendUp(deviceId);
-      } else if (charCode == '.') {
-        currentField = left;
-      }
-    } else {
-      if ('0' <= charCode && charCode <= '9' && currentField.length() < MAX_LENGTH) {
-        currentField.append(charCode);
-        if (currentField == left) {
-          System.out.println("left=" + left);
-        } else {
-          System.out.println("right=" + right);
-        }
-      } else if (charCode == ENTER) {
-        message = onOkay();
-      } else {
-        onCancel();
-      }
-    }
-    if (message != null) {
-      getMessageBroker().publish(message);
-    }
-  }
-
-  private void onKeyRelease(short keyCode) {
-    Message message = null;
-    char charCode = mapKeyCode(keyCode);
-    //System.out.println("onKeyRelease: keyCode=" + keyCode + ", charCode=" + charCode);
-    if (currentField == null) {
-      if ('0' <= charCode && charCode <= '9') {
-        message = new DigitReleased(deviceId, charCode - '0');
-      }
-    }
-    if (message != null) {
-      getMessageBroker().publish(message);
-    }
-  }
-
-  private Message onOkay() {
-    Message message = null;
-    if (currentField == left) {
-      if (left.length() == 0) {
-        left.append("0");
-      }
-      currentField = right;
-    } else {
-      if (right.length() == 0) {
-        right.append("0");
-      }
-      message = new Command(deviceId, parseInteger(left.toString()), parseInteger(right.toString()));
-      clear();
-    }
-    return message;
-  }
-
-  private int parseInteger(String string) {
-    int integer;
-    try {
-      integer = Integer.parseInt(string);
-    } catch (NumberFormatException e) {
-      integer = 0;
-    }
-    return integer;
-  }
-
-  private void run() {
-    try (FileInputStream inputStream = new FileInputStream(deviceName)) {
-      capture(inputStream, 1);
-      byte[] buffer = new byte[16];
-      while (!isTerminated()) {
-        inputStream.read(buffer);
-        short type = ByteArray.toNativeShort(buffer, 8);
-        //System.out.printf("buffer=%s, type=%#x, code=%#x, value=%#x\n", Arrays.toString(buffer), type, code, value);
-        if (type == EV_KEY) {
-          int value = ByteArray.toNativeInteger(buffer, 12);
-          if (value == 0) {
-            short code = ByteArray.toNativeShort(buffer, 10);
-            onKeyRelease(code);
-          } else if (value == 1) {
-            short code = ByteArray.toNativeShort(buffer, 10);
-            onKeyPress(code);
+      NavigableSet<Chord> wordChords = chords.subSet(new Chord(lastTick), false, new Chord(tick + gap), true);
+      for (Chord chord : wordChords) {
+        ChordType chordType = chord.getChordType();
+        if (chordType != lastChordType) {
+          String key = chordToKey.get(chordType);
+          String name = chordType.getName() + "(" + key + ")";
+          if (wordIndex == 0) {
+            System.out.print(name + " ");
+          } else {
+            System.out.print(" " + name);
           }
+          lastChordType = chordType;
         }
       }
-    } catch (FileNotFoundException e) {
-      throw new RuntimeException(e);
-    } catch (IOException e1) {
-      throw new RuntimeException(e1);
+
+      String text = word.getText();
+      if (text.startsWith("/") || text.startsWith("\\")) {
+        text = text.substring(1);
+      }
+      System.out.print(text);
+      lastTick = tick;
     }
+    System.out.println();
+  }
+
+  private void displayContourLyrics(Line line, TreeSet<Contour> contours, Map<Integer, String> contourToKey) {
+    long ticksPerMeasure = currentSong.getTicksPerMeasure(1);
+    long gap = ticksPerMeasure / Default.GAP_BEAT_UNIT;
+    long lastTick = -1;
+    RandomAccessList<Word> words = line.getWords();
+    int wordCount = words.size();
+    for (int wordIndex = 0; wordIndex < wordCount; wordIndex++) {
+      Word word = words.get(wordIndex);
+      long tick = word.getTick();
+      if (lastTick == -1) {
+        lastTick = (tick / ticksPerMeasure) * ticksPerMeasure - gap;
+      }
+
+      NavigableSet<Contour> wordContours = contours.subSet(new Contour(lastTick), false, new Contour(tick + gap), true);
+      for (Contour contour : wordContours) {
+        int midiNote = contour.getMidiNote();
+        String key = contourToKey.get(midiNote);
+        String name = Names.getNoteName(midiNote) + "(" + key + ")";
+        if (wordIndex == 0) {
+          System.out.print(name + " ");
+        } else {
+          System.out.print(" " + name);
+        }
+      }
+
+      String text = word.getText();
+      if (text.startsWith("/") || text.startsWith("\\")) {
+        text = text.substring(1);
+      }
+      System.out.print(text);
+      lastTick = tick;
+    }
+    System.out.println();
+  }
+
+  private void doSelectChords(int channelNumber) {
+    if (currentSong != null) {
+      int channelIndex = channelNumber - 1;
+      player = new ChordPlayer(synthesizer, currentSong, channelIndex);
+    }
+  }
+
+  private void doSelectContour(int channelNumber) {
+    if (currentSong != null) {
+      int channelIndex = channelNumber - 1;
+      player = new NotePlayer(synthesizer, currentSong, channelIndex);
+    }
+  }
+
+  private void doSelectProgram(int programNumber) {
+    if (player != null) {
+      int programIndex = programNumber - 1;
+      player.selectProgram(programIndex);
+    }
+  }
+
+  private void onCommand(int command, int parameter) {
+    System.out.println("CommandProcessor.onCommand: command=" + command + ", parameter=" + parameter);
+    switch (command) {
+    case Command.SELECT_CHORDS:
+      doSelectChords(parameter);
+      break;
+    case Command.SELECT_PROGRAM:
+      doSelectProgram(parameter);
+      break;
+    case Command.SELECT_NOTES:
+      doSelectContour(parameter);
+      break;
+    default:
+      publish(new CommandForwarded(command, parameter));
+      break;
+    }
+  }
+
+  private void OnDigitPressed(int digit) {
+    if (player != null) {
+      player.play(Action.PRESS, digit);
+    }
+  }
+
+  private void OnDigitReleased(int digit) {
+    if (player != null) {
+      player.play(Action.RELEASE, digit);
+    }
+  }
+
+  private void OnKeyPressed(char key) {
+    switch (key) {
+    case '-':
+      if (player != null) {
+        player.selectPreviousPage();
+      }
+      break;
+    case '+':
+      if (player != null) {
+        player.selectNextPage();
+      }
+      break;
+    }
+  }
+
+  private void OnSongSelected(Song song) {
+    currentSong = song;
+    player = null;
   }
 
 }

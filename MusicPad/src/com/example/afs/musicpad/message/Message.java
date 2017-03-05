@@ -9,8 +9,6 @@
 
 package com.example.afs.musicpad.message;
 
-import com.example.afs.musicpad.util.MessageBroker.Message;
-
-public class PageDown implements Message {
+public interface Message {
 
 }

@@ -10,44 +10,38 @@
 package com.example.afs.musicpad;
 
 import java.io.File;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Set;
 
-import com.example.afs.musicpad.message.DeviceAttach;
-import com.example.afs.musicpad.message.DeviceDetach;
-import com.example.afs.musicpad.util.MessageBroker;
-import com.example.afs.musicpad.util.Task;
+import com.example.afs.musicpad.message.DeviceAttached;
+import com.example.afs.musicpad.message.DeviceDetached;
+import com.example.afs.musicpad.message.Message;
+import com.example.afs.musicpad.util.Broker;
+import com.example.afs.musicpad.util.BrokerTask;
 
-public class DeviceWatcher extends Task {
+public class DeviceWatcher extends BrokerTask<Message> {
 
-  private int nextId;
   private Set<String> oldDevices = new HashSet<>();
-  private Map<String, Integer> deviceIds = new HashMap<>();
 
-  public DeviceWatcher(MessageBroker messageBroker) {
+  public DeviceWatcher(Broker<Message> messageBroker) {
     super(messageBroker, 1000);
   }
 
   @Override
-  public void onTimeout() {
+  public void onTimeout() throws InterruptedException {
     Set<String> newDevices = getDevices();
     Iterator<String> oldIterator = oldDevices.iterator();
     while (oldIterator.hasNext()) {
       String oldDevice = oldIterator.next();
       if (!newDevices.contains(oldDevice)) {
-        int deviceId = deviceIds.remove(oldDevice);
-        getMessageBroker().publish(new DeviceDetach(deviceId, oldDevice));
+        publish(new DeviceDetached(oldDevice));
         oldIterator.remove();
       }
     }
     for (String newDevice : newDevices) {
       if (!oldDevices.contains(newDevice)) {
-        int deviceId = nextId++;
-        getMessageBroker().publish(new DeviceAttach(deviceId, newDevice));
-        deviceIds.put(newDevice, deviceId);
+        publish(new DeviceAttached(newDevice));
         oldDevices.add(newDevice);
       }
     }

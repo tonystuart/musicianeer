@@ -12,24 +12,28 @@ package com.example.afs.musicpad;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.example.afs.musicpad.message.DeviceAttach;
-import com.example.afs.musicpad.message.DeviceDetach;
-import com.example.afs.musicpad.util.MessageBroker;
-import com.example.afs.musicpad.util.Task;
+import com.example.afs.fluidsynth.Synthesizer;
+import com.example.afs.musicpad.message.DeviceAttached;
+import com.example.afs.musicpad.message.DeviceDetached;
+import com.example.afs.musicpad.message.Message;
+import com.example.afs.musicpad.util.Broker;
+import com.example.afs.musicpad.util.BrokerTask;
 
-public class DeviceManager extends Task {
+public class DeviceManager extends BrokerTask<Message> {
 
   private Map<String, DeviceHandler> deviceHandlers = new HashMap<>();
+  private Synthesizer synthesizer;
 
-  public DeviceManager(MessageBroker messageBroker) {
+  public DeviceManager(Broker<Message> messageBroker, Synthesizer synthesizer) {
     super(messageBroker);
-    subscribe(DeviceAttach.class, message -> onDeviceAttach(message.getDeviceId(), message.getDevice()));
-    subscribe(DeviceDetach.class, message -> onDeviceDetach(message.getDevice()));
+    this.synthesizer = synthesizer;
+    subscribe(DeviceAttached.class, message -> onDeviceAttach(message.getDevice()));
+    subscribe(DeviceDetached.class, message -> onDeviceDetach(message.getDevice()));
   }
 
-  private void onDeviceAttach(int deviceId, String newDevice) {
+  private void onDeviceAttach(String newDevice) {
     System.out.println("DeviceManager.onDeviceAttach: adding newDevice=" + newDevice);
-    DeviceHandler deviceHandler = new DeviceHandler(getMessageBroker(), deviceId, newDevice);
+    DeviceHandler deviceHandler = new DeviceHandler(getBroker(), synthesizer, newDevice);
     deviceHandlers.put(newDevice, deviceHandler);
     deviceHandler.start();
   }

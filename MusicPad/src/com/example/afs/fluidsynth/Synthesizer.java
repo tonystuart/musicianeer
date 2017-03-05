@@ -9,7 +9,6 @@
 
 package com.example.afs.fluidsynth;
 
-
 public class Synthesizer {
 
   public static class Settings {
@@ -50,6 +49,14 @@ public class Synthesizer {
     synth = FluidSynth.newFluidSynth(settings.getSettings());
     FluidSynth.newFluidAudioDriver(settings.getSettings(), synth);
     FluidSynth.fluidSynthSfload(synth, "/usr/share/sounds/sf2/FluidR3_GM.sf2", 1);
+  }
+
+  public void allNotesOff() {
+    for (int channel = 0; channel < 16; channel++) {
+      for (int key = 0; key < 128; key++) {
+        releaseKey(channel, key);
+      }
+    }
   }
 
   /**

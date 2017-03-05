@@ -9,23 +9,27 @@
 
 package com.example.afs.musicpad.message;
 
-import com.example.afs.musicpad.util.MessageBroker.Message;
+public class CommandEntered implements Message {
 
-public class PageRight implements Message {
+  private int command;
+  private int parameter;
 
-  private int deviceId;
-
-  public PageRight(int deviceId) {
-    this.deviceId = deviceId;
+  public CommandEntered(int command, int parameter) {
+    this.command = command;
+    this.parameter = parameter;
   }
 
-  public int getDeviceId() {
-    return deviceId;
+  public int getCommand() {
+    return command;
+  }
+
+  public int getParameter() {
+    return parameter;
   }
 
   @Override
   public String toString() {
-    return "PageRight [deviceId=" + deviceId + "]";
+    return "CommandEntered [command=" + command + ", parameter=" + parameter + "]";
   }
 
 }

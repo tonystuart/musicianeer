@@ -10,7 +10,9 @@
 package com.example.afs.musicpad;
 
 import com.example.afs.fluidsynth.FluidSynth;
-import com.example.afs.musicpad.util.MessageBroker;
+import com.example.afs.fluidsynth.Synthesizer;
+import com.example.afs.musicpad.message.Message;
+import com.example.afs.musicpad.util.Broker;
 
 public class MusicPad {
 
@@ -24,18 +26,19 @@ public class MusicPad {
     musicPad.start();
   }
 
-  private MessageBroker messageBroker;
+  private Broker<Message> broker;
   private MusicLibrary musicLibrary;
   private DeviceWatcher deviceWatcher;
   private DeviceManager deviceManager;
   private CommandProcessor commandProcessor;
+  private Synthesizer synthesizer = new Synthesizer();
 
   public MusicPad(String libraryPath) {
     this.musicLibrary = new MusicLibrary(libraryPath);
-    this.messageBroker = new MessageBroker();
-    this.commandProcessor = new CommandProcessor(messageBroker, musicLibrary);
-    this.deviceWatcher = new DeviceWatcher(messageBroker);
-    this.deviceManager = new DeviceManager(messageBroker);
+    this.broker = new Broker<Message>();
+    this.deviceWatcher = new DeviceWatcher(broker);
+    this.deviceManager = new DeviceManager(broker, synthesizer);
+    this.commandProcessor = new CommandProcessor(broker, synthesizer, musicLibrary);
   }
 
   private void start() {

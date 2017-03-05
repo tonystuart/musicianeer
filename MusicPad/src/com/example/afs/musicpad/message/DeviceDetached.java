@@ -9,23 +9,20 @@
 
 package com.example.afs.musicpad.message;
 
-import com.example.afs.musicpad.util.MessageBroker.Message;
+public class DeviceDetached implements Message {
+  private String device;
 
-public class PageLeft implements Message {
-
-  private int deviceId;
-
-  public PageLeft(int deviceId) {
-    this.deviceId = deviceId;
+  public DeviceDetached(String device) {
+    this.device = device;
   }
 
-  public int getDeviceId() {
-    return deviceId;
+  public String getDevice() {
+    return device;
   }
 
   @Override
   public String toString() {
-    return "PageLeft [deviceId=" + deviceId + "]";
+    return "DeviceDetached [device=" + device + "]";
   }
 
 }

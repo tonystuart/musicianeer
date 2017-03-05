@@ -9,27 +9,23 @@
 
 package com.example.afs.musicpad.message;
 
-import com.example.afs.musicpad.util.MessageBroker.Message;
+import com.example.afs.musicpad.song.Song;
 
-public class DeviceAttach implements Message {
-  private int deviceId;
-  private String device;
+public class SongSelected implements Message {
 
-  public DeviceAttach(int deviceId, String device) {
-    this.deviceId = deviceId;
-    this.device = device;
+  private Song song;
+
+  public SongSelected(Song song) {
+    this.song = song;
   }
 
-  public String getDevice() {
-    return device;
-  }
-
-  public int getDeviceId() {
-    return deviceId;
+  public Song getSong() {
+    return song;
   }
 
   @Override
   public String toString() {
-    return "DeviceAttach [deviceId=" + deviceId + ", device=" + device + "]";
+    return "SongSelected [song=" + song + "]";
   }
+
 }

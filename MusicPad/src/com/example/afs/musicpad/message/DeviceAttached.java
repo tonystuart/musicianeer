@@ -9,23 +9,19 @@
 
 package com.example.afs.musicpad.message;
 
-import com.example.afs.musicpad.util.MessageBroker.Message;
+public class DeviceAttached implements Message {
+  private String device;
 
-public class BendDown implements Message {
-
-  private int deviceId;
-
-  public BendDown(int deviceId) {
-    this.deviceId = deviceId;
+  public DeviceAttached(String device) {
+    this.device = device;
   }
 
-  public int getDeviceId() {
-    return deviceId;
+  public String getDevice() {
+    return device;
   }
 
   @Override
   public String toString() {
-    return "BendDown [deviceId=" + deviceId + "]";
+    return "DeviceAttached [device=" + device + "]";
   }
-
 }

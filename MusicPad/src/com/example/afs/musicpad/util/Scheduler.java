@@ -7,25 +7,9 @@
 // This program is made available on an "as is" basis, without
 // warranties or conditions of any kind, either express or implied.
 
-package com.example.afs.musicpad.message;
+package com.example.afs.musicpad.util;
 
-import com.example.afs.musicpad.util.MessageBroker.Message;
+public interface Scheduler<T> {
 
-public class BendUp implements Message {
-
-  private int deviceId;
-
-  public BendUp(int deviceId) {
-    this.deviceId = deviceId;
-  }
-
-  public int getDeviceId() {
-    return deviceId;
-  }
-
-  @Override
-  public String toString() {
-    return "BendUp [deviceId=" + deviceId + "]";
-  }
-
+  long getEventTimeMillis(T item);
 }

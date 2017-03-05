@@ -9,8 +9,22 @@
 
 package com.example.afs.musicpad.message;
 
-import com.example.afs.musicpad.util.MessageBroker.Message;
 
-public class PageUp implements Message {
+public class KeyPressed implements Message {
+
+  private char key;
+
+  public KeyPressed(char key) {
+    this.key = key;
+  }
+
+  public char getKey() {
+    return key;
+  }
+
+  @Override
+  public String toString() {
+    return "KeyPressed [key=" + key + "]";
+  }
 
 }

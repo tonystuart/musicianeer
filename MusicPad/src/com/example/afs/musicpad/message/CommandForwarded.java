@@ -9,28 +9,27 @@
 
 package com.example.afs.musicpad.message;
 
-import com.example.afs.musicpad.util.MessageBroker.Message;
+public class CommandForwarded implements Message {
 
-public class DeviceDetach implements Message {
-  private int deviceId;
-  private String device;
+  private int command;
+  private int parameter;
 
-  public DeviceDetach(int deviceId, String device) {
-    this.deviceId = deviceId;
-    this.device = device;
+  public CommandForwarded(int command, int parameter) {
+    this.command = command;
+    this.parameter = parameter;
   }
 
-  public String getDevice() {
-    return device;
+  public int getCommand() {
+    return command;
   }
 
-  public int getDeviceId() {
-    return deviceId;
+  public int getParameter() {
+    return parameter;
   }
 
   @Override
   public String toString() {
-    return "DeviceDetach [deviceId=" + deviceId + ", device=" + device + "]";
+    return "CommandForwarded [command=" + command + ", parameter=" + parameter + "]";
   }
 
 }
