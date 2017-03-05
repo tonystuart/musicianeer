@@ -131,6 +131,14 @@ public class CommandProcessor extends BrokerTask<Message> {
     }
   }
 
+  private void doSetPercentTempo(int percentTempo) {
+    transport.setPercentTempo(percentTempo);
+  }
+
+  private void doSetPercentVolume(int percentVolume) {
+    transport.setPercentVolume(percentVolume);
+  }
+
   private void doStop(int parameter) {
     transport.stop();
   }
@@ -149,6 +157,12 @@ public class CommandProcessor extends BrokerTask<Message> {
       break;
     case Command.STOP:
       doStop(parameter);
+      break;
+    case Command.SET_PERCENT_TEMPO:
+      doSetPercentTempo(parameter);
+      break;
+    case Command.SET_PERCENT_VOLUME:
+      doSetPercentVolume(parameter);
       break;
     }
   }

@@ -25,7 +25,6 @@ public class SongListener implements Listener {
   private static final TimeSignature DEFAULT_TIME_SIGNATURE = new TimeSignature(Default.BEATS_PER_MEASURE, Default.BEAT_UNIT);
 
   private Song song;
-  private long lastTick;
   private NavigableMap<Long, Tempo> tempos = new TreeMap<>();
   private NavigableMap<Long, TimeSignature> timeSignatures = new TreeMap<>();
 

@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.NavigableSet;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -25,10 +26,11 @@ public class NotePlayer extends Player {
 
   private int[] numberToNote;
   private Map<Integer, String> noteToNumber;
+  private TreeSet<Contour> contours;
 
   public NotePlayer(Synthesizer synthesizer, Song song, int channel) {
     super(synthesizer, song, channel);
-    TreeSet<Contour> contours = song.getContours(channel);
+    contours = song.getContours(channel);
     Set<Integer> uniqueNotes = new HashSet<>();
     for (Contour contour : contours) {
       int midiNote = contour.getMidiNote();
@@ -50,7 +52,7 @@ public class NotePlayer extends Player {
     for (int i = 0; i < numberToNote.length; i++) {
       System.out.println(i + " -> " + Names.getNoteName(numberToNote[i]));
     }
-
+    setTitle("Channel " + (channel + 1) + " Notes");
   }
 
   @Override
@@ -65,6 +67,23 @@ public class NotePlayer extends Player {
       int midiNote = numberToNote[index];
       playMidiNote(action, midiNote);
     }
+  }
+
+  @Override
+  protected String getMusic(long firstTick, long lastTick) {
+    StringBuilder s = new StringBuilder();
+    NavigableSet<Contour> tickContours = contours.subSet(new Contour(firstTick), false, new Contour(lastTick), true);
+    if (tickContours.size() > 0) {
+      Contour first = tickContours.first();
+      long firstContourTick = first.getTick();
+      s.append(getIntroTicks(firstTick, firstContourTick));
+      for (Contour contour : tickContours) {
+        int midiNote = contour.getMidiNote();
+        String number = noteToNumber.get(midiNote);
+        s.append(Names.formatNoteName(midiNote) + " (" + number + ") ");
+      }
+    }
+    return s.toString();
   }
 
 }

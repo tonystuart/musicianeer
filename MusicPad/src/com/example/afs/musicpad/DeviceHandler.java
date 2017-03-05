@@ -63,6 +63,9 @@ public class DeviceHandler extends BrokerTask<Message> {
   }
 
   private void doSelectChords(int channelNumber) {
+    if (player != null) {
+      player.close();
+    }
     if (currentSong != null) {
       int channelIndex = channelNumber - 1;
       player = new ChordPlayer(synthesizer, currentSong, channelIndex);
@@ -70,6 +73,9 @@ public class DeviceHandler extends BrokerTask<Message> {
   }
 
   private void doSelectContour(int channelNumber) {
+    if (player != null) {
+      player.close();
+    }
     if (currentSong != null) {
       int channelIndex = channelNumber - 1;
       player = new NotePlayer(synthesizer, currentSong, channelIndex);
@@ -135,7 +141,7 @@ public class DeviceHandler extends BrokerTask<Message> {
 
   private void onTick(long tick) {
     if (player != null) {
-      player.displayMusic(tick);
+      player.displayWordsAndMusic(tick);
     }
   }
 

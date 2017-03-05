@@ -18,5 +18,7 @@ public class Command {
   public static final int SELECT_PROGRAM = 5;
   public static final int PLAY = 6;
   public static final int STOP = 7;
+  public static final int SET_PERCENT_TEMPO = 8;
+  public static final int SET_PERCENT_VOLUME = 9;
 
 }

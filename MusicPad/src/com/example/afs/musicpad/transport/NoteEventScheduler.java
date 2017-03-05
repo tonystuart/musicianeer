@@ -18,6 +18,7 @@ public class NoteEventScheduler implements Scheduler<NoteEvent> {
 
   private long baseTick;
   private long baseTimeMillis;
+  private int percentTempo = 100;
 
   public NoteEventScheduler() {
     this(0);
@@ -39,6 +40,7 @@ public class NoteEventScheduler implements Scheduler<NoteEvent> {
     }
     long noteTick = noteEvent.getTick();
     long deltaTick = noteTick - baseTick;
+    deltaTick = (deltaTick * 100) / percentTempo;
     long deltaMillis = Tick.convertTickToMillis(noteEvent.getNote().getBeatsPerMinute(), deltaTick);
     long eventTimeMillis = baseTimeMillis + deltaMillis;
     // Update base values to handle changes in beats per minute
@@ -47,8 +49,20 @@ public class NoteEventScheduler implements Scheduler<NoteEvent> {
     return eventTimeMillis;
   }
 
+  public int getPercentTempo() {
+    return percentTempo;
+  }
+
+  public void reset() {
+    this.baseTick = 0;
+    this.baseTimeMillis = INITIALIZE_ON_NEXT_EVENT;
+  }
+
   public void setBaseTimeMillis(long baseTimeMillis) {
     this.baseTimeMillis = baseTimeMillis;
   }
 
+  public void setPercentTempo(int percentTempo) {
+    this.percentTempo = percentTempo;
+  }
 }

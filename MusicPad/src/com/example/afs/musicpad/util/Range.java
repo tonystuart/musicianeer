@@ -30,6 +30,11 @@ public class Range {
     int controlRange = controlMaximum - controlMinimum;
     double scaledControlValue = (double) (controlValue - controlMinimum) / controlRange;
     int scaledValue = (int) (dataMinimum + (scaledControlValue * dataRange));
+    if (scaledValue < dataMinimum) {
+      scaledValue = dataMinimum;
+    } else if (scaledValue > dataMaximum) {
+      scaledValue = dataMaximum;
+    }
     System.out.println("control=" + controlValue + " in " + controlMinimum + " to " + controlMaximum + " is " + scaledValue + " in range " + dataMinimum + " to " + dataMaximum);
     return scaledValue;
   }

@@ -9,26 +9,21 @@
 
 package com.example.afs.musicpad.song;
 
-public class Word {
+public class Word extends Item<Word> {
 
-  private long tick;
   private String text;
 
   public Word(long tick) {
-    this.tick = tick;
+    super(tick);
   }
 
   public Word(long tick, String text) {
-    this.tick = tick;
+    super(tick);
     this.text = text;
   }
 
   public String getText() {
     return text;
-  }
-
-  public long getTick() {
-    return tick;
   }
 
   @Override
