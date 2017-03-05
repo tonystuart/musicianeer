@@ -18,14 +18,12 @@ import java.util.TreeSet;
 import com.example.afs.musicpad.midi.Instruments;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.song.Note.NoteBuilder;
-import com.example.afs.musicpad.util.DirectList;
-import com.example.afs.musicpad.util.RandomAccessList;
 
 public class Song {
 
   private String name;
   private TreeSet<Note> notes = new TreeSet<>();
-  private RandomAccessList<Line> lines = new DirectList<>();
+  private TreeSet<Word> words = new TreeSet<>();
   private ChannelFacets channelFacets = new ChannelFacets();
 
   public Song() {
@@ -33,10 +31,6 @@ public class Song {
 
   public Song(String name) {
     this.name = name;
-  }
-
-  public void add(Line line) {
-    lines.add(line);
   }
 
   public void add(Note note) {
@@ -51,6 +45,10 @@ public class Song {
     } else {
       facet.addProgram(program);
     }
+  }
+
+  public void add(Word word) {
+    words.add(word);
   }
 
   public long append(Song newSong) {
@@ -97,10 +95,6 @@ public class Song {
     return length;
   };
 
-  public RandomAccessList<Line> getLines() {
-    return lines;
-  };
-
   public String getName() {
     return name;
   };
@@ -141,6 +135,10 @@ public class Song {
     return ticksPerMeasure;
   };
 
+  public TreeSet<Word> getWords() {
+    return words;
+  };
+
   public long roundTickToNextMeasure(long tick) {
     int ticksPerMeasure = getTicksPerMeasure(tick);
     return ((tick + (ticksPerMeasure - 1)) / ticksPerMeasure) * ticksPerMeasure;
@@ -153,7 +151,7 @@ public class Song {
 
   public void setConcurrency(int channel, int concurrency) {
     channelFacets.getFacet(channel).setConcurrency(concurrency);
-  };
+  }
 
   public void setContour(int channel, TreeSet<Contour> contour) {
     channelFacets.getFacet(channel).setContour(contour);

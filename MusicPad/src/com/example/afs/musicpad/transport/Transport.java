@@ -10,6 +10,8 @@
 package com.example.afs.musicpad.transport;
 
 import com.example.afs.fluidsynth.Synthesizer;
+import com.example.afs.musicpad.message.Message;
+import com.example.afs.musicpad.message.TickOccurred;
 import com.example.afs.musicpad.song.Note;
 import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.transport.NoteEvent.Type;
@@ -33,8 +35,10 @@ public class Transport {
 
   private Synthesizer synthesizer;
   private SequencerTask<NoteEvent> sequencerTask;
+  private Broker<Message> messageBroker;
 
-  public Transport(Synthesizer synthesizer) {
+  public Transport(Broker<Message> messageBroker, Synthesizer synthesizer) {
+    this.messageBroker = messageBroker;
     this.synthesizer = synthesizer;
   }
 
@@ -70,6 +74,7 @@ public class Transport {
       System.out.println(note);
       synthesizer.changeProgram(note.getChannel(), note.getProgram());
       synthesizer.pressKey(note.getChannel(), note.getMidiNote(), note.getVelocity());
+      messageBroker.publish(new TickOccurred(noteEvent.getTick()));
       break;
     default:
       throw new UnsupportedOperationException();

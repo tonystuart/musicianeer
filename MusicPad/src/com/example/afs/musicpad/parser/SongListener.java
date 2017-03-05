@@ -15,7 +15,6 @@ import java.util.TreeSet;
 
 import com.example.afs.musicpad.song.Contour;
 import com.example.afs.musicpad.song.Default;
-import com.example.afs.musicpad.song.Line;
 import com.example.afs.musicpad.song.Note;
 import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.song.Word;
@@ -26,7 +25,6 @@ public class SongListener implements Listener {
   private static final TimeSignature DEFAULT_TIME_SIGNATURE = new TimeSignature(Default.BEATS_PER_MEASURE, Default.BEAT_UNIT);
 
   private Song song;
-  private Line line;
   private long lastTick;
   private NavigableMap<Long, Tempo> tempos = new TreeMap<>();
   private NavigableMap<Long, TimeSignature> timeSignatures = new TreeMap<>();
@@ -53,7 +51,6 @@ public class SongListener implements Listener {
 
   @Override
   public void onEnd(String fileName) {
-    processLineEnd();
   }
 
   @Override
@@ -94,28 +91,7 @@ public class SongListener implements Listener {
   }
 
   private void addWord(long tick, String text) {
-    if (text.startsWith("/") || text.startsWith("\\") || tick < lastTick) {
-      processLineEnd();
-    }
-    if (line == null) {
-      line = new Line(tick);
-    }
-    Word word;
-    if (tick < lastTick) {
-      tick = lastTick + 1;
-      word = new Word(tick, "#" + text);
-    } else {
-      word = new Word(tick, text);
-    }
-    line.add(word);
-    lastTick = tick;
-  }
-
-  private void processLineEnd() {
-    if (line != null) {
-      song.add(line);
-      line = null;
-    }
+    song.add(new Word(tick, text));
   }
 
 }

@@ -9,14 +9,7 @@
 
 package com.example.afs.musicpad;
 
-import java.util.Map;
-import java.util.NavigableSet;
-import java.util.TreeSet;
-
 import com.example.afs.fluidsynth.Synthesizer;
-import com.example.afs.musicpad.analyzer.ChordFinder.Chord;
-import com.example.afs.musicpad.analyzer.ChordFinder.ChordType;
-import com.example.afs.musicpad.analyzer.Names;
 import com.example.afs.musicpad.message.Command;
 import com.example.afs.musicpad.message.CommandEntered;
 import com.example.afs.musicpad.message.CommandForwarded;
@@ -25,18 +18,14 @@ import com.example.afs.musicpad.message.DigitReleased;
 import com.example.afs.musicpad.message.KeyPressed;
 import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.SongSelected;
+import com.example.afs.musicpad.message.TickOccurred;
 import com.example.afs.musicpad.player.ChordPlayer;
 import com.example.afs.musicpad.player.NotePlayer;
 import com.example.afs.musicpad.player.Player;
 import com.example.afs.musicpad.player.Player.Action;
-import com.example.afs.musicpad.song.Contour;
-import com.example.afs.musicpad.song.Default;
-import com.example.afs.musicpad.song.Line;
 import com.example.afs.musicpad.song.Song;
-import com.example.afs.musicpad.song.Word;
 import com.example.afs.musicpad.util.Broker;
 import com.example.afs.musicpad.util.BrokerTask;
-import com.example.afs.musicpad.util.RandomAccessList;
 
 public class DeviceHandler extends BrokerTask<Message> {
 
@@ -54,10 +43,11 @@ public class DeviceHandler extends BrokerTask<Message> {
     this.synthesizer = synthesizer;
     this.deviceReader = new DeviceReader(getInputQueue(), deviceName);
     delegate(CommandEntered.class, message -> onCommand(message.getCommand(), message.getParameter()));
-    delegate(KeyPressed.class, message -> OnKeyPressed(message.getKey()));
-    delegate(DigitPressed.class, message -> OnDigitPressed(message.getDigit()));
-    delegate(DigitReleased.class, message -> OnDigitReleased(message.getDigit()));
+    delegate(KeyPressed.class, message -> onKeyPressed(message.getKey()));
+    delegate(DigitPressed.class, message -> onDigitPressed(message.getDigit()));
+    delegate(DigitReleased.class, message -> onDigitReleased(message.getDigit()));
     subscribe(SongSelected.class, message -> OnSongSelected(message.getSong()));
+    subscribe(TickOccurred.class, message -> onTick(message.getTick()));
   }
 
   @Override
@@ -70,80 +60,6 @@ public class DeviceHandler extends BrokerTask<Message> {
   public void terminate() {
     deviceReader.terminate();
     super.terminate();
-  }
-
-  private void displayChordLyrics(Line line, TreeSet<Chord> chords, Map<ChordType, String> chordToKey) {
-    long ticksPerMeasure = currentSong.getTicksPerMeasure(1);
-    long gap = ticksPerMeasure / Default.GAP_BEAT_UNIT;
-    long lastTick = -1;
-    ChordType lastChordType = null;
-    RandomAccessList<Word> words = line.getWords();
-    int wordCount = words.size();
-    for (int wordIndex = 0; wordIndex < wordCount; wordIndex++) {
-      Word word = words.get(wordIndex);
-      long tick = word.getTick();
-      if (lastTick == -1) {
-        lastTick = (tick / ticksPerMeasure) * ticksPerMeasure - gap;
-      }
-
-      NavigableSet<Chord> wordChords = chords.subSet(new Chord(lastTick), false, new Chord(tick + gap), true);
-      for (Chord chord : wordChords) {
-        ChordType chordType = chord.getChordType();
-        if (chordType != lastChordType) {
-          String key = chordToKey.get(chordType);
-          String name = chordType.getName() + "(" + key + ")";
-          if (wordIndex == 0) {
-            System.out.print(name + " ");
-          } else {
-            System.out.print(" " + name);
-          }
-          lastChordType = chordType;
-        }
-      }
-
-      String text = word.getText();
-      if (text.startsWith("/") || text.startsWith("\\")) {
-        text = text.substring(1);
-      }
-      System.out.print(text);
-      lastTick = tick;
-    }
-    System.out.println();
-  }
-
-  private void displayContourLyrics(Line line, TreeSet<Contour> contours, Map<Integer, String> contourToKey) {
-    long ticksPerMeasure = currentSong.getTicksPerMeasure(1);
-    long gap = ticksPerMeasure / Default.GAP_BEAT_UNIT;
-    long lastTick = -1;
-    RandomAccessList<Word> words = line.getWords();
-    int wordCount = words.size();
-    for (int wordIndex = 0; wordIndex < wordCount; wordIndex++) {
-      Word word = words.get(wordIndex);
-      long tick = word.getTick();
-      if (lastTick == -1) {
-        lastTick = (tick / ticksPerMeasure) * ticksPerMeasure - gap;
-      }
-
-      NavigableSet<Contour> wordContours = contours.subSet(new Contour(lastTick), false, new Contour(tick + gap), true);
-      for (Contour contour : wordContours) {
-        int midiNote = contour.getMidiNote();
-        String key = contourToKey.get(midiNote);
-        String name = Names.getNoteName(midiNote) + "(" + key + ")";
-        if (wordIndex == 0) {
-          System.out.print(name + " ");
-        } else {
-          System.out.print(" " + name);
-        }
-      }
-
-      String text = word.getText();
-      if (text.startsWith("/") || text.startsWith("\\")) {
-        text = text.substring(1);
-      }
-      System.out.print(text);
-      lastTick = tick;
-    }
-    System.out.println();
   }
 
   private void doSelectChords(int channelNumber) {
@@ -185,19 +101,19 @@ public class DeviceHandler extends BrokerTask<Message> {
     }
   }
 
-  private void OnDigitPressed(int digit) {
+  private void onDigitPressed(int digit) {
     if (player != null) {
       player.play(Action.PRESS, digit);
     }
   }
 
-  private void OnDigitReleased(int digit) {
+  private void onDigitReleased(int digit) {
     if (player != null) {
       player.play(Action.RELEASE, digit);
     }
   }
 
-  private void OnKeyPressed(char key) {
+  private void onKeyPressed(char key) {
     switch (key) {
     case '-':
       if (player != null) {
@@ -215,6 +131,12 @@ public class DeviceHandler extends BrokerTask<Message> {
   private void OnSongSelected(Song song) {
     currentSong = song;
     player = null;
+  }
+
+  private void onTick(long tick) {
+    if (player != null) {
+      player.displayMusic(tick);
+    }
   }
 
 }

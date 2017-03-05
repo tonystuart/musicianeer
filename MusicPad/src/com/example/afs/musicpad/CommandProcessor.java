@@ -78,7 +78,7 @@ public class CommandProcessor extends BrokerTask<Message> {
   protected CommandProcessor(Broker<Message> messageBroker, Synthesizer synthesizer, MusicLibrary musicLibrary) {
     super(messageBroker);
     this.musicLibrary = musicLibrary;
-    this.transport = new Transport(synthesizer);
+    this.transport = new Transport(messageBroker, synthesizer);
     subscribe(CommandForwarded.class, message -> onCommand(message.getCommand(), message.getParameter()));
   }
 

@@ -13,26 +13,42 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.NavigableSet;
 import java.util.Set;
 import java.util.TreeSet;
+
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 
 import com.example.afs.fluidsynth.Synthesizer;
 import com.example.afs.musicpad.analyzer.ChordFinder;
 import com.example.afs.musicpad.analyzer.ChordFinder.Chord;
 import com.example.afs.musicpad.analyzer.ChordFinder.ChordType;
+import com.example.afs.musicpad.song.Default;
 import com.example.afs.musicpad.song.Song;
+import com.example.afs.musicpad.song.Word;
 
 public class ChordPlayer extends Player {
 
+  public static class Viewer extends JFrame {
+    public Viewer() {
+      JLabel topLine = new JLabel("Top");
+      JLabel bottomLine = new JLabel("Bottom");
+      JPanel panel = new JPanel();
+    }
+  }
+
   private static final int OCTAVE_BASE = 48;
 
+  private TreeSet<Chord> chords;
   private ChordType[] numberToChord;
   private Map<ChordType, String> chordToNumber;
 
   public ChordPlayer(Synthesizer synthesizer, Song song, int channel) {
     super(synthesizer, song, channel);
     ChordFinder chordFinder = new ChordFinder();
-    TreeSet<Chord> chords = chordFinder.getChords(song.getNotes(), channel);
+    chords = chordFinder.getChords(song.getNotes(), channel);
     Set<ChordType> uniqueChords = new HashSet<>();
     for (Chord chord : chords) {
       ChordType chordType = chord.getChordType();
@@ -54,6 +70,16 @@ public class ChordPlayer extends Player {
     for (int i = 0; i < numberToChord.length; i++) {
       System.out.println(i + " -> " + numberToChord[i].getName());
     }
+  }
+
+  @Override
+  public void displayMusic(long tick) {
+    long ticksPerMeasure = song.getTicksPerMeasure(1);
+    long firstTick = tick - ticksPerMeasure;
+    long lastTick = tick + ticksPerMeasure;
+    long gap = ticksPerMeasure / Default.GAP_BEAT_UNIT;
+    NavigableSet<Chord> tickChords = chords.subSet(new Chord(firstTick), false, new Chord(lastTick), true);
+    NavigableSet<Word> tickWords = song.getWords().subSet(new Word(firstTick), false, new Word(lastTick), true);
   }
 
   @Override

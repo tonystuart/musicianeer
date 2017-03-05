@@ -31,6 +31,10 @@ public abstract class Player {
     this.channel = channel;
   }
 
+  public void displayMusic(long tick) {
+    System.out.println("displayMusic: tick=" + tick);
+  }
+
   public abstract int getUniqueCount();
 
   public abstract void play(Action action, int digit);
