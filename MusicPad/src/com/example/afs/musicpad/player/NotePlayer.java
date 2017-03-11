@@ -80,7 +80,8 @@ public class NotePlayer extends Player {
       for (Contour contour : tickContours) {
         int midiNote = contour.getMidiNote();
         String number = noteToNumber.get(midiNote);
-        s.append(Names.formatNoteName(midiNote) + " (" + number + ") ");
+        //s.append(Names.formatNoteName(midiNote) + " (" + number + ") ");
+        s.append(number + "   ");
       }
     }
     return s.toString();

@@ -91,7 +91,8 @@ public class ChordPlayer extends Player {
       for (Chord chord : tickChords) {
         ChordType chordType = chord.getChordType();
         String number = chordToNumber.get(chordType);
-        s.append(chordType.getName() + " (" + number + ") ");
+        //s.append(chordType.getName() + " (" + number + ") ");
+        s.append(number + " ");
       }
     }
     return s.toString();

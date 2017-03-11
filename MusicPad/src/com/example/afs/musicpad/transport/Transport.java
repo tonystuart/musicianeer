@@ -68,7 +68,7 @@ public class Transport {
       synthesizer.releaseKey(note.getChannel(), note.getMidiNote());
       break;
     case NOTE_ON:
-      System.out.println(note);
+      //System.out.println(note);
       synthesizer.changeProgram(note.getChannel(), note.getProgram());
       synthesizer.pressKey(note.getChannel(), note.getMidiNote(), scaleVelocity(note.getVelocity()));
       messageBroker.publish(new TickOccurred(noteEvent.getTick()));
@@ -85,7 +85,7 @@ public class Transport {
     } else if (scaledVelocity > 127) {
       scaledVelocity = 127;
     }
-    System.out.println("velocity=" + velocity + ", scaledVelocity=" + scaledVelocity);
+    //System.out.println("velocity=" + velocity + ", scaledVelocity=" + scaledVelocity);
     return scaledVelocity;
   }
 }

@@ -41,6 +41,9 @@ public class MusicLibrary {
   }
 
   private void listMidiFiles(RandomAccessList<File> midiFiles, File parent) {
+    if (!parent.isDirectory() || !parent.canRead()) {
+      throw new IllegalArgumentException(parent + " is not a readable directory");
+    }
     File[] files = parent.listFiles((dir, name) -> isMidiFile(name));
     for (File file : files) {
       if (file.isFile()) {

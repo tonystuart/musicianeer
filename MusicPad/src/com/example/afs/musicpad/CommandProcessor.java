@@ -69,8 +69,9 @@ import com.example.afs.musicpad.util.BrokerTask;
 
 public class CommandProcessor extends BrokerTask<Message> {
 
+  private static final int PAGE_SIZE = 10;
+
   private Song currentSong;
-  private int currentPageIndex = -1;
   private MusicLibrary musicLibrary;
   private Random random = new Random();
   private Transport transport;
@@ -83,22 +84,23 @@ public class CommandProcessor extends BrokerTask<Message> {
   }
 
   private void doListSongs(int pageNumber) {
-    int pageIndex;
+    int base;
+    int limit;
     if (pageNumber == 0) {
-      pageIndex = currentPageIndex + 1;
-      pageNumber = pageIndex + 1;
+      base = 0;
+      limit = musicLibrary.size();
     } else {
-      pageIndex = pageNumber - 1;
+      int pagesAvailable = musicLibrary.size() / PAGE_SIZE;
+      int pageIndex = Math.min(pageNumber - 1, pagesAvailable);
+      base = pageIndex * PAGE_SIZE;
+      limit = Math.min(base + PAGE_SIZE, musicLibrary.size());
+      System.out.println("Page #" + (pageIndex + 1));
     }
-    System.out.println("Page #" + pageNumber);
-    int base = pageIndex * 100;
-    int limit = Math.min(base + 100, musicLibrary.size());
     for (int songIndex = base; songIndex < limit; songIndex++) {
       int songNumber = songIndex + 1;
       File midiFile = musicLibrary.getMidiFile(songIndex);
       System.out.println("Song #" + songNumber + ": " + midiFile.getName());
     }
-    currentPageIndex = pageIndex;
   }
 
   private void doPlay(int channelNumber) {
@@ -144,7 +146,6 @@ public class CommandProcessor extends BrokerTask<Message> {
   }
 
   private void onCommand(int command, int parameter) {
-    System.out.println("CommandProcessor.onCommand: command=" + command + ", parameter=" + parameter);
     switch (command) {
     case Command.SELECT_SONG:
       doSelectSong(parameter);
@@ -164,6 +165,8 @@ public class CommandProcessor extends BrokerTask<Message> {
     case Command.SET_PERCENT_VOLUME:
       doSetPercentVolume(parameter);
       break;
+    default:
+      System.out.println("CommandProcessor.onCommand: command=" + command + ", parameter=" + parameter);
     }
   }
 

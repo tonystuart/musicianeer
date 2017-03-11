@@ -90,7 +90,6 @@ public class DeviceHandler extends BrokerTask<Message> {
   }
 
   private void onCommand(int command, int parameter) {
-    System.out.println("CommandProcessor.onCommand: command=" + command + ", parameter=" + parameter);
     switch (command) {
     case Command.SELECT_CHORDS:
       doSelectChords(parameter);
