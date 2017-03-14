@@ -9,22 +9,21 @@
 
 package com.example.afs.musicpad.message;
 
+public class PlayOn implements Message {
 
-public class KeyPressed implements Message {
+  private int playIndex;
 
-  private char key;
-
-  public KeyPressed(char key) {
-    this.key = key;
+  public PlayOn(int playIndex) {
+    this.playIndex = playIndex;
   }
 
-  public char getKey() {
-    return key;
+  public int getPlayIndex() {
+    return playIndex;
   }
 
   @Override
   public String toString() {
-    return "KeyPressed [key=" + key + "]";
+    return "PlayOn [playIndex=" + playIndex + "]";
   }
 
 }

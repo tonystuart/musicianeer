@@ -7,24 +7,11 @@
 // This program is made available on an "as is" basis, without
 // warranties or conditions of any kind, either express or implied.
 
-package com.example.afs.musicpad.message;
+package com.example.afs.musicpad.theory;
 
+public class ScaleBasedChordType extends ChordType {
 
-public class DigitReleased implements Message {
-
-  private int digit;
-
-  public DigitReleased(int digit) {
-    this.digit = digit;
+  public ScaleBasedChordType(Key key, String name, int degree) {
+    super(name, key.getMidiNotes()[degree - 1 + 0], key.getMidiNotes()[degree - 1 + 2], key.getMidiNotes()[degree - 1 + 4]);
   }
-
-  public int getDigit() {
-    return digit;
-  }
-
-  @Override
-  public String toString() {
-    return "DigitReleased [digit=" + digit + "]";
-  }
-
 }

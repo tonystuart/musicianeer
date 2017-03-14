@@ -9,102 +9,24 @@
 
 package com.example.afs.musicpad.analyzer;
 
-import java.util.Arrays;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.NavigableSet;
 import java.util.TreeSet;
 
 import com.example.afs.musicpad.midi.Midi;
+import com.example.afs.musicpad.song.Chord;
 import com.example.afs.musicpad.song.Default;
-import com.example.afs.musicpad.song.Item;
 import com.example.afs.musicpad.song.Note;
+import com.example.afs.musicpad.theory.ChordType;
+import com.example.afs.musicpad.theory.Chords;
 import com.example.afs.musicpad.util.DirectList;
 import com.example.afs.musicpad.util.RandomAccessList;
 
 public class ChordFinder {
 
-  public static class Chord extends Item<Chord> {
-    private ChordType chordType;
-    private long duration;
-
-    public Chord(ChordType chordType, long tick, long duration) {
-      super(tick);
-      this.chordType = chordType;
-      this.duration = duration;
-    }
-
-    public Chord(long tick) {
-      super(tick);
-    }
-
-    public ChordType getChordType() {
-      return chordType;
-    }
-
-    public long getDuration() {
-      return duration;
-    }
-
-    @Override
-    public long getTick() {
-      return tick;
-    }
-
-    @Override
-    public String toString() {
-      return "ChordInstance [chordType=" + chordType + ", tick=" + tick + ", duration=" + duration + "]";
-    }
-  }
-
-  public static class ChordIntervals {
-    private String name;
-    private int[] intervals;
-
-    public ChordIntervals(String name, int[] intervals) {
-      this.name = name;
-      this.intervals = intervals;
-    }
-
-    public int[] getIntervals() {
-      return intervals;
-    }
-
-    public String getName() {
-      return name;
-    }
-
-  }
-
-  public static class ChordType {
-    private String name;
-    private int[] semitones;
-
-    public ChordType(int root, ChordIntervals chordIntervals) {
-      name = Names.getNoteName(root) + chordIntervals.getName();
-      int[] intervals = chordIntervals.getIntervals();
-      semitones = new int[intervals.length];
-      int semitone = root;
-      for (int i = 0; i < semitones.length; i++) {
-        semitone = root + intervals[i];
-        semitones[i] = semitone;
-      }
-    }
-
-    public int getLength() {
-      return semitones.length;
-    }
-
-    public String getName() {
-      return name;
-    }
-
-    public int[] getSemitones() {
-      return semitones;
-    }
-
-    public int match(RandomAccessList<Note> notes, int noteIndex) {
+  public static class ChordMatcher {
+    public int match(int[] semitones, RandomAccessList<Note> notes, int noteIndex) {
       int gap = 0;
       long maxTick = 0;
       long nextMeasureTick = 0;
@@ -122,7 +44,7 @@ public class ChordFinder {
           gap = ticksPerMeasure / Default.GAP_BEAT_UNIT;
           maxTick = tick + duration;
         }
-        if ((maxTick + gap) < tick || tick > (nextMeasureTick - gap) || !contains(note.getMidiNote(), matches)) {
+        if ((maxTick + gap) < tick || tick > (nextMeasureTick - gap) || !contains(semitones, note.getMidiNote(), matches)) {
           isMatch = false;
         } else {
           isMatch = true;
@@ -131,11 +53,6 @@ public class ChordFinder {
         }
       }
       return allSet(matches) ? chordIndex : 0;
-    }
-
-    @Override
-    public String toString() {
-      return "Chord [name=" + name + ", semitones=" + Arrays.toString(semitones) + "]";
     }
 
     private boolean allSet(boolean[] matches) {
@@ -147,7 +64,7 @@ public class ChordFinder {
       return true;
     }
 
-    private boolean contains(int midiNote, boolean[] matches) {
+    private boolean contains(int[] semitones, int midiNote, boolean[] matches) {
       int commonNote = midiNote % Midi.SEMITONES_PER_OCTAVE;
       for (int i = 0; i < semitones.length; i++) {
         if (semitones[i] % Midi.SEMITONES_PER_OCTAVE == commonNote) {
@@ -157,91 +74,7 @@ public class ChordFinder {
       }
       return false;
     }
-  }
 
-  private static final int[] AUGMENTED = new int[] {
-      0,
-      4,
-      8
-  };
-
-  private static final int[] DIMINISHED = new int[] {
-      0,
-      3,
-      6
-  };
-  private static final int[] MAJOR = new int[] {
-      0,
-      4,
-      7
-  };
-
-  private static final int[] MAJOR_SEVENTH = new int[] {
-      0,
-      4,
-      7,
-      11
-  };
-
-  private static final int[] MAJOR_NINTH = new int[] {
-      0,
-      4,
-      7,
-      11,
-      14
-  };
-
-  private static final int[] MINOR = new int[] {
-      0,
-      3,
-      7
-  };
-
-  private static final int[] MINOR_SEVENTH = new int[] {
-      0,
-      3,
-      7,
-      10
-  };
-
-  private static final int[] MINOR_NINTH = new int[] {
-      0,
-      3,
-      7,
-      10,
-      14
-  };
-
-  private static final int[] SEVENTH = new int[] {
-      0,
-      4,
-      7,
-      10
-  };
-
-  private static final ChordIntervals[] CHORD_INTERVALS = new ChordIntervals[] {
-      new ChordIntervals("Maj9", MAJOR_NINTH),
-      new ChordIntervals("min9", MINOR_NINTH),
-      new ChordIntervals("Maj7", MAJOR_SEVENTH),
-      new ChordIntervals("min7", MINOR_SEVENTH),
-      new ChordIntervals("7", SEVENTH),
-      new ChordIntervals("Maj", MAJOR),
-      new ChordIntervals("min", MINOR),
-      new ChordIntervals("aug", AUGMENTED),
-      new ChordIntervals("dim", DIMINISHED),
-  };
-
-  private static final List<ChordType> CHORD_TYPES = createChordTypes();
-
-  public static List<ChordType> createChordTypes() {
-    List<ChordType> chordTypes = new LinkedList<>();
-    for (int root = 0; root < Midi.SEMITONES_PER_OCTAVE; root++) {
-      for (ChordIntervals chordIntervals : CHORD_INTERVALS) {
-        ChordType chordType = new ChordType(root, chordIntervals);
-        chordTypes.add(chordType);
-      }
-    }
-    return chordTypes;
   }
 
   public TreeSet<Chord> getChords(NavigableSet<Note> notes, int channel) {
@@ -265,10 +98,12 @@ public class ChordFinder {
 
   private int findChord(TreeSet<Chord> channelChords, RandomAccessList<Note> channelNotes, int noteIndex) {
     int matchLength = 0;
-    Iterator<ChordType> iterator = CHORD_TYPES.iterator();
+    ChordMatcher chordMatcher = new ChordMatcher();
+    List<ChordType> chords = Chords.getChords();
+    Iterator<ChordType> iterator = chords.iterator();
     while (iterator.hasNext() && matchLength == 0) {
       ChordType chordType = iterator.next();
-      matchLength = chordType.match(channelNotes, noteIndex);
+      matchLength = chordMatcher.match(chordType.getMidiNotes(), channelNotes, noteIndex);
       //System.out.println("noteIndex=" + noteIndex + ", chordType=" + chordType + ", matchLength=" + matchLength);
       if (matchLength > 0) {
         Note firstNote = channelNotes.get(noteIndex);

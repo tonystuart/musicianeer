@@ -9,22 +9,21 @@
 
 package com.example.afs.musicpad.message;
 
+public class PlayOff implements Message {
 
-public class DigitPressed implements Message {
+  private int playIndex;
 
-  private int digit;
-
-  public DigitPressed(int digit) {
-    this.digit = digit;
+  public PlayOff(int playIndex) {
+    this.playIndex = playIndex;
   }
 
-  public int getDigit() {
-    return digit;
+  public int getPlayIndex() {
+    return playIndex;
   }
 
   @Override
   public String toString() {
-    return "DigitPressed [digit=" + digit + "]";
+    return "PlayOff [playIndex=" + playIndex + "]";
   }
 
 }

@@ -42,35 +42,35 @@ public class Names {
       "B"
   };
 
-  public static String formatDrum(int noteNumber) {
-    return Instruments.getDrumName(noteNumber) + " (" + noteNumber + ")";
+  public static String formatDrum(int midiNote) {
+    return Instruments.getDrumName(midiNote) + " (" + midiNote + ")";
   }
 
-  public static String formatDrumName(int noteNumber) {
-    return Instruments.getDrumName(noteNumber);
+  public static String formatDrumName(int midiNote) {
+    return Instruments.getDrumName(midiNote);
   }
 
-  public static String formatNote(int note) {
-    return SHARPS[note % 12] + (note / 12) + " (" + note + ")";
+  public static String formatNote(int midiNote) {
+    return SHARPS[midiNote % 12] + (midiNote / 12) + " (" + midiNote + ")";
   }
 
-  public static String formatNote(long tick, int note, long duration) {
-    return tick + " " + formatNote(note) + " " + duration;
+  public static String formatNote(long tick, int midiNote, long duration) {
+    return tick + " " + formatNote(midiNote) + " " + duration;
   }
 
-  public static String formatNoteName(int note) {
-    return SHARPS[note % 12] + (note / 12);
+  public static String formatNoteName(int midiNote) {
+    return SHARPS[midiNote % 12] + (midiNote / 12);
   }
 
   public static String getKeyName(int tonic, boolean isMajor, int sharpsOrFlats) {
-    String note = (sharpsOrFlats < 0 ? FLATS[tonic] : SHARPS[tonic]);
+    String midiNote = (sharpsOrFlats < 0 ? FLATS[tonic] : SHARPS[tonic]);
     String mode = isMajor ? " Major" : " minor";
-    String key = note + mode;
+    String key = midiNote + mode;
     return key;
   }
 
-  public static String getNoteName(int note) {
-    return SHARPS[note % 12];
+  public static String getNoteName(int midiNote) {
+    return SHARPS[midiNote % 12];
   }
 
   public static String getSynopsis(int sharpsOrFlats) {

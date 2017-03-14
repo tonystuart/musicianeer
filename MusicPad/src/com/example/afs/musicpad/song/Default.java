@@ -9,6 +9,8 @@
 
 package com.example.afs.musicpad.song;
 
+import com.example.afs.musicpad.midi.Midi;
+
 public class Default {
 
   public static final int BEATS_PER_MEASURE = 4;
@@ -17,5 +19,7 @@ public class Default {
   public static final int BEAT_UNIT = 4;
   public static final long LONG_PRESS = 1000;
   public static final int GAP_BEAT_UNIT = 64;
+  public static final int OCTAVE = 4;
+  public static final int OCTAVE_SEMITONE = OCTAVE * Midi.SEMITONES_PER_OCTAVE;
 
 }

@@ -7,7 +7,7 @@
 // This program is made available on an "as is" basis, without
 // warranties or conditions of any kind, either express or implied.
 
-package com.example.afs.musicpad;
+package com.example.afs.musicpad.device;
 
 import java.io.FileDescriptor;
 import java.io.FileInputStream;
@@ -18,10 +18,9 @@ import java.util.concurrent.BlockingQueue;
 
 import com.example.afs.fluidsynth.FluidSynth;
 import com.example.afs.musicpad.message.CommandEntered;
-import com.example.afs.musicpad.message.DigitPressed;
-import com.example.afs.musicpad.message.DigitReleased;
-import com.example.afs.musicpad.message.KeyPressed;
 import com.example.afs.musicpad.message.Message;
+import com.example.afs.musicpad.message.PlayOff;
+import com.example.afs.musicpad.message.PlayOn;
 import com.example.afs.musicpad.util.ByteArray;
 
 // See /usr/include/linux/input.h
@@ -29,22 +28,24 @@ import com.example.afs.musicpad.util.ByteArray;
 
 public class DeviceReader {
 
+  public static final char NUM_LOCK = 'N';
+  public static final char BACK_SPACE = 'B';
+  public static final char ENTER = 'E';
+
   private static final int EV_KEY = 0x01;
-  private static final char NUM_LOCK = 'a';
-  private static final char BACK_SPACE = 'b';
-  private static final char ENTER = 'c';
   private static final int MAX_LENGTH = 5;
 
   private String deviceName;
   private Thread deviceReader;
-  private BlockingQueue<Message> handlerQueue;
 
+  private BlockingQueue<Message> handlerQueue;
   private StringBuilder left = new StringBuilder();
   private StringBuilder right = new StringBuilder();
   private StringBuilder currentField;
   private boolean isTerminated;
+  private boolean isPageDown;
 
-  protected DeviceReader(BlockingQueue<Message> handlerQueue, String deviceName) {
+  public DeviceReader(BlockingQueue<Message> handlerQueue, String deviceName) {
     this.handlerQueue = handlerQueue;
     this.deviceName = deviceName;
   }
@@ -79,94 +80,55 @@ public class DeviceReader {
     currentField = null;
   }
 
-  private char mapKeyCode(short code) {
-    char value = 0;
-    switch (code) {
-    case 69:
-      value = NUM_LOCK;
-      break;
-    case 98:
-      value = '/';
-      break;
-    case 55:
-      value = '*';
-      break;
-    case 14:
-      value = BACK_SPACE;
-      break;
-    case 71:
-      value = '7';
-      break;
-    case 72:
-      value = '8';
-      break;
-    case 73:
-      value = '9';
-      break;
-    case 74:
-      value = '-';
-      break;
-    case 75:
-      value = '4';
-      break;
-    case 76:
-      value = '5';
-      break;
-    case 77:
-      value = '6';
-      break;
-    case 78:
-      value = '+';
-      break;
-    case 79:
-      value = '1';
-      break;
-    case 80:
-      value = '2';
-      break;
-    case 81:
-      value = '3';
-      break;
-    case 96:
-      value = ENTER;
-      break;
-    case 82:
-      value = '0';
-      break;
-    case 83:
-      value = '.';
+  private int mapCharCodeToPlayIndex(int charCode) {
+    int playIndex = CharCode.toIndex(charCode);
+    if (playIndex != -1 && isPageDown) {
+      playIndex += CharCode.PAGE_SIZE;
     }
-    return value;
+    return playIndex;
   }
 
-  private void onCancel() {
-    clear();
+  private int mapKeyCodeToCharCode(short keyCode) {
+    return KeyCode.toCharCode(keyCode);
   }
 
   private void onKeyPress(short keyCode) {
     Message message = null;
-    char charCode = mapKeyCode(keyCode);
-    //System.out.println("onKeyPress: keyCode=" + keyCode + ", charCode=" + charCode);
+    int charCode = mapKeyCodeToCharCode(keyCode);
     if (currentField == null) {
-      if ('0' <= charCode && charCode <= '9') {
-        message = new DigitPressed(charCode - '0');
+      if (charCode == '0') {
+        isPageDown = true;
       } else if (charCode == '.') {
         currentField = left;
-      } else {
-        message = new KeyPressed(charCode);
+      } else if (charCode != -1) {
+        int playIndex = mapCharCodeToPlayIndex(charCode);
+        if (playIndex != -1) {
+          message = new PlayOn(playIndex);
+        }
       }
     } else {
       if ('0' <= charCode && charCode <= '9' && currentField.length() < MAX_LENGTH) {
-        currentField.append(charCode);
+        currentField.append((char) charCode);
         if (currentField == left) {
           System.out.println("left=" + left);
         } else {
           System.out.println("right=" + right);
         }
       } else if (charCode == ENTER) {
-        message = onOkay();
+        if (currentField == left) {
+          if (left.length() == 0) {
+            left.append("0");
+          }
+          currentField = right;
+        } else {
+          if (right.length() == 0) {
+            right.append("0");
+          }
+          message = new CommandEntered(parseInteger(left.toString()), parseInteger(right.toString()));
+          clear();
+        }
       } else {
-        onCancel();
+        clear();
       }
     }
     if (message != null) {
@@ -176,33 +138,20 @@ public class DeviceReader {
 
   private void onKeyRelease(short keyCode) {
     Message message = null;
-    char charCode = mapKeyCode(keyCode);
-    //System.out.println("onKeyRelease: keyCode=" + keyCode + ", charCode=" + charCode);
+    int charCode = mapKeyCodeToCharCode(keyCode);
     if (currentField == null) {
-      if ('0' <= charCode && charCode <= '9') {
-        message = new DigitReleased(charCode - '0');
+      if (charCode == '0') {
+        isPageDown = false;
+      } else if (charCode != -1) {
+        int playIndex = mapCharCodeToPlayIndex(charCode);
+        if (playIndex != -1) {
+          message = new PlayOff(playIndex);
+        }
       }
     }
     if (message != null) {
       sendToHandler(message);
     }
-  }
-
-  private Message onOkay() {
-    Message message = null;
-    if (currentField == left) {
-      if (left.length() == 0) {
-        left.append("0");
-      }
-      currentField = right;
-    } else {
-      if (right.length() == 0) {
-        right.append("0");
-      }
-      message = new CommandEntered(parseInteger(left.toString()), parseInteger(right.toString()));
-      clear();
-    }
-    return message;
   }
 
   private int parseInteger(String string) {
@@ -220,18 +169,23 @@ public class DeviceReader {
       capture(inputStream, 1);
       byte[] buffer = new byte[16];
       while (!isTerminated) {
-        inputStream.read(buffer);
-        short type = ByteArray.toNativeShort(buffer, 8);
-        //System.out.printf("buffer=%s, type=%#x, code=%#x, value=%#x\n", Arrays.toString(buffer), type, code, value);
-        if (type == EV_KEY) {
-          int value = ByteArray.toNativeInteger(buffer, 12);
-          if (value == 0) {
-            short code = ByteArray.toNativeShort(buffer, 10);
-            onKeyRelease(code);
-          } else if (value == 1) {
-            short code = ByteArray.toNativeShort(buffer, 10);
-            onKeyPress(code);
+        try {
+          inputStream.read(buffer);
+          short type = ByteArray.toNativeShort(buffer, 8);
+          //System.out.printf("buffer=%s, type=%#x, code=%#x, value=%#x\n", Arrays.toString(buffer), type, code, value);
+          if (type == EV_KEY) {
+            int value = ByteArray.toNativeInteger(buffer, 12);
+            if (value == 0) {
+              short code = ByteArray.toNativeShort(buffer, 10);
+              onKeyRelease(code);
+            } else if (value == 1) {
+              short code = ByteArray.toNativeShort(buffer, 10);
+              onKeyPress(code);
+            }
           }
+        } catch (RuntimeException e) {
+          e.printStackTrace();
+          System.err.println("DeviceReader.read: ignoring exception");
         }
       }
     } catch (FileNotFoundException e) {
