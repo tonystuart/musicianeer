@@ -19,11 +19,13 @@ import com.example.afs.musicpad.message.PlayOff;
 import com.example.afs.musicpad.message.PlayOn;
 import com.example.afs.musicpad.message.SongSelected;
 import com.example.afs.musicpad.message.TickOccurred;
+import com.example.afs.musicpad.player.GeneralDrumPlayer;
 import com.example.afs.musicpad.player.KeyChordPlayer;
 import com.example.afs.musicpad.player.KeyNotePlayer;
 import com.example.afs.musicpad.player.Player;
 import com.example.afs.musicpad.player.Player.Action;
 import com.example.afs.musicpad.player.SongChordPlayer;
+import com.example.afs.musicpad.player.SongDrumPlayer;
 import com.example.afs.musicpad.player.SongNotePlayer;
 import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.theory.Keys;
@@ -68,6 +70,8 @@ public class DeviceHandler extends BrokerTask<Message> {
     if (channelNumber == 0 || currentSong == null) {
       defaultPlayer = new KeyChordPlayer(synthesizer, Keys.CMajor, 0);
       player = defaultPlayer;
+    } else if (channelNumber == 10) {
+      System.err.println("Cannot select chords for drum channel");
     } else {
       int channelIndex = channelNumber - 1;
       player = new SongChordPlayer(synthesizer, currentSong, channelIndex);
@@ -79,9 +83,22 @@ public class DeviceHandler extends BrokerTask<Message> {
     if (channelNumber == 0 || currentSong == null) {
       defaultPlayer = new KeyNotePlayer(synthesizer, Keys.CMajor, 0);
       player = defaultPlayer;
+    } else if (channelNumber == 10) {
+      System.err.println("Cannot select contour for drum channel");
     } else {
       int channelIndex = channelNumber - 1;
       player = new SongNotePlayer(synthesizer, currentSong, channelIndex);
+    }
+  }
+
+  private void doSelectDrums(int kitNumber) {
+    player.close();
+    if (currentSong == null) {
+      int kitIndex = kitNumber - 1;
+      defaultPlayer = new GeneralDrumPlayer(synthesizer, kitIndex);
+      player = defaultPlayer;
+    } else {
+      player = new SongDrumPlayer(synthesizer, currentSong);
     }
   }
 
@@ -100,6 +117,9 @@ public class DeviceHandler extends BrokerTask<Message> {
       break;
     case Command.SELECT_NOTES:
       doSelectContour(parameter);
+      break;
+    case Command.SELECT_DRUMS:
+      doSelectDrums(parameter);
       break;
     default:
       publish(new CommandForwarded(command, parameter));

@@ -55,6 +55,13 @@ public abstract class Player {
     }
   }
 
+  protected void playMidiDrum(Action action, int midiDrum) {
+    if (action == Action.PRESS) {
+      System.out.println("Player.play: midiDrum=" + Names.formatDrum(midiDrum));
+    }
+    synthesizeNote(action, midiDrum);
+  }
+
   protected void playMidiNote(Action action, int midiNote) {
     if (action == Action.PRESS) {
       System.out.println("Player.play: midiNote=" + Names.formatNote(midiNote));

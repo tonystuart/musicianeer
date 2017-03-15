@@ -9,7 +9,6 @@
 
 package com.example.afs.musicpad.midi;
 
-
 public class Instruments {
 
   private final static String[] DRUMS = new String[] {
@@ -195,6 +194,10 @@ public class Instruments {
 
   public static int getDrum(String name) {
     return findIndex(DRUMS, name);
+  }
+
+  public static int getDrumCount() {
+    return DRUMS.length;
   }
 
   public static String getDrumName(int index) {
