@@ -14,15 +14,17 @@ import java.util.Random;
 
 import com.example.afs.fluidsynth.Synthesizer;
 import com.example.afs.musicpad.analyzer.Analyzer;
-import com.example.afs.musicpad.message.Command;
 import com.example.afs.musicpad.message.CommandForwarded;
 import com.example.afs.musicpad.message.Message;
+import com.example.afs.musicpad.message.OnPlay;
+import com.example.afs.musicpad.message.OnStop;
+import com.example.afs.musicpad.message.OnTempo;
+import com.example.afs.musicpad.message.OnVolume;
 import com.example.afs.musicpad.message.SongSelected;
 import com.example.afs.musicpad.parser.SongBuilder;
 import com.example.afs.musicpad.song.Song;
-import com.example.afs.musicpad.transport.Transport;
+import com.example.afs.musicpad.task.BrokerTask;
 import com.example.afs.musicpad.util.Broker;
-import com.example.afs.musicpad.util.BrokerTask;
 
 // new things
 // zero/enter when not in command mode are modulation down/up1550000550
@@ -74,12 +76,10 @@ public class CommandProcessor extends BrokerTask<Message> {
   private Song currentSong;
   private MusicLibrary musicLibrary;
   private Random random = new Random();
-  private Transport transport;
 
-  protected CommandProcessor(Broker<Message> messageBroker, Synthesizer synthesizer, MusicLibrary musicLibrary) {
-    super(messageBroker);
+  protected CommandProcessor(Broker<Message> broker, Synthesizer synthesizer, MusicLibrary musicLibrary) {
+    super(broker);
     this.musicLibrary = musicLibrary;
-    this.transport = new Transport(messageBroker, synthesizer);
     subscribe(CommandForwarded.class, message -> onCommand(message.getCommand(), message.getParameter()));
   }
 
@@ -105,9 +105,8 @@ public class CommandProcessor extends BrokerTask<Message> {
 
   private void doPlay(int channelNumber) {
     int channelIndex = channelNumber - 1;
-    transport.stop();
     if (currentSong != null) {
-      transport.play(currentSong, channelIndex);
+      getBroker().publish(new OnPlay(currentSong, channelIndex));
     }
   }
 
@@ -134,15 +133,15 @@ public class CommandProcessor extends BrokerTask<Message> {
   }
 
   private void doSetPercentTempo(int percentTempo) {
-    transport.setPercentTempo(percentTempo);
+    getBroker().publish(new OnTempo(percentTempo));
   }
 
   private void doSetPercentVolume(int percentVolume) {
-    transport.setPercentVolume(percentVolume);
+    getBroker().publish(new OnVolume(percentVolume));
   }
 
   private void doStop(int parameter) {
-    transport.stop();
+    getBroker().publish(new OnStop());
   }
 
   private void onCommand(int command, int parameter) {

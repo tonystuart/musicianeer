@@ -11,32 +11,39 @@ package com.example.afs.musicpad.transport;
 
 import com.example.afs.fluidsynth.Synthesizer;
 import com.example.afs.musicpad.message.Message;
-import com.example.afs.musicpad.message.TickOccurred;
+import com.example.afs.musicpad.message.OnPlay;
+import com.example.afs.musicpad.message.OnStop;
+import com.example.afs.musicpad.message.OnTempo;
+import com.example.afs.musicpad.message.OnVolume;
 import com.example.afs.musicpad.song.Note;
 import com.example.afs.musicpad.song.Song;
+import com.example.afs.musicpad.task.BrokerTask;
+import com.example.afs.musicpad.task.SequencerTask;
 import com.example.afs.musicpad.transport.NoteEvent.Type;
 import com.example.afs.musicpad.util.Broker;
-import com.example.afs.musicpad.util.SequencerTask;
 
-public class Transport {
+public class TransportTask extends BrokerTask<Message> {
 
   private Synthesizer synthesizer;
   private SequencerTask<NoteEvent> sequencerTask;
-  private Broker<Message> messageBroker;
   private NoteEventScheduler noteEventScheduler;
   private int percentVolume = 100;
 
-  public Transport(Broker<Message> messageBroker, Synthesizer synthesizer) {
-    this.messageBroker = messageBroker;
+  public TransportTask(Broker<Message> broker, Synthesizer synthesizer) {
+    super(broker);
     this.synthesizer = synthesizer;
+    subscribe(OnPlay.class, message -> onPlay(message.getSong(), message.getChannel()));
+    subscribe(OnStop.class, message -> onStop());
+    subscribe(OnVolume.class, message -> onVolume(message.getPercentVolume()));
+    subscribe(OnTempo.class, message -> onTempo(message.getPercentTempo()));
     noteEventScheduler = new NoteEventScheduler();
     sequencerTask = new SequencerTask<NoteEvent>(noteEventScheduler, new Broker<>());
     sequencerTask.subscribe(NoteEvent.class, noteEvent -> processNoteEvent(noteEvent));
     sequencerTask.start();
   }
 
-  public void play(Song song, int channel) {
-    stop();
+  private void onPlay(Song song, int channel) {
+    onStop();
     for (Note note : song.getNotes()) {
       if (channel == -1 || channel == note.getChannel()) {
         long tick = note.getTick();
@@ -47,18 +54,18 @@ public class Transport {
     }
   }
 
-  public void setPercentTempo(int percentTempo) {
-    noteEventScheduler.setPercentTempo(percentTempo);
-  }
-
-  public void setPercentVolume(int percentVolume) {
-    this.percentVolume = percentVolume;
-  }
-
-  public void stop() {
+  private void onStop() {
     sequencerTask.getInputQueue().clear();
     synthesizer.allNotesOff();
     noteEventScheduler.reset();
+  }
+
+  private void onTempo(int percentTempo) {
+    noteEventScheduler.setPercentTempo(percentTempo);
+  }
+
+  private void onVolume(int percentVolume) {
+    this.percentVolume = percentVolume;
   }
 
   private void processNoteEvent(NoteEvent noteEvent) {
@@ -68,10 +75,8 @@ public class Transport {
       synthesizer.releaseKey(note.getChannel(), note.getMidiNote());
       break;
     case NOTE_ON:
-      //System.out.println(note);
       synthesizer.changeProgram(note.getChannel(), note.getProgram());
       synthesizer.pressKey(note.getChannel(), note.getMidiNote(), scaleVelocity(note.getVelocity()));
-      messageBroker.publish(new TickOccurred(noteEvent.getTick()));
       break;
     default:
       throw new UnsupportedOperationException();
@@ -85,7 +90,6 @@ public class Transport {
     } else if (scaledVelocity > 127) {
       scaledVelocity = 127;
     }
-    //System.out.println("velocity=" + velocity + ", scaledVelocity=" + scaledVelocity);
     return scaledVelocity;
   }
 }

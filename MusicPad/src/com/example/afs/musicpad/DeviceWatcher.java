@@ -17,8 +17,8 @@ import java.util.Set;
 import com.example.afs.musicpad.message.DeviceAttached;
 import com.example.afs.musicpad.message.DeviceDetached;
 import com.example.afs.musicpad.message.Message;
+import com.example.afs.musicpad.task.BrokerTask;
 import com.example.afs.musicpad.util.Broker;
-import com.example.afs.musicpad.util.BrokerTask;
 
 public class DeviceWatcher extends BrokerTask<Message> {
 

@@ -26,19 +26,19 @@ import com.example.afs.musicpad.theory.ChordType;
 public class SongChordPlayer extends SongPlayer {
 
   private TreeSet<Chord> chords;
-  private ChordType[] playIndexToChord;
+  private ChordType[] buttonIndexToChord;
   private Map<ChordType, String> chordToKeySequence;
 
   public SongChordPlayer(Synthesizer synthesizer, Song song, int channel) {
     super(synthesizer, song, channel);
     ChordFinder chordFinder = new ChordFinder();
     chords = chordFinder.getChords(song.getNotes(), channel);
-    playIndexToChord = getUniqueChordTypes(chords);
+    buttonIndexToChord = getUniqueChordTypes(chords);
     chordToKeySequence = new HashMap<>();
-    System.out.println("Total chords: " + chords.size() + ", Unique chords: " + playIndexToChord.length);
-    for (int playIndex = 0; playIndex < playIndexToChord.length; playIndex++) {
-      ChordType chordType = playIndexToChord[playIndex];
-      String keySequence = CharCode.fromIndexToSequence(playIndex);
+    System.out.println("Total chords: " + chords.size() + ", Unique chords: " + buttonIndexToChord.length);
+    for (int buttonIndex = 0; buttonIndex < buttonIndexToChord.length; buttonIndex++) {
+      ChordType chordType = buttonIndexToChord[buttonIndex];
+      String keySequence = CharCode.fromIndexToSequence(buttonIndex);
       chordToKeySequence.put(chordType, keySequence);
       System.out.println(keySequence + " -> " + chordType);
     }
@@ -47,13 +47,13 @@ public class SongChordPlayer extends SongPlayer {
 
   @Override
   public int getUniqueCount() {
-    return playIndexToChord.length;
+    return buttonIndexToChord.length;
   }
 
   @Override
   public void play(Action action, int chordIndex) {
-    if (chordIndex < playIndexToChord.length) {
-      ChordType chordType = playIndexToChord[chordIndex];
+    if (chordIndex < buttonIndexToChord.length) {
+      ChordType chordType = buttonIndexToChord[chordIndex];
       playMidiChord(action, Default.OCTAVE_SEMITONE, chordType);
     }
   }

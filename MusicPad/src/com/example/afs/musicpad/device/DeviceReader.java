@@ -19,8 +19,8 @@ import java.util.concurrent.BlockingQueue;
 import com.example.afs.fluidsynth.FluidSynth;
 import com.example.afs.musicpad.message.CommandEntered;
 import com.example.afs.musicpad.message.Message;
-import com.example.afs.musicpad.message.PlayOff;
-import com.example.afs.musicpad.message.PlayOn;
+import com.example.afs.musicpad.message.Release;
+import com.example.afs.musicpad.message.Press;
 import com.example.afs.musicpad.util.ByteArray;
 
 // See /usr/include/linux/input.h
@@ -80,12 +80,12 @@ public class DeviceReader {
     currentField = null;
   }
 
-  private int mapCharCodeToPlayIndex(int charCode) {
-    int playIndex = CharCode.toIndex(charCode);
-    if (playIndex != -1 && isPageDown) {
-      playIndex += CharCode.PAGE_SIZE;
+  private int mapCharCodeToButtonIndex(int charCode) {
+    int buttonIndex = CharCode.toIndex(charCode);
+    if (buttonIndex != -1 && isPageDown) {
+      buttonIndex += CharCode.PAGE_SIZE;
     }
-    return playIndex;
+    return buttonIndex;
   }
 
   private int mapKeyCodeToCharCode(short keyCode) {
@@ -101,9 +101,9 @@ public class DeviceReader {
       } else if (charCode == '.') {
         currentField = left;
       } else if (charCode != -1) {
-        int playIndex = mapCharCodeToPlayIndex(charCode);
-        if (playIndex != -1) {
-          message = new PlayOn(playIndex);
+        int buttonIndex = mapCharCodeToButtonIndex(charCode);
+        if (buttonIndex != -1) {
+          message = new Press(buttonIndex);
         }
       }
     } else {
@@ -143,9 +143,9 @@ public class DeviceReader {
       if (charCode == '0') {
         isPageDown = false;
       } else if (charCode != -1) {
-        int playIndex = mapCharCodeToPlayIndex(charCode);
-        if (playIndex != -1) {
-          message = new PlayOff(playIndex);
+        int buttonIndex = mapCharCodeToButtonIndex(charCode);
+        if (buttonIndex != -1) {
+          message = new Release(buttonIndex);
         }
       }
     }

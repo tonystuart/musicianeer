@@ -7,11 +7,12 @@
 // This program is made available on an "as is" basis, without
 // warranties or conditions of any kind, either express or implied.
 
-package com.example.afs.musicpad.util;
+package com.example.afs.musicpad.task;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import com.example.afs.musicpad.util.Broker;
 import com.example.afs.musicpad.util.Broker.Subscriber;
 
 public abstract class BrokerTask<M> extends SimpleTask<M> {

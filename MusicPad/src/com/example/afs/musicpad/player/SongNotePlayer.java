@@ -22,19 +22,19 @@ import com.example.afs.musicpad.song.Song;
 
 public class SongNotePlayer extends SongPlayer {
 
-  private int[] playIndexToNote;
+  private int[] buttonIndexToNote;
   private Map<Integer, String> noteToKeySequence;
   private TreeSet<Contour> contours;
 
   public SongNotePlayer(Synthesizer synthesizer, Song song, int channel) {
     super(synthesizer, song, channel);
     contours = song.getContours(channel);
-    playIndexToNote = getUniqueMidiNotes();
+    buttonIndexToNote = getUniqueMidiNotes();
     noteToKeySequence = new HashMap<>();
-    System.out.println("Total notes: " + contours.size() + ", Unique notes: " + playIndexToNote.length);
-    for (int playIndex = 0; playIndex < playIndexToNote.length; playIndex++) {
-      int midiNote = playIndexToNote[playIndex];
-      String keySequence = CharCode.fromIndexToSequence(playIndex);
+    System.out.println("Total notes: " + contours.size() + ", Unique notes: " + buttonIndexToNote.length);
+    for (int buttonIndex = 0; buttonIndex < buttonIndexToNote.length; buttonIndex++) {
+      int midiNote = buttonIndexToNote[buttonIndex];
+      String keySequence = CharCode.fromIndexToSequence(buttonIndex);
       noteToKeySequence.put(midiNote, keySequence);
       System.out.println(keySequence + " -> " + midiNote);
     }
@@ -43,13 +43,13 @@ public class SongNotePlayer extends SongPlayer {
 
   @Override
   public int getUniqueCount() {
-    return playIndexToNote.length;
+    return buttonIndexToNote.length;
   }
 
   @Override
   public void play(Action action, int noteIndex) {
-    if (noteIndex < playIndexToNote.length) {
-      int midiNote = playIndexToNote[noteIndex];
+    if (noteIndex < buttonIndexToNote.length) {
+      int midiNote = buttonIndexToNote[noteIndex];
       playMidiNote(action, midiNote);
     }
   }

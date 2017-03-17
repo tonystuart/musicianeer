@@ -7,23 +7,9 @@
 // This program is made available on an "as is" basis, without
 // warranties or conditions of any kind, either express or implied.
 
-package com.example.afs.musicpad.message;
+package com.example.afs.musicpad.task;
 
-public class PlayOn implements Message {
+public interface Scheduler<T> {
 
-  private int playIndex;
-
-  public PlayOn(int playIndex) {
-    this.playIndex = playIndex;
-  }
-
-  public int getPlayIndex() {
-    return playIndex;
-  }
-
-  @Override
-  public String toString() {
-    return "PlayOn [playIndex=" + playIndex + "]";
-  }
-
+  long getEventTimeMillis(T item);
 }

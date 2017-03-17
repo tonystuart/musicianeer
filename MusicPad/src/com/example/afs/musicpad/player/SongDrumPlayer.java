@@ -25,7 +25,7 @@ public class SongDrumPlayer extends Player {
   }
 
   @Override
-  public void play(Action action, int playIndex) {
+  public void play(Action action, int buttonIndex) {
   }
 
 }

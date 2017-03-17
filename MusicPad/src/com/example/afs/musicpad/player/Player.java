@@ -35,7 +35,7 @@ public abstract class Player {
   public void onTick(long tick) {
   }
 
-  public abstract void play(Action action, int playIndex);
+  public abstract void play(Action action, int buttonIndex);
 
   public void selectProgram(int program) {
     synthesizer.changeProgram(channel, program);

@@ -124,10 +124,10 @@ public class CharCode {
     return index;
   }
 
-  public static String fromIndexToSequence(int playIndex) {
+  public static String fromIndexToSequence(int buttonIndex) {
     String keySequence;
-    int page = playIndex / PAGE_SIZE;
-    int index = playIndex % PAGE_SIZE;
+    int page = buttonIndex / PAGE_SIZE;
+    int index = buttonIndex % PAGE_SIZE;
     int charCode = fromIndex(index);
     if (page == 0) {
       keySequence = Character.toString((char) charCode);

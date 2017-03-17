@@ -7,7 +7,7 @@
 // This program is made available on an "as is" basis, without
 // warranties or conditions of any kind, either express or implied.
 
-package com.example.afs.musicpad.util;
+package com.example.afs.musicpad.task;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -83,6 +83,10 @@ public abstract class SimpleTask<M> {
       }
     }
     System.out.println(name + ": terminating");
+  }
+
+  protected void setTimeoutMillis(long timeoutMillis) {
+    this.timeoutMillis = timeoutMillis;
   }
 
 }

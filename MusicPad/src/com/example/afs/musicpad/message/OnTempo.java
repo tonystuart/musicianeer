@@ -7,9 +7,23 @@
 // This program is made available on an "as is" basis, without
 // warranties or conditions of any kind, either express or implied.
 
-package com.example.afs.musicpad.util;
+package com.example.afs.musicpad.message;
 
-public interface Scheduler<T> {
+public class OnTempo implements Message {
 
-  long getEventTimeMillis(T item);
+  private int percentTempo;
+
+  public OnTempo(int percentTempo) {
+    this.percentTempo = percentTempo;
+  }
+
+  public int getPercentTempo() {
+    return percentTempo;
+  }
+
+  @Override
+  public String toString() {
+    return "OnTempo [percentTempo=" + percentTempo + "]";
+  }
+
 }

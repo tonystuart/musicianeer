@@ -11,12 +11,11 @@ package com.example.afs.musicpad;
 
 import com.example.afs.fluidsynth.Synthesizer;
 import com.example.afs.musicpad.device.DeviceReader;
-import com.example.afs.musicpad.message.Command;
 import com.example.afs.musicpad.message.CommandEntered;
 import com.example.afs.musicpad.message.CommandForwarded;
 import com.example.afs.musicpad.message.Message;
-import com.example.afs.musicpad.message.PlayOff;
-import com.example.afs.musicpad.message.PlayOn;
+import com.example.afs.musicpad.message.Release;
+import com.example.afs.musicpad.message.Press;
 import com.example.afs.musicpad.message.SongSelected;
 import com.example.afs.musicpad.message.TickOccurred;
 import com.example.afs.musicpad.player.GeneralDrumPlayer;
@@ -28,9 +27,9 @@ import com.example.afs.musicpad.player.SongChordPlayer;
 import com.example.afs.musicpad.player.SongDrumPlayer;
 import com.example.afs.musicpad.player.SongNotePlayer;
 import com.example.afs.musicpad.song.Song;
+import com.example.afs.musicpad.task.BrokerTask;
 import com.example.afs.musicpad.theory.Keys;
 import com.example.afs.musicpad.util.Broker;
-import com.example.afs.musicpad.util.BrokerTask;
 
 public class DeviceHandler extends BrokerTask<Message> {
 
@@ -47,8 +46,8 @@ public class DeviceHandler extends BrokerTask<Message> {
     this.defaultPlayer = new KeyNotePlayer(synthesizer, Keys.CMajor, 0);
     this.player = defaultPlayer;
     delegate(CommandEntered.class, message -> onCommand(message.getCommand(), message.getParameter()));
-    delegate(PlayOn.class, message -> onPlayOn(message.getPlayIndex()));
-    delegate(PlayOff.class, message -> onPlayOff(message.getPlayIndex()));
+    delegate(Press.class, message -> onButtonPress(message.getButtonIndex()));
+    delegate(Release.class, message -> onButtonRelease(message.getButtonIndex()));
     subscribe(SongSelected.class, message -> OnSongSelected(message.getSong()));
     subscribe(TickOccurred.class, message -> onTick(message.getTick()));
   }
@@ -127,12 +126,12 @@ public class DeviceHandler extends BrokerTask<Message> {
     }
   }
 
-  private void onPlayOff(int playIndex) {
-    player.play(Action.RELEASE, playIndex);
+  private void onButtonRelease(int buttonIndex) {
+    player.play(Action.RELEASE, buttonIndex);
   }
 
-  private void onPlayOn(int playIndex) {
-    player.play(Action.PRESS, playIndex);
+  private void onButtonPress(int buttonIndex) {
+    player.play(Action.PRESS, buttonIndex);
   }
 
   private void OnSongSelected(Song song) {

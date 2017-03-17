@@ -9,21 +9,29 @@
 
 package com.example.afs.musicpad.message;
 
-public class PlayOff implements Message {
+import com.example.afs.musicpad.song.Song;
 
-  private int playIndex;
+public class OnPlay implements Message {
 
-  public PlayOff(int playIndex) {
-    this.playIndex = playIndex;
+  private Song song;
+  private int channel;
+
+  public OnPlay(Song song, int channel) {
+    this.song = song;
+    this.channel = channel;
   }
 
-  public int getPlayIndex() {
-    return playIndex;
+  public int getChannel() {
+    return channel;
+  }
+
+  public Song getSong() {
+    return song;
   }
 
   @Override
   public String toString() {
-    return "PlayOff [playIndex=" + playIndex + "]";
+    return "OnPlay [song=" + song + ", channel=" + channel + "]";
   }
 
 }

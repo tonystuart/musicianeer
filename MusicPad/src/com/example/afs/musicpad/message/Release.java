@@ -7,18 +7,23 @@
 // This program is made available on an "as is" basis, without
 // warranties or conditions of any kind, either express or implied.
 
-package com.example.afs.musicpad.transport;
+package com.example.afs.musicpad.message;
 
-import com.example.afs.musicpad.task.Scheduler;
+public class Release implements Message {
 
-public class NoteEventScheduler extends TickScheduler implements Scheduler<NoteEvent> {
+  private int buttonIndex;
 
-  public NoteEventScheduler() {
-    super(0);
+  public Release(int buttonIndex) {
+    this.buttonIndex = buttonIndex;
+  }
+
+  public int getButtonIndex() {
+    return buttonIndex;
   }
 
   @Override
-  public long getEventTimeMillis(NoteEvent noteEvent) {
-    return getEventTimeMillis(noteEvent.getTick(), noteEvent.getNote().getBeatsPerMinute());
+  public String toString() {
+    return "Release [buttonIndex=" + buttonIndex + "]";
   }
+
 }
