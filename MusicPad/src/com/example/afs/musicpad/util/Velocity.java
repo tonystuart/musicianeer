@@ -7,23 +7,18 @@
 // This program is made available on an "as is" basis, without
 // warranties or conditions of any kind, either express or implied.
 
-package com.example.afs.musicpad.message;
+package com.example.afs.musicpad.util;
 
-public class OnTempo implements Message {
+public class Velocity {
 
-  private int percentTempo;
-
-  public OnTempo(int percentTempo) {
-    this.percentTempo = percentTempo;
-  }
-
-  public int getPercentTempo() {
-    return percentTempo;
-  }
-
-  @Override
-  public String toString() {
-    return "OnTempo [percentTempo=" + percentTempo + "]";
+  public static int scale(int velocity, int percent) {
+    int scaledVelocity = (velocity * percent) / 100;
+    if (scaledVelocity < 0) {
+      scaledVelocity = 0;
+    } else if (scaledVelocity > 127) {
+      scaledVelocity = 127;
+    }
+    return scaledVelocity;
   }
 
 }

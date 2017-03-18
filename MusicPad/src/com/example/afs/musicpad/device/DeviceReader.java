@@ -17,10 +17,11 @@ import java.lang.reflect.Field;
 import java.util.concurrent.BlockingQueue;
 
 import com.example.afs.fluidsynth.FluidSynth;
-import com.example.afs.musicpad.message.OnInput;
+import com.example.afs.musicpad.Command;
 import com.example.afs.musicpad.message.Message;
-import com.example.afs.musicpad.message.OnRelease;
+import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnPress;
+import com.example.afs.musicpad.message.OnRelease;
 import com.example.afs.musicpad.util.ByteArray;
 
 // See /usr/include/linux/input.h
@@ -80,6 +81,76 @@ public class DeviceReader {
     currentField = null;
   }
 
+  private Message composeCharPress(int charCode) {
+    Message message = null;
+    if (charCode == '0') {
+      isPageDown = true;
+    } else if (charCode == '.') {
+      currentField = left;
+    } else if (charCode != -1) {
+      int buttonIndex = mapCharCodeToButtonIndex(charCode);
+      if (buttonIndex != -1) {
+        message = new OnPress(buttonIndex);
+      }
+    }
+    return message;
+  }
+
+  private Message composeCharRelease(int charCode) {
+    Message message = null;
+    if (charCode == '0') {
+      isPageDown = false;
+    } else if (charCode != -1) {
+      int buttonIndex = mapCharCodeToButtonIndex(charCode);
+      if (buttonIndex != -1) {
+        message = new OnRelease(buttonIndex);
+      }
+    }
+    return message;
+  }
+
+  private Message composeField(int charCode) {
+    Message message = null;
+    if ('0' <= charCode && charCode <= '9' && currentField.length() < MAX_LENGTH) {
+      currentField.append((char) charCode);
+      if (currentField == left) {
+        System.out.println("left=" + left);
+      } else {
+        System.out.println("right=" + right);
+      }
+    } else if (charCode == ENTER) {
+      if (currentField == left) {
+        if (left.length() == 0) {
+          left.append("0");
+        }
+        currentField = right;
+      } else {
+        if (right.length() == 0) {
+          right.append("0");
+        }
+        message = createCommand();
+        clear();
+      }
+    } else {
+      clear();
+    }
+    return message;
+  }
+
+  private Message createCommand() {
+    Message message = null;
+    int commandIndex = parseInteger(left.toString());
+    int commandOperand = parseInteger(right.toString());
+    Command[] commandValues = Command.values();
+    if (commandIndex < commandValues.length) {
+      Command command = commandValues[commandIndex];
+      message = new OnCommand(command, commandOperand);
+    } else {
+      System.err.println("Invalid command index " + commandIndex);
+    }
+    return message;
+  }
+
   private int mapCharCodeToButtonIndex(int charCode) {
     int buttonIndex = CharCode.toIndex(charCode);
     if (buttonIndex != -1 && isPageDown) {
@@ -96,40 +167,9 @@ public class DeviceReader {
     Message message = null;
     int charCode = mapKeyCodeToCharCode(keyCode);
     if (currentField == null) {
-      if (charCode == '0') {
-        isPageDown = true;
-      } else if (charCode == '.') {
-        currentField = left;
-      } else if (charCode != -1) {
-        int buttonIndex = mapCharCodeToButtonIndex(charCode);
-        if (buttonIndex != -1) {
-          message = new OnPress(buttonIndex);
-        }
-      }
+      message = composeCharPress(charCode);
     } else {
-      if ('0' <= charCode && charCode <= '9' && currentField.length() < MAX_LENGTH) {
-        currentField.append((char) charCode);
-        if (currentField == left) {
-          System.out.println("left=" + left);
-        } else {
-          System.out.println("right=" + right);
-        }
-      } else if (charCode == ENTER) {
-        if (currentField == left) {
-          if (left.length() == 0) {
-            left.append("0");
-          }
-          currentField = right;
-        } else {
-          if (right.length() == 0) {
-            right.append("0");
-          }
-          message = new OnInput(parseInteger(left.toString()), parseInteger(right.toString()));
-          clear();
-        }
-      } else {
-        clear();
-      }
+      message = composeField(charCode);
     }
     if (message != null) {
       sendToHandler(message);
@@ -140,14 +180,7 @@ public class DeviceReader {
     Message message = null;
     int charCode = mapKeyCodeToCharCode(keyCode);
     if (currentField == null) {
-      if (charCode == '0') {
-        isPageDown = false;
-      } else if (charCode != -1) {
-        int buttonIndex = mapCharCodeToButtonIndex(charCode);
-        if (buttonIndex != -1) {
-          message = new OnRelease(buttonIndex);
-        }
-      }
+      message = composeCharRelease(charCode);
     }
     if (message != null) {
       sendToHandler(message);

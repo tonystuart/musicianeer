@@ -18,6 +18,7 @@ import java.util.TreeSet;
 import com.example.afs.fluidsynth.Synthesizer;
 import com.example.afs.musicpad.device.CharCode;
 import com.example.afs.musicpad.song.Contour;
+import com.example.afs.musicpad.song.Default;
 import com.example.afs.musicpad.song.Song;
 
 public class SongNotePlayer extends SongPlayer {
@@ -60,13 +61,24 @@ public class SongNotePlayer extends SongPlayer {
     NavigableSet<Contour> tickContours = contours.subSet(new Contour(firstTick), false, new Contour(lastTick), true);
     if (tickContours.size() > 0) {
       Contour first = tickContours.first();
+      long previousTick = first.getTick();
       long firstContourTick = first.getTick();
       s.append(getIntroTicks(firstTick, firstContourTick));
       for (Contour contour : tickContours) {
+        long currentTick = contour.getTick();
+        long measureTick = song.roundTickToThisMeasure(currentTick);
+        if (measureTick > previousTick && measureTick <= currentTick) {
+          s.append("|");
+        }
+        while (((currentTick - previousTick) / Default.TICKS_PER_BEAT) > 0) {
+          s.append(".");
+          previousTick += Default.TICKS_PER_BEAT;
+        }
         int midiNote = contour.getMidiNote();
         String keySequence = noteToKeySequence.get(midiNote);
         //s.append(Names.formatNoteName(midiNote) + " (" + keySequence + ") ");
         s.append(keySequence + "   ");
+        previousTick = currentTick;
       }
     }
     return s.toString();

@@ -11,11 +11,10 @@ package com.example.afs.musicpad;
 
 import com.example.afs.fluidsynth.Synthesizer;
 import com.example.afs.musicpad.device.DeviceReader;
-import com.example.afs.musicpad.message.OnInput;
-import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.Message;
-import com.example.afs.musicpad.message.OnRelease;
+import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnPress;
+import com.example.afs.musicpad.message.OnRelease;
 import com.example.afs.musicpad.message.OnSongSelected;
 import com.example.afs.musicpad.message.OnTick;
 import com.example.afs.musicpad.player.GeneralDrumPlayer;
@@ -45,11 +44,11 @@ public class DeviceHandler extends BrokerTask<Message> {
     this.deviceReader = new DeviceReader(getInputQueue(), deviceName);
     this.defaultPlayer = new KeyNotePlayer(synthesizer, Keys.CMajor, 0);
     this.player = defaultPlayer;
-    delegate(OnInput.class, message -> onCommand(message.getCommand(), message.getParameter()));
-    delegate(OnPress.class, message -> onButtonPress(message.getButtonIndex()));
-    delegate(OnRelease.class, message -> onButtonRelease(message.getButtonIndex()));
-    subscribe(OnSongSelected.class, message -> OnSongSelected(message.getSong()));
-    subscribe(OnTick.class, message -> onTick(message.getTick()));
+    delegate(OnCommand.class, message -> doCommand(message));
+    delegate(OnPress.class, message -> doPress(message.getButtonIndex()));
+    delegate(OnRelease.class, message -> doRelease(message.getButtonIndex()));
+    subscribe(OnSongSelected.class, message -> doSongSelected(message.getSong()));
+    subscribe(OnTick.class, message -> doTick(message.getTick()));
   }
 
   @Override
@@ -64,7 +63,50 @@ public class DeviceHandler extends BrokerTask<Message> {
     super.terminate();
   }
 
-  private void doSelectChords(int channelNumber) {
+  private void doCommand(OnCommand message) {
+    Command command = message.getCommand();
+    int parameter = message.getParameter();
+    switch (command) {
+    case SELECT_CHORDS:
+      selectChords(parameter);
+      break;
+    case SELECT_PROGRAM:
+      selectProgram(parameter);
+      break;
+    case SELECT_NOTES:
+      selectContour(parameter);
+      break;
+    case SELECT_DRUMS:
+      selectDrums(parameter);
+      break;
+    case SET_PLAYER_VELOCITY:
+      setPercentVelocity(parameter);
+      break;
+    default:
+      getBroker().publish(message);
+      break;
+    }
+  }
+
+  private void doPress(int buttonIndex) {
+    player.play(Action.PRESS, buttonIndex);
+  }
+
+  private void doRelease(int buttonIndex) {
+    player.play(Action.RELEASE, buttonIndex);
+  }
+
+  private void doSongSelected(Song song) {
+    player.close();
+    currentSong = song;
+    player = defaultPlayer;
+  }
+
+  private void doTick(long tick) {
+    player.onTick(tick);
+  }
+
+  private void selectChords(int channelNumber) {
     player.close();
     if (channelNumber == 0 || currentSong == null) {
       defaultPlayer = new KeyChordPlayer(synthesizer, Keys.CMajor, 0);
@@ -77,7 +119,7 @@ public class DeviceHandler extends BrokerTask<Message> {
     }
   }
 
-  private void doSelectContour(int channelNumber) {
+  private void selectContour(int channelNumber) {
     player.close();
     if (channelNumber == 0 || currentSong == null) {
       defaultPlayer = new KeyNotePlayer(synthesizer, Keys.CMajor, 0);
@@ -90,7 +132,7 @@ public class DeviceHandler extends BrokerTask<Message> {
     }
   }
 
-  private void doSelectDrums(int kitNumber) {
+  private void selectDrums(int kitNumber) {
     player.close();
     if (currentSong == null) {
       int kitIndex = kitNumber - 1;
@@ -101,47 +143,13 @@ public class DeviceHandler extends BrokerTask<Message> {
     }
   }
 
-  private void doSelectProgram(int programNumber) {
+  private void selectProgram(int programNumber) {
     int programIndex = programNumber - 1;
     player.selectProgram(programIndex);
   }
 
-  private void onCommand(int command, int parameter) {
-    switch (command) {
-    case Command.SELECT_CHORDS:
-      doSelectChords(parameter);
-      break;
-    case Command.SELECT_PROGRAM:
-      doSelectProgram(parameter);
-      break;
-    case Command.SELECT_NOTES:
-      doSelectContour(parameter);
-      break;
-    case Command.SELECT_DRUMS:
-      doSelectDrums(parameter);
-      break;
-    default:
-      publish(new OnCommand(command, parameter));
-      break;
-    }
-  }
-
-  private void onButtonRelease(int buttonIndex) {
-    player.play(Action.RELEASE, buttonIndex);
-  }
-
-  private void onButtonPress(int buttonIndex) {
-    player.play(Action.PRESS, buttonIndex);
-  }
-
-  private void OnSongSelected(Song song) {
-    player.close();
-    currentSong = song;
-    player = defaultPlayer;
-  }
-
-  private void onTick(long tick) {
-    player.onTick(tick);
+  private void setPercentVelocity(int percentVelocity) {
+    player.setPercentVelocity(percentVelocity);
   }
 
 }

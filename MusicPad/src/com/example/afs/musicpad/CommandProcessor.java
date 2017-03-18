@@ -14,12 +14,8 @@ import java.util.Random;
 
 import com.example.afs.fluidsynth.Synthesizer;
 import com.example.afs.musicpad.analyzer.Analyzer;
-import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.Message;
-import com.example.afs.musicpad.message.OnPlay;
-import com.example.afs.musicpad.message.OnStop;
-import com.example.afs.musicpad.message.OnTempo;
-import com.example.afs.musicpad.message.OnVolume;
+import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnSongSelected;
 import com.example.afs.musicpad.parser.SongBuilder;
 import com.example.afs.musicpad.song.Song;
@@ -80,33 +76,45 @@ public class CommandProcessor extends BrokerTask<Message> {
   protected CommandProcessor(Broker<Message> broker, Synthesizer synthesizer, MusicLibrary musicLibrary) {
     super(broker);
     this.musicLibrary = musicLibrary;
-    subscribe(OnCommand.class, message -> onCommand(message.getCommand(), message.getParameter()));
+    subscribe(OnCommand.class, message -> doCommand(message.getCommand(), message.getParameter()));
   }
 
-  private void doListSongs(int pageNumber) {
+  private void doCommand(Command command, int parameter) {
+    switch (command) {
+    case HELP:
+      doHelp();
+      break;
+    case SELECT_SONG:
+      doSelectSong(parameter);
+      break;
+    case LIST_SONGS:
+      doListSongs(parameter);
+      break;
+    default:
+      break;
+    }
+  }
+
+  private void doHelp() {
+    for (Command command : Command.values()) {
+      System.out.println(command.ordinal() + " -> " + command);
+    }
+  }
+
+  private void doListSongs(int songNumber) {
     int base;
     int limit;
-    if (pageNumber == 0) {
+    if (songNumber == 0) {
       base = 0;
       limit = musicLibrary.size();
     } else {
-      int pagesAvailable = musicLibrary.size() / PAGE_SIZE;
-      int pageIndex = Math.min(pageNumber - 1, pagesAvailable);
-      base = pageIndex * PAGE_SIZE;
-      limit = Math.min(base + PAGE_SIZE, musicLibrary.size());
-      System.out.println("Page #" + (pageIndex + 1));
+      int songIndex = songNumber - 1;
+      base = Math.max(0, songIndex);
+      limit = Math.min(songIndex + PAGE_SIZE, musicLibrary.size());
     }
     for (int songIndex = base; songIndex < limit; songIndex++) {
-      int songNumber = songIndex + 1;
       File midiFile = musicLibrary.getMidiFile(songIndex);
-      System.out.println("Song #" + songNumber + ": " + midiFile.getName());
-    }
-  }
-
-  private void doPlay(int channelNumber) {
-    int channelIndex = channelNumber - 1;
-    if (currentSong != null) {
-      getBroker().publish(new OnPlay(currentSong, channelIndex));
+      System.out.println("Song #" + (songIndex + 1) + ": " + midiFile.getName());
     }
   }
 
@@ -129,43 +137,6 @@ public class CommandProcessor extends BrokerTask<Message> {
       publish(new OnSongSelected(currentSong));
     } else {
       System.out.println("Song " + songNumber + " is out of range");
-    }
-  }
-
-  private void doSetPercentTempo(int percentTempo) {
-    getBroker().publish(new OnTempo(percentTempo));
-  }
-
-  private void doSetPercentVolume(int percentVolume) {
-    getBroker().publish(new OnVolume(percentVolume));
-  }
-
-  private void doStop(int parameter) {
-    getBroker().publish(new OnStop());
-  }
-
-  private void onCommand(int command, int parameter) {
-    switch (command) {
-    case Command.SELECT_SONG:
-      doSelectSong(parameter);
-      break;
-    case Command.LIST_SONGS:
-      doListSongs(parameter);
-      break;
-    case Command.PLAY:
-      doPlay(parameter);
-      break;
-    case Command.STOP:
-      doStop(parameter);
-      break;
-    case Command.SET_PERCENT_TEMPO:
-      doSetPercentTempo(parameter);
-      break;
-    case Command.SET_PERCENT_VOLUME:
-      doSetPercentVolume(parameter);
-      break;
-    default:
-      System.out.println("CommandProcessor.onCommand: command=" + command + ", parameter=" + parameter);
     }
   }
 

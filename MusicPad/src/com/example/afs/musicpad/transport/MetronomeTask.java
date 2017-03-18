@@ -9,10 +9,10 @@
 
 package com.example.afs.musicpad.transport;
 
+import com.example.afs.musicpad.Command;
 import com.example.afs.musicpad.message.Message;
-import com.example.afs.musicpad.message.OnPlay;
-import com.example.afs.musicpad.message.OnStop;
-import com.example.afs.musicpad.message.OnTempo;
+import com.example.afs.musicpad.message.OnCommand;
+import com.example.afs.musicpad.message.OnSongSelected;
 import com.example.afs.musicpad.message.OnTick;
 import com.example.afs.musicpad.song.Default;
 import com.example.afs.musicpad.song.Song;
@@ -27,9 +27,8 @@ public class MetronomeTask extends BrokerTask<Message> {
 
   public MetronomeTask(Broker<Message> broker) {
     super(broker);
-    subscribe(OnStop.class, message -> onStop());
-    subscribe(OnPlay.class, message -> onPlay(message.getSong(), message.getChannel()));
-    subscribe(OnTempo.class, message -> onTempo(message.getPercentTempo()));
+    subscribe(OnSongSelected.class, message -> doSongSelected(message.getSong()));
+    subscribe(OnCommand.class, message -> doCommand(message.getCommand(), message.getParameter()));
   }
 
   @Override
@@ -50,18 +49,40 @@ public class MetronomeTask extends BrokerTask<Message> {
     setTimeoutMillis(deltaTimeMillis);
   }
 
-  private void onPlay(Song song, int channel) {
-    this.tick = 0;
+  private void doCommand(Command command, int parameter) {
+    switch (command) {
+    case PLAY:
+      play(parameter);
+      break;
+    case STOP:
+      stop();
+      break;
+    case SET_TRANSPORT_TEMPO:
+      setPercentTempo(parameter);
+      break;
+    default:
+      break;
+    }
+  }
+
+  private void doSongSelected(Song song) {
+    stop();
     this.song = song;
-    tickScheduler.reset();
-    calculateTimeout();
   }
 
-  private void onStop() {
-    setTimeoutMillis(0);
+  private void play(int channelNumber) {
+    if (song != null) {
+      this.tick = 0;
+      tickScheduler.reset();
+      calculateTimeout();
+    }
   }
 
-  private void onTempo(int percentTempo) {
+  private void setPercentTempo(int percentTempo) {
     tickScheduler.setPercentTempo(percentTempo);
+  }
+
+  private void stop() {
+    setTimeoutMillis(0);
   }
 }

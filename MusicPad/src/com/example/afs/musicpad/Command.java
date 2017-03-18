@@ -9,17 +9,17 @@
 
 package com.example.afs.musicpad;
 
-public class Command {
-
-  public static final int LIST_SONGS = 1;
-  public static final int SELECT_SONG = 2;
-  public static final int SELECT_NOTES = 3;
-  public static final int SELECT_CHORDS = 4;
-  public static final int SELECT_PROGRAM = 5;
-  public static final int PLAY = 6;
-  public static final int STOP = 7;
-  public static final int SET_PERCENT_TEMPO = 8;
-  public static final int SET_PERCENT_VOLUME = 9;
-  public static final int SELECT_DRUMS = 10;
-
+public enum Command {
+  HELP, //
+  LIST_SONGS, //
+  SELECT_SONG, //
+  SELECT_NOTES, //
+  SELECT_CHORDS, //
+  SELECT_DRUMS, //
+  SELECT_PROGRAM, //
+  PLAY, //
+  STOP, //
+  SET_PLAYER_VELOCITY, //
+  SET_TRANSPORT_TEMPO, //
+  SET_TRANSPORT_VELOCITY, //
 }

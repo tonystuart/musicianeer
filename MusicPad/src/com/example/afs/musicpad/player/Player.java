@@ -12,6 +12,7 @@ package com.example.afs.musicpad.player;
 import com.example.afs.fluidsynth.Synthesizer;
 import com.example.afs.musicpad.analyzer.Names;
 import com.example.afs.musicpad.theory.ChordType;
+import com.example.afs.musicpad.util.Velocity;
 
 public abstract class Player {
 
@@ -19,8 +20,11 @@ public abstract class Player {
     PRESS, RELEASE
   }
 
+  private static final int DEFAULT_VELOCITY = 92;
+
   private int channel;
   private Synthesizer synthesizer;
+  private int percentVelocity = 100;
 
   public Player(Synthesizer synthesizer, int channel) {
     this.synthesizer = synthesizer;
@@ -39,6 +43,10 @@ public abstract class Player {
 
   public void selectProgram(int program) {
     synthesizer.changeProgram(channel, program);
+  }
+
+  public void setPercentVelocity(int percentVelocity) {
+    this.percentVelocity = percentVelocity;
   }
 
   protected void playMidiChord(Action action, int octave, ChordType chordType) {
@@ -72,7 +80,7 @@ public abstract class Player {
   protected void synthesizeNote(Action action, int midiNote) {
     switch (action) {
     case PRESS:
-      synthesizer.pressKey(channel, midiNote, 92);
+      synthesizer.pressKey(channel, midiNote, Velocity.scale(DEFAULT_VELOCITY, percentVelocity));
       break;
     case RELEASE:
       synthesizer.releaseKey(channel, midiNote);

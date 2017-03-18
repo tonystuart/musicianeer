@@ -9,17 +9,19 @@
 
 package com.example.afs.musicpad.message;
 
+import com.example.afs.musicpad.Command;
+
 public class OnCommand implements Message {
 
-  private int command;
+  private Command command;
   private int parameter;
 
-  public OnCommand(int command, int parameter) {
+  public OnCommand(Command command, int parameter) {
     this.command = command;
     this.parameter = parameter;
   }
 
-  public int getCommand() {
+  public Command getCommand() {
     return command;
   }
 
