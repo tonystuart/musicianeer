@@ -9,19 +9,23 @@
 
 package com.example.afs.musicpad.message;
 
-public class DeviceAttached implements Message {
-  private String device;
+import com.example.afs.musicpad.song.Song;
 
-  public DeviceAttached(String device) {
-    this.device = device;
+public class OnSongSelected implements Message {
+
+  private Song song;
+
+  public OnSongSelected(Song song) {
+    this.song = song;
   }
 
-  public String getDevice() {
-    return device;
+  public Song getSong() {
+    return song;
   }
 
   @Override
   public String toString() {
-    return "DeviceAttached [device=" + device + "]";
+    return "OnSongSelected [song=" + song + "]";
   }
+
 }

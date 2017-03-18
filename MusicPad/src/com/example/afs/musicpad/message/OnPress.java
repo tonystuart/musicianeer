@@ -9,27 +9,21 @@
 
 package com.example.afs.musicpad.message;
 
-public class CommandForwarded implements Message {
+public class OnPress implements Message {
 
-  private int command;
-  private int parameter;
+  private int buttonIndex;
 
-  public CommandForwarded(int command, int parameter) {
-    this.command = command;
-    this.parameter = parameter;
+  public OnPress(int buttonIndex) {
+    this.buttonIndex = buttonIndex;
   }
 
-  public int getCommand() {
-    return command;
-  }
-
-  public int getParameter() {
-    return parameter;
+  public int getButtonIndex() {
+    return buttonIndex;
   }
 
   @Override
   public String toString() {
-    return "CommandForwarded [command=" + command + ", parameter=" + parameter + "]";
+    return "OnPress [buttonIndex=" + buttonIndex + "]";
   }
 
 }

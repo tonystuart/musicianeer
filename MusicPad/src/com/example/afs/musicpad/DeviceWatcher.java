@@ -14,8 +14,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import com.example.afs.musicpad.message.DeviceAttached;
-import com.example.afs.musicpad.message.DeviceDetached;
+import com.example.afs.musicpad.message.OnDeviceAttached;
+import com.example.afs.musicpad.message.OnDeviceDetached;
 import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.task.BrokerTask;
 import com.example.afs.musicpad.util.Broker;
@@ -35,13 +35,13 @@ public class DeviceWatcher extends BrokerTask<Message> {
     while (oldIterator.hasNext()) {
       String oldDevice = oldIterator.next();
       if (!newDevices.contains(oldDevice)) {
-        publish(new DeviceDetached(oldDevice));
+        publish(new OnDeviceDetached(oldDevice));
         oldIterator.remove();
       }
     }
     for (String newDevice : newDevices) {
       if (!oldDevices.contains(newDevice)) {
-        publish(new DeviceAttached(newDevice));
+        publish(new OnDeviceAttached(newDevice));
         oldDevices.add(newDevice);
       }
     }

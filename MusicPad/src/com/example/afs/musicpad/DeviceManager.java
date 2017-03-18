@@ -13,8 +13,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.example.afs.fluidsynth.Synthesizer;
-import com.example.afs.musicpad.message.DeviceAttached;
-import com.example.afs.musicpad.message.DeviceDetached;
+import com.example.afs.musicpad.message.OnDeviceAttached;
+import com.example.afs.musicpad.message.OnDeviceDetached;
 import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.task.BrokerTask;
 import com.example.afs.musicpad.util.Broker;
@@ -27,8 +27,8 @@ public class DeviceManager extends BrokerTask<Message> {
   public DeviceManager(Broker<Message> messageBroker, Synthesizer synthesizer) {
     super(messageBroker);
     this.synthesizer = synthesizer;
-    subscribe(DeviceAttached.class, message -> onDeviceAttach(message.getDevice()));
-    subscribe(DeviceDetached.class, message -> onDeviceDetach(message.getDevice()));
+    subscribe(OnDeviceAttached.class, message -> onDeviceAttach(message.getDevice()));
+    subscribe(OnDeviceDetached.class, message -> onDeviceDetach(message.getDevice()));
   }
 
   private void onDeviceAttach(String newDevice) {

@@ -9,12 +9,12 @@
 
 package com.example.afs.musicpad.message;
 
-public class CommandEntered implements Message {
+public class OnInput implements Message {
 
   private int command;
   private int parameter;
 
-  public CommandEntered(int command, int parameter) {
+  public OnInput(int command, int parameter) {
     this.command = command;
     this.parameter = parameter;
   }
@@ -29,7 +29,7 @@ public class CommandEntered implements Message {
 
   @Override
   public String toString() {
-    return "CommandEntered [command=" + command + ", parameter=" + parameter + "]";
+    return "OnInput [command=" + command + ", parameter=" + parameter + "]";
   }
 
 }

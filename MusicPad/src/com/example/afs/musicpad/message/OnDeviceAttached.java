@@ -9,21 +9,19 @@
 
 package com.example.afs.musicpad.message;
 
-public class Release implements Message {
+public class OnDeviceAttached implements Message {
+  private String device;
 
-  private int buttonIndex;
-
-  public Release(int buttonIndex) {
-    this.buttonIndex = buttonIndex;
+  public OnDeviceAttached(String device) {
+    this.device = device;
   }
 
-  public int getButtonIndex() {
-    return buttonIndex;
+  public String getDevice() {
+    return device;
   }
 
   @Override
   public String toString() {
-    return "Release [buttonIndex=" + buttonIndex + "]";
+    return "OnDeviceAttached [device=" + device + "]";
   }
-
 }

@@ -11,13 +11,13 @@ package com.example.afs.musicpad;
 
 import com.example.afs.fluidsynth.Synthesizer;
 import com.example.afs.musicpad.device.DeviceReader;
-import com.example.afs.musicpad.message.CommandEntered;
-import com.example.afs.musicpad.message.CommandForwarded;
+import com.example.afs.musicpad.message.OnInput;
+import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.Message;
-import com.example.afs.musicpad.message.Release;
-import com.example.afs.musicpad.message.Press;
-import com.example.afs.musicpad.message.SongSelected;
-import com.example.afs.musicpad.message.TickOccurred;
+import com.example.afs.musicpad.message.OnRelease;
+import com.example.afs.musicpad.message.OnPress;
+import com.example.afs.musicpad.message.OnSongSelected;
+import com.example.afs.musicpad.message.OnTick;
 import com.example.afs.musicpad.player.GeneralDrumPlayer;
 import com.example.afs.musicpad.player.KeyChordPlayer;
 import com.example.afs.musicpad.player.KeyNotePlayer;
@@ -45,11 +45,11 @@ public class DeviceHandler extends BrokerTask<Message> {
     this.deviceReader = new DeviceReader(getInputQueue(), deviceName);
     this.defaultPlayer = new KeyNotePlayer(synthesizer, Keys.CMajor, 0);
     this.player = defaultPlayer;
-    delegate(CommandEntered.class, message -> onCommand(message.getCommand(), message.getParameter()));
-    delegate(Press.class, message -> onButtonPress(message.getButtonIndex()));
-    delegate(Release.class, message -> onButtonRelease(message.getButtonIndex()));
-    subscribe(SongSelected.class, message -> OnSongSelected(message.getSong()));
-    subscribe(TickOccurred.class, message -> onTick(message.getTick()));
+    delegate(OnInput.class, message -> onCommand(message.getCommand(), message.getParameter()));
+    delegate(OnPress.class, message -> onButtonPress(message.getButtonIndex()));
+    delegate(OnRelease.class, message -> onButtonRelease(message.getButtonIndex()));
+    subscribe(OnSongSelected.class, message -> OnSongSelected(message.getSong()));
+    subscribe(OnTick.class, message -> onTick(message.getTick()));
   }
 
   @Override
@@ -121,7 +121,7 @@ public class DeviceHandler extends BrokerTask<Message> {
       doSelectDrums(parameter);
       break;
     default:
-      publish(new CommandForwarded(command, parameter));
+      publish(new OnCommand(command, parameter));
       break;
     }
   }

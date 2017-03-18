@@ -17,10 +17,10 @@ import java.lang.reflect.Field;
 import java.util.concurrent.BlockingQueue;
 
 import com.example.afs.fluidsynth.FluidSynth;
-import com.example.afs.musicpad.message.CommandEntered;
+import com.example.afs.musicpad.message.OnInput;
 import com.example.afs.musicpad.message.Message;
-import com.example.afs.musicpad.message.Release;
-import com.example.afs.musicpad.message.Press;
+import com.example.afs.musicpad.message.OnRelease;
+import com.example.afs.musicpad.message.OnPress;
 import com.example.afs.musicpad.util.ByteArray;
 
 // See /usr/include/linux/input.h
@@ -103,7 +103,7 @@ public class DeviceReader {
       } else if (charCode != -1) {
         int buttonIndex = mapCharCodeToButtonIndex(charCode);
         if (buttonIndex != -1) {
-          message = new Press(buttonIndex);
+          message = new OnPress(buttonIndex);
         }
       }
     } else {
@@ -124,7 +124,7 @@ public class DeviceReader {
           if (right.length() == 0) {
             right.append("0");
           }
-          message = new CommandEntered(parseInteger(left.toString()), parseInteger(right.toString()));
+          message = new OnInput(parseInteger(left.toString()), parseInteger(right.toString()));
           clear();
         }
       } else {
@@ -145,7 +145,7 @@ public class DeviceReader {
       } else if (charCode != -1) {
         int buttonIndex = mapCharCodeToButtonIndex(charCode);
         if (buttonIndex != -1) {
-          message = new Release(buttonIndex);
+          message = new OnRelease(buttonIndex);
         }
       }
     }

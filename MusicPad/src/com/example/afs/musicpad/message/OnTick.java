@@ -9,11 +9,11 @@
 
 package com.example.afs.musicpad.message;
 
-public class TickOccurred implements Message {
+public class OnTick implements Message {
 
   private long tick;
 
-  public TickOccurred(long tick) {
+  public OnTick(long tick) {
     this.tick = tick;
   }
 
@@ -23,7 +23,7 @@ public class TickOccurred implements Message {
 
   @Override
   public String toString() {
-    return "TickOccurred [tick=" + tick + "]";
+    return "OnTick [tick=" + tick + "]";
   }
 
 }

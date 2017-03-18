@@ -9,23 +9,27 @@
 
 package com.example.afs.musicpad.message;
 
-import com.example.afs.musicpad.song.Song;
+public class OnCommand implements Message {
 
-public class SongSelected implements Message {
+  private int command;
+  private int parameter;
 
-  private Song song;
-
-  public SongSelected(Song song) {
-    this.song = song;
+  public OnCommand(int command, int parameter) {
+    this.command = command;
+    this.parameter = parameter;
   }
 
-  public Song getSong() {
-    return song;
+  public int getCommand() {
+    return command;
+  }
+
+  public int getParameter() {
+    return parameter;
   }
 
   @Override
   public String toString() {
-    return "SongSelected [song=" + song + "]";
+    return "OnCommand [command=" + command + ", parameter=" + parameter + "]";
   }
 
 }

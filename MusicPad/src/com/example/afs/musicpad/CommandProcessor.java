@@ -14,13 +14,13 @@ import java.util.Random;
 
 import com.example.afs.fluidsynth.Synthesizer;
 import com.example.afs.musicpad.analyzer.Analyzer;
-import com.example.afs.musicpad.message.CommandForwarded;
+import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnPlay;
 import com.example.afs.musicpad.message.OnStop;
 import com.example.afs.musicpad.message.OnTempo;
 import com.example.afs.musicpad.message.OnVolume;
-import com.example.afs.musicpad.message.SongSelected;
+import com.example.afs.musicpad.message.OnSongSelected;
 import com.example.afs.musicpad.parser.SongBuilder;
 import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.task.BrokerTask;
@@ -80,7 +80,7 @@ public class CommandProcessor extends BrokerTask<Message> {
   protected CommandProcessor(Broker<Message> broker, Synthesizer synthesizer, MusicLibrary musicLibrary) {
     super(broker);
     this.musicLibrary = musicLibrary;
-    subscribe(CommandForwarded.class, message -> onCommand(message.getCommand(), message.getParameter()));
+    subscribe(OnCommand.class, message -> onCommand(message.getCommand(), message.getParameter()));
   }
 
   private void doListSongs(int pageNumber) {
@@ -126,7 +126,7 @@ public class CommandProcessor extends BrokerTask<Message> {
       Analyzer.displaySemitoneCounts(currentSong);
       Analyzer.displayKey(currentSong);
       Analyzer.displayDrumCounts(currentSong);
-      publish(new SongSelected(currentSong));
+      publish(new OnSongSelected(currentSong));
     } else {
       System.out.println("Song " + songNumber + " is out of range");
     }

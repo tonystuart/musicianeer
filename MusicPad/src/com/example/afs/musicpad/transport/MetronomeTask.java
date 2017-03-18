@@ -13,7 +13,7 @@ import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnPlay;
 import com.example.afs.musicpad.message.OnStop;
 import com.example.afs.musicpad.message.OnTempo;
-import com.example.afs.musicpad.message.TickOccurred;
+import com.example.afs.musicpad.message.OnTick;
 import com.example.afs.musicpad.song.Default;
 import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.task.BrokerTask;
@@ -34,7 +34,7 @@ public class MetronomeTask extends BrokerTask<Message> {
 
   @Override
   protected void onTimeout() throws InterruptedException {
-    getBroker().publish(new TickOccurred(tick));
+    getBroker().publish(new OnTick(tick));
     tick += Default.TICKS_PER_BEAT;
     calculateTimeout();
   }

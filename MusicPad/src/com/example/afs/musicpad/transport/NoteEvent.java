@@ -46,6 +46,34 @@ public class NoteEvent implements Comparable<NoteEvent> {
     return 0;
   }
 
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    NoteEvent other = (NoteEvent) obj;
+    if (note == null) {
+      if (other.note != null) {
+        return false;
+      }
+    } else if (!note.equals(other.note)) {
+      return false;
+    }
+    if (tick != other.tick) {
+      return false;
+    }
+    if (type != other.type) {
+      return false;
+    }
+    return true;
+  }
+
   public Note getNote() {
     return note;
   }
@@ -56,6 +84,16 @@ public class NoteEvent implements Comparable<NoteEvent> {
 
   public NoteEvent.Type getType() {
     return type;
+  }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((note == null) ? 0 : note.hashCode());
+    result = prime * result + (int) (tick ^ (tick >>> 32));
+    result = prime * result + ((type == null) ? 0 : type.hashCode());
+    return result;
   }
 
   @Override
