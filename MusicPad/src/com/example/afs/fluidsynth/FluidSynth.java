@@ -15,32 +15,34 @@ public class FluidSynth {
 
   public static native int capture(int fd, int value);
 
-  public static native void deleteFluidAudioDriver(long driver);
+  public static native void delete_fluid_audio_driver(long driver);
 
-  public static native void deleteFluidSettings(long settings);
+  public static native void delete_fluid_settings(long settings);
 
-  public static native void deleteFluidSynth(long synth);
+  public static native void delete_fluid_synth(long synth);
 
-  public static native void fluidSettingsSetstr(long settings, String name, String str);
+  public static native void fluid_settings_setint(long settings, String name, int val);
 
-  public static native int fluidSynthCc(long synth, int chan, int num, int val);
+  public static native void fluid_settings_setstr(long settings, String name, String str);
 
-  public static native int fluidSynthNoteoff(long synth, int chan, int key);
+  public static native int fluid_synth_cc(long synth, int chan, int num, int val);
 
-  public static native int fluidSynthNoteon(long synth, int chan, int key, int vel);
+  public static native int fluid_synth_noteoff(long synth, int chan, int key);
 
-  public static native int fluidSynthPitchBend(long synth, int chan, int val);
+  public static native int fluid_synth_noteon(long synth, int chan, int key, int vel);
 
-  public static native int fluidSynthProgramChange(long synth, int chan, int program);
+  public static native int fluid_synth_pitch_bend(long synth, int chan, int val);
 
-  public static native long fluidSynthSetGain(long synth, float gain);
+  public static native int fluid_synth_program_change(long synth, int chan, int program);
 
-  public static native long fluidSynthSfload(long synth, String filename, int resetPresets);
+  public static native long fluid_synth_set_gain(long synth, float gain);
 
-  public static native long newFluidAudioDriver(long settings, long synth);
+  public static native long fluid_synth_sfload(long synth, String filename, int resetPresets);
 
-  public static native long newFluidSettings();
+  public static native long new_fluid_audio_driver(long settings, long synth);
 
-  public static native long newFluidSynth(long settings);
+  public static native long new_fluid_settings();
+
+  public static native long new_fluid_synth(long settings);
 
 }

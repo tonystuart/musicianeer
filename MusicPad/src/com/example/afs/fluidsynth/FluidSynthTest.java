@@ -13,18 +13,18 @@ public class FluidSynthTest {
 
   public static void main(String[] args) throws Exception {
     System.loadLibrary(FluidSynth.NATIVE_LIBRARY_NAME);
-    long settings = FluidSynth.newFluidSettings();
-    long synth = FluidSynth.newFluidSynth(settings);
-    FluidSynth.fluidSettingsSetstr(settings, "audio.driver", "alsa");
-    long adriver = FluidSynth.newFluidAudioDriver(settings, synth);
-    FluidSynth.fluidSynthSfload(synth, "/usr/share/sounds/sf2/FluidR3_GM.sf2", 1);
+    long settings = FluidSynth.new_fluid_settings();
+    long synth = FluidSynth.new_fluid_synth(settings);
+    FluidSynth.fluid_settings_setstr(settings, "audio.driver", "alsa");
+    long adriver = FluidSynth.new_fluid_audio_driver(settings, synth);
+    FluidSynth.fluid_synth_sfload(synth, "/usr/share/sounds/sf2/FluidR3_GM.sf2", 1);
     for (int i = 0; i < 12; i++) {
-      FluidSynth.fluidSynthNoteon(synth, 0, 60 + i, 64);
+      FluidSynth.fluid_synth_noteon(synth, 0, 60 + i, 64);
       Thread.sleep(500);
-      FluidSynth.fluidSynthNoteoff(synth, 0, 60 + i);
+      FluidSynth.fluid_synth_noteoff(synth, 0, 60 + i);
     }
-    FluidSynth.deleteFluidAudioDriver(adriver);
-    FluidSynth.deleteFluidSynth(synth);
-    FluidSynth.deleteFluidSettings(settings);
+    FluidSynth.delete_fluid_audio_driver(adriver);
+    FluidSynth.delete_fluid_synth(synth);
+    FluidSynth.delete_fluid_settings(settings);
   }
 }

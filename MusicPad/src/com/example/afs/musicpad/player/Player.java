@@ -11,6 +11,7 @@ package com.example.afs.musicpad.player;
 
 import com.example.afs.fluidsynth.Synthesizer;
 import com.example.afs.musicpad.analyzer.Names;
+import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.theory.ChordType;
 import com.example.afs.musicpad.util.Velocity;
 
@@ -80,10 +81,10 @@ public abstract class Player {
   protected void synthesizeNote(Action action, int midiNote) {
     switch (action) {
     case PRESS:
-      synthesizer.pressKey(channel, midiNote, Velocity.scale(DEFAULT_VELOCITY, percentVelocity));
+      synthesizer.pressKey(Midi.CHANNELS + channel, midiNote, Velocity.scale(DEFAULT_VELOCITY, percentVelocity));
       break;
     case RELEASE:
-      synthesizer.releaseKey(channel, midiNote);
+      synthesizer.releaseKey(Midi.CHANNELS + channel, midiNote);
       break;
     default:
       throw new UnsupportedOperationException();
