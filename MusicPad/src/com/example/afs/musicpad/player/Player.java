@@ -21,11 +21,15 @@ public abstract class Player {
     PRESS, RELEASE
   }
 
+  public static final int PLAYER_BASE = Midi.CHANNELS;
+  public static final int PLAYER_CHANNELS = Midi.CHANNELS;
+  public static final int TOTAL_CHANNELS = PLAYER_BASE + PLAYER_CHANNELS;
+
   private static final int DEFAULT_VELOCITY = 92;
 
   private int channel;
-  private Synthesizer synthesizer;
   private int percentVelocity = 100;
+  private Synthesizer synthesizer;
 
   public Player(Synthesizer synthesizer, int channel) {
     this.synthesizer = synthesizer;
@@ -43,7 +47,7 @@ public abstract class Player {
   public abstract void play(Action action, int buttonIndex);
 
   public void selectProgram(int program) {
-    synthesizer.changeProgram(channel, program);
+    synthesizer.changeProgram(PLAYER_BASE + channel, program);
   }
 
   public void setPercentVelocity(int percentVelocity) {
@@ -81,10 +85,10 @@ public abstract class Player {
   protected void synthesizeNote(Action action, int midiNote) {
     switch (action) {
     case PRESS:
-      synthesizer.pressKey(Midi.CHANNELS + channel, midiNote, Velocity.scale(DEFAULT_VELOCITY, percentVelocity));
+      synthesizer.pressKey(PLAYER_BASE + channel, midiNote, Velocity.scale(DEFAULT_VELOCITY, percentVelocity));
       break;
     case RELEASE:
-      synthesizer.releaseKey(Midi.CHANNELS + channel, midiNote);
+      synthesizer.releaseKey(PLAYER_BASE + channel, midiNote);
       break;
     default:
       throw new UnsupportedOperationException();

@@ -9,7 +9,7 @@
 
 package com.example.afs.musicpad.song;
 
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -21,7 +21,7 @@ public class Facet {
   private int concurrency;
   private int totalNoteCount;
   private TreeSet<Contour> contour;
-  private Set<Integer> programs = new HashSet<>();
+  private Set<Integer> programs = new LinkedHashSet<>();
   private int[] distinctNoteCounts = new int[Midi.NOTES];
   private int[] commonNoteCounts = new int[Midi.SEMITONES_PER_OCTAVE];
 

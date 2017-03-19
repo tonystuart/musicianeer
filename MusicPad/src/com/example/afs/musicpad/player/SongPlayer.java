@@ -10,6 +10,7 @@
 package com.example.afs.musicpad.player;
 
 import java.util.NavigableSet;
+import java.util.Set;
 
 import com.example.afs.fluidsynth.Synthesizer;
 import com.example.afs.musicpad.song.Default;
@@ -25,6 +26,11 @@ public abstract class SongPlayer extends Player {
     super(synthesizer, channel);
     this.song = song;
     this.viewer = new Viewer();
+    Set<Integer> programs = song.getPrograms(channel);
+    if (programs.size() > 0) {
+      int program = programs.iterator().next();
+      selectProgram(program);
+    }
   }
 
   @Override

@@ -11,7 +11,9 @@ package com.example.afs.musicpad;
 
 import com.example.afs.fluidsynth.FluidSynth;
 import com.example.afs.fluidsynth.Synthesizer;
+import com.example.afs.fluidsynth.Synthesizer.Settings;
 import com.example.afs.musicpad.message.Message;
+import com.example.afs.musicpad.player.Player;
 import com.example.afs.musicpad.transport.TransportTask;
 import com.example.afs.musicpad.util.Broker;
 
@@ -27,13 +29,20 @@ public class MusicPad {
     musicPad.start();
   }
 
+  private static Settings getSynthesizerSettings() {
+    Settings settings = Synthesizer.createDefaultSettings();
+    settings.set("synth.midi-channels", Player.TOTAL_CHANNELS);
+    return settings;
+  }
+
   private Broker<Message> broker;
   private MusicLibrary musicLibrary;
   private DeviceWatcher deviceWatcher;
   private DeviceManager deviceManager;
   private CommandProcessor commandProcessor;
   private TransportTask transportTask;
-  private Synthesizer synthesizer = new Synthesizer();
+
+  private Synthesizer synthesizer = new Synthesizer(getSynthesizerSettings());
 
   public MusicPad(String libraryPath) {
     this.musicLibrary = new MusicLibrary(libraryPath);

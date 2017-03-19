@@ -9,8 +9,6 @@
 
 package com.example.afs.fluidsynth;
 
-import com.example.afs.musicpad.midi.Midi;
-
 public class Synthesizer {
 
   public static class Settings {
@@ -40,9 +38,6 @@ public class Synthesizer {
   public static Settings createDefaultSettings() {
     Settings settings = new Settings();
     settings.set("audio.driver", "alsa");
-    settings.set("synth.midi-channels", Midi.CHANNELS * 2);
-    // settings.set("synth.chorus.active", "no");
-    // settings.set("synth.reverb.active", "no");
     return settings;
   }
 

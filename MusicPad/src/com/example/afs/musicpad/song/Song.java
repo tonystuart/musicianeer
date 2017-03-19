@@ -144,6 +144,10 @@ public class Song {
     return programNames;
   }
 
+  public Set<Integer> getPrograms(int channel) {
+    return channelFacets.getFacet(channel).getPrograms();
+  }
+
   public int getTicksPerMeasure(long tick) {
     int ticksPerMeasure;
     Note note = getControllingNote(tick);
