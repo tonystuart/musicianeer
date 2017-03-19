@@ -21,6 +21,7 @@ import com.example.afs.musicpad.parser.SongBuilder;
 import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.task.BrokerTask;
 import com.example.afs.musicpad.util.Broker;
+import com.example.afs.musicpad.util.Velocity;
 
 // new things
 // zero/enter when not in command mode are modulation down/up1550000550
@@ -73,10 +74,14 @@ public class CommandProcessor extends BrokerTask<Message> {
   private MusicLibrary musicLibrary;
   private Random random = new Random();
 
+  private Synthesizer synthesizer;
+
   protected CommandProcessor(Broker<Message> broker, Synthesizer synthesizer, MusicLibrary musicLibrary) {
     super(broker);
+    this.synthesizer = synthesizer;
     this.musicLibrary = musicLibrary;
     subscribe(OnCommand.class, message -> doCommand(message.getCommand(), message.getParameter()));
+    doSetPercentGain(100);
   }
 
   private void doCommand(Command command, int parameter) {
@@ -89,6 +94,18 @@ public class CommandProcessor extends BrokerTask<Message> {
       break;
     case LIST_SONGS:
       doListSongs(parameter);
+      break;
+    case SET_PERCENT_GAIN:
+      doSetPercentGain(parameter);
+      break;
+    case SHOW_CHANNEL_INFO:
+      doShowChannelInfo();
+      break;
+    case SHOW_KEY_INFO:
+      doShowKeyInfo();
+      break;
+    case SHOW_DRUM_INFO:
+      doShowDrumInfo();
       break;
     default:
       break;
@@ -130,13 +147,35 @@ public class CommandProcessor extends BrokerTask<Message> {
       File midiFile = musicLibrary.getMidiFile(songIndex);
       SongBuilder songBuilder = new SongBuilder();
       currentSong = songBuilder.createSong(midiFile);
-      System.out.println("Selecting #" + songNumber + ": " + currentSong.getName());
-      Analyzer.displaySemitoneCounts(currentSong);
-      Analyzer.displayKey(currentSong);
-      Analyzer.displayDrumCounts(currentSong);
+      System.out.println("Selecting song " + songNumber + " - " + currentSong.getName());
+      doShowChannelInfo();
       publish(new OnSongSelected(currentSong));
     } else {
       System.out.println("Song " + songNumber + " is out of range");
+    }
+  }
+
+  private void doSetPercentGain(int percentGain) {
+    float gain = Velocity.scalePercentGain(percentGain);
+    System.out.println("Set " + percentGain + " percent gain (" + gain + ")");
+    synthesizer.setGain(gain);
+  }
+
+  private void doShowChannelInfo() {
+    if (currentSong != null) {
+      Analyzer.showChannelInfo(currentSong);
+    }
+  }
+
+  private void doShowDrumInfo() {
+    if (currentSong != null) {
+      Analyzer.showDrumInfo(currentSong);
+    }
+  }
+
+  private void doShowKeyInfo() {
+    if (currentSong != null) {
+      Analyzer.showKeyInfo(currentSong);
     }
   }
 

@@ -12,10 +12,34 @@ package com.example.afs.musicpad.analyzer;
 import com.example.afs.musicpad.midi.Instruments;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.song.Song;
+import com.example.afs.musicpad.util.F;
 
 public class Analyzer {
 
-  public static void displayDrumCounts(Song song) {
+  public static void showChannelInfo(Song song) {
+    System.out.print("CHN   TOT OCC CON");
+    for (int semitone = 0; semitone < Midi.SEMITONES_PER_OCTAVE; semitone++) {
+      System.out.printf(" %3s", Names.getNoteName(semitone));
+    }
+    System.out.println();
+    for (int channel = 0; channel < Midi.CHANNELS; channel++) {
+      if (song.getChannelNoteCount(channel) > 0) {
+        if (channel != Midi.DRUM) {
+          int channelNoteCount = song.getChannelNoteCount(channel);
+          int occupancy = song.getOccupancy(channel);
+          int concurrency = song.getConcurrency(channel);
+          System.out.printf("%3d %5d %3d %3d", F.toNumber(channel), channelNoteCount, occupancy, concurrency);
+          for (int semitone = 0; semitone < Midi.SEMITONES_PER_OCTAVE; semitone++) {
+            int commonNoteCount = song.getCommonNoteCounts(channel)[semitone];
+            System.out.printf(" %3d", commonNoteCount);
+          }
+          System.out.println(" " + song.getProgramNames(channel));
+        }
+      }
+    }
+  }
+
+  public static void showDrumInfo(Song song) {
     int drumBeatCount = song.getChannelNoteCount(Midi.DRUM);
     if (drumBeatCount > 0) {
       System.out.println("CHN 9 TOT " + drumBeatCount);
@@ -29,7 +53,7 @@ public class Analyzer {
     }
   }
 
-  public static void displayKey(Song song) {
+  public static void showKeyInfo(Song song) {
     System.out.println("CHN RNK KEY      SYNOPSIS ACCIDENTALS TRIADS THIRDS");
     for (int channel = 0; channel < Midi.CHANNELS; channel++) {
       if (song.getChannelNoteCount(channel) > 0) {
@@ -44,32 +68,9 @@ public class Analyzer {
               int accidentals = keyScore.getAccidentals();
               int triads = keyScore.getTriads();
               int thirds = keyScore.getThirds();
-              System.out.printf("%3d %3d %-8s %-8s         %3d    %3d    %3d\n", channel, rank, key, synopsis, accidentals, triads, thirds);
+              System.out.printf("%3d %3d %-8s %-8s         %3d    %3d    %3d\n", F.toNumber(channel), rank, key, synopsis, accidentals, triads, thirds);
             }
           }
-        }
-      }
-    }
-  }
-
-  public static void displaySemitoneCounts(Song song) {
-    System.out.print("CHN   TOT OCC CON");
-    for (int semitone = 0; semitone < Midi.SEMITONES_PER_OCTAVE; semitone++) {
-      System.out.printf(" %3s", Names.getNoteName(semitone));
-    }
-    System.out.println();
-    for (int channel = 0; channel < Midi.CHANNELS; channel++) {
-      if (song.getChannelNoteCount(channel) > 0) {
-        if (channel != Midi.DRUM) {
-          int channelNoteCount = song.getChannelNoteCount(channel);
-          int occupancy = song.getOccupancy(channel);
-          int concurrency = song.getConcurrency(channel);
-          System.out.printf("%3d %5d %3d %3d", channel, channelNoteCount, occupancy, concurrency);
-          for (int semitone = 0; semitone < Midi.SEMITONES_PER_OCTAVE; semitone++) {
-            int commonNoteCount = song.getCommonNoteCounts(channel)[semitone];
-            System.out.printf(" %3d", commonNoteCount);
-          }
-          System.out.println(" " + song.getProgramNames(channel));
         }
       }
     }

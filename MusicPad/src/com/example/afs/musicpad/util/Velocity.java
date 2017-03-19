@@ -11,6 +11,9 @@ package com.example.afs.musicpad.util;
 
 public class Velocity {
 
+  // https://sourceforge.net/p/fluidsynth/wiki/FluidSettings/
+  public static final float DEFAULT_GAIN = 1f;
+
   public static int scale(int velocity, int percent) {
     int scaledVelocity = (velocity * percent) / 100;
     if (scaledVelocity < 0) {
@@ -19,6 +22,11 @@ public class Velocity {
       scaledVelocity = 127;
     }
     return scaledVelocity;
+  }
+
+  public static float scalePercentGain(int percentGain) {
+    float scaledGain = (DEFAULT_GAIN * percentGain) / 100;
+    return scaledGain;
   }
 
 }

@@ -25,10 +25,12 @@ import com.example.afs.musicpad.util.Velocity;
 
 public class TransportTask extends BrokerTask<Message> {
 
+  public static final int DEFAULT_PERCENT_VELOCITY = 75;
+
   private Synthesizer synthesizer;
   private SequencerTask<NoteEvent> sequencerTask;
   private NoteEventScheduler noteEventScheduler;
-  private int percentVelocity = 100;
+  private int percentVelocity = DEFAULT_PERCENT_VELOCITY;
   private Song song;
 
   public TransportTask(Broker<Message> broker, Synthesizer synthesizer) {

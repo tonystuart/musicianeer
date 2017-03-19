@@ -7,23 +7,12 @@
 // This program is made available on an "as is" basis, without
 // warranties or conditions of any kind, either express or implied.
 
-package com.example.afs.musicpad;
+package com.example.afs.musicpad.util;
 
-public enum Command {
-  HELP, //
-  LIST_SONGS, //
-  SELECT_SONG, //
-  SELECT_NOTES, //
-  SELECT_CHORDS, //
-  SELECT_DRUMS, //
-  SELECT_PROGRAM, //
-  PLAY, //
-  STOP, //
-  SET_PLAYER_VELOCITY, //
-  SET_TRANSPORT_TEMPO, //
-  SET_TRANSPORT_VELOCITY, //
-  SET_PERCENT_GAIN, //
-  SHOW_CHANNEL_INFO, //
-  SHOW_KEY_INFO, //
-  SHOW_DRUM_INFO, //
+public class F {
+
+  public static int toNumber(int index) {
+    return index + 1;
+  }
+
 }
