@@ -4,7 +4,7 @@ rm -f com_example_afs_fluidsynth_FluidSynth.o
 rm -f libfluidsynth_jni.so
 
 JAVA_HOME=$(readlink -f $(which javac) | sed "s:/bin/javac::")
-LIB=../lib/$(uname -p)
+LIB=../lib/$(uname -m)
 
 gcc -c -fPIC \
   -Wno-int-to-pointer-cast \
@@ -21,5 +21,6 @@ gcc -shared \
   com_example_afs_fluidsynth_FluidSynth.o \
   -lfluidsynth
 
+mkdir -p $LIB
 mv libfluidsynth_jni.so $LIB
 rm -f com_example_afs_fluidsynth_FluidSynth.o

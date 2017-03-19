@@ -107,6 +107,9 @@ public class CommandProcessor extends BrokerTask<Message> {
     case SHOW_DRUM_INFO:
       doShowDrumInfo();
       break;
+    case QUIT:
+      System.exit(0);
+      break;
     default:
       break;
     }

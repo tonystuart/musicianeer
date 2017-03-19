@@ -26,4 +26,5 @@ public enum Command {
   SHOW_CHANNEL_INFO, //
   SHOW_KEY_INFO, //
   SHOW_DRUM_INFO, //
+  QUIT, //
 }

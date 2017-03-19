@@ -51,7 +51,7 @@ public class DeviceWatcher extends BrokerTask<Message> {
     // See: man udev
     // See: http://reactivated.net/writing_udev_rules.html
     // See: https://puredata.info/docs/faq/how-can-i-set-permissions-so-hid-can-read-devices-in-gnu-linux
-    File deviceFolder = new File("/dev/input/by-id");
+    File deviceFolder = new File("/dev/input/by-path");
     File[] deviceArray = deviceFolder.listFiles((dir, name) -> name.endsWith("event-kbd"));
     Set<String> deviceSet = new HashSet<>();
     for (File device : deviceArray) {
