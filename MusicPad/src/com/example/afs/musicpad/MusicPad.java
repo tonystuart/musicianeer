@@ -12,6 +12,8 @@ package com.example.afs.musicpad;
 import com.example.afs.fluidsynth.FluidSynth;
 import com.example.afs.fluidsynth.Synthesizer;
 import com.example.afs.fluidsynth.Synthesizer.Settings;
+import com.example.afs.musicpad.device.DeviceManager;
+import com.example.afs.musicpad.device.DeviceWatcher;
 import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.player.Player;
 import com.example.afs.musicpad.transport.TransportTask;

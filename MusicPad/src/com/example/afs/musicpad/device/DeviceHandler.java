@@ -7,10 +7,10 @@
 // This program is made available on an "as is" basis, without
 // warranties or conditions of any kind, either express or implied.
 
-package com.example.afs.musicpad;
+package com.example.afs.musicpad.device;
 
 import com.example.afs.fluidsynth.Synthesizer;
-import com.example.afs.musicpad.device.DeviceReader;
+import com.example.afs.musicpad.Command;
 import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnPress;
