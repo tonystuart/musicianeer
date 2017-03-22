@@ -73,7 +73,7 @@ public class MetronomeTask extends BrokerTask<Message> {
   private void play(int channelNumber) {
     if (song != null) {
       this.tick = 0;
-      tickScheduler.reset();
+      tickScheduler.resetAll();
       calculateTimeout();
     }
   }

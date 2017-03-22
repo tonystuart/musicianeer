@@ -9,6 +9,7 @@
 
 package com.example.afs.musicpad.song;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.NavigableSet;
@@ -146,7 +147,13 @@ public class Song {
   }
 
   public Set<Integer> getPrograms(int channel) {
-    return channelFacets.getFacet(channel).getPrograms();
+    Set<Integer> programs;
+    if (channel == Midi.MELODIC) {
+      programs = Collections.emptySet();
+    } else {
+      programs = channelFacets.getFacet(channel).getPrograms();
+    }
+    return programs;
   }
 
   public int getTicksPerMeasure(long tick) {

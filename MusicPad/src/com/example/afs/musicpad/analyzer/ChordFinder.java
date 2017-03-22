@@ -26,6 +26,7 @@ import com.example.afs.musicpad.util.RandomAccessList;
 public class ChordFinder {
 
   public static class ChordMatcher {
+
     public int match(int[] semitones, RandomAccessList<Note> notes, int noteIndex) {
       int gap = 0;
       long maxTick = 0;
@@ -120,7 +121,8 @@ public class ChordFinder {
   private RandomAccessList<Note> getChannelNotes(NavigableSet<Note> notes, int channel) {
     RandomAccessList<Note> channelNotes = new DirectList<>();
     for (Note note : notes) {
-      if (note.getChannel() == channel) {
+      int noteChannel = note.getChannel();
+      if (channel == noteChannel || (channel == Midi.MELODIC && noteChannel != Midi.DRUM)) {
         channelNotes.add(note);
       }
     }

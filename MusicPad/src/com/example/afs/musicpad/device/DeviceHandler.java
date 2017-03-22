@@ -108,7 +108,7 @@ public class DeviceHandler extends BrokerTask<Message> {
 
   private void selectChords(int channelNumber) {
     player.close();
-    if (channelNumber == 0 || currentSong == null) {
+    if (currentSong == null) {
       defaultPlayer = new KeyChordPlayer(synthesizer, Keys.CMajor, 0);
       player = defaultPlayer;
     } else if (channelNumber == 10) {
@@ -121,7 +121,7 @@ public class DeviceHandler extends BrokerTask<Message> {
 
   private void selectContour(int channelNumber) {
     player.close();
-    if (channelNumber == 0 || currentSong == null) {
+    if (currentSong == null) {
       defaultPlayer = new KeyNotePlayer(synthesizer, Keys.CMajor, 0);
       player = defaultPlayer;
     } else if (channelNumber == 10) {

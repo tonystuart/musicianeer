@@ -18,15 +18,17 @@ public enum Command {
   SELECT_DRUMS, //
   SELECT_PROGRAM, //
   PLAY, //
+  PAUSE, //
+  RESUME, //
   STOP, //
   SET_PLAYER_VELOCITY, //
   SET_TRANSPORT_TEMPO, //
   SET_TRANSPORT_VELOCITY, //
   SET_PERCENT_GAIN, //
+  SET_LOG_LEVEL, //
   SHOW_CHANNEL_INFO, //
   SHOW_KEY_INFO, //
   SHOW_DRUM_INFO, //
+  SHOW_STATUS, //
   QUIT, //
-  STATUS, //
-  LOG, //
 }

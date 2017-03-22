@@ -17,6 +17,7 @@ import java.util.TreeSet;
 
 import com.example.afs.fluidsynth.Synthesizer;
 import com.example.afs.musicpad.device.CharCode;
+import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.song.Contour;
 import com.example.afs.musicpad.song.Default;
 import com.example.afs.musicpad.song.Song;
@@ -29,7 +30,7 @@ public class SongNotePlayer extends SongPlayer {
 
   public SongNotePlayer(Synthesizer synthesizer, Song song, int channel) {
     super(synthesizer, song, channel);
-    contours = song.getContours(channel);
+    contours = getContours(song, channel);
     buttonIndexToNote = getUniqueMidiNotes();
     noteToKeySequence = new HashMap<>();
     System.out.println("Total notes: " + contours.size() + ", Unique notes: " + buttonIndexToNote.length);
@@ -82,6 +83,21 @@ public class SongNotePlayer extends SongPlayer {
       }
     }
     return s.toString();
+  }
+
+  private TreeSet<Contour> getContours(Song song, int channel) {
+    TreeSet<Contour> contours;
+    if (channel == Midi.MELODIC) {
+      contours = new TreeSet<>();
+      for (int i = 0; i < Midi.CHANNELS; i++) {
+        if (i != Midi.DRUM) {
+          contours.addAll(song.getContours(i));
+        }
+      }
+    } else {
+      contours = song.getContours(channel);
+    }
+    return contours;
   }
 
   private int[] getUniqueMidiNotes() {

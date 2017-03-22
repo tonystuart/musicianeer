@@ -18,7 +18,7 @@ import com.example.afs.musicpad.message.OnTick;
 import com.example.afs.musicpad.song.Note;
 import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.task.BrokerTask;
-import com.example.afs.musicpad.task.SequencerTask;
+import com.example.afs.musicpad.task.PausibleSequencerTask;
 import com.example.afs.musicpad.transport.NoteEvent.Type;
 import com.example.afs.musicpad.util.Broker;
 import com.example.afs.musicpad.util.Velocity;
@@ -28,7 +28,7 @@ public class TransportTask extends BrokerTask<Message> {
   public static final int DEFAULT_PERCENT_VELOCITY = 75;
 
   private Synthesizer synthesizer;
-  private SequencerTask<NoteEvent> sequencerTask;
+  private PausibleSequencerTask<NoteEvent> sequencerTask;
   private NoteEventScheduler noteEventScheduler;
   private int percentVelocity = DEFAULT_PERCENT_VELOCITY;
   private Song song;
@@ -39,7 +39,7 @@ public class TransportTask extends BrokerTask<Message> {
     subscribe(OnSongSelected.class, message -> doSongSelected(message.getSong()));
     subscribe(OnCommand.class, message -> doCommand(message.getCommand(), message.getParameter()));
     noteEventScheduler = new NoteEventScheduler();
-    sequencerTask = new SequencerTask<NoteEvent>(noteEventScheduler, new Broker<>());
+    sequencerTask = new PausibleSequencerTask<NoteEvent>(noteEventScheduler, new Broker<>());
     sequencerTask.subscribe(NoteEvent.class, noteEvent -> processNoteEvent(noteEvent));
     sequencerTask.start();
   }
@@ -48,6 +48,12 @@ public class TransportTask extends BrokerTask<Message> {
     switch (command) {
     case PLAY:
       play(parameter);
+      break;
+    case PAUSE:
+      pause(parameter);
+      break;
+    case RESUME:
+      resume(parameter);
       break;
     case STOP:
       stop();
@@ -66,6 +72,12 @@ public class TransportTask extends BrokerTask<Message> {
   private void doSongSelected(Song song) {
     stop();
     this.song = song;
+  }
+
+  private void pause(int parameter) {
+    sequencerTask.pause();
+    noteEventScheduler.resetBaseTime();
+    synthesizer.allNotesOff();
   }
 
   private void play(int channelNumber) {
@@ -99,6 +111,10 @@ public class TransportTask extends BrokerTask<Message> {
     }
   }
 
+  private void resume(int parameter) {
+    sequencerTask.resume();
+  }
+
   private void setPercentTempo(int percentTempo) {
     noteEventScheduler.setPercentTempo(percentTempo);
   }
@@ -110,6 +126,6 @@ public class TransportTask extends BrokerTask<Message> {
   private void stop() {
     sequencerTask.getInputQueue().clear();
     synthesizer.allNotesOff();
-    noteEventScheduler.reset();
+    noteEventScheduler.resetAll();
   }
 }

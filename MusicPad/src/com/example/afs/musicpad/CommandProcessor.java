@@ -70,8 +70,18 @@ public class CommandProcessor extends BrokerTask<Message> {
 
   private static final int PAGE_SIZE = 10;
 
+  public static boolean isTraceMusic() {
+    return false;
+  }
+
+  public static boolean isTracePlay() {
+    return false;
+  }
+
   private Song currentSong;
+
   private MusicLibrary musicLibrary;
+
   private Random random = new Random();
 
   private Synthesizer synthesizer;

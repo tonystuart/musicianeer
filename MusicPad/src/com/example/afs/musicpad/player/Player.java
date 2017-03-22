@@ -10,6 +10,7 @@
 package com.example.afs.musicpad.player;
 
 import com.example.afs.fluidsynth.Synthesizer;
+import com.example.afs.musicpad.CommandProcessor;
 import com.example.afs.musicpad.analyzer.Names;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.theory.ChordType;
@@ -56,7 +57,7 @@ public abstract class Player {
   }
 
   protected void playMidiChord(Action action, int octave, ChordType chordType) {
-    if (action == Action.PRESS) {
+    if (action == Action.PRESS && CommandProcessor.isTracePlay()) {
       System.out.println("Player.play: chordType=" + chordType);
     }
     for (int midiNote : chordType.getMidiNotes()) {
@@ -70,14 +71,14 @@ public abstract class Player {
   }
 
   protected void playMidiDrum(Action action, int midiDrum) {
-    if (action == Action.PRESS) {
+    if (action == Action.PRESS && CommandProcessor.isTracePlay()) {
       System.out.println("Player.play: midiDrum=" + Names.formatDrum(midiDrum));
     }
     synthesizeNote(action, midiDrum);
   }
 
   protected void playMidiNote(Action action, int midiNote) {
-    if (action == Action.PRESS) {
+    if (action == Action.PRESS && CommandProcessor.isTracePlay()) {
       System.out.println("Player.play: midiNote=" + Names.formatNote(midiNote));
     }
     synthesizeNote(action, midiNote);

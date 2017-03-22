@@ -16,6 +16,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import com.example.afs.fluidsynth.Synthesizer;
+import com.example.afs.musicpad.CommandProcessor;
 import com.example.afs.musicpad.analyzer.ChordFinder;
 import com.example.afs.musicpad.device.CharCode;
 import com.example.afs.musicpad.song.Chord;
@@ -71,6 +72,9 @@ public class SongChordPlayer extends SongPlayer {
         String keySequence = chordToKeySequence.get(chordType);
         //s.append(chordType.getName() + " (" + keySequence + ") ");
         s.append(keySequence + " ");
+        if (CommandProcessor.isTraceMusic()) {
+          System.out.println("SongChordPlayer.getMusic: tick=" + chord.getTick() + ", duration=" + chord.getDuration() + ", chordType=" + chordType.getName());
+        }
       }
     }
     return s.toString();
