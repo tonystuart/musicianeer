@@ -15,6 +15,7 @@ import com.example.afs.fluidsynth.Synthesizer.Settings;
 import com.example.afs.musicpad.device.DeviceManager;
 import com.example.afs.musicpad.device.DeviceWatcher;
 import com.example.afs.musicpad.message.Message;
+import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.player.Player;
 import com.example.afs.musicpad.transport.TransportTask;
 import com.example.afs.musicpad.util.Broker;
@@ -31,20 +32,13 @@ public class MusicPad {
     musicPad.start();
   }
 
-  private static Settings getSynthesizerSettings() {
-    Settings settings = Synthesizer.createDefaultSettings();
-    settings.set("synth.midi-channels", Player.TOTAL_CHANNELS);
-    return settings;
-  }
-
   private Broker<Message> broker;
   private MusicLibrary musicLibrary;
   private DeviceWatcher deviceWatcher;
   private DeviceManager deviceManager;
   private CommandProcessor commandProcessor;
   private TransportTask transportTask;
-
-  private Synthesizer synthesizer = new Synthesizer(getSynthesizerSettings());
+  private Synthesizer synthesizer = createSynthesizer();
 
   public MusicPad(String libraryPath) {
     this.musicLibrary = new MusicLibrary(libraryPath);
@@ -53,6 +47,16 @@ public class MusicPad {
     this.deviceManager = new DeviceManager(broker, synthesizer);
     this.commandProcessor = new CommandProcessor(broker, synthesizer, musicLibrary);
     this.transportTask = new TransportTask(broker, synthesizer);
+  }
+
+  private Synthesizer createSynthesizer() {
+    Settings settings = Synthesizer.createDefaultSettings();
+    settings.set("synth.midi-channels", Player.TOTAL_CHANNELS);
+    Synthesizer synthesizer = new Synthesizer(settings);
+    synthesizer.setChannelType(Player.PLAYER_BASE + Midi.DRUM, FluidSynth.CHANNEL_TYPE_DRUM);
+    // Force initialization of drum instrument bank and preset, see fluid_synth.c for info
+    synthesizer.changeProgram(Player.PLAYER_BASE + Midi.DRUM, 0);
+    return synthesizer;
   }
 
   private void start() {

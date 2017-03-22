@@ -13,6 +13,10 @@ public class FluidSynth {
 
   public static final String NATIVE_LIBRARY_NAME = "fluidsynth_jni";
 
+  public static final int CHANNEL_TYPE_MELODIC = 0;
+
+  public static final int CHANNEL_TYPE_DRUM = 1;
+
   public static native int capture(int fd, int value);
 
   public static native void delete_fluid_audio_driver(long driver);
@@ -25,6 +29,10 @@ public class FluidSynth {
 
   public static native void fluid_settings_setstr(long settings, String name, String str);
 
+  public static native int fluid_synth_all_notes_off(long synth, int chan);
+
+  public static native int fluid_synth_all_sounds_off(long synth, int chan);
+
   public static native int fluid_synth_cc(long synth, int chan, int num, int val);
 
   public static native int fluid_synth_noteoff(long synth, int chan, int key);
@@ -34,6 +42,8 @@ public class FluidSynth {
   public static native int fluid_synth_pitch_bend(long synth, int chan, int val);
 
   public static native int fluid_synth_program_change(long synth, int chan, int program);
+
+  public static native long fluid_synth_set_channel_type(long synth, int channel, int type);
 
   public static native long fluid_synth_set_gain(long synth, float gain);
 

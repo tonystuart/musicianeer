@@ -34,6 +34,16 @@ JNIEXPORT void JNICALL Java_com_example_afs_fluidsynth_FluidSynth_fluid_1setting
 	(*env)->ReleaseStringUTFChars(env, hStr, str);
 }  	
 
+JNIEXPORT jint JNICALL Java_com_example_afs_fluidsynth_FluidSynth_fluid_1synth_1all_1notes_1off
+  (JNIEnv *env, jclass this, jlong synth, jint chan) {
+  	return fluid_synth_all_notes_off((fluid_synth_t*)synth, chan);
+}
+
+JNIEXPORT jint JNICALL Java_com_example_afs_fluidsynth_FluidSynth_fluid_1synth_1all_1sounds_1off
+  (JNIEnv *env, jclass this, jlong synth, jint chan) {
+  	return fluid_synth_all_sounds_off((fluid_synth_t*)synth, chan);
+}
+
 JNIEXPORT jint JNICALL Java_com_example_afs_fluidsynth_FluidSynth_fluid_1synth_1cc
   (JNIEnv *env, jclass this, jlong synth, jint chan, jint num, jint val) {
   	return fluid_synth_cc((fluid_synth_t*)synth, chan, num, val);
@@ -57,6 +67,11 @@ JNIEXPORT jint JNICALL Java_com_example_afs_fluidsynth_FluidSynth_fluid_1synth_1
 JNIEXPORT jint JNICALL Java_com_example_afs_fluidsynth_FluidSynth_fluid_1synth_1program_1change
   (JNIEnv *env, jclass this, jlong synth, jint chan, jint program) {
     return fluid_synth_program_change((fluid_synth_t*)synth, chan, program);
+}
+
+JNIEXPORT jint JNICALL Java_com_example_afs_fluidsynth_FluidSynth_fluid_1synth_1set_1channel_1type
+  (JNIEnv *env, jclass this, jlong synth, jint chan, jint type) {
+    int rc = fluid_synth_set_channel_type((fluid_synth_t*)synth, chan, type);
 }
 
 JNIEXPORT jint JNICALL Java_com_example_afs_fluidsynth_FluidSynth_fluid_1synth_1set_1gain

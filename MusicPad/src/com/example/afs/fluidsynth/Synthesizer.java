@@ -9,17 +9,31 @@
 
 package com.example.afs.fluidsynth;
 
+import com.example.afs.musicpad.player.Player;
+
 public class Synthesizer {
 
   public static class Settings {
+    private static final String SOUND_FONT_FILE_NAME = "/usr/share/sounds/sf2/FluidR3_GM.sf2";
+
     private long settings;
+    private String soundFontFileName;
 
     public Settings() {
+      this(SOUND_FONT_FILE_NAME);
+    }
+
+    public Settings(String soundFileFileName) {
+      soundFontFileName = soundFileFileName;
       settings = FluidSynth.new_fluid_settings();
     }
 
     public long getSettings() {
       return settings;
+    }
+
+    public String getSoundFontFileName() {
+      return soundFontFileName;
     }
 
     public void set(String name, int value) {
@@ -50,14 +64,12 @@ public class Synthesizer {
   public Synthesizer(Settings settings) {
     synth = FluidSynth.new_fluid_synth(settings.getSettings());
     FluidSynth.new_fluid_audio_driver(settings.getSettings(), synth);
-    FluidSynth.fluid_synth_sfload(synth, "/usr/share/sounds/sf2/FluidR3_GM.sf2", 1);
+    FluidSynth.fluid_synth_sfload(synth, settings.getSoundFontFileName(), 1);
   }
 
   public void allNotesOff() {
-    for (int channel = 0; channel < 16; channel++) {
-      for (int key = 0; key < 128; key++) {
-        releaseKey(channel, key);
-      }
+    for (int i = 0; i < Player.TOTAL_CHANNELS; i++) {
+      FluidSynth.fluid_synth_all_notes_off(synth, i);
     }
   }
 
@@ -87,6 +99,18 @@ public class Synthesizer {
   }
 
   /**
+   * Set midi channel type
+   * 
+   * @param channel
+   *          channel number (0 to MIDI channel count - 1)
+   * @param type
+   *          CHANNEL_TYPE_MELODIC, or CHANNEL_TYPE_DRUM
+   */
+  public void setChannelType(int channel, int type) {
+    FluidSynth.fluid_synth_set_channel_type(synth, channel, type);
+  }
+
+  /**
    * Modifies the gain for the synthesizer.
    * 
    * @param gain
@@ -95,5 +119,4 @@ public class Synthesizer {
   public void setGain(float gain) {
     FluidSynth.fluid_synth_set_gain(synth, gain);
   }
-
 }

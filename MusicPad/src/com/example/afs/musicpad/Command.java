@@ -27,4 +27,6 @@ public enum Command {
   SHOW_KEY_INFO, //
   SHOW_DRUM_INFO, //
   QUIT, //
+  STATUS, //
+  LOG, //
 }
