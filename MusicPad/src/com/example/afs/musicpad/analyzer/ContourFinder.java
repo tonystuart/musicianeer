@@ -13,25 +13,26 @@ import java.util.ArrayList;
 import java.util.NavigableSet;
 import java.util.TreeSet;
 
+import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.song.Contour;
 import com.example.afs.musicpad.song.Default;
 import com.example.afs.musicpad.song.Note;
-import com.example.afs.musicpad.util.DirectList;
-import com.example.afs.musicpad.util.RandomAccessList;
 
 // TODO: Integrate with Group
 // TODO: Use common note to eliminate effect of chord inversion
 
-public class ContourAnalyzer {
+public class ContourFinder {
 
-  public RandomAccessList<Contour> getContours(NavigableSet<Note> notes) {
+  public TreeSet<Contour> getContours(NavigableSet<Note> notes) {
     TreeSet<TickEvent> tickEvents = new TreeSet<TickEvent>();
-    RandomAccessList<Contour> contours = new DirectList<>();
+    TreeSet<Contour> contours = new TreeSet<>();
     for (Note note : notes) {
-      TickEvent noteOnEvent = new TickEvent(note);
-      TickEvent noteOffEvent = new TickEvent(note, noteOnEvent);
-      tickEvents.add(noteOnEvent);
-      tickEvents.add(noteOffEvent);
+      if (note.getChannel() != Midi.DRUM) {
+        TickEvent noteOnEvent = new TickEvent(note);
+        TickEvent noteOffEvent = new TickEvent(note, noteOnEvent);
+        tickEvents.add(noteOnEvent);
+        tickEvents.add(noteOffEvent);
+      }
     }
     ArrayList<TickEvent> activeNotes = new ArrayList<>();
     TickEvent currentTickEvent = null;

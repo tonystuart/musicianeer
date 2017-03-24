@@ -13,9 +13,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.NavigableSet;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.TreeSet;
 
 import com.example.afs.fluidsynth.Synthesizer;
+import com.example.afs.musicpad.analyzer.ContourFinder;
 import com.example.afs.musicpad.device.CharCode;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.song.Contour;
@@ -59,6 +61,48 @@ public class SongNotePlayer extends SongPlayer {
   @Override
   protected String getMusic(long currentTick, long firstTick, long lastTick, int ticksPerCharacter) {
     StringBuilder s = new StringBuilder();
+    long untilTick;
+    Contour previousContour = contours.lower(new Contour(currentTick));
+    if (previousContour == null) {
+      untilTick = 0;
+    } else {
+      untilTick = previousContour.getTick() + previousContour.getDuration();
+    }
+    for (long tick = firstTick; tick < lastTick; tick += ticksPerCharacter) {
+      long nextTick = tick + ticksPerCharacter;
+      if (currentTick >= tick && currentTick < nextTick) {
+        s.append(">");
+      } else {
+        s.append(" ");
+      }
+      SortedSet<Contour> tickContours = contours.subSet(new Contour(tick), new Contour(nextTick));
+      int contourCount = tickContours.size();
+      if (contourCount == 0) {
+        if (tick < untilTick) {
+          s.append("~");
+        } else {
+          s.append(".");
+        }
+      } else {
+        if (contourCount > 1) {
+          //System.out.println("Squeezing " + contourCount + " contours into space for one contour");
+        }
+        for (Contour contour : tickContours) {
+          int midiNote = contour.getMidiNote();
+          String keySequence = noteToKeySequence.get(midiNote);
+          if (keySequence.length() > 1) {
+            //System.out.println("Squeezing " + keySequence.length() + " characters into space for one character");
+          }
+          s.append(keySequence);
+          untilTick = contour.getTick() + contour.getDuration();
+        }
+      }
+    }
+    return s.toString();
+  }
+
+  protected String getMusicOld(long currentTick, long firstTick, long lastTick, int ticksPerCharacter) {
+    StringBuilder s = new StringBuilder();
     NavigableSet<Contour> tickContours = contours.subSet(new Contour(firstTick), false, new Contour(lastTick), true);
     if (tickContours.size() > 0) {
       Contour first = tickContours.first();
@@ -88,12 +132,8 @@ public class SongNotePlayer extends SongPlayer {
   private TreeSet<Contour> getContours(Song song, int channel) {
     TreeSet<Contour> contours;
     if (channel == Midi.MELODIC) {
-      contours = new TreeSet<>();
-      for (int i = 0; i < Midi.CHANNELS; i++) {
-        if (i != Midi.DRUM) {
-          contours.addAll(song.getContours(i));
-        }
-      }
+      ContourFinder contourFinder = new ContourFinder();
+      contours = contourFinder.getContours(song.getNotes());
     } else {
       contours = song.getContours(channel);
     }
