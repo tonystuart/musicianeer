@@ -57,7 +57,7 @@ public class SongNotePlayer extends SongPlayer {
   }
 
   @Override
-  protected String getMusic(long firstTick, long lastTick) {
+  protected String getMusic(long currentTick, long firstTick, long lastTick, int ticksPerCharacter) {
     StringBuilder s = new StringBuilder();
     NavigableSet<Contour> tickContours = contours.subSet(new Contour(firstTick), false, new Contour(lastTick), true);
     if (tickContours.size() > 0) {
@@ -66,12 +66,12 @@ public class SongNotePlayer extends SongPlayer {
       long firstContourTick = first.getTick();
       s.append(getIntroTicks(firstTick, firstContourTick));
       for (Contour contour : tickContours) {
-        long currentTick = contour.getTick();
-        long measureTick = song.roundTickToThisMeasure(currentTick);
-        if (measureTick > previousTick && measureTick <= currentTick) {
+        long contourTick = contour.getTick();
+        long measureTick = song.roundTickToThisMeasure(contourTick);
+        if (measureTick > previousTick && measureTick <= contourTick) {
           s.append("|");
         }
-        while (((currentTick - previousTick) / Default.TICKS_PER_BEAT) > 0) {
+        while (((contourTick - previousTick) / Default.TICKS_PER_BEAT) > 0) {
           s.append(".");
           previousTick += Default.TICKS_PER_BEAT;
         }
@@ -79,7 +79,7 @@ public class SongNotePlayer extends SongPlayer {
         String keySequence = noteToKeySequence.get(midiNote);
         //s.append(Names.formatNoteName(midiNote) + " (" + keySequence + ") ");
         s.append(keySequence + "   ");
-        previousTick = currentTick;
+        previousTick = contourTick;
       }
     }
     return s.toString();

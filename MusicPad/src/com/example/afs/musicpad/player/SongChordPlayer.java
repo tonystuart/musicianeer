@@ -11,12 +11,11 @@ package com.example.afs.musicpad.player;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.NavigableSet;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.TreeSet;
 
 import com.example.afs.fluidsynth.Synthesizer;
-import com.example.afs.musicpad.CommandProcessor;
 import com.example.afs.musicpad.analyzer.ChordFinder;
 import com.example.afs.musicpad.device.CharCode;
 import com.example.afs.musicpad.song.Chord;
@@ -60,20 +59,42 @@ public class SongChordPlayer extends SongPlayer {
   }
 
   @Override
-  protected String getMusic(long firstTick, long lastTick) {
+  protected String getMusic(long currentTick, long firstTick, long lastTick, int ticksPerCharacter) {
     StringBuilder s = new StringBuilder();
-    NavigableSet<Chord> tickChords = chords.subSet(new Chord(firstTick), false, new Chord(lastTick), true);
-    if (tickChords.size() > 0) {
-      Chord first = tickChords.first();
-      long firstChordTick = first.getTick();
-      s.append(getIntroTicks(firstTick, firstChordTick));
-      for (Chord chord : tickChords) {
-        ChordType chordType = chord.getChordType();
-        String keySequence = chordToKeySequence.get(chordType);
-        //s.append(chordType.getName() + " (" + keySequence + ") ");
-        s.append(keySequence + " ");
-        if (CommandProcessor.isTraceMusic()) {
-          System.out.println("SongChordPlayer.getMusic: tick=" + chord.getTick() + ", duration=" + chord.getDuration() + ", chordType=" + chordType.getName());
+    long untilTick;
+    Chord previousChord = chords.lower(new Chord(currentTick));
+    if (previousChord == null) {
+      untilTick = 0;
+    } else {
+      untilTick = previousChord.getTick() + previousChord.getDuration();
+    }
+    for (long tick = firstTick; tick < lastTick; tick += ticksPerCharacter) {
+      long nextTick = tick + ticksPerCharacter;
+      if (currentTick >= tick && currentTick < nextTick) {
+        s.append(">");
+      } else {
+        s.append(" ");
+      }
+      SortedSet<Chord> tickChords = chords.subSet(new Chord(tick), new Chord(nextTick));
+      int chordCount = tickChords.size();
+      if (chordCount == 0) {
+        if (tick < untilTick) {
+          s.append("~");
+        } else {
+          s.append(".");
+        }
+      } else {
+        if (chordCount > 1) {
+          System.out.println("Squeezing " + chordCount + " chords into space for one chord");
+        }
+        for (Chord chord : tickChords) {
+          ChordType chordType = chord.getChordType();
+          String keySequence = chordToKeySequence.get(chordType);
+          if (keySequence.length() > 1) {
+            //System.out.println("Squeezing " + keySequence.length() + " characters into space for one character");
+          }
+          s.append(keySequence);
+          untilTick = chord.getTick() + chord.getDuration();
         }
       }
     }

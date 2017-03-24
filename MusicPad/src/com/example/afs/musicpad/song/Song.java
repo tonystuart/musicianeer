@@ -67,6 +67,17 @@ public class Song {
     return appendTick;
   }
 
+  public int getBeatsPerMeasure(long tick) {
+    int beatsPerMeasure;
+    Note note = getControllingNote(tick);
+    if (note == null) {
+      beatsPerMeasure = Default.BEATS_PER_MEASURE;
+    } else {
+      beatsPerMeasure = note.getBeatsPerMeasure();
+    }
+    return beatsPerMeasure;
+  }
+
   public int getBeatsPerMinute(long tick) {
     int beatsPerMinute;
     Note note = getControllingNote(tick);
@@ -76,7 +87,7 @@ public class Song {
       beatsPerMinute = note.getBeatsPerMinute();
     }
     return beatsPerMinute;
-  }
+  };
 
   public int getChannelNoteCount(int channel) {
     return channelFacets.getFacet(channel).getTotalNoteCount();
@@ -130,7 +141,7 @@ public class Song {
     Note lastNote = new Note(toTick);
     NavigableSet<Note> set = notes.subSet(firstNote, true, lastNote, false);
     return set;
-  };
+  }
 
   public int getOccupancy(int channel) {
     return channelFacets.getFacet(channel).getOccupancy();
@@ -154,16 +165,10 @@ public class Song {
       programs = channelFacets.getFacet(channel).getPrograms();
     }
     return programs;
-  }
+  };
 
   public int getTicksPerMeasure(long tick) {
-    int ticksPerMeasure;
-    Note note = getControllingNote(tick);
-    if (note == null) {
-      ticksPerMeasure = Default.BEATS_PER_MEASURE * Default.TICKS_PER_BEAT;
-    } else {
-      ticksPerMeasure = note.getTicksPerMeasure();
-    }
+    int ticksPerMeasure = getBeatsPerMeasure(tick) * Default.TICKS_PER_BEAT;
     return ticksPerMeasure;
   };
 

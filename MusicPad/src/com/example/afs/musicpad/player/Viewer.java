@@ -10,6 +10,7 @@
 package com.example.afs.musicpad.player;
 
 import java.awt.BorderLayout;
+import java.awt.Font;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -20,10 +21,13 @@ public class Viewer extends JFrame {
   private JLabel bottomLine;
 
   public Viewer() {
+    Font font = new Font("Courier", Font.BOLD, 36);
     JPanel panel = new JPanel(new BorderLayout());
     topLine = new JLabel("Top");
+    topLine.setFont(font);
     panel.add(topLine, BorderLayout.NORTH);
     bottomLine = new JLabel("Bottom");
+    bottomLine.setFont(font);
     panel.add(bottomLine, BorderLayout.SOUTH);
     getContentPane().add(panel);
     setDefaultCloseOperation(EXIT_ON_CLOSE);
