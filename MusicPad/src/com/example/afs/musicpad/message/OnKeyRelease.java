@@ -9,21 +9,21 @@
 
 package com.example.afs.musicpad.message;
 
-public class OnRelease implements Message {
+public class OnKeyRelease implements Message {
 
-  private int buttonIndex;
+  private short code;
 
-  public OnRelease(int buttonIndex) {
-    this.buttonIndex = buttonIndex;
+  public OnKeyRelease(short code) {
+    this.code = code;
   }
 
-  public int getButtonIndex() {
-    return buttonIndex;
+  public short getCode() {
+    return code;
   }
 
   @Override
   public String toString() {
-    return "OnRelease [buttonIndex=" + buttonIndex + "]";
+    return "OnKeyRelease [code=" + code + "]";
   }
 
 }

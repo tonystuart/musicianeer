@@ -9,12 +9,10 @@
 
 package com.example.afs.musicpad.player;
 
-import java.util.NavigableSet;
 import java.util.Set;
 import java.util.SortedSet;
 
 import com.example.afs.fluidsynth.Synthesizer;
-import com.example.afs.musicpad.song.Default;
 import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.song.Word;
 
@@ -74,17 +72,6 @@ public abstract class SongPlayer extends Player {
     viewer.getBottomLine().setText(words);
   }
 
-  @Deprecated
-  protected String getIntroTicks(long currentTick, long firstTick) {
-    StringBuilder s = new StringBuilder();
-    long deltaTicks = firstTick - currentTick;
-    long beats = deltaTicks / Default.TICKS_PER_BEAT;
-    for (int i = 0; i < beats; i++) {
-      s.append(".");
-    }
-    return s.toString();
-  }
-
   protected abstract String getMusic(long x, long y, long z, int ticksPerCharacter);
 
   protected String getWords(long currentTick, long firstTick, long lastTick, int ticksPerCharacter) {
@@ -119,25 +106,6 @@ public abstract class SongPlayer extends Player {
       }
     }
 
-    return s.toString();
-  }
-
-  @Deprecated
-  protected String getWordsOld(long currentTick, long firstTick, long lastTick, int ticksPerCharacter) {
-    StringBuilder s = new StringBuilder();
-    NavigableSet<Word> tickWords = song.getWords().subSet(new Word(firstTick), false, new Word(lastTick), true);
-    if (tickWords.size() > 0) {
-      Word first = tickWords.first();
-      long firstWordTick = first.getTick();
-      s.append(getIntroTicks(firstTick, firstWordTick));
-      for (Word word : tickWords) {
-        String text = word.getText();
-        if (text.startsWith("/") || text.startsWith("\\")) {
-          text = " " + text.substring(1);
-        }
-        s.append(text);
-      }
-    }
     return s.toString();
   }
 

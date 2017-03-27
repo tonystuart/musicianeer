@@ -12,6 +12,7 @@ package com.example.afs.musicpad.player;
 import com.example.afs.fluidsynth.Synthesizer;
 import com.example.afs.musicpad.CommandProcessor;
 import com.example.afs.musicpad.analyzer.Names;
+import com.example.afs.musicpad.device.InputDevice;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.theory.ChordType;
 import com.example.afs.musicpad.util.Velocity;
@@ -54,6 +55,9 @@ public abstract class Player {
 
   public void setPercentVelocity(int percentVelocity) {
     this.percentVelocity = percentVelocity;
+  }
+
+  public void updateInputDevice(InputDevice inputDevice) {
   }
 
   protected void playMidiChord(Action action, int octave, ChordType chordType) {

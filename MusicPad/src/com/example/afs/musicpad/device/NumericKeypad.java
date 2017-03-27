@@ -9,12 +9,16 @@
 
 package com.example.afs.musicpad.device;
 
-public class CharCode {
+public class NumericKeypad extends InputDevice {
 
-  public static final int PAGE_SIZE = 16;
-  public static final int TOTAL_SIZE = PAGE_SIZE * 2;
+  public static final char NUM_LOCK = 'N';
+  public static final char BACK_SPACE = 'B';
 
-  public static int fromIndex(int index) {
+  private static final int PAGE_SIZE = 16;
+  private static final int TOTAL_SIZE = PAGE_SIZE * 2;
+
+  @Override
+  public int fromIndex(int index) {
     int charCode = -1;
     switch (index) {
     case 0:
@@ -27,7 +31,7 @@ public class CharCode {
       charCode = '3';
       break;
     case 3:
-      charCode = DeviceReader.ENTER;
+      charCode = InputDevice.ENTER;
       break;
     case 4:
       charCode = '4';
@@ -54,7 +58,7 @@ public class CharCode {
       charCode = '-';
       break;
     case 12:
-      charCode = DeviceReader.NUM_LOCK;
+      charCode = NumericKeypad.NUM_LOCK;
       break;
     case 13:
       charCode = '/';
@@ -63,13 +67,86 @@ public class CharCode {
       charCode = '*';
       break;
     case 15:
-      charCode = DeviceReader.BACK_SPACE;
+      charCode = NumericKeypad.BACK_SPACE;
       break;
     }
     return charCode;
   }
 
-  public static int toIndex(int charCode) {
+  @Override
+  public int getButtonPageSize() {
+    return PAGE_SIZE;
+  }
+
+  @Override
+  public int getButtonTotalSize() {
+    return TOTAL_SIZE;
+  }
+
+  @Override
+  public int toCharCode(int keyCode) {
+    int charCode = -1;
+    switch (keyCode) {
+    case 69:
+      charCode = NumericKeypad.NUM_LOCK;
+      break;
+    case 98:
+      charCode = '/';
+      break;
+    case 55:
+      charCode = '*';
+      break;
+    case 14:
+      charCode = NumericKeypad.BACK_SPACE;
+      break;
+    case 71:
+      charCode = '7';
+      break;
+    case 72:
+      charCode = '8';
+      break;
+    case 73:
+      charCode = '9';
+      break;
+    case 74:
+      charCode = '-';
+      break;
+    case 75:
+      charCode = '4';
+      break;
+    case 76:
+      charCode = '5';
+      break;
+    case 77:
+      charCode = '6';
+      break;
+    case 78:
+      charCode = '+';
+      break;
+    case 79:
+      charCode = '1';
+      break;
+    case 80:
+      charCode = '2';
+      break;
+    case 81:
+      charCode = '3';
+      break;
+    case 96:
+      charCode = InputDevice.ENTER;
+      break;
+    case 82:
+      charCode = '0';
+      break;
+    case 83:
+      charCode = '.';
+      break;
+    }
+    return charCode;
+  }
+
+  @Override
+  public int toIndex(int charCode) {
     int index = -1;
     switch (charCode) {
     case '1':
@@ -81,7 +158,7 @@ public class CharCode {
     case '3':
       index = 2;
       break;
-    case DeviceReader.ENTER:
+    case InputDevice.ENTER:
       index = 3;
       break;
     case '4':
@@ -108,7 +185,7 @@ public class CharCode {
     case '-':
       index = 11;
       break;
-    case DeviceReader.NUM_LOCK:
+    case NumericKeypad.NUM_LOCK:
       index = 12;
       break;
     case '/':
@@ -117,26 +194,11 @@ public class CharCode {
     case '*':
       index = 14;
       break;
-    case DeviceReader.BACK_SPACE:
+    case NumericKeypad.BACK_SPACE:
       index = 15;
       break;
     }
     return index;
-  }
-
-  public static String fromIndexToSequence(int buttonIndex) {
-    String keySequence;
-    int page = buttonIndex / PAGE_SIZE;
-    int index = buttonIndex % PAGE_SIZE;
-    int charCode = fromIndex(index);
-    if (page == 0) {
-      keySequence = Character.toString((char) charCode);
-    } else if (page == 1) {
-      keySequence = "0+" + (char) charCode;
-    } else {
-      keySequence = "?+" + (char) charCode;
-    }
-    return keySequence;
   }
 
 }

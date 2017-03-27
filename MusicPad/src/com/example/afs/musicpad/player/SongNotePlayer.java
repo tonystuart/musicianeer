@@ -11,17 +11,15 @@ package com.example.afs.musicpad.player;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.NavigableSet;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
 import com.example.afs.fluidsynth.Synthesizer;
 import com.example.afs.musicpad.analyzer.ContourFinder;
-import com.example.afs.musicpad.device.CharCode;
+import com.example.afs.musicpad.device.InputDevice;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.song.Contour;
-import com.example.afs.musicpad.song.Default;
 import com.example.afs.musicpad.song.Song;
 
 public class SongNotePlayer extends SongPlayer {
@@ -30,18 +28,13 @@ public class SongNotePlayer extends SongPlayer {
   private Map<Integer, String> noteToKeySequence;
   private TreeSet<Contour> contours;
 
-  public SongNotePlayer(Synthesizer synthesizer, Song song, int channel) {
+  public SongNotePlayer(Synthesizer synthesizer, Song song, int channel, InputDevice inputDevice) {
     super(synthesizer, song, channel);
     contours = getContours(song, channel);
     buttonIndexToNote = getUniqueMidiNotes();
     noteToKeySequence = new HashMap<>();
     System.out.println("Total notes: " + contours.size() + ", Unique notes: " + buttonIndexToNote.length);
-    for (int buttonIndex = 0; buttonIndex < buttonIndexToNote.length; buttonIndex++) {
-      int midiNote = buttonIndexToNote[buttonIndex];
-      String keySequence = CharCode.fromIndexToSequence(buttonIndex);
-      noteToKeySequence.put(midiNote, keySequence);
-      System.out.println(keySequence + " -> " + midiNote);
-    }
+    updateInputDevice(inputDevice);
     setTitle("Channel " + (channel + 1) + " Notes");
   }
 
@@ -55,6 +48,16 @@ public class SongNotePlayer extends SongPlayer {
     if (noteIndex < buttonIndexToNote.length) {
       int midiNote = buttonIndexToNote[noteIndex];
       playMidiNote(action, midiNote);
+    }
+  }
+
+  @Override
+  public void updateInputDevice(InputDevice inputDevice) {
+    for (int buttonIndex = 0; buttonIndex < buttonIndexToNote.length; buttonIndex++) {
+      int midiNote = buttonIndexToNote[buttonIndex];
+      String keySequence = inputDevice.fromIndexToSequence(buttonIndex);
+      noteToKeySequence.put(midiNote, keySequence);
+      System.out.println(keySequence + " -> " + midiNote);
     }
   }
 
@@ -96,34 +99,6 @@ public class SongNotePlayer extends SongPlayer {
           s.append(keySequence);
           untilTick = contour.getTick() + contour.getDuration();
         }
-      }
-    }
-    return s.toString();
-  }
-
-  protected String getMusicOld(long currentTick, long firstTick, long lastTick, int ticksPerCharacter) {
-    StringBuilder s = new StringBuilder();
-    NavigableSet<Contour> tickContours = contours.subSet(new Contour(firstTick), false, new Contour(lastTick), true);
-    if (tickContours.size() > 0) {
-      Contour first = tickContours.first();
-      long previousTick = first.getTick();
-      long firstContourTick = first.getTick();
-      s.append(getIntroTicks(firstTick, firstContourTick));
-      for (Contour contour : tickContours) {
-        long contourTick = contour.getTick();
-        long measureTick = song.roundTickToThisMeasure(contourTick);
-        if (measureTick > previousTick && measureTick <= contourTick) {
-          s.append("|");
-        }
-        while (((contourTick - previousTick) / Default.TICKS_PER_BEAT) > 0) {
-          s.append(".");
-          previousTick += Default.TICKS_PER_BEAT;
-        }
-        int midiNote = contour.getMidiNote();
-        String keySequence = noteToKeySequence.get(midiNote);
-        //s.append(Names.formatNoteName(midiNote) + " (" + keySequence + ") ");
-        s.append(keySequence + "   ");
-        previousTick = contourTick;
       }
     }
     return s.toString();

@@ -21,7 +21,7 @@ import com.example.afs.musicpad.analyzer.BeatFinder.Beat;
 import com.example.afs.musicpad.analyzer.BeatFinder.BeatNote;
 import com.example.afs.musicpad.analyzer.BeatFinder.BeatNotes;
 import com.example.afs.musicpad.analyzer.BeatFinder.Beats;
-import com.example.afs.musicpad.device.CharCode;
+import com.example.afs.musicpad.device.InputDevice;
 import com.example.afs.musicpad.song.Default;
 import com.example.afs.musicpad.song.Song;
 
@@ -31,19 +31,14 @@ public class SongBeatPlayer extends SongPlayer {
   private BeatNotes[] buttonIndexToBeat;
   private Map<BeatNotes, String> beatToKeySequence;
 
-  public SongBeatPlayer(Synthesizer synthesizer, Song song, int channel) {
+  public SongBeatPlayer(Synthesizer synthesizer, Song song, int channel, InputDevice inputDevice) {
     super(synthesizer, song, channel);
     BeatFinder beatFinder = new BeatFinder();
     beats = beatFinder.findBeats(song.getNotes());
     buttonIndexToBeat = getUniqueBeatNotes(beats);
     beatToKeySequence = new HashMap<>();
     System.out.println("Total beats: " + beats.size() + ", Unique beats: " + buttonIndexToBeat.length);
-    for (int buttonIndex = 0; buttonIndex < buttonIndexToBeat.length; buttonIndex++) {
-      BeatNotes BeatNotes = buttonIndexToBeat[buttonIndex];
-      String keySequence = CharCode.fromIndexToSequence(buttonIndex);
-      beatToKeySequence.put(BeatNotes, keySequence);
-      System.out.println(keySequence + " -> " + BeatNotes);
-    }
+    updateInputDevice(inputDevice);
     setTitle("Channel " + (channel + 1) + " Beats");
   }
 
@@ -57,6 +52,16 @@ public class SongBeatPlayer extends SongPlayer {
     if (beatIndex < buttonIndexToBeat.length) {
       BeatNotes beatNotes = buttonIndexToBeat[beatIndex];
       playMidiBeat(action, Default.OCTAVE_SEMITONE, beatNotes);
+    }
+  }
+
+  @Override
+  public void updateInputDevice(InputDevice inputDevice) {
+    for (int buttonIndex = 0; buttonIndex < buttonIndexToBeat.length; buttonIndex++) {
+      BeatNotes beatNotes = buttonIndexToBeat[buttonIndex];
+      String keySequence = inputDevice.fromIndexToSequence(buttonIndex);
+      beatToKeySequence.put(beatNotes, keySequence);
+      System.out.println(keySequence + " -> " + beatNotes);
     }
   }
 

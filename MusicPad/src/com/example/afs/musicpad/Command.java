@@ -22,6 +22,7 @@ public enum Command {
   PAUSE, //
   RESUME, //
   STOP, //
+  SET_KEYBOARD_MAPPING, //
   SET_PLAYER_VELOCITY, //
   SET_TRANSPORT_TEMPO, //
   SET_TRANSPORT_VELOCITY, //

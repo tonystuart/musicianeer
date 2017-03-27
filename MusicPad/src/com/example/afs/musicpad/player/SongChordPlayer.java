@@ -17,7 +17,7 @@ import java.util.TreeSet;
 
 import com.example.afs.fluidsynth.Synthesizer;
 import com.example.afs.musicpad.analyzer.ChordFinder;
-import com.example.afs.musicpad.device.CharCode;
+import com.example.afs.musicpad.device.InputDevice;
 import com.example.afs.musicpad.song.Chord;
 import com.example.afs.musicpad.song.Default;
 import com.example.afs.musicpad.song.Song;
@@ -29,19 +29,14 @@ public class SongChordPlayer extends SongPlayer {
   private ChordType[] buttonIndexToChord;
   private Map<ChordType, String> chordToKeySequence;
 
-  public SongChordPlayer(Synthesizer synthesizer, Song song, int channel) {
+  public SongChordPlayer(Synthesizer synthesizer, Song song, int channel, InputDevice inputDevice) {
     super(synthesizer, song, channel);
     ChordFinder chordFinder = new ChordFinder();
     chords = chordFinder.getChords(song.getNotes(), channel);
     buttonIndexToChord = getUniqueChordTypes(chords);
     chordToKeySequence = new HashMap<>();
     System.out.println("Total chords: " + chords.size() + ", Unique chords: " + buttonIndexToChord.length);
-    for (int buttonIndex = 0; buttonIndex < buttonIndexToChord.length; buttonIndex++) {
-      ChordType chordType = buttonIndexToChord[buttonIndex];
-      String keySequence = CharCode.fromIndexToSequence(buttonIndex);
-      chordToKeySequence.put(chordType, keySequence);
-      System.out.println(keySequence + " -> " + chordType);
-    }
+    updateInputDevice(inputDevice);
     setTitle("Channel " + (channel + 1) + " Chords");
   }
 
@@ -55,6 +50,16 @@ public class SongChordPlayer extends SongPlayer {
     if (chordIndex < buttonIndexToChord.length) {
       ChordType chordType = buttonIndexToChord[chordIndex];
       playMidiChord(action, Default.OCTAVE_SEMITONE, chordType);
+    }
+  }
+
+  @Override
+  public void updateInputDevice(InputDevice inputDevice) {
+    for (int buttonIndex = 0; buttonIndex < buttonIndexToChord.length; buttonIndex++) {
+      ChordType chordType = buttonIndexToChord[buttonIndex];
+      String keySequence = inputDevice.fromIndexToSequence(buttonIndex);
+      chordToKeySequence.put(chordType, keySequence);
+      System.out.println(keySequence + " -> " + chordType);
     }
   }
 
