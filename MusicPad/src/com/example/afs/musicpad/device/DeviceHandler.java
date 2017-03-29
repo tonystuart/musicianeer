@@ -74,6 +74,7 @@ public class DeviceHandler extends BrokerTask<Message> {
     }
 
     private void composeField(int charCode) {
+      System.out.println("composeField: charCode=" + charCode);
       if ('0' <= charCode && charCode <= '9' && currentField.length() < MAX_LENGTH) {
         currentField.append((char) charCode);
         if (currentField == left) {
@@ -282,6 +283,9 @@ public class DeviceHandler extends BrokerTask<Message> {
     switch (mapping) {
     case 1:
       inputDevice = new NumericKeypad();
+      break;
+    case 2:
+      inputDevice = new AlphabeticKeyboard();
       break;
     }
     player.updateInputDevice(inputDevice);
