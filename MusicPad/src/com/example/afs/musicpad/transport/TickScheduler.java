@@ -59,6 +59,10 @@ public class TickScheduler {
     this.baseTimeMillis = INITIALIZE_ON_NEXT_EVENT;
   }
 
+  public void setBaseTick(long baseTick) {
+    this.baseTick = baseTick;
+  }
+
   public void setBaseTimeMillis(long baseTimeMillis) {
     this.baseTimeMillis = baseTimeMillis;
   }

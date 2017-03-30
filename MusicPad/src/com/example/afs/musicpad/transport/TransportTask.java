@@ -83,11 +83,16 @@ public class TransportTask extends BrokerTask<Message> {
   private void play(int channelNumber) {
     if (song != null) {
       stop();
+      boolean isFirstTick = true;
       int channel = channelNumber - 1;
       for (Note note : song.getNotes()) {
         if (channel == -1 || channel == note.getChannel()) {
           long tick = note.getTick();
           long duration = note.getDuration();
+          if (isFirstTick) {
+            noteEventScheduler.setBaseTick(tick);
+            isFirstTick = false;
+          }
           sequencerTask.getInputQueue().add(new NoteEvent(Type.NOTE_ON, tick, note));
           sequencerTask.getInputQueue().add(new NoteEvent(Type.NOTE_OFF, tick + duration, note));
         }
