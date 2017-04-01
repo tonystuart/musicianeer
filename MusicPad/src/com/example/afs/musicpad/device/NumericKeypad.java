@@ -9,13 +9,9 @@
 
 package com.example.afs.musicpad.device;
 
-public class NumericKeypad extends InputDevice {
+import java.awt.event.KeyEvent;
 
-  public static final char NUM_LOCK = 'N';
-  public static final char BACK_SPACE = 'B';
-
-  private static final int PAGE_SIZE = 16;
-  private static final int TOTAL_SIZE = PAGE_SIZE * 2;
+public class NumericKeypad extends LinuxKeyboard {
 
   @Override
   public int fromIndex(int index) {
@@ -31,7 +27,7 @@ public class NumericKeypad extends InputDevice {
       charCode = '3';
       break;
     case 3:
-      charCode = InputDevice.ENTER;
+      charCode = 'E';
       break;
     case 4:
       charCode = '4';
@@ -58,7 +54,7 @@ public class NumericKeypad extends InputDevice {
       charCode = '-';
       break;
     case 12:
-      charCode = NumericKeypad.NUM_LOCK;
+      charCode = 'N';
       break;
     case 13:
       charCode = '/';
@@ -67,79 +63,7 @@ public class NumericKeypad extends InputDevice {
       charCode = '*';
       break;
     case 15:
-      charCode = NumericKeypad.BACK_SPACE;
-      break;
-    }
-    return charCode;
-  }
-
-  @Override
-  public int getButtonPageSize() {
-    return PAGE_SIZE;
-  }
-
-  @Override
-  public int getButtonTotalSize() {
-    return TOTAL_SIZE;
-  }
-
-  @Override
-  public int toCharCode(int keyCode) {
-    int charCode = -1;
-    switch (keyCode) {
-    case 69:
-      charCode = NumericKeypad.NUM_LOCK;
-      break;
-    case 98:
-      charCode = '/';
-      break;
-    case 55:
-      charCode = '*';
-      break;
-    case 14:
-      charCode = NumericKeypad.BACK_SPACE;
-      break;
-    case 71:
-      charCode = '7';
-      break;
-    case 72:
-      charCode = '8';
-      break;
-    case 73:
-      charCode = '9';
-      break;
-    case 74:
-      charCode = '-';
-      break;
-    case 75:
-      charCode = '4';
-      break;
-    case 76:
-      charCode = '5';
-      break;
-    case 77:
-      charCode = '6';
-      break;
-    case 78:
-      charCode = '+';
-      break;
-    case 79:
-      charCode = '1';
-      break;
-    case 80:
-      charCode = '2';
-      break;
-    case 81:
-      charCode = '3';
-      break;
-    case 96:
-      charCode = InputDevice.ENTER;
-      break;
-    case 82:
-      charCode = '0';
-      break;
-    case 83:
-      charCode = '.';
+      charCode = 'B';
       break;
     }
     return charCode;
@@ -158,7 +82,8 @@ public class NumericKeypad extends InputDevice {
     case '3':
       index = 2;
       break;
-    case InputDevice.ENTER:
+    case 'E':
+    case KeyEvent.VK_ENTER:
       index = 3;
       break;
     case '4':
@@ -185,7 +110,7 @@ public class NumericKeypad extends InputDevice {
     case '-':
       index = 11;
       break;
-    case NumericKeypad.NUM_LOCK:
+    case 'N':
       index = 12;
       break;
     case '/':
@@ -194,11 +119,11 @@ public class NumericKeypad extends InputDevice {
     case '*':
       index = 14;
       break;
-    case NumericKeypad.BACK_SPACE:
+    case 'B':
+    case KeyEvent.VK_BACK_SPACE:
       index = 15;
       break;
     }
     return index;
   }
-
 }

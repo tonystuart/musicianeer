@@ -27,17 +27,47 @@ import com.example.afs.musicpad.util.ByteArray;
 
 public class DeviceReader {
 
+  public static class EventDeviceGrabber {
+    private FileInputStream fileInputStream;
+
+    public EventDeviceGrabber(FileInputStream fileInputStream) {
+      this.fileInputStream = fileInputStream;
+    }
+
+    public void setExclusive(boolean isExclusive) {
+      try {
+        Field f = FileDescriptor.class.getDeclaredField("fd");
+        if (f != null) {
+          f.setAccessible(true);
+          Integer fd = (Integer) f.get(fileInputStream.getFD());
+          if (fd != null) {
+            // See EVIOCGRAB in drivers/input/evdev.c
+            int value = isExclusive ? 1 : 0;
+            System.out.println("DeviceReader.setExclusive: value=" + value);
+            FluidSynth.capture(fd, value);
+          }
+        }
+      } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException | IOException e) {
+        throw new RuntimeException(e);
+      }
+    }
+  }
+
   private static final int EV_KEY = 0x01;
 
   private String deviceName;
   private Thread deviceReader;
   private boolean isTerminated;
-
+  private EventDeviceGrabber eventDeviceGrabber;
   private BlockingQueue<Message> handlerQueue;
 
   public DeviceReader(BlockingQueue<Message> handlerQueue, String deviceName) {
     this.handlerQueue = handlerQueue;
     this.deviceName = deviceName;
+  }
+
+  public void setExclusive(boolean isExclusive) {
+    eventDeviceGrabber.setExclusive(isExclusive);
   }
 
   public void start() {
@@ -49,28 +79,14 @@ public class DeviceReader {
     isTerminated = true;
   }
 
-  private void capture(FileInputStream inputStream, int value) {
-    try {
-      Field f = FileDescriptor.class.getDeclaredField("fd");
-      if (f != null) {
-        f.setAccessible(true);
-        Integer fd = (Integer) f.get(inputStream.getFD());
-        if (fd != null) {
-          FluidSynth.capture(fd, value);
-        }
-      }
-    } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException | IOException e) {
-      throw new RuntimeException(e);
-    }
-  }
-
   private void run() {
-    try (FileInputStream inputStream = new FileInputStream(deviceName)) {
-      capture(inputStream, 1);
+    try (FileInputStream fileInputStream = new FileInputStream(deviceName)) {
+      eventDeviceGrabber = new EventDeviceGrabber(fileInputStream);
+      eventDeviceGrabber.setExclusive(true);
       byte[] buffer = new byte[16];
       while (!isTerminated) {
         try {
-          inputStream.read(buffer);
+          fileInputStream.read(buffer);
           short type = ByteArray.toNativeShort(buffer, 8);
           //System.out.printf("buffer=%s, type=%#x, code=%#x, value=%#x\n", Arrays.toString(buffer), type, code, value);
           if (type == EV_KEY) {

@@ -10,15 +10,15 @@
 package com.example.afs.musicpad.player;
 
 import com.example.afs.fluidsynth.Synthesizer;
-import com.example.afs.musicpad.device.InputDevice;
+import com.example.afs.musicpad.device.InputMapping;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.song.Song;
 
 public class SongDrumPlayer extends Player {
 
-  public SongDrumPlayer(Synthesizer synthesizer, Song currentSong, InputDevice inputDevice) {
+  public SongDrumPlayer(Synthesizer synthesizer, Song currentSong, InputMapping inputMapping) {
     super(synthesizer, Midi.DRUM);
-    updateInputDevice(inputDevice);
+    updateInputDevice(inputMapping);
   }
 
   @Override
@@ -31,7 +31,7 @@ public class SongDrumPlayer extends Player {
   }
 
   @Override
-  public void updateInputDevice(InputDevice inputDevice) {
+  public void updateInputDevice(InputMapping inputMapping) {
   }
 
 }

@@ -9,23 +9,12 @@
 
 package com.example.afs.musicpad.device;
 
-public class AlphabeticKeyboard extends LinuxKeyboard {
+public abstract class LinuxKeyboard extends InputMapping {
 
   @Override
-  public int fromIndex(int index) {
-    int charCode = -1;
-    if (index >= 0 && index < 26) {
-      charCode = 'A' + index;
-    }
+  public int toCharCode(int keyCode) {
+    int charCode = LinuxKeycodeTable.charCodes[keyCode];
     return charCode;
   }
 
-  @Override
-  public int toIndex(int charCode) {
-    int index = -1;
-    if (charCode >= 'A' && charCode <= 'Z') {
-      index = charCode - 'A';
-    }
-    return index;
-  }
 }

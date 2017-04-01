@@ -43,7 +43,7 @@ public class LinuxKeycodeTable {
       '[', //
       ']', //
       KeyEvent.VK_ENTER, //
-      KeyEvent.VK_CONTROL, // keft
+      KeyEvent.VK_CONTROL, // left
       'A', //
       'S', //
       'D', //
@@ -83,33 +83,33 @@ public class LinuxKeycodeTable {
       KeyEvent.VK_F8, //
       KeyEvent.VK_F9, //
       KeyEvent.VK_F10, //
-      KeyEvent.VK_NUM_LOCK, //
+      'N', // KeyEvent.VK_NUM_LOCK, //
       KeyEvent.VK_SCROLL_LOCK, //
-      KeyEvent.VK_HOME, // 7
-      KeyEvent.VK_UP, // 8
-      KeyEvent.VK_PAGE_UP, // 9
+      '7', // KeyEvent.VK_HOME, // 7
+      '8', // KeyEvent.VK_UP, // 8
+      '9', //KeyEvent.VK_PAGE_UP, // 9
       '-', //
-      KeyEvent.VK_LEFT, // 4
+      '4',//KeyEvent.VK_LEFT, // 4
       '5', //
-      KeyEvent.VK_RIGHT, // 6
+      '6', //KeyEvent.VK_RIGHT, // 6
       '+', //
-      KeyEvent.VK_END, // 1
-      KeyEvent.VK_DOWN, // 2
-      KeyEvent.VK_PAGE_DOWN, // 3
-      KeyEvent.VK_INSERT, //
-      KeyEvent.VK_DELETE, //
-      KeyEvent.VK_UNDEFINED, //
-      KeyEvent.VK_UNDEFINED, //
-      KeyEvent.VK_UNDEFINED, //
-      KeyEvent.VK_F11, //
-      KeyEvent.VK_F12, //
-      KeyEvent.VK_UNDEFINED, //
-      KeyEvent.VK_UNDEFINED, //
-      KeyEvent.VK_UNDEFINED, //
-      KeyEvent.VK_UNDEFINED, //
-      KeyEvent.VK_UNDEFINED, //
-      KeyEvent.VK_UNDEFINED, //
-      KeyEvent.VK_UNDEFINED, //
+      '1', //KeyEvent.VK_END, // 1
+      '2', //KeyEvent.VK_DOWN, // 2
+      '3', //KeyEvent.VK_PAGE_DOWN, // 3
+      '0', //KeyEvent.VK_INSERT, //
+      '.', //KeyEvent.VK_DELETE 83
+      KeyEvent.VK_UNDEFINED, // 84
+      KeyEvent.VK_UNDEFINED, // 85
+      KeyEvent.VK_UNDEFINED, // 86
+      KeyEvent.VK_F11, // 87
+      KeyEvent.VK_F12, // 88
+      KeyEvent.VK_UNDEFINED, // 89
+      KeyEvent.VK_UNDEFINED, // 90
+      KeyEvent.VK_UNDEFINED, // 91
+      KeyEvent.VK_UNDEFINED, // 92
+      KeyEvent.VK_UNDEFINED, // 93
+      KeyEvent.VK_UNDEFINED, // 94
+      KeyEvent.VK_UNDEFINED, // 95
       KeyEvent.VK_ENTER, // right
       KeyEvent.VK_CONTROL, // right
       '/', //

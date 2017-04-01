@@ -17,7 +17,7 @@ import java.util.TreeSet;
 
 import com.example.afs.fluidsynth.Synthesizer;
 import com.example.afs.musicpad.analyzer.ContourFinder;
-import com.example.afs.musicpad.device.InputDevice;
+import com.example.afs.musicpad.device.InputMapping;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.song.Contour;
 import com.example.afs.musicpad.song.Song;
@@ -28,13 +28,13 @@ public class SongNotePlayer extends SongPlayer {
   private Map<Integer, String> noteToKeySequence;
   private TreeSet<Contour> contours;
 
-  public SongNotePlayer(Synthesizer synthesizer, Song song, int channel, InputDevice inputDevice) {
+  public SongNotePlayer(Synthesizer synthesizer, Song song, int channel, InputMapping inputMapping) {
     super(synthesizer, song, channel);
     contours = getContours(song, channel);
     buttonIndexToNote = getUniqueMidiNotes();
     noteToKeySequence = new HashMap<>();
     System.out.println("Total notes: " + contours.size() + ", Unique notes: " + buttonIndexToNote.length);
-    updateInputDevice(inputDevice);
+    updateInputDevice(inputMapping);
     setTitle("Channel " + (channel + 1) + " Notes");
   }
 
@@ -52,10 +52,10 @@ public class SongNotePlayer extends SongPlayer {
   }
 
   @Override
-  public void updateInputDevice(InputDevice inputDevice) {
+  public void updateInputDevice(InputMapping inputMapping) {
     for (int buttonIndex = 0; buttonIndex < buttonIndexToNote.length; buttonIndex++) {
       int midiNote = buttonIndexToNote[buttonIndex];
-      String keySequence = inputDevice.fromIndexToSequence(buttonIndex);
+      String keySequence = inputMapping.fromIndexToSequence(buttonIndex);
       noteToKeySequence.put(midiNote, keySequence);
       System.out.println(keySequence + " -> " + midiNote);
     }

@@ -61,7 +61,7 @@ public class DeviceWatcher extends BrokerTask<Message> {
   }
 
   private boolean isMusicPad(String name) {
-    return name.endsWith("event-kbd") && !name.startsWith("platform");
+    return name.endsWith("event-kbd");
   }
 
 }
