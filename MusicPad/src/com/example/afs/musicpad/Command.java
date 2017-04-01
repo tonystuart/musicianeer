@@ -15,7 +15,6 @@ public enum Command {
   SELECT_SONG, //
   SELECT_NOTES, //
   SELECT_CHORDS, //
-  SELECT_BEATS, //
   SELECT_DRUMS, //
   SELECT_PROGRAM, //
   PLAY, //

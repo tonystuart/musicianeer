@@ -22,7 +22,6 @@ import com.example.afs.musicpad.player.KeyChordPlayer;
 import com.example.afs.musicpad.player.KeyNotePlayer;
 import com.example.afs.musicpad.player.Player;
 import com.example.afs.musicpad.player.Player.Action;
-import com.example.afs.musicpad.player.SongBeatPlayer;
 import com.example.afs.musicpad.player.SongChordPlayer;
 import com.example.afs.musicpad.player.SongDrumPlayer;
 import com.example.afs.musicpad.player.SongNotePlayer;
@@ -197,9 +196,6 @@ public class DeviceHandler extends BrokerTask<Message> {
     case SELECT_DRUMS:
       selectDrums(parameter);
       break;
-    case SELECT_BEATS:
-      selectBeats(parameter);
-      break;
     case SELECT_PROGRAM:
       selectProgram(parameter);
       break;
@@ -223,18 +219,6 @@ public class DeviceHandler extends BrokerTask<Message> {
 
   private void doTick(long tick) {
     player.onTick(tick);
-  }
-
-  private void selectBeats(int channelNumber) {
-    if (currentSong == null) {
-      System.err.println("Cannot select beats without song");
-    } else if (channelNumber == 10) {
-      System.err.println("Cannot select beats for drum channel yet");
-    } else {
-      player.close();
-      int channelIndex = channelNumber - 1;
-      player = new SongBeatPlayer(synthesizer, currentSong, channelIndex, inputDevice);
-    }
   }
 
   private void selectChords(int channelNumber) {
