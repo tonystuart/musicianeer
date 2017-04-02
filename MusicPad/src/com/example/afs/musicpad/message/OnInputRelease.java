@@ -9,21 +9,21 @@
 
 package com.example.afs.musicpad.message;
 
-public class OnCharRelease implements Message {
+public class OnInputRelease implements Message {
 
-  private int charCode;
+  private int inputCode;
 
-  public OnCharRelease(int charCode) {
-    this.charCode = charCode;
+  public OnInputRelease(int inputCode) {
+    this.inputCode = inputCode;
   }
 
-  public int getCharCode() {
-    return charCode;
+  public int getInputCode() {
+    return inputCode;
   }
 
   @Override
   public String toString() {
-    return "OnCharRelease [charCode=" + charCode + "]";
+    return "OnInputRelease [inputCode=" + inputCode + "]";
   }
 
 }

@@ -57,17 +57,17 @@ public class QwertyReader implements DeviceInterface {
   }
 
   public void processKeyPress(short keyCode) {
-    char charCode = QwertyKeyCodes.charCodes[keyCode];
-    if (charCode == KeyEvent.VK_ESCAPE) {
+    char inputCode = QwertyKeyCodes.inputCodes[keyCode];
+    if (inputCode == KeyEvent.VK_ESCAPE) {
       terminate();
     } else {
-      commandBuilder.processCharPress(charCode);
+      commandBuilder.processInputPress(inputCode);
     }
   }
 
   public void processKeyRelease(short keyCode) {
-    char charCode = QwertyKeyCodes.charCodes[keyCode];
-    commandBuilder.processCharRelease(charCode);
+    char inputCode = QwertyKeyCodes.inputCodes[keyCode];
+    commandBuilder.processInputRelease(inputCode);
   }
 
   @Override

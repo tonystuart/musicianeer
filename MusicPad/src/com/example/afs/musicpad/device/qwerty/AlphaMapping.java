@@ -14,11 +14,11 @@ public class AlphaMapping extends QwertyMapping {
 
   @Override
   public int fromNoteIndex(int buttonIndex) {
-    int charCode = -1;
+    int inputCode = -1;
     if (buttonIndex >= 0 && buttonIndex < 26) {
-      charCode = 'A' + buttonIndex;
+      inputCode = 'A' + buttonIndex;
     }
-    return charCode;
+    return inputCode;
   }
 
 }

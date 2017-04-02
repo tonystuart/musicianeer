@@ -13,19 +13,19 @@ public abstract class InputMapping {
 
   public String fromIndexToSequence(int buttonIndex) {
     String keySequence;
-    int charCode = fromNoteIndex(buttonIndex);
-    if (charCode == -1) {
+    int inputCode = fromNoteIndex(buttonIndex);
+    if (inputCode == -1) {
       keySequence = "?";
     } else {
-      keySequence = Character.toString((char) charCode);
+      keySequence = Character.toString((char) inputCode);
     }
     return keySequence;
   }
 
   public abstract int fromNoteIndex(int noteIndex);
 
-  public abstract int toCharCode(int keyCode);
+  public abstract int toInputCode(int keyCode);
 
-  public abstract int toNoteIndex(int charCode);
+  public abstract int toNoteIndex(int inputCode);
 
 }

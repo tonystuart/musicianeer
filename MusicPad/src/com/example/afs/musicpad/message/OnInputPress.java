@@ -9,21 +9,21 @@
 
 package com.example.afs.musicpad.message;
 
-public class OnCharPress implements Message {
+public class OnInputPress implements Message {
 
-  private int charCode;
+  private int inputCode;
 
-  public OnCharPress(int charCode) {
-    this.charCode = charCode;
+  public OnInputPress(int inputCode) {
+    this.inputCode = inputCode;
   }
 
-  public int getCharCode() {
-    return charCode;
+  public int getInputCode() {
+    return inputCode;
   }
 
   @Override
   public String toString() {
-    return "OnCharPress [charCode=" + charCode + "]";
+    return "OnInputPress [inputCode=" + inputCode + "]";
   }
 
 }

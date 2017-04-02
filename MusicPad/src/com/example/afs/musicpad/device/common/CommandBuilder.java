@@ -15,8 +15,8 @@ import java.util.concurrent.BlockingQueue;
 import com.example.afs.musicpad.Command;
 import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnCommand;
-import com.example.afs.musicpad.message.OnCharRelease;
-import com.example.afs.musicpad.message.OnCharPress;
+import com.example.afs.musicpad.message.OnInputRelease;
+import com.example.afs.musicpad.message.OnInputPress;
 
 public class CommandBuilder {
 
@@ -30,22 +30,22 @@ public class CommandBuilder {
     this.queue = queue;
   }
 
-  public void processCharPress(int charCode) {
+  public void processInputPress(int inputCode) {
     if (currentField == null) {
-      if (charCode == '.') {
+      if (inputCode == '.') {
         currentField = left;
-      } else if (charCode != -1) {
-        queue.add(new OnCharPress(charCode));
+      } else if (inputCode != -1) {
+        queue.add(new OnInputPress(inputCode));
       }
     } else {
-      composeField(charCode);
+      composeField(inputCode);
     }
   }
 
-  public void processCharRelease(int charCode) {
+  public void processInputRelease(int inputCode) {
     if (currentField == null) {
-      if (charCode != -1) {
-        queue.add(new OnCharRelease(charCode));
+      if (inputCode != -1) {
+        queue.add(new OnInputRelease(inputCode));
       }
     }
   }
@@ -56,15 +56,15 @@ public class CommandBuilder {
     currentField = null;
   }
 
-  private void composeField(int charCode) {
-    if ('0' <= charCode && charCode <= '9') {
-      currentField.append((char) charCode);
+  private void composeField(int inputCode) {
+    if ('0' <= inputCode && inputCode <= '9') {
+      currentField.append((char) inputCode);
       if (currentField == left) {
         System.out.println("left=" + left);
       } else {
         System.out.println("right=" + right);
       }
-    } else if (charCode == KeyEvent.VK_ENTER) {
+    } else if (inputCode == KeyEvent.VK_ENTER) {
       if (currentField == left) {
         if (left.length() == 0) {
           left.append("0");

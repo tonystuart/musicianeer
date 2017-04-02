@@ -22,8 +22,8 @@ import com.example.afs.musicpad.device.midi.PianoWatcher.Device;
 import com.example.afs.musicpad.device.midi.PianoWatcher.InputDevice;
 import com.example.afs.musicpad.device.midi.PianoWatcher.OutputDevice;
 import com.example.afs.musicpad.message.Message;
-import com.example.afs.musicpad.message.OnCharPress;
-import com.example.afs.musicpad.message.OnCharRelease;
+import com.example.afs.musicpad.message.OnInputPress;
+import com.example.afs.musicpad.message.OnInputRelease;
 import com.example.afs.musicpad.util.DirectList;
 import com.example.afs.musicpad.util.RandomAccessList;
 
@@ -85,9 +85,9 @@ public class PianoReader implements DeviceInterface {
       int control = shortMessage.getData1();
       int value = shortMessage.getData2();
       if (type == ShortMessage.NOTE_ON) {
-        queue.add(new OnCharPress(control));
+        queue.add(new OnInputPress(control));
       } else if (type == ShortMessage.NOTE_OFF) {
-        queue.add(new OnCharRelease(control));
+        queue.add(new OnInputRelease(control));
       }
     }
   }

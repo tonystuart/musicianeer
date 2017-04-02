@@ -14,8 +14,8 @@ import com.example.afs.musicpad.Command;
 import com.example.afs.musicpad.device.qwerty.AlphaMapping;
 import com.example.afs.musicpad.device.qwerty.NumericMapping;
 import com.example.afs.musicpad.message.Message;
-import com.example.afs.musicpad.message.OnCharPress;
-import com.example.afs.musicpad.message.OnCharRelease;
+import com.example.afs.musicpad.message.OnInputPress;
+import com.example.afs.musicpad.message.OnInputRelease;
 import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnSongSelected;
 import com.example.afs.musicpad.message.OnTick;
@@ -45,8 +45,8 @@ public class DeviceHandler extends BrokerTask<Message> {
     this.synthesizer = synthesizer;
     this.defaultPlayer = new KeyNotePlayer(synthesizer, Keys.CMajor, 0);
     this.player = defaultPlayer;
-    delegate(OnCharPress.class, message -> doNoteOn(message.getCharCode()));
-    delegate(OnCharRelease.class, message -> doNoteOff(message.getCharCode()));
+    delegate(OnInputPress.class, message -> doNoteOn(message.getInputCode()));
+    delegate(OnInputRelease.class, message -> doNoteOff(message.getInputCode()));
     delegate(OnCommand.class, message -> doCommand(message));
     subscribe(OnSongSelected.class, message -> doSongSelected(message.getSong()));
     subscribe(OnTick.class, message -> doTick(message.getTick()));
@@ -80,13 +80,13 @@ public class DeviceHandler extends BrokerTask<Message> {
     }
   }
 
-  private void doNoteOff(int charCode) {
-    int noteIndex = inputMapping.toNoteIndex(charCode);
+  private void doNoteOff(int inputCode) {
+    int noteIndex = inputMapping.toNoteIndex(inputCode);
     player.play(Action.RELEASE, noteIndex);
   }
 
-  private void doNoteOn(int charCode) {
-    int noteIndex = inputMapping.toNoteIndex(charCode);
+  private void doNoteOn(int inputCode) {
+    int noteIndex = inputMapping.toNoteIndex(inputCode);
     player.play(Action.PRESS, noteIndex);
   }
 

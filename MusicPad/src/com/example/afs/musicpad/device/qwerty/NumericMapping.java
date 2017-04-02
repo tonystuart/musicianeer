@@ -15,58 +15,58 @@ public class NumericMapping extends QwertyMapping {
 
   @Override
   public int fromNoteIndex(int noteIndex) {
-    int charCode = -1;
+    int inputCode = -1;
     switch (noteIndex) {
     case 0:
-      charCode = '1';
+      inputCode = '1';
       break;
     case 1:
-      charCode = '2';
+      inputCode = '2';
       break;
     case 2:
-      charCode = '3';
+      inputCode = '3';
       break;
     case 3:
-      charCode = ENTER;
+      inputCode = ENTER;
       break;
     case 4:
-      charCode = '4';
+      inputCode = '4';
       break;
     case 5:
-      charCode = '5';
+      inputCode = '5';
       break;
     case 6:
-      charCode = '6';
+      inputCode = '6';
       break;
     case 7:
-      charCode = '+';
+      inputCode = '+';
       break;
     case 8:
-      charCode = '7';
+      inputCode = '7';
       break;
     case 9:
-      charCode = '8';
+      inputCode = '8';
       break;
     case 10:
-      charCode = '9';
+      inputCode = '9';
       break;
     case 11:
-      charCode = '-';
+      inputCode = '-';
       break;
     case 12:
-      charCode = NUM_LOCK;
+      inputCode = NUM_LOCK;
       break;
     case 13:
-      charCode = '/';
+      inputCode = '/';
       break;
     case 14:
-      charCode = '*';
+      inputCode = '*';
       break;
     case 15:
-      charCode = BACK_SPACE;
+      inputCode = BACK_SPACE;
       break;
     }
-    return charCode;
+    return inputCode;
   }
 
 }

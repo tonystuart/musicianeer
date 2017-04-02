@@ -21,18 +21,18 @@ public abstract class QwertyMapping extends InputMapping {
   protected static final int NUM_LOCK = '#';
 
   @Override
-  public int toCharCode(int keyCode) {
-    int charCode = QwertyKeyCodes.charCodes[keyCode];
-    return charCode;
+  public int toInputCode(int keyCode) {
+    int inputCode = QwertyKeyCodes.inputCodes[keyCode];
+    return inputCode;
   }
 
   @Override
-  public int toNoteIndex(int charCode) {
+  public int toNoteIndex(int inputCode) {
     int noteIndex = -1;
-    if (charCode >= 'A' && charCode <= 'Z') {
-      noteIndex = charCode - 'A';
+    if (inputCode >= 'A' && inputCode <= 'Z') {
+      noteIndex = inputCode - 'A';
     } else {
-      switch (charCode) {
+      switch (inputCode) {
       case '1':
         noteIndex = 0;
         break;

@@ -13,7 +13,7 @@ import java.awt.event.KeyEvent;
 
 public class QwertyKeyCodes {
   // http://www.comptechdoc.org/os/linux/howlinuxworks/linux_hlkeycodes.html
-  public static final char[] charCodes = new char[] {
+  public static final char[] inputCodes = new char[] {
       KeyEvent.VK_UNDEFINED, //
       KeyEvent.VK_ESCAPE, //
       '1', //
