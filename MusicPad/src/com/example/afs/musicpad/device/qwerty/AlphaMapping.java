@@ -13,10 +13,10 @@ package com.example.afs.musicpad.device.qwerty;
 public class AlphaMapping extends QwertyMapping {
 
   @Override
-  public int fromNoteIndex(int buttonIndex) {
+  public int fromNoteIndex(int noteIndex) {
     int inputCode = -1;
-    if (buttonIndex >= 0 && buttonIndex < 26) {
-      inputCode = 'A' + buttonIndex;
+    if (noteIndex >= 0 && noteIndex < 26) {
+      inputCode = 'A' + noteIndex;
     }
     return inputCode;
   }

@@ -12,6 +12,7 @@ package com.example.afs.musicpad;
 import com.example.afs.fluidsynth.FluidSynth;
 import com.example.afs.fluidsynth.Synthesizer;
 import com.example.afs.fluidsynth.Synthesizer.Settings;
+import com.example.afs.musicpad.device.midi.MidiWatcher;
 import com.example.afs.musicpad.device.qwerty.QwertyWatcher;
 import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.midi.Midi;
@@ -33,6 +34,7 @@ public class MusicPad {
 
   private Broker<Message> broker;
   private MusicLibrary musicLibrary;
+  private MidiWatcher midiWatcher;
   private QwertyWatcher qwertyWatcher;
   private CommandProcessor commandProcessor;
   private TransportTask transportTask;
@@ -41,6 +43,7 @@ public class MusicPad {
   public MusicPad(String libraryPath) {
     this.musicLibrary = new MusicLibrary(libraryPath);
     this.broker = new Broker<Message>();
+    this.midiWatcher = new MidiWatcher(broker, synthesizer);
     this.qwertyWatcher = new QwertyWatcher(broker, synthesizer);
     this.commandProcessor = new CommandProcessor(broker, synthesizer, musicLibrary);
     this.transportTask = new TransportTask(broker, synthesizer);
@@ -58,6 +61,7 @@ public class MusicPad {
 
   private void start() {
     commandProcessor.start();
+    midiWatcher.start();
     qwertyWatcher.start();
     transportTask.start();
   }

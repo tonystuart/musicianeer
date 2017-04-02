@@ -26,38 +26,38 @@ import com.example.afs.musicpad.theory.ChordType;
 public class SongChordPlayer extends SongPlayer {
 
   private TreeSet<Chord> chords;
-  private ChordType[] buttonIndexToChord;
+  private ChordType[] noteIndexToChord;
   private Map<ChordType, String> chordToKeySequence;
 
   public SongChordPlayer(Synthesizer synthesizer, Song song, int channel, InputMapping inputMapping) {
     super(synthesizer, song, channel);
     ChordFinder chordFinder = new ChordFinder();
     chords = chordFinder.getChords(song.getNotes(), channel);
-    buttonIndexToChord = getUniqueChordTypes(chords);
+    noteIndexToChord = getUniqueChordTypes(chords);
     chordToKeySequence = new HashMap<>();
-    System.out.println("Total chords: " + chords.size() + ", Unique chords: " + buttonIndexToChord.length);
+    System.out.println("Total chords: " + chords.size() + ", Unique chords: " + noteIndexToChord.length);
     updateInputDevice(inputMapping);
     setTitle("Channel " + (channel + 1) + " Chords");
   }
 
   @Override
   public int getUniqueCount() {
-    return buttonIndexToChord.length;
+    return noteIndexToChord.length;
   }
 
   @Override
   public void play(Action action, int chordIndex) {
-    if (chordIndex < buttonIndexToChord.length) {
-      ChordType chordType = buttonIndexToChord[chordIndex];
+    if (chordIndex < noteIndexToChord.length) {
+      ChordType chordType = noteIndexToChord[chordIndex];
       playMidiChord(action, Default.OCTAVE_SEMITONE, chordType);
     }
   }
 
   @Override
   public void updateInputDevice(InputMapping inputMapping) {
-    for (int buttonIndex = 0; buttonIndex < buttonIndexToChord.length; buttonIndex++) {
-      ChordType chordType = buttonIndexToChord[buttonIndex];
-      String keySequence = inputMapping.fromIndexToSequence(buttonIndex);
+    for (int noteIndex = 0; noteIndex < noteIndexToChord.length; noteIndex++) {
+      ChordType chordType = noteIndexToChord[noteIndex];
+      String keySequence = inputMapping.fromIndexToSequence(noteIndex);
       chordToKeySequence.put(chordType, keySequence);
       System.out.println(keySequence + " -> " + chordType);
     }

@@ -25,8 +25,8 @@ public class GeneralDrumPlayer extends Player {
   }
 
   @Override
-  public void play(Action action, int buttonIndex) {
-    int midiDrum = Midi.DRUM_BASE + buttonIndex;
+  public void play(Action action, int noteIndex) {
+    int midiDrum = Midi.DRUM_BASE + noteIndex;
     playMidiDrum(action, midiDrum);
   }
 

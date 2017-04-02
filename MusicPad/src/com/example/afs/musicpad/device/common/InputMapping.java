@@ -11,9 +11,9 @@ package com.example.afs.musicpad.device.common;
 
 public abstract class InputMapping {
 
-  public String fromIndexToSequence(int buttonIndex) {
+  public String fromIndexToSequence(int noteIndex) {
     String keySequence;
-    int inputCode = fromNoteIndex(buttonIndex);
+    int inputCode = fromNoteIndex(noteIndex);
     if (inputCode == -1) {
       keySequence = "?";
     } else {
@@ -23,8 +23,6 @@ public abstract class InputMapping {
   }
 
   public abstract int fromNoteIndex(int noteIndex);
-
-  public abstract int toInputCode(int keyCode);
 
   public abstract int toNoteIndex(int inputCode);
 

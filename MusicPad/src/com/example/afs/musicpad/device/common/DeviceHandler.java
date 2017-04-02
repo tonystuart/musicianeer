@@ -14,9 +14,9 @@ import com.example.afs.musicpad.Command;
 import com.example.afs.musicpad.device.qwerty.AlphaMapping;
 import com.example.afs.musicpad.device.qwerty.NumericMapping;
 import com.example.afs.musicpad.message.Message;
+import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnInputPress;
 import com.example.afs.musicpad.message.OnInputRelease;
-import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnSongSelected;
 import com.example.afs.musicpad.message.OnTick;
 import com.example.afs.musicpad.player.GeneralDrumPlayer;
@@ -34,19 +34,20 @@ import com.example.afs.musicpad.util.Broker;
 
 public class DeviceHandler extends BrokerTask<Message> {
 
-  Player player;
+  private Player player;
   private Song currentSong;
   private Synthesizer synthesizer;
   private Player defaultPlayer;
-  InputMapping inputMapping = new NumericMapping();
+  private InputMapping inputMapping;
 
-  public DeviceHandler(Broker<Message> messageBroker, Synthesizer synthesizer) {
+  public DeviceHandler(Broker<Message> messageBroker, Synthesizer synthesizer, InputMapping inputMapping) {
     super(messageBroker);
     this.synthesizer = synthesizer;
+    this.inputMapping = inputMapping;
     this.defaultPlayer = new KeyNotePlayer(synthesizer, Keys.CMajor, 0);
     this.player = defaultPlayer;
-    delegate(OnInputPress.class, message -> doNoteOn(message.getInputCode()));
-    delegate(OnInputRelease.class, message -> doNoteOff(message.getInputCode()));
+    delegate(OnInputPress.class, message -> doInputPress(message.getInputCode()));
+    delegate(OnInputRelease.class, message -> doInputRelease(message.getInputCode()));
     delegate(OnCommand.class, message -> doCommand(message));
     subscribe(OnSongSelected.class, message -> doSongSelected(message.getSong()));
     subscribe(OnTick.class, message -> doTick(message.getTick()));
@@ -80,14 +81,14 @@ public class DeviceHandler extends BrokerTask<Message> {
     }
   }
 
-  private void doNoteOff(int inputCode) {
-    int noteIndex = inputMapping.toNoteIndex(inputCode);
-    player.play(Action.RELEASE, noteIndex);
-  }
-
-  private void doNoteOn(int inputCode) {
+  private void doInputPress(int inputCode) {
     int noteIndex = inputMapping.toNoteIndex(inputCode);
     player.play(Action.PRESS, noteIndex);
+  }
+
+  private void doInputRelease(int inputCode) {
+    int noteIndex = inputMapping.toNoteIndex(inputCode);
+    player.play(Action.RELEASE, noteIndex);
   }
 
   private void doSongSelected(Song song) {

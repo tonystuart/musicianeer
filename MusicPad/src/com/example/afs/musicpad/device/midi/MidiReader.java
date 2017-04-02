@@ -18,18 +18,15 @@ import javax.sound.midi.Receiver;
 import javax.sound.midi.ShortMessage;
 
 import com.example.afs.musicpad.device.common.DeviceGroup.DeviceInterface;
-import com.example.afs.musicpad.device.midi.PianoWatcher.Device;
-import com.example.afs.musicpad.device.midi.PianoWatcher.InputDevice;
-import com.example.afs.musicpad.device.midi.PianoWatcher.OutputDevice;
 import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnInputPress;
 import com.example.afs.musicpad.message.OnInputRelease;
 import com.example.afs.musicpad.util.DirectList;
 import com.example.afs.musicpad.util.RandomAccessList;
 
-public class PianoReader implements DeviceInterface {
+public class MidiReader implements DeviceInterface {
 
-  public class PianoInput implements Receiver {
+  public class DeviceReceiver implements Receiver {
 
     @Override
     public void close() {
@@ -37,24 +34,24 @@ public class PianoReader implements DeviceInterface {
 
     @Override
     public void send(MidiMessage message, long timestamp) {
-      receiveFromPiano(message, timestamp);
+      receiveFromDevice(message, timestamp);
     }
 
   }
 
-  private PianoInput pianoInput = new PianoInput();
-  private RandomAccessList<Receiver> receivers = new DirectList<>();
   private BlockingQueue<Message> queue;
+  private DeviceReceiver deviceInput = new DeviceReceiver();
+  private RandomAccessList<Receiver> receivers = new DirectList<>();
 
-  public PianoReader(BlockingQueue<Message> queue, Device device) {
+  public MidiReader(BlockingQueue<Message> queue, MidiDeviceBundle device) {
     this.queue = queue;
     try {
-      for (InputDevice inputDevice : device.getInputDevices()) {
+      for (MidiInputDevice inputDevice : device.getInputDevices()) {
         MidiDevice midiInputDevice = inputDevice.getMidiDevice();
         midiInputDevice.open();
-        midiInputDevice.getTransmitter().setReceiver(pianoInput);
+        midiInputDevice.getTransmitter().setReceiver(deviceInput);
       }
-      for (OutputDevice outputDevice : device.getOutputDevices()) {
+      for (MidiOutputDevice outputDevice : device.getOutputDevices()) {
         MidiDevice midiOutputDevice = outputDevice.getMidiDevice();
         midiOutputDevice.open();
         receivers.add(midiOutputDevice.getReceiver());
@@ -64,7 +61,7 @@ public class PianoReader implements DeviceInterface {
     }
   }
 
-  public void sendToPiano(MidiMessage message, long timestamp) {
+  public void sendToDevice(MidiMessage message, long timestamp) {
     for (Receiver receiver : receivers) {
       receiver.send(message, timestamp);
     }
@@ -78,7 +75,7 @@ public class PianoReader implements DeviceInterface {
   public void terminate() {
   }
 
-  private void receiveFromPiano(MidiMessage message, long timestamp) {
+  private void receiveFromDevice(MidiMessage message, long timestamp) {
     if (message instanceof ShortMessage) {
       ShortMessage shortMessage = (ShortMessage) message;
       int type = shortMessage.getCommand();

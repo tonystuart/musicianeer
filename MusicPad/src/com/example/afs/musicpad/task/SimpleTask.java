@@ -77,12 +77,12 @@ public abstract class SimpleTask<M> {
         }
       } catch (RuntimeException e) {
         e.printStackTrace();
-        System.err.println(name + ": ignoring exception");
+        System.err.println("SimpleTask: ignoring exception in " + name);
       } catch (InterruptedException e) {
         isTerminated = true;
       }
     }
-    System.out.println("Terminating " + name);
+    System.out.println("SimpleTask: returning from run method in  " + name);
   }
 
   protected void setTimeoutMillis(long timeoutMillis) {

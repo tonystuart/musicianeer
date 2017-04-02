@@ -28,7 +28,7 @@ public class KeyNotePlayer extends Player {
 
   @Override
   public void play(Action action, int noteIndex) {
-    if (noteIndex < key.getMidiNotes().length) {
+    if (noteIndex >= 0 && noteIndex < key.getMidiNotes().length) {
       int midiNote = key.getMidiNotes()[noteIndex];
       playMidiNote(action, midiNote);
     }

@@ -27,107 +27,20 @@ import com.example.afs.musicpad.device.common.DeviceHandler;
 import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.task.BrokerTask;
 import com.example.afs.musicpad.util.Broker;
-import com.example.afs.musicpad.util.DirectList;
-import com.example.afs.musicpad.util.RandomAccessList;
 
-public class PianoWatcher extends BrokerTask<Message> {
-
-  public static class Device {
-
-    private String name;
-    private RandomAccessList<InputDevice> inputDevices = new DirectList<>();
-    private RandomAccessList<OutputDevice> outputDevices = new DirectList<>();
-
-    public Device(String name) {
-      this.name = name;
-    }
-
-    public void addInput(InputDevice midiDevice) {
-      inputDevices.add(midiDevice);
-    }
-
-    public void addOutput(OutputDevice outputDevice) {
-      outputDevices.add(outputDevice);
-    }
-
-    public RandomAccessList<InputDevice> getInputDevices() {
-      return inputDevices;
-    }
-
-    public String getName() {
-      return name;
-    }
-
-    public RandomAccessList<OutputDevice> getOutputDevices() {
-      return outputDevices;
-    }
-
-    @Override
-    public String toString() {
-      return "Device [name=" + name + ", inputDevices=" + inputDevices + ", outputDevices=" + outputDevices + "]";
-    }
-
-  }
-
-  public static class InputDevice {
-    private String name;
-    private MidiDevice midiDevice;
-
-    public InputDevice(String name, MidiDevice midiDevice) {
-      this.name = name;
-      this.midiDevice = midiDevice;
-    }
-
-    public MidiDevice getMidiDevice() {
-      return midiDevice;
-    }
-
-    public String getName() {
-      return name;
-    }
-
-    @Override
-    public String toString() {
-      return "InputDevice [name=" + name + "]";
-    }
-
-  }
-
-  public static class OutputDevice {
-    private String name;
-    private MidiDevice midiDevice;
-
-    public OutputDevice(String name, MidiDevice midiDevice) {
-      this.name = name;
-      this.midiDevice = midiDevice;
-    }
-
-    public MidiDevice getMidiDevice() {
-      return midiDevice;
-    }
-
-    public String getName() {
-      return name;
-    }
-
-    @Override
-    public String toString() {
-      return "OutputDevice [name=" + name + "]";
-    }
-
-  }
+public class MidiWatcher extends BrokerTask<Message> {
 
   private Synthesizer synthesizer;
   private Map<String, DeviceGroup> oldDevices = new HashMap<>();
 
-  public PianoWatcher(Broker<Message> broker, Synthesizer synthesizer) {
+  public MidiWatcher(Broker<Message> broker, Synthesizer synthesizer) {
     super(broker, 1000);
     this.synthesizer = synthesizer;
   }
 
   @Override
   public void onTimeout() throws InterruptedException {
-    Map<String, Device> newDevices = getDevices();
+    Map<String, MidiDeviceBundle> newDevices = getDevices();
     Iterator<Entry<String, DeviceGroup>> oldIterator = oldDevices.entrySet().iterator();
     while (oldIterator.hasNext()) {
       Entry<String, DeviceGroup> oldEntry = oldIterator.next();
@@ -136,18 +49,18 @@ public class PianoWatcher extends BrokerTask<Message> {
         oldIterator.remove();
       }
     }
-    for (Entry<String, Device> newEntry : newDevices.entrySet()) {
+    for (Entry<String, MidiDeviceBundle> newEntry : newDevices.entrySet()) {
       if (!oldDevices.containsKey(newEntry.getKey())) {
         attachDevice(newEntry.getKey(), newEntry.getValue());
       }
     }
   }
 
-  private void attachDevice(String name, Device device) {
+  private void attachDevice(String name, MidiDeviceBundle device) {
     System.out.println("Attaching MIDI device " + name);
-    DeviceHandler deviceHandler = new DeviceHandler(getBroker(), synthesizer);
-    PianoReader pianoReader = new PianoReader(deviceHandler.getInputQueue(), device);
-    DeviceGroup deviceGroup = new DeviceGroup(deviceHandler, pianoReader);
+    DeviceHandler deviceHandler = new DeviceHandler(getBroker(), synthesizer, new MidiMapping());
+    MidiReader midiReader = new MidiReader(deviceHandler.getInputQueue(), device);
+    DeviceGroup deviceGroup = new DeviceGroup(deviceHandler, midiReader);
     oldDevices.put(name, deviceGroup);
     deviceGroup.start();
   }
@@ -157,25 +70,25 @@ public class PianoWatcher extends BrokerTask<Message> {
     deviceGroup.terminate();
   }
 
-  private Map<String, Device> getDevices() {
+  private Map<String, MidiDeviceBundle> getDevices() {
     try {
-      Map<String, Device> devices = new HashMap<>();
+      Map<String, MidiDeviceBundle> devices = new HashMap<>();
       Info[] deviceDescriptors = MidiSystem.getMidiDeviceInfo();
       for (Info deviceDescriptor : deviceDescriptors) {
         String fullName = deviceDescriptor.getName();
         String name = getName(fullName);
         if (name != null) {
-          Device device = devices.get(name);
+          MidiDeviceBundle device = devices.get(name);
           if (device == null) {
-            device = new Device(name);
+            device = new MidiDeviceBundle(name);
             devices.put(name, device);
           }
           MidiDevice midiDevice = MidiSystem.getMidiDevice(deviceDescriptor);
           if (midiDevice.getMaxReceivers() != 0) {
-            device.addOutput(new OutputDevice(fullName, midiDevice));
+            device.addOutput(new MidiOutputDevice(fullName, midiDevice));
           }
           if (midiDevice.getMaxTransmitters() != 0) {
-            device.addInput(new InputDevice(fullName, midiDevice));
+            device.addInput(new MidiInputDevice(fullName, midiDevice));
           }
         }
       }

@@ -21,12 +21,6 @@ public abstract class QwertyMapping extends InputMapping {
   protected static final int NUM_LOCK = '#';
 
   @Override
-  public int toInputCode(int keyCode) {
-    int inputCode = QwertyKeyCodes.inputCodes[keyCode];
-    return inputCode;
-  }
-
-  @Override
   public int toNoteIndex(int inputCode) {
     int noteIndex = -1;
     if (inputCode >= 'A' && inputCode <= 'Z') {
