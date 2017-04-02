@@ -9,14 +9,12 @@
 
 package com.example.afs.musicpad.device;
 
-import java.awt.event.KeyEvent;
-
 import com.example.afs.fluidsynth.Synthesizer;
 import com.example.afs.musicpad.Command;
 import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnCommand;
-import com.example.afs.musicpad.message.OnKeyPress;
-import com.example.afs.musicpad.message.OnKeyRelease;
+import com.example.afs.musicpad.message.OnNoteOff;
+import com.example.afs.musicpad.message.OnNoteOn;
 import com.example.afs.musicpad.message.OnSongSelected;
 import com.example.afs.musicpad.message.OnTick;
 import com.example.afs.musicpad.player.GeneralDrumPlayer;
@@ -34,118 +32,12 @@ import com.example.afs.musicpad.util.Broker;
 
 public class DeviceHandler extends BrokerTask<Message> {
 
-  public class CommandBuilder {
-
-    private static final int MAX_LENGTH = 5;
-
-    private StringBuilder left = new StringBuilder();
-    private StringBuilder right = new StringBuilder();
-    private StringBuilder currentField;
-
-    private void clear() {
-      left.setLength(0);
-      right.setLength(0);
-      currentField = null;
-    }
-
-    private void composeCharPress(int charCode) {
-      if (charCode == '.') {
-        currentField = left;
-      } else if (charCode != -1) {
-        int buttonIndex = inputMapping.toIndex(charCode);
-        if (buttonIndex != -1) {
-          player.play(Action.PRESS, buttonIndex);
-        }
-      }
-    }
-
-    private void composeCharRelease(int charCode) {
-      if (charCode != -1) {
-        int buttonIndex = inputMapping.toIndex(charCode);
-        if (buttonIndex != -1) {
-          player.play(Action.RELEASE, buttonIndex);
-        }
-      }
-    }
-
-    private void composeField(int charCode) {
-      System.out.println("composeField: charCode=" + (char) charCode);
-      if ('0' <= charCode && charCode <= '9' && currentField.length() < MAX_LENGTH) {
-        currentField.append((char) charCode);
-        if (currentField == left) {
-          System.out.println("left=" + left);
-        } else {
-          System.out.println("right=" + right);
-        }
-      } else if (charCode == KeyEvent.VK_ENTER) {
-        if (currentField == left) {
-          if (left.length() == 0) {
-            left.append("0");
-          }
-          currentField = right;
-        } else {
-          if (right.length() == 0) {
-            right.append("0");
-          }
-          createCommand();
-          clear();
-        }
-      } else {
-        clear();
-      }
-    }
-
-    private void createCommand() {
-      int commandIndex = parseInteger(left.toString());
-      int commandOperand = parseInteger(right.toString());
-      Command[] commandValues = Command.values();
-      if (commandIndex < commandValues.length) {
-        Command command = commandValues[commandIndex];
-        OnCommand onCommand = new OnCommand(command, commandOperand);
-        doCommand(onCommand);
-      } else {
-        System.err.println("Invalid command index " + commandIndex);
-      }
-    }
-
-    private void doKeyPress(short keyCode) {
-      int charCode = mapKeyCodeToCharCode(keyCode);
-      if (currentField == null) {
-        composeCharPress(charCode);
-      } else {
-        composeField(charCode);
-      }
-    }
-
-    private void doKeyRelease(short keyCode) {
-      int charCode = mapKeyCodeToCharCode(keyCode);
-      if (currentField == null) {
-        composeCharRelease(charCode);
-      }
-    }
-
-    private int mapKeyCodeToCharCode(short keyCode) {
-      return inputMapping.toCharCode(keyCode);
-    }
-
-    private int parseInteger(String string) {
-      int integer;
-      try {
-        integer = Integer.parseInt(string);
-      } catch (NumberFormatException e) {
-        integer = 0;
-      }
-      return integer;
-    }
-  }
-
-  private Player player;
+  Player player;
   private Song currentSong;
   private Synthesizer synthesizer;
   private DeviceReader deviceReader;
   private Player defaultPlayer;
-  private CommandBuilder commandBuilder = new CommandBuilder();
-  private InputMapping inputMapping = new NumericKeypad();
+  InputMapping inputMapping = new NumericKeypad();
 
   protected DeviceHandler(Broker<Message> messageBroker, Synthesizer synthesizer, String deviceName) {
     super(messageBroker);
@@ -153,8 +45,9 @@ public class DeviceHandler extends BrokerTask<Message> {
     this.deviceReader = new DeviceReader(getInputQueue(), deviceName);
     this.defaultPlayer = new KeyNotePlayer(synthesizer, Keys.CMajor, 0);
     this.player = defaultPlayer;
-    delegate(OnKeyPress.class, message -> commandBuilder.doKeyPress(message.getCode()));
-    delegate(OnKeyRelease.class, message -> commandBuilder.doKeyRelease(message.getCode()));
+    delegate(OnNoteOn.class, message -> doNoteOn(message.getCharCode()));
+    delegate(OnNoteOff.class, message -> doNoteOff(message.getCharCode()));
+    delegate(OnCommand.class, message -> doCommand(message));
     subscribe(OnSongSelected.class, message -> doSongSelected(message.getSong()));
     subscribe(OnTick.class, message -> doTick(message.getTick()));
   }
@@ -171,7 +64,7 @@ public class DeviceHandler extends BrokerTask<Message> {
     super.terminate();
   }
 
-  private void doCommand(OnCommand message) {
+  void doCommand(OnCommand message) {
     Command command = message.getCommand();
     int parameter = message.getParameter();
     switch (command) {
@@ -193,13 +86,20 @@ public class DeviceHandler extends BrokerTask<Message> {
     case SET_KEYBOARD_MAPPING:
       setKeyboardMapping(parameter);
       break;
-    case SET_EXCLUSIVE:
-      setExclusive(parameter);
-      break;
     default:
       getBroker().publish(message);
       break;
     }
+  }
+
+  private void doNoteOff(int charCode) {
+    int noteIndex = inputMapping.toNoteIndex(charCode);
+    player.play(Action.RELEASE, noteIndex);
+  }
+
+  private void doNoteOn(int charCode) {
+    int noteIndex = inputMapping.toNoteIndex(charCode);
+    player.play(Action.PRESS, noteIndex);
   }
 
   private void doSongSelected(Song song) {
@@ -254,17 +154,13 @@ public class DeviceHandler extends BrokerTask<Message> {
     player.selectProgram(programIndex);
   }
 
-  private void setExclusive(int parameter) {
-    deviceReader.setExclusive(parameter != 0);
-  }
-
   private void setKeyboardMapping(int mapping) {
     switch (mapping) {
     case 1:
       inputMapping = new NumericKeypad();
       break;
     case 2:
-      inputMapping = new AlphabeticKeyboard();
+      inputMapping = new AlphaKeyboard();
       break;
     }
     player.updateInputDevice(inputMapping);

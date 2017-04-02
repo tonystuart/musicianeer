@@ -9,21 +9,21 @@
 
 package com.example.afs.musicpad.message;
 
-public class OnKeyPress implements Message {
+public class OnNoteOff implements Message {
 
-  private short code;
+  private int charCode;
 
-  public OnKeyPress(short code) {
-    this.code = code;
+  public OnNoteOff(int charCode) {
+    this.charCode = charCode;
   }
 
-  public short getCode() {
-    return code;
+  public int getCharCode() {
+    return charCode;
   }
 
   @Override
   public String toString() {
-    return "OnKeyPress [code=" + code + "]";
+    return "OnNoteOff [charCode=" + charCode + "]";
   }
 
 }

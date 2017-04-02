@@ -11,7 +11,7 @@ package com.example.afs.musicpad.device;
 
 import java.awt.event.KeyEvent;
 
-public class LinuxKeycodeTable {
+public class LinuxKeyCodes {
   // http://www.comptechdoc.org/os/linux/howlinuxworks/linux_hlkeycodes.html
   public static final char[] charCodes = new char[] {
       KeyEvent.VK_UNDEFINED, //
@@ -83,7 +83,7 @@ public class LinuxKeycodeTable {
       KeyEvent.VK_F8, //
       KeyEvent.VK_F9, //
       KeyEvent.VK_F10, //
-      'N', // KeyEvent.VK_NUM_LOCK, //
+      KeyEvent.VK_NUM_LOCK, //
       KeyEvent.VK_SCROLL_LOCK, //
       '7', // KeyEvent.VK_HOME, // 7
       '8', // KeyEvent.VK_UP, // 8

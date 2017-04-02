@@ -9,14 +9,13 @@
 
 package com.example.afs.musicpad.device;
 
-import java.awt.event.KeyEvent;
 
 public class NumericKeypad extends LinuxKeyboard {
 
   @Override
-  public int fromIndex(int index) {
+  public int fromNoteIndex(int noteIndex) {
     int charCode = -1;
-    switch (index) {
+    switch (noteIndex) {
     case 0:
       charCode = '1';
       break;
@@ -27,7 +26,7 @@ public class NumericKeypad extends LinuxKeyboard {
       charCode = '3';
       break;
     case 3:
-      charCode = 'E';
+      charCode = ENTER;
       break;
     case 4:
       charCode = '4';
@@ -54,7 +53,7 @@ public class NumericKeypad extends LinuxKeyboard {
       charCode = '-';
       break;
     case 12:
-      charCode = 'N';
+      charCode = NUM_LOCK;
       break;
     case 13:
       charCode = '/';
@@ -63,67 +62,10 @@ public class NumericKeypad extends LinuxKeyboard {
       charCode = '*';
       break;
     case 15:
-      charCode = 'B';
+      charCode = BACK_SPACE;
       break;
     }
     return charCode;
   }
 
-  @Override
-  public int toIndex(int charCode) {
-    int index = -1;
-    switch (charCode) {
-    case '1':
-      index = 0;
-      break;
-    case '2':
-      index = 1;
-      break;
-    case '3':
-      index = 2;
-      break;
-    case 'E':
-    case KeyEvent.VK_ENTER:
-      index = 3;
-      break;
-    case '4':
-      index = 4;
-      break;
-    case '5':
-      index = 5;
-      break;
-    case '6':
-      index = 6;
-      break;
-    case '+':
-      index = 7;
-      break;
-    case '7':
-      index = 8;
-      break;
-    case '8':
-      index = 9;
-      break;
-    case '9':
-      index = 10;
-      break;
-    case '-':
-      index = 11;
-      break;
-    case 'N':
-      index = 12;
-      break;
-    case '/':
-      index = 13;
-      break;
-    case '*':
-      index = 14;
-      break;
-    case 'B':
-    case KeyEvent.VK_BACK_SPACE:
-      index = 15;
-      break;
-    }
-    return index;
-  }
 }

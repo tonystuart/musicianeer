@@ -7,23 +7,17 @@
 // This program is made available on an "as is" basis, without
 // warranties or conditions of any kind, either express or implied.
 
-package com.example.afs.musicpad.message;
+package com.example.afs.musicpad.device;
 
-public class OnKeyRelease implements Message {
-
-  private short code;
-
-  public OnKeyRelease(short code) {
-    this.code = code;
-  }
-
-  public short getCode() {
-    return code;
-  }
+public class AlphaKeyboard extends LinuxKeyboard {
 
   @Override
-  public String toString() {
-    return "OnKeyRelease [code=" + code + "]";
+  public int fromNoteIndex(int buttonIndex) {
+    int charCode = -1;
+    if (buttonIndex >= 0 && buttonIndex < 26) {
+      charCode = 'A' + buttonIndex;
+    }
+    return charCode;
   }
 
 }

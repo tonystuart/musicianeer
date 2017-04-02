@@ -7,25 +7,23 @@
 // This program is made available on an "as is" basis, without
 // warranties or conditions of any kind, either express or implied.
 
-package com.example.afs.musicpad.device;
+package com.example.afs.musicpad.message;
 
-public class AlphabeticKeyboard extends LinuxKeyboard {
+public class OnNoteOn implements Message {
 
-  @Override
-  public int fromIndex(int index) {
-    int charCode = -1;
-    if (index >= 0 && index < 26) {
-      charCode = 'A' + index;
-    }
+  private int charCode;
+
+  public OnNoteOn(int charCode) {
+    this.charCode = charCode;
+  }
+
+  public int getCharCode() {
     return charCode;
   }
 
   @Override
-  public int toIndex(int charCode) {
-    int index = -1;
-    if (charCode >= 'A' && charCode <= 'Z') {
-      index = charCode - 'A';
-    }
-    return index;
+  public String toString() {
+    return "OnNoteOn [charCode=" + charCode + "]";
   }
+
 }
