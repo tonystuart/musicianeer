@@ -9,11 +9,11 @@
 
 package com.example.afs.musicpad.message;
 
-public class OnNoteOff implements Message {
+public class OnCharRelease implements Message {
 
   private int charCode;
 
-  public OnNoteOff(int charCode) {
+  public OnCharRelease(int charCode) {
     this.charCode = charCode;
   }
 
@@ -23,7 +23,7 @@ public class OnNoteOff implements Message {
 
   @Override
   public String toString() {
-    return "OnNoteOff [charCode=" + charCode + "]";
+    return "OnCharRelease [charCode=" + charCode + "]";
   }
 
 }

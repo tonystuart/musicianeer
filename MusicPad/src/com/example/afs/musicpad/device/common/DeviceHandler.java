@@ -12,12 +12,11 @@ package com.example.afs.musicpad.device.common;
 import com.example.afs.fluidsynth.Synthesizer;
 import com.example.afs.musicpad.Command;
 import com.example.afs.musicpad.device.qwerty.AlphaMapping;
-import com.example.afs.musicpad.device.qwerty.QwertyReader;
 import com.example.afs.musicpad.device.qwerty.NumericMapping;
 import com.example.afs.musicpad.message.Message;
+import com.example.afs.musicpad.message.OnCharPress;
+import com.example.afs.musicpad.message.OnCharRelease;
 import com.example.afs.musicpad.message.OnCommand;
-import com.example.afs.musicpad.message.OnNoteOff;
-import com.example.afs.musicpad.message.OnNoteOn;
 import com.example.afs.musicpad.message.OnSongSelected;
 import com.example.afs.musicpad.message.OnTick;
 import com.example.afs.musicpad.player.GeneralDrumPlayer;
@@ -38,33 +37,19 @@ public class DeviceHandler extends BrokerTask<Message> {
   Player player;
   private Song currentSong;
   private Synthesizer synthesizer;
-  private QwertyReader qwertyReader;
   private Player defaultPlayer;
   InputMapping inputMapping = new NumericMapping();
 
-  public DeviceHandler(Broker<Message> messageBroker, Synthesizer synthesizer, String deviceName) {
+  public DeviceHandler(Broker<Message> messageBroker, Synthesizer synthesizer) {
     super(messageBroker);
     this.synthesizer = synthesizer;
-    this.qwertyReader = new QwertyReader(getInputQueue(), deviceName);
     this.defaultPlayer = new KeyNotePlayer(synthesizer, Keys.CMajor, 0);
     this.player = defaultPlayer;
-    delegate(OnNoteOn.class, message -> doNoteOn(message.getCharCode()));
-    delegate(OnNoteOff.class, message -> doNoteOff(message.getCharCode()));
+    delegate(OnCharPress.class, message -> doNoteOn(message.getCharCode()));
+    delegate(OnCharRelease.class, message -> doNoteOff(message.getCharCode()));
     delegate(OnCommand.class, message -> doCommand(message));
     subscribe(OnSongSelected.class, message -> doSongSelected(message.getSong()));
     subscribe(OnTick.class, message -> doTick(message.getTick()));
-  }
-
-  @Override
-  public void start() {
-    super.start();
-    qwertyReader.start();
-  }
-
-  @Override
-  public void terminate() {
-    qwertyReader.terminate();
-    super.terminate();
   }
 
   void doCommand(OnCommand message) {

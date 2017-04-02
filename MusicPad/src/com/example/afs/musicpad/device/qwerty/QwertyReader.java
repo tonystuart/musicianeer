@@ -19,13 +19,14 @@ import java.util.concurrent.BlockingQueue;
 
 import com.example.afs.fluidsynth.FluidSynth;
 import com.example.afs.musicpad.device.common.CommandBuilder;
+import com.example.afs.musicpad.device.common.DeviceGroup.DeviceInterface;
 import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.util.ByteArray;
 
 // See /usr/include/linux/input.h
 // See https://www.kernel.org/doc/Documentation/input/input.txt
 
-public class QwertyReader {
+public class QwertyReader implements DeviceInterface {
 
   private static final int EV_KEY = 0x01;
 
@@ -69,11 +70,13 @@ public class QwertyReader {
     commandBuilder.processCharRelease(charCode);
   }
 
+  @Override
   public void start() {
     deviceReader = new Thread(() -> run(), deviceName);
     deviceReader.start();
   }
 
+  @Override
   public void terminate() {
     isTerminated = true;
   }
@@ -99,7 +102,7 @@ public class QwertyReader {
           }
         } catch (RuntimeException e) {
           e.printStackTrace();
-          System.err.println("DeviceReader.read: ignoring exception");
+          System.err.println("Ignoring exception");
         }
       }
     } catch (FileNotFoundException e) {
@@ -107,7 +110,7 @@ public class QwertyReader {
     } catch (IOException e1) {
       throw new RuntimeException(e1);
     }
-    System.out.println("DeviceReader.run: deviceName=" + deviceName + ", terminating.");
+    System.out.println("Terminating QWERTY device " + deviceName);
   }
 
 }

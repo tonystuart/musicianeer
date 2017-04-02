@@ -15,8 +15,8 @@ import java.util.concurrent.BlockingQueue;
 import com.example.afs.musicpad.Command;
 import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnCommand;
-import com.example.afs.musicpad.message.OnNoteOff;
-import com.example.afs.musicpad.message.OnNoteOn;
+import com.example.afs.musicpad.message.OnCharRelease;
+import com.example.afs.musicpad.message.OnCharPress;
 
 public class CommandBuilder {
 
@@ -35,7 +35,7 @@ public class CommandBuilder {
       if (charCode == '.') {
         currentField = left;
       } else if (charCode != -1) {
-        queue.add(new OnNoteOn(charCode));
+        queue.add(new OnCharPress(charCode));
       }
     } else {
       composeField(charCode);
@@ -45,7 +45,7 @@ public class CommandBuilder {
   public void processCharRelease(int charCode) {
     if (currentField == null) {
       if (charCode != -1) {
-        queue.add(new OnNoteOff(charCode));
+        queue.add(new OnCharRelease(charCode));
       }
     }
   }

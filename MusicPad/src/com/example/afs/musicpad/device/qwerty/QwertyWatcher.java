@@ -14,9 +14,11 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import com.example.afs.fluidsynth.Synthesizer;
+import com.example.afs.musicpad.device.common.DeviceGroup;
 import com.example.afs.musicpad.device.common.DeviceHandler;
 import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.task.BrokerTask;
@@ -25,46 +27,43 @@ import com.example.afs.musicpad.util.Broker;
 public class QwertyWatcher extends BrokerTask<Message> {
 
   private Synthesizer synthesizer;
-  private Set<String> oldDevices = new HashSet<>();
-  private Map<String, DeviceHandler> deviceHandlers = new HashMap<>();
+  private Map<String, DeviceGroup> oldDevices = new HashMap<>();
 
-  public QwertyWatcher(Broker<Message> messageBroker, Synthesizer synthesizer) {
-    super(messageBroker, 1000);
+  public QwertyWatcher(Broker<Message> broker, Synthesizer synthesizer) {
+    super(broker, 1000);
     this.synthesizer = synthesizer;
   }
 
   @Override
   public void onTimeout() throws InterruptedException {
     Set<String> newDevices = getDevices();
-    Iterator<String> oldIterator = oldDevices.iterator();
+    Iterator<Entry<String, DeviceGroup>> oldIterator = oldDevices.entrySet().iterator();
     while (oldIterator.hasNext()) {
-      String oldDevice = oldIterator.next();
-      if (!newDevices.contains(oldDevice)) {
-        detachDevice(oldDevice);
+      Entry<String, DeviceGroup> oldDevice = oldIterator.next();
+      if (!newDevices.contains(oldDevice.getKey())) {
+        detachDevice(oldDevice.getKey(), oldDevice.getValue());
         oldIterator.remove();
       }
     }
     for (String newDevice : newDevices) {
-      if (!oldDevices.contains(newDevice)) {
+      if (!oldDevices.containsKey(newDevice)) {
         attachDevice(newDevice);
-        oldDevices.add(newDevice);
       }
     }
   }
 
-  private void attachDevice(String newDevice) {
-    System.out.println("DeviceManager.onDeviceAttach: adding newDevice=" + newDevice);
-    DeviceHandler deviceHandler = new DeviceHandler(getBroker(), synthesizer, newDevice);
-    deviceHandlers.put(newDevice, deviceHandler);
-    deviceHandler.start();
+  private void attachDevice(String name) {
+    System.out.println("Attaching QWERTY device " + name);
+    DeviceHandler deviceHandler = new DeviceHandler(getBroker(), synthesizer);
+    QwertyReader qwertyReader = new QwertyReader(deviceHandler.getInputQueue(), name);
+    DeviceGroup deviceGroup = new DeviceGroup(deviceHandler, qwertyReader);
+    oldDevices.put(name, deviceGroup);
+    deviceGroup.start();
   }
 
-  private void detachDevice(String oldDevice) {
-    System.out.println("DeviceManager.onDeviceDetach: removing oldDevice=" + oldDevice);
-    DeviceHandler deviceHandler = deviceHandlers.get(oldDevice);
-    if (deviceHandler != null) {
-      deviceHandler.terminate();
-    }
+  private void detachDevice(String name, DeviceGroup deviceGroup) {
+    System.out.println("Detaching QWERTY device " + name);
+    deviceGroup.terminate();
   }
 
   private Set<String> getDevices() {

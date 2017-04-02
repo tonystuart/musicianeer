@@ -82,7 +82,7 @@ public abstract class SimpleTask<M> {
         isTerminated = true;
       }
     }
-    System.out.println(name + ": terminating");
+    System.out.println("Terminating " + name);
   }
 
   protected void setTimeoutMillis(long timeoutMillis) {
