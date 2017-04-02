@@ -7,25 +7,30 @@
 // This program is made available on an "as is" basis, without
 // warranties or conditions of any kind, either express or implied.
 
-package com.example.afs.musicpad.device;
+package com.example.afs.musicpad.device.qwerty;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 
+import com.example.afs.fluidsynth.Synthesizer;
+import com.example.afs.musicpad.device.common.DeviceHandler;
 import com.example.afs.musicpad.message.Message;
-import com.example.afs.musicpad.message.OnDeviceAttached;
-import com.example.afs.musicpad.message.OnDeviceDetached;
 import com.example.afs.musicpad.task.BrokerTask;
 import com.example.afs.musicpad.util.Broker;
 
-public class DeviceWatcher extends BrokerTask<Message> {
+public class QwertyWatcher extends BrokerTask<Message> {
 
+  private Synthesizer synthesizer;
   private Set<String> oldDevices = new HashSet<>();
+  private Map<String, DeviceHandler> deviceHandlers = new HashMap<>();
 
-  public DeviceWatcher(Broker<Message> messageBroker) {
+  public QwertyWatcher(Broker<Message> messageBroker, Synthesizer synthesizer) {
     super(messageBroker, 1000);
+    this.synthesizer = synthesizer;
   }
 
   @Override
@@ -35,15 +40,30 @@ public class DeviceWatcher extends BrokerTask<Message> {
     while (oldIterator.hasNext()) {
       String oldDevice = oldIterator.next();
       if (!newDevices.contains(oldDevice)) {
-        publish(new OnDeviceDetached(oldDevice));
+        detachDevice(oldDevice);
         oldIterator.remove();
       }
     }
     for (String newDevice : newDevices) {
       if (!oldDevices.contains(newDevice)) {
-        publish(new OnDeviceAttached(newDevice));
+        attachDevice(newDevice);
         oldDevices.add(newDevice);
       }
+    }
+  }
+
+  private void attachDevice(String newDevice) {
+    System.out.println("DeviceManager.onDeviceAttach: adding newDevice=" + newDevice);
+    DeviceHandler deviceHandler = new DeviceHandler(getBroker(), synthesizer, newDevice);
+    deviceHandlers.put(newDevice, deviceHandler);
+    deviceHandler.start();
+  }
+
+  private void detachDevice(String oldDevice) {
+    System.out.println("DeviceManager.onDeviceDetach: removing oldDevice=" + oldDevice);
+    DeviceHandler deviceHandler = deviceHandlers.get(oldDevice);
+    if (deviceHandler != null) {
+      deviceHandler.terminate();
     }
   }
 

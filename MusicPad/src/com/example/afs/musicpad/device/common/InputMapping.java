@@ -7,7 +7,7 @@
 // This program is made available on an "as is" basis, without
 // warranties or conditions of any kind, either express or implied.
 
-package com.example.afs.musicpad.device;
+package com.example.afs.musicpad.device.common;
 
 public abstract class InputMapping {
 

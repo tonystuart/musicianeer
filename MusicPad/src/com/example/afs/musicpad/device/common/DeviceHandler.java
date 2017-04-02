@@ -7,10 +7,13 @@
 // This program is made available on an "as is" basis, without
 // warranties or conditions of any kind, either express or implied.
 
-package com.example.afs.musicpad.device;
+package com.example.afs.musicpad.device.common;
 
 import com.example.afs.fluidsynth.Synthesizer;
 import com.example.afs.musicpad.Command;
+import com.example.afs.musicpad.device.qwerty.AlphaMapping;
+import com.example.afs.musicpad.device.qwerty.QwertyReader;
+import com.example.afs.musicpad.device.qwerty.NumericMapping;
 import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnNoteOff;
@@ -35,14 +38,14 @@ public class DeviceHandler extends BrokerTask<Message> {
   Player player;
   private Song currentSong;
   private Synthesizer synthesizer;
-  private DeviceReader deviceReader;
+  private QwertyReader qwertyReader;
   private Player defaultPlayer;
-  InputMapping inputMapping = new NumericKeypad();
+  InputMapping inputMapping = new NumericMapping();
 
-  protected DeviceHandler(Broker<Message> messageBroker, Synthesizer synthesizer, String deviceName) {
+  public DeviceHandler(Broker<Message> messageBroker, Synthesizer synthesizer, String deviceName) {
     super(messageBroker);
     this.synthesizer = synthesizer;
-    this.deviceReader = new DeviceReader(getInputQueue(), deviceName);
+    this.qwertyReader = new QwertyReader(getInputQueue(), deviceName);
     this.defaultPlayer = new KeyNotePlayer(synthesizer, Keys.CMajor, 0);
     this.player = defaultPlayer;
     delegate(OnNoteOn.class, message -> doNoteOn(message.getCharCode()));
@@ -55,12 +58,12 @@ public class DeviceHandler extends BrokerTask<Message> {
   @Override
   public void start() {
     super.start();
-    deviceReader.start();
+    qwertyReader.start();
   }
 
   @Override
   public void terminate() {
-    deviceReader.terminate();
+    qwertyReader.terminate();
     super.terminate();
   }
 
@@ -157,10 +160,10 @@ public class DeviceHandler extends BrokerTask<Message> {
   private void setKeyboardMapping(int mapping) {
     switch (mapping) {
     case 1:
-      inputMapping = new NumericKeypad();
+      inputMapping = new NumericMapping();
       break;
     case 2:
-      inputMapping = new AlphaKeyboard();
+      inputMapping = new AlphaMapping();
       break;
     }
     player.updateInputDevice(inputMapping);

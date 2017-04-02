@@ -7,20 +7,22 @@
 // This program is made available on an "as is" basis, without
 // warranties or conditions of any kind, either express or implied.
 
-package com.example.afs.musicpad.device;
+package com.example.afs.musicpad.device.qwerty;
 
 import java.awt.event.KeyEvent;
 
-public abstract class LinuxKeyboard extends InputMapping {
+import com.example.afs.musicpad.device.common.InputMapping;
 
-  // These are: 1) used only within this class hierarchy 2) symmetric, 3) exclusive of the alpha range 
-  protected static final int ENTER = '\u8595';
-  protected static final int BACK_SPACE = '\u8592';
+public abstract class QwertyMapping extends InputMapping {
+
+  // http://www.fileformat.info/
+  protected static final int ENTER = '\u23ce';
+  protected static final int BACK_SPACE = '\u2190';
   protected static final int NUM_LOCK = '#';
 
   @Override
   public int toCharCode(int keyCode) {
-    int charCode = LinuxKeyCodes.charCodes[keyCode];
+    int charCode = QwertyKeyCodes.charCodes[keyCode];
     return charCode;
   }
 

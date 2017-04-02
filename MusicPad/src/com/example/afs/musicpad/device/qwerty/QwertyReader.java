@@ -7,7 +7,7 @@
 // This program is made available on an "as is" basis, without
 // warranties or conditions of any kind, either express or implied.
 
-package com.example.afs.musicpad.device;
+package com.example.afs.musicpad.device.qwerty;
 
 import java.awt.event.KeyEvent;
 import java.io.FileDescriptor;
@@ -18,13 +18,14 @@ import java.lang.reflect.Field;
 import java.util.concurrent.BlockingQueue;
 
 import com.example.afs.fluidsynth.FluidSynth;
+import com.example.afs.musicpad.device.common.CommandBuilder;
 import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.util.ByteArray;
 
 // See /usr/include/linux/input.h
 // See https://www.kernel.org/doc/Documentation/input/input.txt
 
-public class DeviceReader {
+public class QwertyReader {
 
   private static final int EV_KEY = 0x01;
 
@@ -33,7 +34,7 @@ public class DeviceReader {
   private boolean isTerminated;
   private CommandBuilder commandBuilder;
 
-  public DeviceReader(BlockingQueue<Message> queue, String deviceName) {
+  public QwertyReader(BlockingQueue<Message> queue, String deviceName) {
     this.deviceName = deviceName;
     this.commandBuilder = new CommandBuilder(queue);
   }
@@ -55,7 +56,7 @@ public class DeviceReader {
   }
 
   public void processKeyPress(short keyCode) {
-    char charCode = LinuxKeyCodes.charCodes[keyCode];
+    char charCode = QwertyKeyCodes.charCodes[keyCode];
     if (charCode == KeyEvent.VK_ESCAPE) {
       terminate();
     } else {
@@ -64,7 +65,7 @@ public class DeviceReader {
   }
 
   public void processKeyRelease(short keyCode) {
-    char charCode = LinuxKeyCodes.charCodes[keyCode];
+    char charCode = QwertyKeyCodes.charCodes[keyCode];
     commandBuilder.processCharRelease(charCode);
   }
 

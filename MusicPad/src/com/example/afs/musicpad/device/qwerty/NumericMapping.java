@@ -7,10 +7,11 @@
 // This program is made available on an "as is" basis, without
 // warranties or conditions of any kind, either express or implied.
 
-package com.example.afs.musicpad.device;
+package com.example.afs.musicpad.device.qwerty;
 
 
-public class NumericKeypad extends LinuxKeyboard {
+
+public class NumericMapping extends QwertyMapping {
 
   @Override
   public int fromNoteIndex(int noteIndex) {

@@ -10,7 +10,7 @@
 package com.example.afs.musicpad.player;
 
 import com.example.afs.fluidsynth.Synthesizer;
-import com.example.afs.musicpad.device.InputMapping;
+import com.example.afs.musicpad.device.common.InputMapping;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.song.Song;
 

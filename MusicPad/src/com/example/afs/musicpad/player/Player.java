@@ -12,7 +12,7 @@ package com.example.afs.musicpad.player;
 import com.example.afs.fluidsynth.Synthesizer;
 import com.example.afs.musicpad.CommandProcessor;
 import com.example.afs.musicpad.analyzer.Names;
-import com.example.afs.musicpad.device.InputMapping;
+import com.example.afs.musicpad.device.common.InputMapping;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.theory.ChordType;
 import com.example.afs.musicpad.util.Velocity;

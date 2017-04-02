@@ -7,11 +7,11 @@
 // This program is made available on an "as is" basis, without
 // warranties or conditions of any kind, either express or implied.
 
-package com.example.afs.musicpad.device;
+package com.example.afs.musicpad.device.qwerty;
 
 import java.awt.event.KeyEvent;
 
-public class LinuxKeyCodes {
+public class QwertyKeyCodes {
   // http://www.comptechdoc.org/os/linux/howlinuxworks/linux_hlkeycodes.html
   public static final char[] charCodes = new char[] {
       KeyEvent.VK_UNDEFINED, //
