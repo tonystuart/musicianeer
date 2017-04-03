@@ -80,7 +80,6 @@ public class MidiReader implements DeviceInterface {
       ShortMessage shortMessage = (ShortMessage) message;
       int type = shortMessage.getCommand();
       int control = shortMessage.getData1();
-      int value = shortMessage.getData2();
       if (type == ShortMessage.NOTE_ON) {
         queue.add(new OnInputPress(control));
       } else if (type == ShortMessage.NOTE_OFF) {

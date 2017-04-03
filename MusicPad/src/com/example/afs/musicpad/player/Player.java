@@ -42,8 +42,6 @@ public abstract class Player {
   public void close() {
   }
 
-  public abstract int getUniqueCount();
-
   public void onTick(long tick) {
   }
 

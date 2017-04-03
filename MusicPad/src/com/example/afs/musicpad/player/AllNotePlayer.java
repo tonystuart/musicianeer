@@ -12,16 +12,17 @@ package com.example.afs.musicpad.player;
 import com.example.afs.fluidsynth.Synthesizer;
 import com.example.afs.musicpad.midi.Midi;
 
-public class GeneralDrumPlayer extends Player {
+public class AllNotePlayer extends Player {
 
-  public GeneralDrumPlayer(Synthesizer synthesizer, int kitIndex) {
-    super(synthesizer, Midi.DRUM);
+  public AllNotePlayer(Synthesizer synthesizer, int channel) {
+    super(synthesizer, channel);
   }
 
   @Override
   public void play(Action action, int noteIndex) {
-    int midiDrum = Midi.DRUM_BASE + noteIndex;
-    playMidiDrum(action, midiDrum);
+    if (noteIndex >= 0 && noteIndex < Midi.NOTES) {
+      playMidiNote(action, noteIndex);
+    }
   }
 
 }

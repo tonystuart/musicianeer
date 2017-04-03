@@ -41,11 +41,6 @@ public class SongChordPlayer extends SongPlayer {
   }
 
   @Override
-  public int getUniqueCount() {
-    return noteIndexToChord.length;
-  }
-
-  @Override
   public void play(Action action, int chordIndex) {
     if (chordIndex < noteIndexToChord.length) {
       ChordType chordType = noteIndexToChord[chordIndex];

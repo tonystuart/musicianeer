@@ -22,11 +22,6 @@ public class SongDrumPlayer extends Player {
   }
 
   @Override
-  public int getUniqueCount() {
-    return 0;
-  }
-
-  @Override
   public void play(Action action, int noteIndex) {
   }
 

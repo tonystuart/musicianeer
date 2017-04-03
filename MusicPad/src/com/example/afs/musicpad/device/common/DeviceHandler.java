@@ -11,6 +11,7 @@ package com.example.afs.musicpad.device.common;
 
 import com.example.afs.fluidsynth.Synthesizer;
 import com.example.afs.musicpad.Command;
+import com.example.afs.musicpad.device.midi.MidiMapping;
 import com.example.afs.musicpad.device.qwerty.AlphaMapping;
 import com.example.afs.musicpad.device.qwerty.NumericMapping;
 import com.example.afs.musicpad.message.Message;
@@ -34,17 +35,18 @@ import com.example.afs.musicpad.util.Broker;
 
 public class DeviceHandler extends BrokerTask<Message> {
 
-  private Player player;
-  private Song currentSong;
-  private Synthesizer synthesizer;
   private Player defaultPlayer;
   private InputMapping inputMapping;
 
-  public DeviceHandler(Broker<Message> messageBroker, Synthesizer synthesizer, InputMapping inputMapping) {
+  private Player player;
+  private Song currentSong;
+  private Synthesizer synthesizer;
+
+  public DeviceHandler(Broker<Message> messageBroker, Synthesizer synthesizer, InputMapping inputMapping, Player defaultPlayer) {
     super(messageBroker);
     this.synthesizer = synthesizer;
     this.inputMapping = inputMapping;
-    this.defaultPlayer = new KeyNotePlayer(synthesizer, Keys.CMajor, 0);
+    this.defaultPlayer = defaultPlayer;
     this.player = defaultPlayer;
     delegate(OnInputPress.class, message -> doInputPress(message.getInputCode()));
     delegate(OnInputRelease.class, message -> doInputRelease(message.getInputCode()));
@@ -150,6 +152,9 @@ public class DeviceHandler extends BrokerTask<Message> {
       break;
     case 2:
       inputMapping = new AlphaMapping();
+      break;
+    case 3:
+      inputMapping = new MidiMapping();
       break;
     }
     player.updateInputDevice(inputMapping);

@@ -22,11 +22,6 @@ public class KeyNotePlayer extends Player {
   }
 
   @Override
-  public int getUniqueCount() {
-    return key.getMidiNotes().length;
-  }
-
-  @Override
   public void play(Action action, int noteIndex) {
     if (noteIndex >= 0 && noteIndex < key.getMidiNotes().length) {
       int midiNote = key.getMidiNotes()[noteIndex];

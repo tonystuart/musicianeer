@@ -39,11 +39,6 @@ public class SongNotePlayer extends SongPlayer {
   }
 
   @Override
-  public int getUniqueCount() {
-    return noteIndexToNote.length;
-  }
-
-  @Override
   public void play(Action action, int noteIndex) {
     if (noteIndex < noteIndexToNote.length) {
       int midiNote = noteIndexToNote[noteIndex];

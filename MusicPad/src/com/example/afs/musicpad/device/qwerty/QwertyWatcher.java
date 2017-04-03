@@ -54,7 +54,7 @@ public class QwertyWatcher extends BrokerTask<Message> {
 
   private void attachDevice(String name) {
     System.out.println("Attaching QWERTY device " + name);
-    DeviceHandler deviceHandler = new DeviceHandler(getBroker(), synthesizer, new NumericMapping());
+    DeviceHandler deviceHandler = new QwertyDeviceHandler(getBroker(), synthesizer);
     QwertyReader qwertyReader = new QwertyReader(deviceHandler.getInputQueue(), name);
     DeviceGroup deviceGroup = new DeviceGroup(deviceHandler, qwertyReader);
     oldDevices.put(name, deviceGroup);

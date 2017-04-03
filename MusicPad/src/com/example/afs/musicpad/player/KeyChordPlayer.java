@@ -17,18 +17,11 @@ import com.example.afs.musicpad.theory.ScaleBasedChordTypes;
 
 public class KeyChordPlayer extends Player {
 
-  private Key key;
   private ScaleBasedChordTypes scaleBasedChordTypes;
 
   public KeyChordPlayer(Synthesizer synthesizer, Key key, int channel) {
     super(synthesizer, channel);
-    this.key = key;
     this.scaleBasedChordTypes = new ScaleBasedChordTypes(key);
-  }
-
-  @Override
-  public int getUniqueCount() {
-    return key.getMidiNotes().length;
   }
 
   @Override

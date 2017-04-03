@@ -37,6 +37,10 @@ public class MidiMapping extends InputMapping {
 
   @Override
   public int toNoteIndex(int inputCode) {
+    return inputCode;
+  }
+
+  public int toNoteIndexOld(int inputCode) {
     int noteIndex = -1;
     if (inputCode >= Default.OCTAVE_SEMITONE) {
       int octave = inputCode / Midi.SEMITONES_PER_OCTAVE;

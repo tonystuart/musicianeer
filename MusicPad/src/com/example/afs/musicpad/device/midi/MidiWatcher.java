@@ -58,7 +58,7 @@ public class MidiWatcher extends BrokerTask<Message> {
 
   private void attachDevice(String name, MidiDeviceBundle device) {
     System.out.println("Attaching MIDI device " + name);
-    DeviceHandler deviceHandler = new DeviceHandler(getBroker(), synthesizer, new MidiMapping());
+    DeviceHandler deviceHandler = new MidiDeviceHandler(getBroker(), synthesizer);
     MidiReader midiReader = new MidiReader(deviceHandler.getInputQueue(), device);
     DeviceGroup deviceGroup = new DeviceGroup(deviceHandler, midiReader);
     oldDevices.put(name, deviceGroup);
