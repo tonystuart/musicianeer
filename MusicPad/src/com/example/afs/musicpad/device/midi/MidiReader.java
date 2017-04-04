@@ -9,8 +9,12 @@
 
 package com.example.afs.musicpad.device.midi;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
 import java.util.concurrent.BlockingQueue;
 
+import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.MidiDevice;
 import javax.sound.midi.MidiMessage;
 import javax.sound.midi.MidiUnavailableException;
@@ -26,7 +30,13 @@ import com.example.afs.musicpad.util.RandomAccessList;
 
 public class MidiReader implements DeviceInterface {
 
-  public class DeviceReceiver implements Receiver {
+  private class MidiReceiver implements Receiver {
+
+    private int subdevice;
+
+    public MidiReceiver(int subdevice) {
+      this.subdevice = subdevice;
+    }
 
     @Override
     public void close() {
@@ -34,31 +44,21 @@ public class MidiReader implements DeviceInterface {
 
     @Override
     public void send(MidiMessage message, long timestamp) {
-      receiveFromDevice(message, timestamp);
+      receiveFromDevice(message, timestamp, subdevice);
     }
-
   }
 
   private BlockingQueue<Message> queue;
-  private DeviceReceiver deviceInput = new DeviceReceiver();
+  private MidiDeviceBundle device;
   private RandomAccessList<Receiver> receivers = new DirectList<>();
+  private Properties properties;
 
   public MidiReader(BlockingQueue<Message> queue, MidiDeviceBundle device) {
     this.queue = queue;
-    try {
-      for (MidiInputDevice inputDevice : device.getInputDevices()) {
-        MidiDevice midiInputDevice = inputDevice.getMidiDevice();
-        midiInputDevice.open();
-        midiInputDevice.getTransmitter().setReceiver(deviceInput);
-      }
-      for (MidiOutputDevice outputDevice : device.getOutputDevices()) {
-        MidiDevice midiOutputDevice = outputDevice.getMidiDevice();
-        midiOutputDevice.open();
-        receivers.add(midiOutputDevice.getReceiver());
-      }
-    } catch (MidiUnavailableException e) {
-      throw new RuntimeException(e);
-    }
+    this.device = device;
+    readProperties();
+    connectDevices();
+    initializeDevices();
   }
 
   public void sendToDevice(MidiMessage message, long timestamp) {
@@ -75,7 +75,45 @@ public class MidiReader implements DeviceInterface {
   public void terminate() {
   }
 
-  private void receiveFromDevice(MidiMessage message, long timestamp) {
+  private void connectDevices() {
+    try {
+      for (MidiInputDevice midiInputDevice : device.getInputDevices()) {
+        MidiDevice midiDevice = midiInputDevice.getMidiDevice();
+        midiDevice.open();
+        midiDevice.getTransmitter().setReceiver(new MidiReceiver(midiInputDevice.getSubdevice()));
+      }
+      for (MidiOutputDevice midiOutputDevice : device.getOutputDevices()) {
+        MidiDevice midiDevice = midiOutputDevice.getMidiDevice();
+        midiDevice.open();
+        receivers.add(midiDevice.getReceiver());
+      }
+    } catch (MidiUnavailableException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  private void initializeDevices() {
+    String property = properties.getProperty("initialize.output");
+    try {
+      ShortMessage shortMessage = new ShortMessage(ShortMessage.NOTE_ON, 0, 0x0c, 0x7f);
+      sendToDevice(shortMessage, -1);
+    } catch (InvalidMidiDataException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  private void readProperties() {
+    properties = new Properties();
+    try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream(device.getType() + ".properties")) {
+      if (inputStream != null) {
+        properties.load(inputStream);
+      }
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  private void receiveFromDevice(MidiMessage message, long timestamp, int subdevice) {
     if (message instanceof ShortMessage) {
       ShortMessage shortMessage = (ShortMessage) message;
       int type = shortMessage.getCommand();

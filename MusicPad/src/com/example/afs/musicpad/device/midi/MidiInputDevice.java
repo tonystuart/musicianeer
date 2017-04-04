@@ -12,25 +12,26 @@ package com.example.afs.musicpad.device.midi;
 import javax.sound.midi.MidiDevice;
 
 public class MidiInputDevice {
-  private String name;
-  private MidiDevice midiDevice;
 
-  public MidiInputDevice(String name, MidiDevice midiDevice) {
-    this.name = name;
+  private MidiDevice midiDevice;
+  private int subdevice;
+
+  public MidiInputDevice(MidiDevice midiDevice, int subdevice) {
     this.midiDevice = midiDevice;
+    this.subdevice = subdevice;
   }
 
   public MidiDevice getMidiDevice() {
     return midiDevice;
   }
 
-  public String getName() {
-    return name;
+  public int getSubdevice() {
+    return subdevice;
   }
 
   @Override
   public String toString() {
-    return "InputDevice [name=" + name + "]";
+    return "MidiInputDevice [midiDevice=" + midiDevice + ", subdevice=" + subdevice + "]";
   }
 
 }

@@ -30,6 +30,8 @@ import com.example.afs.musicpad.util.Broker;
 
 public class MidiWatcher extends BrokerTask<Message> {
 
+  private static final Pattern PATTERN = Pattern.compile("^(.*) \\[hw\\:([0-9]+),([0-9]+),([0-9]+)\\]$");
+
   private Synthesizer synthesizer;
   private Map<String, DeviceGroup> oldDevices = new HashMap<>();
 
@@ -76,19 +78,24 @@ public class MidiWatcher extends BrokerTask<Message> {
       Info[] deviceDescriptors = MidiSystem.getMidiDeviceInfo();
       for (Info deviceDescriptor : deviceDescriptors) {
         String fullName = deviceDescriptor.getName();
-        String name = getName(fullName);
-        if (name != null) {
-          MidiDeviceBundle device = devices.get(name);
-          if (device == null) {
-            device = new MidiDeviceBundle(name);
-            devices.put(name, device);
+        Matcher matcher = PATTERN.matcher(fullName);
+        if (matcher.matches()) {
+          String type = matcher.group(1);
+          int card = Integer.parseInt(matcher.group(2));
+          int device = Integer.parseInt(matcher.group(3));
+          int subdevice = Integer.parseInt(matcher.group(4));
+          String name = type + "-" + card + "-" + device;
+          MidiDeviceBundle deviceBundle = devices.get(name);
+          if (deviceBundle == null) {
+            deviceBundle = new MidiDeviceBundle(type, card, device);
+            devices.put(name, deviceBundle);
           }
           MidiDevice midiDevice = MidiSystem.getMidiDevice(deviceDescriptor);
           if (midiDevice.getMaxReceivers() != 0) {
-            device.addOutput(new MidiOutputDevice(fullName, midiDevice));
+            deviceBundle.addOutput(midiDevice, subdevice);
           }
           if (midiDevice.getMaxTransmitters() != 0) {
-            device.addInput(new MidiInputDevice(fullName, midiDevice));
+            deviceBundle.addInput(midiDevice, subdevice);
           }
         }
       }
@@ -96,21 +103,6 @@ public class MidiWatcher extends BrokerTask<Message> {
     } catch (MidiUnavailableException e) {
       throw new RuntimeException(e);
     }
-  }
-
-  private String getName(String fullName) {
-    String name = null;
-    //String p = "^(.*) \\[hw\\:([0-9]+),([0-9]+),([0-9]+)$";
-    String p = "^(.*) \\[hw\\:([0-9]+),([0-9]+),([0-9]+)\\]$";
-    Pattern pattern = Pattern.compile(p);
-    Matcher matcher = pattern.matcher(fullName);
-    if (matcher.matches()) {
-      String type = matcher.group(1);
-      String card = matcher.group(2);
-      String device = matcher.group(3);
-      name = type + "-" + card + "-" + device;
-    }
-    return name;
   }
 
 }

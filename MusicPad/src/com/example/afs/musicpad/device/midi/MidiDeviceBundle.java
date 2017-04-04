@@ -9,42 +9,57 @@
 
 package com.example.afs.musicpad.device.midi;
 
+import javax.sound.midi.MidiDevice;
+
 import com.example.afs.musicpad.util.DirectList;
 import com.example.afs.musicpad.util.RandomAccessList;
 
 public class MidiDeviceBundle {
 
-  private String name;
+  private String type;
+  private int card;
+  private int device;
+
   private RandomAccessList<MidiInputDevice> inputDevices = new DirectList<>();
   private RandomAccessList<MidiOutputDevice> outputDevices = new DirectList<>();
 
-  public MidiDeviceBundle(String name) {
-    this.name = name;
+  public MidiDeviceBundle(String type, int card, int device) {
+    this.type = type;
+    this.card = card;
+    this.device = device;
   }
 
-  public void addInput(MidiInputDevice midiDevice) {
-    inputDevices.add(midiDevice);
+  public void addInput(MidiDevice midiDevice, int subdevice) {
+    inputDevices.add(new MidiInputDevice(midiDevice, subdevice));
   }
 
-  public void addOutput(MidiOutputDevice outputDevice) {
-    outputDevices.add(outputDevice);
+  public void addOutput(MidiDevice midiDevice, int subdevice) {
+    outputDevices.add(new MidiOutputDevice(midiDevice, subdevice));
+  }
+
+  public int getCard() {
+    return card;
+  }
+
+  public int getDevice() {
+    return device;
   }
 
   public RandomAccessList<MidiInputDevice> getInputDevices() {
     return inputDevices;
   }
 
-  public String getName() {
-    return name;
-  }
-
   public RandomAccessList<MidiOutputDevice> getOutputDevices() {
     return outputDevices;
   }
 
+  public String getType() {
+    return type;
+  }
+
   @Override
   public String toString() {
-    return "Device [name=" + name + ", inputDevices=" + inputDevices + ", outputDevices=" + outputDevices + "]";
+    return "MidiDeviceBundle [type=" + type + ", card=" + card + ", device=" + device + ", inputDevices=" + inputDevices + ", outputDevices=" + outputDevices + "]";
   }
 
 }
