@@ -1,0 +1,10 @@
+{
+  "initializers" : [
+    {
+      "command" : 144,
+      "channel" : 0,
+      "data1" : 12,
+      "data2" : 127
+    }
+  ]
+}

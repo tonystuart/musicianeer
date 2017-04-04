@@ -9,9 +9,8 @@
 
 package com.example.afs.musicpad.device.midi;
 
-import java.io.IOException;
+import java.io.File;
 import java.io.InputStream;
-import java.util.Properties;
 import java.util.concurrent.BlockingQueue;
 
 import javax.sound.midi.InvalidMidiDataException;
@@ -22,10 +21,13 @@ import javax.sound.midi.Receiver;
 import javax.sound.midi.ShortMessage;
 
 import com.example.afs.musicpad.device.common.DeviceGroup.DeviceInterface;
+import com.example.afs.musicpad.device.midi.MidiConfiguration.ConfigurationMessage;
 import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnInputPress;
 import com.example.afs.musicpad.message.OnInputRelease;
 import com.example.afs.musicpad.util.DirectList;
+import com.example.afs.musicpad.util.FileUtilities;
+import com.example.afs.musicpad.util.JsonUtilities;
 import com.example.afs.musicpad.util.RandomAccessList;
 
 public class MidiReader implements DeviceInterface {
@@ -48,15 +50,15 @@ public class MidiReader implements DeviceInterface {
     }
   }
 
-  private BlockingQueue<Message> queue;
   private MidiDeviceBundle device;
+  private BlockingQueue<Message> queue;
   private RandomAccessList<Receiver> receivers = new DirectList<>();
-  private Properties properties;
+  private MidiConfiguration configuration;
 
   public MidiReader(BlockingQueue<Message> queue, MidiDeviceBundle device) {
     this.queue = queue;
     this.device = device;
-    readProperties();
+    this.configuration = readConfiguration();
     connectDevices();
     initializeDevices();
   }
@@ -93,24 +95,36 @@ public class MidiReader implements DeviceInterface {
   }
 
   private void initializeDevices() {
-    String property = properties.getProperty("initialize.output");
-    try {
-      ShortMessage shortMessage = new ShortMessage(ShortMessage.NOTE_ON, 0, 0x0c, 0x7f);
-      sendToDevice(shortMessage, -1);
-    } catch (InvalidMidiDataException e) {
-      throw new RuntimeException(e);
+    for (ConfigurationMessage message : configuration.getInitializers()) {
+      try {
+        int command = message.getCommand();
+        int channel = message.getChannel();
+        int data1 = message.getData1();
+        int data2 = message.getData2();
+        ShortMessage shortMessage = new ShortMessage(command, channel, data1, data2);
+        sendToDevice(shortMessage, -1);
+      } catch (InvalidMidiDataException e) {
+        throw new RuntimeException(e);
+      }
     }
   }
 
-  private void readProperties() {
-    properties = new Properties();
-    try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream(device.getType() + ".properties")) {
-      if (inputStream != null) {
-        properties.load(inputStream);
-      }
-    } catch (IOException e) {
-      throw new RuntimeException(e);
+  private MidiConfiguration readConfiguration() {
+    String home = System.getProperty("user.home");
+    String fileName = device.getType() + ".configuration";
+    String overridePathName = home + File.separatorChar + ".musicpad" + File.separatorChar + fileName;
+    File configurationFile = new File(overridePathName);
+    if (configurationFile.isFile() && configurationFile.canRead()) {
+      MidiConfiguration configuration = FileUtilities.readJson(overridePathName, MidiConfiguration.class);
+      return configuration;
     }
+    InputStream inputStream = getClass().getClassLoader().getResourceAsStream(fileName);
+    if (inputStream != null) {
+      String contents = FileUtilities.read(inputStream);
+      MidiConfiguration configuration = JsonUtilities.fromJson(contents, MidiConfiguration.class);
+      return configuration;
+    }
+    return new MidiConfiguration();
   }
 
   private void receiveFromDevice(MidiMessage message, long timestamp, int subdevice) {
