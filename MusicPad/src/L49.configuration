@@ -1,42 +1,147 @@
 {
-  "initializers" : [
+  "initializationActions" : [
     {
-      "subDevice" : 0,
-      "command" : 144,
-      "channel" : 0,
-      "data1" : 12,
-      "data2" : 127
+      "sendDeviceMessages" : [
+        {
+          "subDevice" : 0,
+          "command" : 144,
+          "channel" : 0,
+          "data1" : 12,
+          "data2" : 127
+        }
+      ]
     }
   ],
-  "inputs" : [
+  "inputActions" : [
+    { // template
+      "ifMatch" : {
+        "subDevice" : -1,
+        "command" : 0,
+        "channel" : 0,
+        "data1" : 0,
+        "data2" : 0
+      },
+      "ifModes" : [
+        0
+      ],
+      "ifNotModes" : [
+        0
+      ],
+      "actions" : [
+        {
+          "setMode" : 0,
+          "sendDeviceMessages" : [
+            {
+              "subDevice" : 0,
+              "command" : 0,
+              "channel" : 0,
+              "data1" : 0,
+              "data2" : 0
+            }
+          ],
+          "sendHandlerMessages" : [
+            {
+              "subDevice" : 0,
+              "command" : 0,
+              "channel" : 0,
+              "data1" : 0,
+              "data2" : 0
+            }
+          ],
+          "sendHandlerCommands" : [
+            {
+              "command" : 0,
+              "parameter" : 0
+            }
+          ]
+        }
+      ]
+    }, // template
+    { // enter select notes mode
+      "ifMatch" : {
+        "subDevice" : 1,
+        "command" : 144,
+        "data1" : 104 // top round pad
+      },
+      "ifNotMode" : [
+        1
+      ],
+      "actions" : [
+        {
+          "setMode" : 1,
+          "sendDeviceMessages" : [
+            {
+              "subDevice" : 1,
+              "command" : 144,
+              "channel" : 0,
+              "data1" : 104,
+              "data2" : 127
+            },
+            {
+              "subDevice" : 1,
+              "command" : 128,
+              "channel" : 0,
+              "data1" : 104,
+              "data2" : 127
+            }
+          ]
+        }
+       ]
+    }, // enter select notes mode
+    { // exit select notes mode
+      "ifMatch" : {
+        "subDevice" : 1,
+        "command" : 144,
+        "data1" : 104 // top round pad
+      },
+      "ifMode" : [
+        1
+      ],
+      "actions" : [
+        {
+          "clearMode" : 1,
+          "sendDeviceMessages" : [
+            {
+              "subDevice" : 1,
+              "command" : 144,
+              "channel" : 0,
+              "data1" : 104,
+              "data2" : 0
+            },
+            {
+              "subDevice" : 1,
+              "command" : 128,
+              "channel" : 0,
+              "data1" : 104,
+              "data2" : 0
+            }
+          ]
+        }
+      ]
+    }, // exit select notes mode
     {
       "ifMatch" : {
         "subDevice" : 1,
         "command" : 144,
-        "data1" : 112,
+        "data1" : 96 // top square pad 1
       },
-      "onPress" : {
-        "setShift" : 1,
-        "sendDeviceMessages" : [
-        ],
-        "sendHandlerMessages" : [
-        ],
-        "sendHandlerCommands" : [
-        ]
-      },
-      "onRelease" : {
-        "clearShift" : 1,
-        "sendDeviceMessages" : [
-        ],
-        "sendHandlerMessages" : [
-        ],
-        "sendHandlerCommands" : [
-          {
-            "command" : 3,
-            "parameter" : 1
-          }
-        ]
-      }
+      "ifModes" : [
+        1
+      ],
+      "actions" : [
+        {
+          "sendDeviceMessages" : [
+          ],
+          "sendHandlerMessages" : [
+          ],
+          "sendHandlerCommands" : [
+            {
+              "command" : 3,
+              "parameter" : 1
+            }
+          ]
+        }
+      ]
     }
   ]
 }

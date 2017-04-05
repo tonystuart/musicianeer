@@ -27,7 +27,7 @@ import com.example.afs.musicpad.device.common.DeviceGroup.DeviceInterface;
 import com.example.afs.musicpad.device.midi.MidiConfiguration.Action;
 import com.example.afs.musicpad.device.midi.MidiConfiguration.ChannelMessage;
 import com.example.afs.musicpad.device.midi.MidiConfiguration.Command;
-import com.example.afs.musicpad.device.midi.MidiConfiguration.Input;
+import com.example.afs.musicpad.device.midi.MidiConfiguration.InputActions;
 import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnInputPress;
@@ -107,7 +107,48 @@ public class MidiReader implements DeviceInterface {
   }
 
   private void initializeDevices() {
-    sendDeviceMessages(configuration.getInitializers());
+    for (Action action : configuration.getInitializationActions()) {
+      performActions(action);
+    }
+  }
+
+  private boolean modesMatch(List<Integer> ifModes) {
+    if (ifModes == null) {
+      return true;
+    }
+    for (Integer mode : ifModes) {
+      if (!currentShifts.contains(mode)) {
+        return false;
+      }
+    }
+    return false;
+  }
+
+  private boolean notModesMatch(List<Integer> ifNotModes) {
+    if (ifNotModes == null) {
+      return true;
+    }
+    for (Integer mode : ifNotModes) {
+      if (currentShifts.contains(mode)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  private void performActions(Action action) {
+    List<ChannelMessage> deviceMessages = action.getSendDeviceMessages();
+    if (deviceMessages != null) {
+      sendDeviceMessages(deviceMessages);
+    }
+    List<ChannelMessage> handlerMessages = action.getSendHandlerMessages();
+    if (handlerMessages != null) {
+      sendHandlerMessages(handlerMessages, true);
+    }
+    List<Command> handlerCommands = action.getSendHandlerCommands();
+    if (handlerCommands != null) {
+      sendHandlerCommands(handlerCommands);
+    }
   }
 
   private MidiConfiguration readConfiguration() {
@@ -135,32 +176,20 @@ public class MidiReader implements DeviceInterface {
       int channel = shortMessage.getChannel();
       int data1 = shortMessage.getData1();
       int data2 = shortMessage.getData2();
-      for (Input input : configuration.getInputs()) {
-        if (input.equals(subDevice, command, channel, data1, data2)) {
-          if (input.getAndIfShift() == null || currentShifts.contains(input.getAndIfShift())) {
-            if (input.getAndIfMode() == null || currentModes.contains(input.getAndIfMode())) {
-              Action action;
-              if (command == ShortMessage.NOTE_ON) {
-                action = input.getOnPress();
-              } else {
-                action = input.getOnRelease();
+      for (InputActions inputActions : configuration.getInputActions()) {
+        if (inputActions.equals(subDevice, command, channel, data1, data2)) {
+          if (modesMatch(inputActions.getIfModes())) {
+            if (notModesMatch(inputActions.getIfNotModes())) {
+              for (Action action : inputActions.getActions()) {
+                if (action.getSetMode() != null) {
+                  currentModes.add(action.getSetMode());
+                }
+                if (action.getClearMode() != null) {
+                  currentModes.remove(action.getClearMode());
+                }
+                performActions(action);
               }
-              if (action.getSetShift() != null) {
-                currentShifts.add(action.getSetShift());
-              }
-              if (action.getClearShift() != null) {
-                currentShifts.remove(action.getClearShift());
-              }
-              if (action.getSetMode() != null) {
-                currentModes.add(action.getSetMode());
-              }
-              if (action.getClearMode() != null) {
-                currentModes.remove(action.getClearMode());
-              }
-              sendDeviceMessages(action.getSendDeviceMessages());
-              sendHandlerMessages(action.getSendHandlerMessages(), true);
-              sendHandlerCommands(action.getSendHandlerCommands());
-              return; // TODO: Rethink this...
+              return;
             }
           }
         }
