@@ -1,10 +1,42 @@
 {
   "initializers" : [
     {
+      "subDevice" : 0,
       "command" : 144,
       "channel" : 0,
       "data1" : 12,
       "data2" : 127
+    }
+  ],
+  "inputs" : [
+    {
+      "ifMatch" : {
+        "subDevice" : 1,
+        "command" : 144,
+        "data1" : 112,
+      },
+      "onPress" : {
+        "setShift" : 1,
+        "sendDeviceMessages" : [
+        ],
+        "sendHandlerMessages" : [
+        ],
+        "sendHandlerCommands" : [
+        ]
+      },
+      "onRelease" : {
+        "clearShift" : 1,
+        "sendDeviceMessages" : [
+        ],
+        "sendHandlerMessages" : [
+        ],
+        "sendHandlerCommands" : [
+          {
+            "command" : 3,
+            "parameter" : 1
+          }
+        ]
+      }
     }
   ]
 }
