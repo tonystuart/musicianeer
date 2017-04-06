@@ -19,14 +19,14 @@ import java.util.concurrent.BlockingQueue;
 
 import com.example.afs.fluidsynth.FluidSynth;
 import com.example.afs.musicpad.device.common.CommandBuilder;
-import com.example.afs.musicpad.device.common.DeviceGroup.DeviceInterface;
+import com.example.afs.musicpad.device.common.ControllableGroup.Controllable;
 import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.util.ByteArray;
 
 // See /usr/include/linux/input.h
 // See https://www.kernel.org/doc/Documentation/input/input.txt
 
-public class QwertyReader implements DeviceInterface {
+public class QwertyReader implements Controllable {
 
   private static final int EV_KEY = 0x01;
 

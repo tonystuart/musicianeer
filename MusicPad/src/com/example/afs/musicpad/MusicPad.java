@@ -12,6 +12,7 @@ package com.example.afs.musicpad;
 import com.example.afs.fluidsynth.FluidSynth;
 import com.example.afs.fluidsynth.Synthesizer;
 import com.example.afs.fluidsynth.Synthesizer.Settings;
+import com.example.afs.musicpad.analyzer.AnalyzerTask;
 import com.example.afs.musicpad.device.midi.MidiWatcher;
 import com.example.afs.musicpad.device.qwerty.QwertyWatcher;
 import com.example.afs.musicpad.message.Message;
@@ -36,8 +37,9 @@ public class MusicPad {
   private MusicLibrary musicLibrary;
   private MidiWatcher midiWatcher;
   private QwertyWatcher qwertyWatcher;
-  private CommandProcessor commandProcessor;
   private TransportTask transportTask;
+  private AnalyzerTask analyzerTask;
+  private CommandProcessor commandProcessor;
   private Synthesizer synthesizer = createSynthesizer();
 
   public MusicPad(String libraryPath) {
@@ -45,8 +47,9 @@ public class MusicPad {
     this.broker = new Broker<Message>();
     this.midiWatcher = new MidiWatcher(broker, synthesizer);
     this.qwertyWatcher = new QwertyWatcher(broker, synthesizer);
-    this.commandProcessor = new CommandProcessor(broker, synthesizer, musicLibrary);
     this.transportTask = new TransportTask(broker, synthesizer);
+    this.analyzerTask = new AnalyzerTask(broker);
+    this.commandProcessor = new CommandProcessor(broker, synthesizer, musicLibrary);
   }
 
   private Synthesizer createSynthesizer() {
@@ -60,10 +63,11 @@ public class MusicPad {
   }
 
   private void start() {
-    commandProcessor.start();
     midiWatcher.start();
     qwertyWatcher.start();
     transportTask.start();
+    analyzerTask.start();
+    commandProcessor.start();
   }
 
 }

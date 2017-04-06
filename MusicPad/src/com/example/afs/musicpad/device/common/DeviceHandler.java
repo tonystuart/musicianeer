@@ -11,6 +11,7 @@ package com.example.afs.musicpad.device.common;
 
 import com.example.afs.fluidsynth.Synthesizer;
 import com.example.afs.musicpad.Command;
+import com.example.afs.musicpad.device.common.ControllableGroup.Controllable;
 import com.example.afs.musicpad.device.midi.MidiMapping;
 import com.example.afs.musicpad.device.qwerty.AlphaMapping;
 import com.example.afs.musicpad.device.qwerty.NumericMapping;
@@ -33,7 +34,7 @@ import com.example.afs.musicpad.task.BrokerTask;
 import com.example.afs.musicpad.theory.Keys;
 import com.example.afs.musicpad.util.Broker;
 
-public class DeviceHandler extends BrokerTask<Message> {
+public class DeviceHandler extends BrokerTask<Message> implements Controllable {
 
   private Player defaultPlayer;
   private InputMapping inputMapping;
@@ -55,7 +56,7 @@ public class DeviceHandler extends BrokerTask<Message> {
     subscribe(OnTick.class, message -> doTick(message.getTick()));
   }
 
-  void doCommand(OnCommand message) {
+  private void doCommand(OnCommand message) {
     Command command = message.getCommand();
     int parameter = message.getParameter();
     switch (command) {

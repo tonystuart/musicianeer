@@ -18,7 +18,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import com.example.afs.fluidsynth.Synthesizer;
-import com.example.afs.musicpad.device.common.DeviceGroup;
+import com.example.afs.musicpad.device.common.ControllableGroup;
 import com.example.afs.musicpad.device.common.DeviceHandler;
 import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.task.BrokerTask;
@@ -27,7 +27,7 @@ import com.example.afs.musicpad.util.Broker;
 public class QwertyWatcher extends BrokerTask<Message> {
 
   private Synthesizer synthesizer;
-  private Map<String, DeviceGroup> oldDevices = new HashMap<>();
+  private Map<String, ControllableGroup> oldDevices = new HashMap<>();
 
   public QwertyWatcher(Broker<Message> broker, Synthesizer synthesizer) {
     super(broker, 1000);
@@ -37,9 +37,9 @@ public class QwertyWatcher extends BrokerTask<Message> {
   @Override
   public void onTimeout() throws InterruptedException {
     Set<String> newDevices = getDevices();
-    Iterator<Entry<String, DeviceGroup>> oldIterator = oldDevices.entrySet().iterator();
+    Iterator<Entry<String, ControllableGroup>> oldIterator = oldDevices.entrySet().iterator();
     while (oldIterator.hasNext()) {
-      Entry<String, DeviceGroup> oldDevice = oldIterator.next();
+      Entry<String, ControllableGroup> oldDevice = oldIterator.next();
       if (!newDevices.contains(oldDevice.getKey())) {
         detachDevice(oldDevice.getKey(), oldDevice.getValue());
         oldIterator.remove();
@@ -56,14 +56,14 @@ public class QwertyWatcher extends BrokerTask<Message> {
     System.out.println("Attaching QWERTY device " + name);
     DeviceHandler deviceHandler = new QwertyDeviceHandler(getBroker(), synthesizer);
     QwertyReader qwertyReader = new QwertyReader(deviceHandler.getInputQueue(), name);
-    DeviceGroup deviceGroup = new DeviceGroup(deviceHandler, qwertyReader);
-    oldDevices.put(name, deviceGroup);
-    deviceGroup.start();
+    ControllableGroup controllableGroup = new ControllableGroup(deviceHandler, qwertyReader);
+    oldDevices.put(name, controllableGroup);
+    controllableGroup.start();
   }
 
-  private void detachDevice(String name, DeviceGroup deviceGroup) {
+  private void detachDevice(String name, ControllableGroup controllableGroup) {
     System.out.println("Detaching QWERTY device " + name);
-    deviceGroup.terminate();
+    controllableGroup.terminate();
   }
 
   private Set<String> getDevices() {

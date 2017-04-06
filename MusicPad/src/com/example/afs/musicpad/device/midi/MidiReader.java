@@ -9,35 +9,31 @@
 
 package com.example.afs.musicpad.device.midi;
 
-import java.io.File;
-import java.io.InputStream;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 
-import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.MidiDevice;
 import javax.sound.midi.MidiMessage;
 import javax.sound.midi.MidiUnavailableException;
 import javax.sound.midi.Receiver;
 import javax.sound.midi.ShortMessage;
 
-import com.example.afs.musicpad.device.common.DeviceGroup.DeviceInterface;
+import com.example.afs.musicpad.device.common.ControllableGroup.Controllable;
 import com.example.afs.musicpad.device.midi.MidiConfiguration.Action;
 import com.example.afs.musicpad.device.midi.MidiConfiguration.ChannelMessage;
 import com.example.afs.musicpad.device.midi.MidiConfiguration.HandlerCommand;
 import com.example.afs.musicpad.device.midi.MidiConfiguration.InputAction;
 import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnCommand;
+import com.example.afs.musicpad.message.OnDeviceMessages;
 import com.example.afs.musicpad.message.OnInputPress;
 import com.example.afs.musicpad.message.OnInputRelease;
-import com.example.afs.musicpad.util.DirectList;
-import com.example.afs.musicpad.util.FileUtilities;
-import com.example.afs.musicpad.util.JsonUtilities;
-import com.example.afs.musicpad.util.RandomAccessList;
+import com.example.afs.musicpad.util.Broker;
+import com.example.afs.musicpad.util.Value;
 
-public class MidiReader implements DeviceInterface {
+public class MidiReader implements Controllable {
 
   private class MidiReceiver implements Receiver {
 
@@ -57,17 +53,17 @@ public class MidiReader implements DeviceInterface {
     }
   }
 
+  private Broker<Message> broker;
   private MidiDeviceBundle device;
   private BlockingQueue<Message> queue;
-  private RandomAccessList<Receiver> receivers = new DirectList<>();
   private MidiConfiguration configuration;
-
   private Set<Integer> currentModes = new HashSet<>();
 
-  public MidiReader(BlockingQueue<Message> queue, MidiDeviceBundle device) {
+  public MidiReader(Broker<Message> broker, BlockingQueue<Message> queue, MidiDeviceBundle device, MidiConfiguration configuration) {
+    this.broker = broker;
     this.queue = queue;
     this.device = device;
-    this.configuration = readConfiguration();
+    this.configuration = configuration;
     connectDevices();
     initializeDevices();
   }
@@ -87,22 +83,9 @@ public class MidiReader implements DeviceInterface {
         midiDevice.open();
         midiDevice.getTransmitter().setReceiver(new MidiReceiver(midiInputDevice.getSubdevice()));
       }
-      for (MidiOutputDevice midiOutputDevice : device.getOutputDevices()) {
-        MidiDevice midiDevice = midiOutputDevice.getMidiDevice();
-        midiDevice.open();
-        receivers.add(midiDevice.getReceiver());
-      }
     } catch (MidiUnavailableException e) {
       throw new RuntimeException(e);
     }
-  }
-
-  private int getInt(Integer value) {
-    return getInt(value, 0);
-  }
-
-  private int getInt(Integer value, int defaultValue) {
-    return value == null ? defaultValue : value;
   }
 
   private void initializeDevices() {
@@ -136,7 +119,7 @@ public class MidiReader implements DeviceInterface {
   private void performActions(Action action) {
     List<ChannelMessage> deviceMessages = action.getSendDeviceMessages();
     if (deviceMessages != null) {
-      sendDeviceMessages(deviceMessages);
+      broker.publish(new OnDeviceMessages(deviceMessages));
     }
     List<ChannelMessage> handlerMessages = action.getSendHandlerMessages();
     if (handlerMessages != null) {
@@ -146,24 +129,6 @@ public class MidiReader implements DeviceInterface {
     if (handlerCommands != null) {
       sendHandlerCommands(handlerCommands);
     }
-  }
-
-  private MidiConfiguration readConfiguration() {
-    String home = System.getProperty("user.home");
-    String fileName = device.getType() + ".configuration";
-    String overridePathName = home + File.separatorChar + ".musicpad" + File.separatorChar + fileName;
-    File configurationFile = new File(overridePathName);
-    if (configurationFile.isFile() && configurationFile.canRead()) {
-      MidiConfiguration configuration = FileUtilities.readJson(overridePathName, MidiConfiguration.class);
-      return configuration;
-    }
-    InputStream inputStream = getClass().getClassLoader().getResourceAsStream(fileName);
-    if (inputStream != null) {
-      String contents = FileUtilities.read(inputStream);
-      MidiConfiguration configuration = JsonUtilities.fromJson(contents, MidiConfiguration.class);
-      return configuration;
-    }
-    return new MidiConfiguration();
   }
 
   private void receiveFromDevice(MidiMessage message, long timestamp, int subDevice) {
@@ -198,41 +163,15 @@ public class MidiReader implements DeviceInterface {
     }
   }
 
-  private void sendDeviceMessages(List<ChannelMessage> deviceMessages) {
-    for (ChannelMessage channelMessage : deviceMessages) {
-      try {
-        int command = channelMessage.getCommand();
-        int channel = channelMessage.getChannel();
-        int data1 = getInt(channelMessage.getData1());
-        int data2 = getInt(channelMessage.getData2());
-        ShortMessage shortMessage = new ShortMessage(command, channel, data1, data2);
-        if (channelMessage.getSubDevice() == null) {
-          for (Receiver receiver : receivers) {
-            receiver.send(shortMessage, -1);
-          }
-        } else {
-          receivers.get(channelMessage.getSubDevice()).send(shortMessage, -1);
-        }
-      } catch (InvalidMidiDataException e) {
-        throw new RuntimeException(e);
-      }
-    }
-  }
-
   private void sendHandlerCommands(List<HandlerCommand> handlerCommands) {
     for (HandlerCommand handlerCommand : handlerCommands) {
       queue.add(new OnCommand(handlerCommand.getCommand(), handlerCommand.getParameter()));
     }
   }
 
-  @SuppressWarnings("unused")
   private void sendHandlerMessages(List<ChannelMessage> handlerMessages, boolean isPress) {
     for (ChannelMessage channelMessage : handlerMessages) {
-      int command = channelMessage.getCommand();
-      int channel = channelMessage.getChannel();
-      int data1 = getInt(channelMessage.getData1());
-      int data2 = getInt(channelMessage.getData2());
-      // ShortMessage shortMessage = new ShortMessage(command, channel, data1, data2);
+      int data1 = Value.getInt(channelMessage.getData1());
       if (isPress) {
         queue.add(new OnInputPress(data1));
       } else {

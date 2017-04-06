@@ -9,30 +9,30 @@
 
 package com.example.afs.musicpad.device.common;
 
-public class DeviceGroup {
+public class ControllableGroup {
 
-  public interface DeviceInterface {
+  public interface Controllable {
     public void start();
 
     public void terminate();
   }
 
-  private DeviceHandler deviceHandler;
-  private DeviceInterface deviceInterface;
+  private Controllable[] devices;
 
-  public DeviceGroup(DeviceHandler deviceHandler, DeviceInterface deviceInterface) {
-    this.deviceHandler = deviceHandler;
-    this.deviceInterface = deviceInterface;
+  public ControllableGroup(Controllable... devices) {
+    this.devices = devices;
   }
 
   public void start() {
-    deviceHandler.start();
-    deviceInterface.start();
+    for (Controllable device : devices) {
+      device.start();
+    }
   }
 
   public void terminate() {
-    deviceHandler.terminate();
-    deviceInterface.terminate();
+    for (Controllable device : devices) {
+      device.terminate();
+    }
   }
 
 }

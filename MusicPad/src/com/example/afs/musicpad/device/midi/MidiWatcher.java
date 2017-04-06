@@ -9,6 +9,8 @@
 
 package com.example.afs.musicpad.device.midi;
 
+import java.io.File;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -22,18 +24,20 @@ import javax.sound.midi.MidiSystem;
 import javax.sound.midi.MidiUnavailableException;
 
 import com.example.afs.fluidsynth.Synthesizer;
-import com.example.afs.musicpad.device.common.DeviceGroup;
+import com.example.afs.musicpad.device.common.ControllableGroup;
 import com.example.afs.musicpad.device.common.DeviceHandler;
 import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.task.BrokerTask;
 import com.example.afs.musicpad.util.Broker;
+import com.example.afs.musicpad.util.FileUtilities;
+import com.example.afs.musicpad.util.JsonUtilities;
 
 public class MidiWatcher extends BrokerTask<Message> {
 
   private static final Pattern PATTERN = Pattern.compile("^(.*) \\[hw\\:([0-9]+),([0-9]+),([0-9]+)\\]$");
 
   private Synthesizer synthesizer;
-  private Map<String, DeviceGroup> oldDevices = new HashMap<>();
+  private Map<String, ControllableGroup> oldDevices = new HashMap<>();
 
   public MidiWatcher(Broker<Message> broker, Synthesizer synthesizer) {
     super(broker, 1000);
@@ -43,9 +47,9 @@ public class MidiWatcher extends BrokerTask<Message> {
   @Override
   public void onTimeout() throws InterruptedException {
     Map<String, MidiDeviceBundle> newDevices = getDevices();
-    Iterator<Entry<String, DeviceGroup>> oldIterator = oldDevices.entrySet().iterator();
+    Iterator<Entry<String, ControllableGroup>> oldIterator = oldDevices.entrySet().iterator();
     while (oldIterator.hasNext()) {
-      Entry<String, DeviceGroup> oldEntry = oldIterator.next();
+      Entry<String, ControllableGroup> oldEntry = oldIterator.next();
       if (!newDevices.containsKey(oldEntry.getKey())) {
         detachDevice(oldEntry.getKey(), oldEntry.getValue());
         oldIterator.remove();
@@ -61,15 +65,17 @@ public class MidiWatcher extends BrokerTask<Message> {
   private void attachDevice(String name, MidiDeviceBundle device) {
     System.out.println("Attaching MIDI device " + name);
     DeviceHandler deviceHandler = new MidiDeviceHandler(getBroker(), synthesizer);
-    MidiReader midiReader = new MidiReader(deviceHandler.getInputQueue(), device);
-    DeviceGroup deviceGroup = new DeviceGroup(deviceHandler, midiReader);
-    oldDevices.put(name, deviceGroup);
-    deviceGroup.start();
+    MidiConfiguration configuration = readConfiguration(device);
+    MidiReader midiReader = new MidiReader(getBroker(), deviceHandler.getInputQueue(), device, configuration);
+    MidiWriter midiWriter = new MidiWriter(getBroker(), device, configuration);
+    ControllableGroup controllableGroup = new ControllableGroup(deviceHandler, midiReader, midiWriter);
+    oldDevices.put(name, controllableGroup);
+    controllableGroup.start();
   }
 
-  private void detachDevice(String name, DeviceGroup deviceGroup) {
+  private void detachDevice(String name, ControllableGroup controllableGroup) {
     System.out.println("Detaching MIDI device " + name);
-    deviceGroup.terminate();
+    controllableGroup.terminate();
   }
 
   private Map<String, MidiDeviceBundle> getDevices() {
@@ -103,6 +109,24 @@ public class MidiWatcher extends BrokerTask<Message> {
     } catch (MidiUnavailableException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  private MidiConfiguration readConfiguration(MidiDeviceBundle device) {
+    String home = System.getProperty("user.home");
+    String fileName = device.getType() + ".configuration";
+    String overridePathName = home + File.separatorChar + ".musicpad" + File.separatorChar + fileName;
+    File configurationFile = new File(overridePathName);
+    if (configurationFile.isFile() && configurationFile.canRead()) {
+      MidiConfiguration configuration = FileUtilities.readJson(overridePathName, MidiConfiguration.class);
+      return configuration;
+    }
+    InputStream inputStream = getClass().getClassLoader().getResourceAsStream(fileName);
+    if (inputStream != null) {
+      String contents = FileUtilities.read(inputStream);
+      MidiConfiguration configuration = JsonUtilities.fromJson(contents, MidiConfiguration.class);
+      return configuration;
+    }
+    return new MidiConfiguration();
   }
 
 }

@@ -13,7 +13,6 @@ import java.io.File;
 import java.util.Random;
 
 import com.example.afs.fluidsynth.Synthesizer;
-import com.example.afs.musicpad.analyzer.Analyzer;
 import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnSongSelected;
@@ -108,15 +107,6 @@ public class CommandProcessor extends BrokerTask<Message> {
     case SET_PERCENT_GAIN:
       doSetPercentGain(parameter);
       break;
-    case SHOW_CHANNEL_INFO:
-      doShowChannelInfo();
-      break;
-    case SHOW_KEY_INFO:
-      doShowKeyInfo();
-      break;
-    case SHOW_DRUM_INFO:
-      doShowDrumInfo();
-      break;
     case QUIT:
       System.exit(0);
       break;
@@ -161,7 +151,6 @@ public class CommandProcessor extends BrokerTask<Message> {
       SongBuilder songBuilder = new SongBuilder();
       currentSong = songBuilder.createSong(midiFile);
       System.out.println("Selecting song " + songNumber + " - " + currentSong.getName());
-      doShowChannelInfo();
       publish(new OnSongSelected(currentSong));
     } else {
       System.out.println("Song " + songNumber + " is out of range");
@@ -172,24 +161,6 @@ public class CommandProcessor extends BrokerTask<Message> {
     float gain = Velocity.scalePercentGain(percentGain);
     System.out.println("Set " + percentGain + " percent gain (" + gain + ")");
     synthesizer.setGain(gain);
-  }
-
-  private void doShowChannelInfo() {
-    if (currentSong != null) {
-      Analyzer.showChannelInfo(currentSong);
-    }
-  }
-
-  private void doShowDrumInfo() {
-    if (currentSong != null) {
-      Analyzer.showDrumInfo(currentSong);
-    }
-  }
-
-  private void doShowKeyInfo() {
-    if (currentSong != null) {
-      Analyzer.showKeyInfo(currentSong);
-    }
   }
 
 }

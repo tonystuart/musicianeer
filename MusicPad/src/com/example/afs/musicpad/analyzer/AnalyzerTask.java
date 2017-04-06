@@ -9,14 +9,68 @@
 
 package com.example.afs.musicpad.analyzer;
 
+import com.example.afs.musicpad.Command;
+import com.example.afs.musicpad.message.Message;
+import com.example.afs.musicpad.message.OnChannelInfo;
+import com.example.afs.musicpad.message.OnCommand;
+import com.example.afs.musicpad.message.OnSongSelected;
 import com.example.afs.musicpad.midi.Instruments;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.song.Song;
-import com.example.afs.musicpad.util.F;
+import com.example.afs.musicpad.task.BrokerTask;
+import com.example.afs.musicpad.util.Broker;
+import com.example.afs.musicpad.util.Value;
 
-public class Analyzer {
+public class AnalyzerTask extends BrokerTask<Message> {
 
-  public static void showChannelInfo(Song song) {
+  private Song currentSong;
+
+  public AnalyzerTask(Broker<Message> broker) {
+    super(broker);
+    subscribe(OnCommand.class, message -> doCommand(message.getCommand(), message.getParameter()));
+    subscribe(OnSongSelected.class, message -> doSongSelected(message.getSong()));
+  }
+
+  private void doCommand(Command command, int parameter) {
+    switch (command) {
+    case SHOW_CHANNEL_INFO:
+      doShowChannelInfo();
+      break;
+    case SHOW_KEY_INFO:
+      doShowKeyInfo();
+      break;
+    case SHOW_DRUM_INFO:
+      doShowDrumInfo();
+      break;
+    default:
+      break;
+    }
+  }
+
+  private void doShowChannelInfo() {
+    if (currentSong != null) {
+      showChannelInfo(currentSong);
+    }
+  }
+
+  private void doShowDrumInfo() {
+    if (currentSong != null) {
+      showDrumInfo(currentSong);
+    }
+  }
+
+  private void doShowKeyInfo() {
+    if (currentSong != null) {
+      showKeyInfo(currentSong);
+    }
+  }
+
+  private void doSongSelected(Song song) {
+    currentSong = song;
+    showChannelInfo(currentSong);
+  }
+
+  private void showChannelInfo(Song song) {
     System.out.print("CHN   TOT OCC CON");
     for (int semitone = 0; semitone < Midi.SEMITONES_PER_OCTAVE; semitone++) {
       System.out.printf(" %3s", Names.getNoteName(semitone));
@@ -28,18 +82,19 @@ public class Analyzer {
           int channelNoteCount = song.getChannelNoteCount(channel);
           int occupancy = song.getOccupancy(channel);
           int concurrency = song.getConcurrency(channel);
-          System.out.printf("%3d %5d %3d %3d", F.toNumber(channel), channelNoteCount, occupancy, concurrency);
+          System.out.printf("%3d %5d %3d %3d", Value.toNumber(channel), channelNoteCount, occupancy, concurrency);
           for (int semitone = 0; semitone < Midi.SEMITONES_PER_OCTAVE; semitone++) {
             int commonNoteCount = song.getCommonNoteCounts(channel)[semitone];
             System.out.printf(" %3d", commonNoteCount);
           }
           System.out.println(" " + song.getProgramNames(channel));
+          publish(new OnChannelInfo(currentSong, channel, channelNoteCount, occupancy, concurrency));
         }
       }
     }
   }
 
-  public static void showDrumInfo(Song song) {
+  private void showDrumInfo(Song song) {
     int drumBeatCount = song.getChannelNoteCount(Midi.DRUM);
     if (drumBeatCount > 0) {
       System.out.println("CHN 9 TOT " + drumBeatCount);
@@ -53,7 +108,7 @@ public class Analyzer {
     }
   }
 
-  public static void showKeyInfo(Song song) {
+  private void showKeyInfo(Song song) {
     System.out.println("CHN RNK KEY      SYNOPSIS ACCIDENTALS TRIADS THIRDS");
     for (int channel = 0; channel < Midi.CHANNELS; channel++) {
       if (song.getChannelNoteCount(channel) > 0) {
@@ -68,7 +123,7 @@ public class Analyzer {
               int accidentals = keyScore.getAccidentals();
               int triads = keyScore.getTriads();
               int thirds = keyScore.getThirds();
-              System.out.printf("%3d %3d %-8s %-8s         %3d    %3d    %3d\n", F.toNumber(channel), rank, key, synopsis, accidentals, triads, thirds);
+              System.out.printf("%3d %3d %-8s %-8s         %3d    %3d    %3d\n", Value.toNumber(channel), rank, key, synopsis, accidentals, triads, thirds);
             }
           }
         }

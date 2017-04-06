@@ -9,10 +9,19 @@
 
 package com.example.afs.musicpad.util;
 
-public class F {
+
+public class Value {
 
   public static int toNumber(int index) {
     return index + 1;
+  }
+
+  public static int getInt(Integer value) {
+    return Value.getInt(value, 0);
+  }
+
+  public static int getInt(Integer value, int defaultValue) {
+    return value == null ? defaultValue : value;
   }
 
 }
