@@ -11,6 +11,8 @@ package com.example.afs.musicpad.device.midi;
 
 import java.util.List;
 
+import com.example.afs.musicpad.Command;
+
 public class MidiConfiguration {
 
   public static class Action {
@@ -19,7 +21,7 @@ public class MidiConfiguration {
     private Integer clearMode;
     private List<ChannelMessage> sendDeviceMessages;
     private List<ChannelMessage> sendHandlerMessages;
-    private List<Command> sendHandlerCommands;
+    private List<HandlerCommand> sendHandlerCommands;
 
     public Integer getClearMode() {
       return clearMode;
@@ -29,7 +31,7 @@ public class MidiConfiguration {
       return sendDeviceMessages;
     }
 
-    public List<Command> getSendHandlerCommands() {
+    public List<HandlerCommand> getSendHandlerCommands() {
       return sendHandlerCommands;
     }
 
@@ -49,7 +51,7 @@ public class MidiConfiguration {
       this.sendDeviceMessages = sendDeviceMessages;
     }
 
-    public void setSendHandlerCommands(List<Command> sendHandlerCommands) {
+    public void setSendHandlerCommands(List<HandlerCommand> sendHandlerCommands) {
       this.sendHandlerCommands = sendHandlerCommands;
     }
 
@@ -131,12 +133,12 @@ public class MidiConfiguration {
 
   }
 
-  public static class Command {
+  public static class HandlerCommand {
 
-    private Integer command;
+    private Command command;
     private Integer parameter;
 
-    public Integer getCommand() {
+    public Command getCommand() {
       return command;
     }
 
@@ -144,7 +146,7 @@ public class MidiConfiguration {
       return parameter;
     }
 
-    public void setCommand(Integer command) {
+    public void setCommand(Command command) {
       this.command = command;
     }
 
@@ -159,23 +161,19 @@ public class MidiConfiguration {
 
   }
 
-  public static class InputActions {
+  public static class InputAction {
 
-    private ChannelMessage ifMatch;
+    private ChannelMessage ifInput;
     private List<Integer> ifModes;
     private List<Integer> ifNotModes;
-    private List<Action> actions;
+    private Action thenDo;
 
     public boolean equals(int subdevice, int command, int channel, int data1, int data2) {
-      return ifMatch.equals(subdevice, command, channel, data1, data2);
+      return ifInput.equals(subdevice, command, channel, data1, data2);
     }
 
-    public List<Action> getActions() {
-      return actions;
-    }
-
-    public ChannelMessage getIfMatch() {
-      return ifMatch;
+    public ChannelMessage getIfInput() {
+      return ifInput;
     }
 
     public List<Integer> getIfModes() {
@@ -186,12 +184,12 @@ public class MidiConfiguration {
       return ifNotModes;
     }
 
-    public void setActions(List<Action> actions) {
-      this.actions = actions;
+    public Action getThenDo() {
+      return thenDo;
     }
 
-    public void setIfMatch(ChannelMessage ifMatch) {
-      this.ifMatch = ifMatch;
+    public void setIfInput(ChannelMessage ifInput) {
+      this.ifInput = ifInput;
     }
 
     public void setIfModes(List<Integer> andIfModes) {
@@ -202,29 +200,33 @@ public class MidiConfiguration {
       this.ifNotModes = ifNotModes;
     }
 
+    public void setThenDo(Action thenDo) {
+      this.thenDo = thenDo;
+    }
+
     @Override
     public String toString() {
-      return "InputActions [ifMatch=" + ifMatch + ", ifModes=" + ifModes + ", ifNotModes=" + ifNotModes + ", actions=" + actions + "]";
+      return "InputAction [ifInput=" + ifInput + ", ifModes=" + ifModes + ", ifNotModes=" + ifNotModes + ", thenDo=" + thenDo + "]";
     }
 
   }
 
-  private List<Action> initializationActions;
-  private List<InputActions> inputActions;
+  private Action initializationActions;
+  private List<InputAction> inputActions;
 
-  public List<Action> getInitializationActions() {
+  public Action getInitializationActions() {
     return initializationActions;
   }
 
-  public List<InputActions> getInputActions() {
+  public List<InputAction> getInputActions() {
     return inputActions;
   }
 
-  public void setInitializationActions(List<Action> initializationActions) {
+  public void setInitializationActions(Action initializationActions) {
     this.initializationActions = initializationActions;
   }
 
-  public void setInputActions(List<InputActions> inputActions) {
+  public void setInputActions(List<InputAction> inputActions) {
     this.inputActions = inputActions;
   }
 

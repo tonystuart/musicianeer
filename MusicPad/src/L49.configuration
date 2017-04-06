@@ -1,20 +1,26 @@
 {
-  "initializationActions" : [
+  "initializationActions" :
     {
       "sendDeviceMessages" : [
-        {
-          "subDevice" : 0,
+        { // exit InControl mode
+          "subDevice" : 1,
+          "command" : 144,
+          "channel" : 0,
+          "data1" : 12,
+          "data2" : 0
+        },
+        { // enter InControl mode
+          "subDevice" : 1,
           "command" : 144,
           "channel" : 0,
           "data1" : 12,
           "data2" : 127
         }
       ]
-    }
-  ],
+    },
   "inputActions" : [
     { // template
-      "ifMatch" : {
+      "ifInput" : {
         "subDevice" : -1,
         "command" : 0,
         "channel" : 0,
@@ -27,7 +33,7 @@
       "ifNotModes" : [
         0
       ],
-      "actions" : [
+      "thenDo" :
         {
           "setMode" : 0,
           "sendDeviceMessages" : [
@@ -55,18 +61,17 @@
             }
           ]
         }
-      ]
     }, // template
     { // enter select notes mode
-      "ifMatch" : {
+      "ifInput" : {
         "subDevice" : 1,
         "command" : 144,
         "data1" : 104 // top round pad
       },
-      "ifNotMode" : [
+      "ifNotModes" : [
         1
       ],
-      "actions" : [
+      "thenDo" :
         {
           "setMode" : 1,
           "sendDeviceMessages" : [
@@ -76,7 +81,23 @@
               "channel" : 0,
               "data1" : 104,
               "data2" : 127
-            },
+            }
+          ]
+        }
+    }, // enter select notes mode
+    { // exit select notes mode
+      "ifInput" : {
+        "subDevice" : 1,
+        "command" : 144,
+        "data1" : 104 // top round pad
+      },
+      "ifModes" : [
+        1
+      ],
+      "thenDo" :
+        {
+          "clearMode" : 1,
+          "sendDeviceMessages" : [
             {
               "subDevice" : 1,
               "command" : 128,
@@ -86,41 +107,9 @@
             }
           ]
         }
-       ]
-    }, // enter select notes mode
-    { // exit select notes mode
-      "ifMatch" : {
-        "subDevice" : 1,
-        "command" : 144,
-        "data1" : 104 // top round pad
-      },
-      "ifMode" : [
-        1
-      ],
-      "actions" : [
-        {
-          "clearMode" : 1,
-          "sendDeviceMessages" : [
-            {
-              "subDevice" : 1,
-              "command" : 144,
-              "channel" : 0,
-              "data1" : 104,
-              "data2" : 0
-            },
-            {
-              "subDevice" : 1,
-              "command" : 128,
-              "channel" : 0,
-              "data1" : 104,
-              "data2" : 0
-            }
-          ]
-        }
-      ]
     }, // exit select notes mode
     {
-      "ifMatch" : {
+      "ifInput" : {
         "subDevice" : 1,
         "command" : 144,
         "data1" : 96 // top square pad 1
@@ -128,20 +117,15 @@
       "ifModes" : [
         1
       ],
-      "actions" : [
+      "thenDo" :
         {
-          "sendDeviceMessages" : [
-          ],
-          "sendHandlerMessages" : [
-          ],
-          "sendHandlerCommands" : [
+         "sendHandlerCommands" : [
             {
-              "command" : 3,
+              "command" : "SELECT_NOTES",
               "parameter" : 1
             }
           ]
         }
-      ]
     }
   ]
 }

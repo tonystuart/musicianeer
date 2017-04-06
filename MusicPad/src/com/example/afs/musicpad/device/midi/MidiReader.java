@@ -26,8 +26,8 @@ import javax.sound.midi.ShortMessage;
 import com.example.afs.musicpad.device.common.DeviceGroup.DeviceInterface;
 import com.example.afs.musicpad.device.midi.MidiConfiguration.Action;
 import com.example.afs.musicpad.device.midi.MidiConfiguration.ChannelMessage;
-import com.example.afs.musicpad.device.midi.MidiConfiguration.Command;
-import com.example.afs.musicpad.device.midi.MidiConfiguration.InputActions;
+import com.example.afs.musicpad.device.midi.MidiConfiguration.HandlerCommand;
+import com.example.afs.musicpad.device.midi.MidiConfiguration.InputAction;
 import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnInputPress;
@@ -62,7 +62,6 @@ public class MidiReader implements DeviceInterface {
   private RandomAccessList<Receiver> receivers = new DirectList<>();
   private MidiConfiguration configuration;
 
-  private Set<Integer> currentShifts = new HashSet<>();
   private Set<Integer> currentModes = new HashSet<>();
 
   public MidiReader(BlockingQueue<Message> queue, MidiDeviceBundle device) {
@@ -107,9 +106,7 @@ public class MidiReader implements DeviceInterface {
   }
 
   private void initializeDevices() {
-    for (Action action : configuration.getInitializationActions()) {
-      performActions(action);
-    }
+    performActions(configuration.getInitializationActions());
   }
 
   private boolean modesMatch(List<Integer> ifModes) {
@@ -117,11 +114,11 @@ public class MidiReader implements DeviceInterface {
       return true;
     }
     for (Integer mode : ifModes) {
-      if (!currentShifts.contains(mode)) {
+      if (!currentModes.contains(mode)) {
         return false;
       }
     }
-    return false;
+    return true;
   }
 
   private boolean notModesMatch(List<Integer> ifNotModes) {
@@ -129,7 +126,7 @@ public class MidiReader implements DeviceInterface {
       return true;
     }
     for (Integer mode : ifNotModes) {
-      if (currentShifts.contains(mode)) {
+      if (currentModes.contains(mode)) {
         return false;
       }
     }
@@ -145,7 +142,7 @@ public class MidiReader implements DeviceInterface {
     if (handlerMessages != null) {
       sendHandlerMessages(handlerMessages, true);
     }
-    List<Command> handlerCommands = action.getSendHandlerCommands();
+    List<HandlerCommand> handlerCommands = action.getSendHandlerCommands();
     if (handlerCommands != null) {
       sendHandlerCommands(handlerCommands);
     }
@@ -176,19 +173,18 @@ public class MidiReader implements DeviceInterface {
       int channel = shortMessage.getChannel();
       int data1 = shortMessage.getData1();
       int data2 = shortMessage.getData2();
-      for (InputActions inputActions : configuration.getInputActions()) {
-        if (inputActions.equals(subDevice, command, channel, data1, data2)) {
-          if (modesMatch(inputActions.getIfModes())) {
-            if (notModesMatch(inputActions.getIfNotModes())) {
-              for (Action action : inputActions.getActions()) {
-                if (action.getSetMode() != null) {
-                  currentModes.add(action.getSetMode());
-                }
-                if (action.getClearMode() != null) {
-                  currentModes.remove(action.getClearMode());
-                }
-                performActions(action);
+      for (InputAction inputAction : configuration.getInputActions()) {
+        if (inputAction.equals(subDevice, command, channel, data1, data2)) {
+          if (modesMatch(inputAction.getIfModes())) {
+            if (notModesMatch(inputAction.getIfNotModes())) {
+              Action action = inputAction.getThenDo();
+              if (action.getSetMode() != null) {
+                currentModes.add(action.getSetMode());
               }
+              if (action.getClearMode() != null) {
+                currentModes.remove(action.getClearMode());
+              }
+              performActions(action);
               return;
             }
           }
@@ -223,9 +219,9 @@ public class MidiReader implements DeviceInterface {
     }
   }
 
-  private void sendHandlerCommands(List<Command> handlerCommands) {
-    for (Command command : handlerCommands) {
-      queue.add(new OnCommand(com.example.afs.musicpad.Command.values()[command.getCommand()], command.getParameter()));
+  private void sendHandlerCommands(List<HandlerCommand> handlerCommands) {
+    for (HandlerCommand handlerCommand : handlerCommands) {
+      queue.add(new OnCommand(handlerCommand.getCommand(), handlerCommand.getParameter()));
     }
   }
 
