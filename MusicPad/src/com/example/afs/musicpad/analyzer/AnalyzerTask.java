@@ -71,16 +71,6 @@ public class AnalyzerTask extends BrokerTask<Message> {
     showChannelInfo(currentSong);
   }
 
-  private ChannelState getChannelState(int channelNoteCount) {
-    ChannelState channelState;
-    if (channelNoteCount == 0) {
-      channelState = ChannelState.INACTIVE;
-    } else {
-      channelState = ChannelState.ACTIVE;
-    }
-    return channelState;
-  }
-
   private void showChannelInfo(Song song) {
     System.out.print("CHN   TOT OCC CON");
     for (int semitone = 0; semitone < Midi.SEMITONES_PER_OCTAVE; semitone++) {
@@ -88,13 +78,13 @@ public class AnalyzerTask extends BrokerTask<Message> {
     }
     System.out.println();
     for (int channel = 0; channel < Midi.CHANNELS; channel++) {
-      int channelNoteCount = song.getChannelNoteCount(channel);
-      publish(new OnChannelState(Value.toNumber(channel), getChannelState(channelNoteCount)));
-      if (channelNoteCount > 0) {
+      int noteCount = song.getChannelNoteCount(channel);
+      publish(new OnChannelState(channel, noteCount == 0 ? ChannelState.INACTIVE : ChannelState.ACTIVE));
+      if (noteCount > 0) {
         if (channel != Midi.DRUM) {
           int occupancy = song.getOccupancy(channel);
           int concurrency = song.getConcurrency(channel);
-          System.out.printf("%3d %5d %3d %3d", Value.toNumber(channel), channelNoteCount, occupancy, concurrency);
+          System.out.printf("%3d %5d %3d %3d", Value.toNumber(channel), noteCount, occupancy, concurrency);
           for (int semitone = 0; semitone < Midi.SEMITONES_PER_OCTAVE; semitone++) {
             int commonNoteCount = song.getCommonNoteCounts(channel)[semitone];
             System.out.printf(" %3d", commonNoteCount);

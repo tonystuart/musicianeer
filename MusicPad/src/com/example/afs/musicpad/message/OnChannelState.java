@@ -13,16 +13,16 @@ import com.example.afs.musicpad.device.midi.MidiConfiguration.ChannelState;
 
 public class OnChannelState implements Message {
 
-  private int channelNumber;
+  private int channel;
   private ChannelState channelState;
 
-  public OnChannelState(int channelNumber, ChannelState active) {
-    this.channelNumber = channelNumber;
+  public OnChannelState(int channel, ChannelState active) {
+    this.channel = channel;
     this.channelState = active;
   }
 
-  public int getChannelNumber() {
-    return channelNumber;
+  public int getChannel() {
+    return channel;
   }
 
   public ChannelState getChannelState() {
@@ -31,7 +31,7 @@ public class OnChannelState implements Message {
 
   @Override
   public String toString() {
-    return "OnChannelState [channelNumber=" + channelNumber + ", channelState=" + channelState + "]";
+    return "OnChannelState [channel=" + channel + ", channelState=" + channelState + "]";
   }
 
 }

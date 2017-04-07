@@ -129,7 +129,7 @@ public class DeviceHandler extends BrokerTask<Message> implements Controllable {
     } else {
       int channelIndex = channelNumber - 1;
       player = new SongNotePlayer(synthesizer, currentSong, channelIndex, inputMapping);
-      getBroker().publish(new OnChannelState(channelNumber, ChannelState.SELECTED));
+      getBroker().publish(new OnChannelState(channelIndex, ChannelState.SELECTED));
     }
   }
 
