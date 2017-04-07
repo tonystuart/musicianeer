@@ -139,18 +139,20 @@ public class MidiReader implements Controllable {
       int data1 = shortMessage.getData1();
       int data2 = shortMessage.getData2();
       for (InputAction inputAction : configuration.getInputActions()) {
-        if (inputAction.equals(subDevice, command, channel, data1, data2)) {
-          if (modesMatch(inputAction.getIfModes())) {
-            if (notModesMatch(inputAction.getIfNotModes())) {
-              Action action = inputAction.getThenDo();
-              if (action.getSetMode() != null) {
-                currentModes.add(action.getSetMode());
+        if (inputAction != null) {
+          if (inputAction.equals(subDevice, command, channel, data1, data2)) {
+            if (modesMatch(inputAction.getIfModes())) {
+              if (notModesMatch(inputAction.getIfNotModes())) {
+                Action action = inputAction.getThenDo();
+                if (action.getSetMode() != null) {
+                  currentModes.add(action.getSetMode());
+                }
+                if (action.getClearMode() != null) {
+                  currentModes.remove(action.getClearMode());
+                }
+                performActions(action);
+                return;
               }
-              if (action.getClearMode() != null) {
-                currentModes.remove(action.getClearMode());
-              }
-              performActions(action);
-              return;
             }
           }
         }

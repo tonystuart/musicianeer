@@ -10,8 +10,9 @@
 package com.example.afs.musicpad.analyzer;
 
 import com.example.afs.musicpad.Command;
+import com.example.afs.musicpad.device.midi.MidiConfiguration.ChannelState;
 import com.example.afs.musicpad.message.Message;
-import com.example.afs.musicpad.message.OnChannelInfo;
+import com.example.afs.musicpad.message.OnChannelState;
 import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnSongSelected;
 import com.example.afs.musicpad.midi.Instruments;
@@ -70,6 +71,16 @@ public class AnalyzerTask extends BrokerTask<Message> {
     showChannelInfo(currentSong);
   }
 
+  private ChannelState getChannelState(int channelNoteCount) {
+    ChannelState channelState;
+    if (channelNoteCount == 0) {
+      channelState = ChannelState.INACTIVE;
+    } else {
+      channelState = ChannelState.ACTIVE;
+    }
+    return channelState;
+  }
+
   private void showChannelInfo(Song song) {
     System.out.print("CHN   TOT OCC CON");
     for (int semitone = 0; semitone < Midi.SEMITONES_PER_OCTAVE; semitone++) {
@@ -77,9 +88,10 @@ public class AnalyzerTask extends BrokerTask<Message> {
     }
     System.out.println();
     for (int channel = 0; channel < Midi.CHANNELS; channel++) {
-      if (song.getChannelNoteCount(channel) > 0) {
+      int channelNoteCount = song.getChannelNoteCount(channel);
+      publish(new OnChannelState(Value.toNumber(channel), getChannelState(channelNoteCount)));
+      if (channelNoteCount > 0) {
         if (channel != Midi.DRUM) {
-          int channelNoteCount = song.getChannelNoteCount(channel);
           int occupancy = song.getOccupancy(channel);
           int concurrency = song.getConcurrency(channel);
           System.out.printf("%3d %5d %3d %3d", Value.toNumber(channel), channelNoteCount, occupancy, concurrency);
@@ -88,7 +100,6 @@ public class AnalyzerTask extends BrokerTask<Message> {
             System.out.printf(" %3d", commonNoteCount);
           }
           System.out.println(" " + song.getProgramNames(channel));
-          publish(new OnChannelInfo(currentSong, channel, channelNoteCount, occupancy, concurrency));
         }
       }
     }

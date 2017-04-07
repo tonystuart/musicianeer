@@ -12,10 +12,12 @@ package com.example.afs.musicpad.device.common;
 import com.example.afs.fluidsynth.Synthesizer;
 import com.example.afs.musicpad.Command;
 import com.example.afs.musicpad.device.common.ControllableGroup.Controllable;
+import com.example.afs.musicpad.device.midi.MidiConfiguration.ChannelState;
 import com.example.afs.musicpad.device.midi.MidiMapping;
 import com.example.afs.musicpad.device.qwerty.AlphaMapping;
 import com.example.afs.musicpad.device.qwerty.NumericMapping;
 import com.example.afs.musicpad.message.Message;
+import com.example.afs.musicpad.message.OnChannelState;
 import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnInputPress;
 import com.example.afs.musicpad.message.OnInputRelease;
@@ -127,6 +129,7 @@ public class DeviceHandler extends BrokerTask<Message> implements Controllable {
     } else {
       int channelIndex = channelNumber - 1;
       player = new SongNotePlayer(synthesizer, currentSong, channelIndex, inputMapping);
+      getBroker().publish(new OnChannelState(channelNumber, ChannelState.SELECTED));
     }
   }
 

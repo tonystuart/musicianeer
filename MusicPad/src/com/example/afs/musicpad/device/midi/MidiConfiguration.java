@@ -128,7 +128,39 @@ public class MidiConfiguration {
 
     @Override
     public String toString() {
-      return String.format("ChannelMessage [command=%d (0x%02x), channel=%d (0x%02x), data1=%d (0x%02x), data2=%d (0x%02x)", command, command, channel, channel, data1, data1, data2, data2);
+      return String.format("ChannelMessage [subDevice=%d, command=%d (0x%02x), channel=%d (0x%02x), data1=%d (0x%02x), data2=%d (0x%02x)", subDevice, command, command, channel, channel, data1, data1, data2, data2);
+    }
+
+  }
+
+  public enum ChannelState {
+    ACTIVE, INACTIVE, SELECTED
+  }
+
+  public class ChannelStatus {
+
+    private Integer channelNumber;
+    private ChannelState state;
+
+    public Integer getChannelNumber() {
+      return channelNumber;
+    }
+
+    public ChannelState getState() {
+      return state;
+    }
+
+    public void setChannelNumber(Integer channelNumber) {
+      this.channelNumber = channelNumber;
+    }
+
+    public void setState(ChannelState state) {
+      this.state = state;
+    }
+
+    @Override
+    public String toString() {
+      return "ChannelStatus [channelNumber=" + channelNumber + ", state=" + state + "]";
     }
 
   }
@@ -211,8 +243,37 @@ public class MidiConfiguration {
 
   }
 
+  public class OutputAction {
+
+    private ChannelStatus ifChannelStatus;
+    private List<ChannelMessage> thenSendDeviceMessages;
+
+    public ChannelStatus getIfChannelStatus() {
+      return ifChannelStatus;
+    }
+
+    public List<ChannelMessage> getThenSendDeviceMessages() {
+      return thenSendDeviceMessages;
+    }
+
+    public void setIfChannelStatus(ChannelStatus ifChannelStatus) {
+      this.ifChannelStatus = ifChannelStatus;
+    }
+
+    public void setThenSendDeviceMessages(List<ChannelMessage> thenSendDeviceMessages) {
+      this.thenSendDeviceMessages = thenSendDeviceMessages;
+    }
+
+    @Override
+    public String toString() {
+      return "OutputAction [ifChannelStatus=" + ifChannelStatus + ", thenSendDeviceMessages=" + thenSendDeviceMessages + "]";
+    }
+
+  }
+
   private Action initializationActions;
   private List<InputAction> inputActions;
+  private List<OutputAction> outputActions;
 
   public Action getInitializationActions() {
     return initializationActions;
@@ -220,6 +281,10 @@ public class MidiConfiguration {
 
   public List<InputAction> getInputActions() {
     return inputActions;
+  }
+
+  public List<OutputAction> getOutputActions() {
+    return outputActions;
   }
 
   public void setInitializationActions(Action initializationActions) {
@@ -230,9 +295,13 @@ public class MidiConfiguration {
     this.inputActions = inputActions;
   }
 
+  public void setOutputActions(List<OutputAction> outputActions) {
+    this.outputActions = outputActions;
+  }
+
   @Override
   public String toString() {
-    return "MidiConfiguration [initializationActions=" + initializationActions + ", inputActions=" + inputActions + "]";
+    return "MidiConfiguration [initializationActions=" + initializationActions + ", inputActions=" + inputActions + ", outputActions=" + outputActions + "]";
   }
 
 }
