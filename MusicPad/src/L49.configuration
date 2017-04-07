@@ -1,113 +1,36 @@
 {
-  "initializationActions" :
-    {
-      "sendDeviceMessages" : [
-        { // exit InControl mode
-          "subDevice" : 1,
-          "command" : 144,
-          "channel" : 0,
-          "data1" : 12,
-          "data2" : 0
-        },
-        { // enter InControl mode
-          "subDevice" : 1,
-          "command" : 144,
-          "channel" : 0,
-          "data1" : 12,
-          "data2" : 127
-        }
-      ]
-    },
-  "inputActions" : [
-    { // template
-      "ifInput" : {
-        "subDevice" : -1,
-        "command" : 0,
-        "channel" : 0,
-        "data1" : 0,
-        "data2" : 0
-      },
-      "ifModes" : [
-        0
-      ],
-      "ifNotModes" : [
-        0
-      ],
-      "thenDo" :
-        {
-          "setMode" : 0,
-          "sendDeviceMessages" : [
-            {
-              "subDevice" : 0,
-              "command" : 0,
-              "channel" : 0,
-              "data1" : 0,
-              "data2" : 0
-            }
-          ],
-          "sendHandlerMessages" : [
-            {
-              "subDevice" : 0,
-              "command" : 0,
-              "channel" : 0,
-              "data1" : 0,
-              "data2" : 0
-            }
-          ],
-          "sendHandlerCommands" : [
-            {
-              "command" : 0,
-              "parameter" : 0
-            }
-          ]
-        }
-    }, // template
-    { // enter select notes mode
-      "ifInput" : {
-        "subDevice" : 1,
-        "command" : 144,
-        "data1" : 104 // top round pad
-      },
-      "ifNotModes" : [
-        1
-      ],
-      "thenDo" :
-        {
-          "setMode" : 1,
-          "sendDeviceMessages" : [
-            {
-              "subDevice" : 1,
-              "command" : 144,
-              "channel" : 0,
-              "data1" : 104,
-              "data2" : 127
-            }
-          ]
-        }
-    }, // enter select notes mode
-    { // exit select notes mode
-      "ifInput" : {
-        "subDevice" : 1,
-        "command" : 144,
-        "data1" : 104 // top round pad
-      },
-      "ifModes" : [
-        1
-      ],
-      "thenDo" :
-        {
-          "clearMode" : 1,
-          "sendDeviceMessages" : [
-            {
-              "subDevice" : 1,
-              "command" : 128,
-              "channel" : 0,
-              "data1" : 104,
-              "data2" : 127
-            }
-          ]
-        }
-    }, // exit select notes mode
+	"initializationActions" : {
+		// exit then enter InControl mode to initialize
+		"sendDeviceMessages" : [
+        	{ "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 12, "data2" : 0 },
+        	{ "subDevice" : 1, "command" : 128, "channel" : 0, "data1" : 12, "data2" : 0 },
+        	{ "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 12, "data2" : 127 }
+		]
+	},
+	"inputActions" : [ {
+		"ifInput" : { "subDevice" : -1, "command" : 0, "channel" : 0, "data1" : 0, "data2" : 0 }, "ifModes" : [ 0 ], "ifNotModes" : [ 0 ],
+		"thenDo" : {
+			"setMode" : 0,
+			"sendDeviceMessages" : [
+				{ "subDevice" : 0, "command" : 0, "channel" : 0, "data1" : 0, "data2" : 0 } ],
+			"sendHandlerMessages" : [
+				{ "subDevice" : 0, "command" : 0, "channel" : 0, "data1" : 0, "data2" : 0 } ],
+			"sendHandlerCommands" : [
+				{ "command" : 0, "parameter" : 0 } ]
+		}
+	},
+	// enter select notes mode (top round pad)
+	{ "ifInput" : { "subDevice" : 1, "command" : 144, "data1" : 104 }, "ifNotModes" : [ 1 ],
+	"thenDo" : {
+		"setMode" : 1,
+		"sendDeviceMessages" : [
+			{ "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 104, "data2" : 127 } ] } },
+	// exit select notes mode (top round pad)
+	{ "ifInput" : { "subDevice" : 1, "command" : 144, "data1" : 104 }, "ifModes" : [ 1 ],
+	"thenDo" : {
+		"clearMode" : 1,
+		"sendDeviceMessages" : [
+			{ "subDevice" : 1, "command" : 128, "channel" : 0, "data1" : 104, "data2" : 127 } ] } },
 	// channel 1
     { "ifInput" : { "subDevice" : 1, "command" : 144, "data1" : 96 }, "ifModes" : [ 1 ],
 		"thenDo" : { "sendHandlerCommands" : [ { "command" : "SELECT_NOTES", "parameter" : 1 } ] } },
