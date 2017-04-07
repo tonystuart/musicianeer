@@ -126,6 +126,7 @@ public class MidiWatcher extends BrokerTask<Message> {
       MidiConfiguration configuration = JsonUtilities.fromJson(contents, MidiConfiguration.class);
       return configuration;
     }
+    System.out.println("Cannot find configuration for " + device.getType() + ", using default");
     return new MidiConfiguration();
   }
 

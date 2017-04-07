@@ -10,7 +10,6 @@
 package com.example.afs.musicpad.device.midi;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 
@@ -27,7 +26,7 @@ import com.example.afs.musicpad.device.midi.MidiConfiguration.HandlerCommand;
 import com.example.afs.musicpad.device.midi.MidiConfiguration.InputAction;
 import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnCommand;
-import com.example.afs.musicpad.message.OnDeviceMessages;
+import com.example.afs.musicpad.message.OnDeviceMessage;
 import com.example.afs.musicpad.message.OnInputPress;
 import com.example.afs.musicpad.message.OnInputRelease;
 import com.example.afs.musicpad.util.Broker;
@@ -89,45 +88,32 @@ public class MidiReader implements Controllable {
   }
 
   private void initializeDevices() {
-    performActions(configuration.getInitializationActions());
+    for (Action action : configuration.getInitializationActions()) {
+      performAction(action);
+    }
   }
 
-  private boolean modesMatch(List<Integer> ifModes) {
-    if (ifModes == null) {
-      return true;
+  private void performAction(Action action) {
+    Integer setMode = action.getSetMode();
+    if (setMode != null) {
+      currentModes.add(setMode);
     }
-    for (Integer mode : ifModes) {
-      if (!currentModes.contains(mode)) {
-        return false;
-      }
+    Integer clearMode = action.getClearMode();
+    if (clearMode != null) {
+      currentModes.remove(clearMode);
     }
-    return true;
-  }
-
-  private boolean notModesMatch(List<Integer> ifNotModes) {
-    if (ifNotModes == null) {
-      return true;
+    ChannelMessage deviceMessage = action.getSendDeviceMessage();
+    if (deviceMessage != null) {
+      broker.publish(new OnDeviceMessage(deviceMessage));
     }
-    for (Integer mode : ifNotModes) {
-      if (currentModes.contains(mode)) {
-        return false;
-      }
+    ChannelMessage handlerMessage = action.getSendHandlerMessage();
+    if (handlerMessage != null) {
+      int data1 = Value.getInt(handlerMessage.getData1());
+      queue.add(new OnInputPress(data1));
     }
-    return true;
-  }
-
-  private void performActions(Action action) {
-    List<ChannelMessage> deviceMessages = action.getSendDeviceMessages();
-    if (deviceMessages != null) {
-      broker.publish(new OnDeviceMessages(deviceMessages));
-    }
-    List<ChannelMessage> handlerMessages = action.getSendHandlerMessages();
-    if (handlerMessages != null) {
-      sendHandlerMessages(handlerMessages, true);
-    }
-    List<HandlerCommand> handlerCommands = action.getSendHandlerCommands();
-    if (handlerCommands != null) {
-      sendHandlerCommands(handlerCommands);
+    HandlerCommand handlerCommand = action.getSendHandlerCommand();
+    if (handlerCommand != null) {
+      queue.add(new OnCommand(handlerCommand.getCommand(), handlerCommand.getParameter()));
     }
   }
 
@@ -141,16 +127,10 @@ public class MidiReader implements Controllable {
       for (InputAction inputAction : configuration.getInputActions()) {
         if (inputAction != null) {
           if (inputAction.equals(subDevice, command, channel, data1, data2)) {
-            if (modesMatch(inputAction.getIfModes())) {
-              if (notModesMatch(inputAction.getIfNotModes())) {
+            if (inputAction.getIfMode() == null || currentModes.contains(inputAction.getIfMode())) {
+              if (inputAction.getIfNotMode() == null || !currentModes.contains(inputAction.getIfNotMode())) {
                 Action action = inputAction.getThenDo();
-                if (action.getSetMode() != null) {
-                  currentModes.add(action.getSetMode());
-                }
-                if (action.getClearMode() != null) {
-                  currentModes.remove(action.getClearMode());
-                }
-                performActions(action);
+                performAction(action);
                 return;
               }
             }
@@ -160,23 +140,6 @@ public class MidiReader implements Controllable {
       if (command == ShortMessage.NOTE_ON) {
         queue.add(new OnInputPress(data1));
       } else if (command == ShortMessage.NOTE_OFF) {
-        queue.add(new OnInputRelease(data1));
-      }
-    }
-  }
-
-  private void sendHandlerCommands(List<HandlerCommand> handlerCommands) {
-    for (HandlerCommand handlerCommand : handlerCommands) {
-      queue.add(new OnCommand(handlerCommand.getCommand(), handlerCommand.getParameter()));
-    }
-  }
-
-  private void sendHandlerMessages(List<ChannelMessage> handlerMessages, boolean isPress) {
-    for (ChannelMessage channelMessage : handlerMessages) {
-      int data1 = Value.getInt(channelMessage.getData1());
-      if (isPress) {
-        queue.add(new OnInputPress(data1));
-      } else {
         queue.add(new OnInputRelease(data1));
       }
     }

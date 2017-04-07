@@ -19,24 +19,24 @@ public class MidiConfiguration {
 
     private Integer setMode;
     private Integer clearMode;
-    private List<ChannelMessage> sendDeviceMessages;
-    private List<ChannelMessage> sendHandlerMessages;
-    private List<HandlerCommand> sendHandlerCommands;
+    private ChannelMessage sendDeviceMessage;
+    private ChannelMessage sendHandlerMessage;
+    private HandlerCommand sendHandlerCommand;
 
     public Integer getClearMode() {
       return clearMode;
     }
 
-    public List<ChannelMessage> getSendDeviceMessages() {
-      return sendDeviceMessages;
+    public ChannelMessage getSendDeviceMessage() {
+      return sendDeviceMessage;
     }
 
-    public List<HandlerCommand> getSendHandlerCommands() {
-      return sendHandlerCommands;
+    public HandlerCommand getSendHandlerCommand() {
+      return sendHandlerCommand;
     }
 
-    public List<ChannelMessage> getSendHandlerMessages() {
-      return sendHandlerMessages;
+    public ChannelMessage getSendHandlerMessage() {
+      return sendHandlerMessage;
     }
 
     public Integer getSetMode() {
@@ -47,16 +47,16 @@ public class MidiConfiguration {
       this.clearMode = clearMode;
     }
 
-    public void setSendDeviceMessages(List<ChannelMessage> sendDeviceMessages) {
-      this.sendDeviceMessages = sendDeviceMessages;
+    public void setSendDeviceMessage(ChannelMessage sendDeviceMessages) {
+      this.sendDeviceMessage = sendDeviceMessages;
     }
 
-    public void setSendHandlerCommands(List<HandlerCommand> sendHandlerCommands) {
-      this.sendHandlerCommands = sendHandlerCommands;
+    public void setSendHandlerCommand(HandlerCommand sendHandlerCommands) {
+      this.sendHandlerCommand = sendHandlerCommands;
     }
 
-    public void setSendHandlerMessages(List<ChannelMessage> sendHandlerMessages) {
-      this.sendHandlerMessages = sendHandlerMessages;
+    public void setSendHandlerMessage(ChannelMessage sendHandlerMessages) {
+      this.sendHandlerMessage = sendHandlerMessages;
     }
 
     public void setSetMode(Integer setMode) {
@@ -65,7 +65,7 @@ public class MidiConfiguration {
 
     @Override
     public String toString() {
-      return "Action [setMode=" + setMode + ", clearMode=" + clearMode + ", sendDeviceMessages=" + sendDeviceMessages + ", sendHandlerMessages=" + sendHandlerMessages + ", sendHandlerCommands=" + sendHandlerCommands + "]";
+      return "Action [setMode=" + setMode + ", clearMode=" + clearMode + ", sendDeviceMessages=" + sendDeviceMessage + ", sendHandlerMessages=" + sendHandlerMessage + ", sendHandlerCommands=" + sendHandlerCommand + "]";
     }
 
   }
@@ -196,8 +196,8 @@ public class MidiConfiguration {
   public static class InputAction {
 
     private ChannelMessage ifInput;
-    private List<Integer> ifModes;
-    private List<Integer> ifNotModes;
+    private Integer ifMode;
+    private Integer ifNotMode;
     private Action thenDo;
 
     public boolean equals(int subdevice, int command, int channel, int data1, int data2) {
@@ -208,12 +208,12 @@ public class MidiConfiguration {
       return ifInput;
     }
 
-    public List<Integer> getIfModes() {
-      return ifModes;
+    public Integer getIfMode() {
+      return ifMode;
     }
 
-    public List<Integer> getIfNotModes() {
-      return ifNotModes;
+    public Integer getIfNotMode() {
+      return ifNotMode;
     }
 
     public Action getThenDo() {
@@ -224,12 +224,12 @@ public class MidiConfiguration {
       this.ifInput = ifInput;
     }
 
-    public void setIfModes(List<Integer> andIfModes) {
-      this.ifModes = andIfModes;
+    public void setIfMode(Integer andIfModes) {
+      this.ifMode = andIfModes;
     }
 
-    public void setIfNotModes(List<Integer> ifNotModes) {
-      this.ifNotModes = ifNotModes;
+    public void setIfNotMode(Integer ifNotModes) {
+      this.ifNotMode = ifNotModes;
     }
 
     public void setThenDo(Action thenDo) {
@@ -238,7 +238,7 @@ public class MidiConfiguration {
 
     @Override
     public String toString() {
-      return "InputAction [ifInput=" + ifInput + ", ifModes=" + ifModes + ", ifNotModes=" + ifNotModes + ", thenDo=" + thenDo + "]";
+      return "InputAction [ifInput=" + ifInput + ", ifModes=" + ifMode + ", ifNotModes=" + ifNotMode + ", thenDo=" + thenDo + "]";
     }
 
   }
@@ -246,36 +246,36 @@ public class MidiConfiguration {
   public class OutputAction {
 
     private ChannelStatus ifChannelStatus;
-    private List<ChannelMessage> thenSendDeviceMessages;
+    private ChannelMessage thenSendDeviceMessage;
 
     public ChannelStatus getIfChannelStatus() {
       return ifChannelStatus;
     }
 
-    public List<ChannelMessage> getThenSendDeviceMessages() {
-      return thenSendDeviceMessages;
+    public ChannelMessage getThenSendDeviceMessage() {
+      return thenSendDeviceMessage;
     }
 
     public void setIfChannelStatus(ChannelStatus ifChannelStatus) {
       this.ifChannelStatus = ifChannelStatus;
     }
 
-    public void setThenSendDeviceMessages(List<ChannelMessage> thenSendDeviceMessages) {
-      this.thenSendDeviceMessages = thenSendDeviceMessages;
+    public void setThenSendDeviceMessage(ChannelMessage thenSendDeviceMessages) {
+      this.thenSendDeviceMessage = thenSendDeviceMessages;
     }
 
     @Override
     public String toString() {
-      return "OutputAction [ifChannelStatus=" + ifChannelStatus + ", thenSendDeviceMessages=" + thenSendDeviceMessages + "]";
+      return "OutputAction [ifChannelStatus=" + ifChannelStatus + ", thenSendDeviceMessages=" + thenSendDeviceMessage + "]";
     }
 
   }
 
-  private Action initializationActions;
+  private List<Action> initializationActions;
   private List<InputAction> inputActions;
   private List<OutputAction> outputActions;
 
-  public Action getInitializationActions() {
+  public List<Action> getInitializationActions() {
     return initializationActions;
   }
 
@@ -287,7 +287,7 @@ public class MidiConfiguration {
     return outputActions;
   }
 
-  public void setInitializationActions(Action initializationActions) {
+  public void setInitializationActions(List<Action> initializationActions) {
     this.initializationActions = initializationActions;
   }
 

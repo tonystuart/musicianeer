@@ -1,197 +1,187 @@
 {
-	"initializationActions" : {
+	"initializationActions" : [
 		// exit then enter InControl mode to initialize
-		"sendDeviceMessages" : [
-        	{ "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 12, "data2" : 0 },
-        	{ "subDevice" : 1, "command" : 128, "channel" : 0, "data1" : 12, "data2" : 0 },
-        	{ "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 12, "data2" : 127 }
-		]
-	},
-	"inputActions" : [ {
-		"ifInput" : { "subDevice" : -1, "command" : 0, "channel" : 0, "data1" : 0, "data2" : 0 }, "ifModes" : [ 0 ], "ifNotModes" : [ 0 ],
+		{ "sendDeviceMessage" : { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 12, "data2" : 0 } },
+        { "sendDeviceMessage" : { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 12, "data2" : 127 } }
+	],
+	"inputActions" : [
+		{ "ifInput" : { "subDevice" : -1, "command" : 0, "channel" : 0, "data1" : 0, "data2" : 0 }, "ifMode" :  0 , "ifNotMode" :  0 ,
 		"thenDo" : {
 			"setMode" : 0,
-			"sendDeviceMessages" : [
-				{ "subDevice" : 0, "command" : 0, "channel" : 0, "data1" : 0, "data2" : 0 } ],
-			"sendHandlerMessages" : [
-				{ "subDevice" : 0, "command" : 0, "channel" : 0, "data1" : 0, "data2" : 0 } ],
-			"sendHandlerCommands" : [
-				{ "command" : 0, "parameter" : 0 } ]
-		}
-	},
+			"sendDeviceMessage" : { "subDevice" : 0, "command" : 0, "channel" : 0, "data1" : 0, "data2" : 0 } ,
+			"sendHandlerMessage" : { "subDevice" : 0, "command" : 0, "channel" : 0, "data1" : 0, "data2" : 0 },
+			"sendHandlerCommand" : { "command" : 0, "parameter" : 0 } } },
 	// enter select notes mode (top round pad)
-	{ "ifInput" : { "subDevice" : 1, "command" : 144, "data1" : 104 }, "ifNotModes" : [ 1 ],
+	{ "ifInput" : { "subDevice" : 1, "command" : 144, "data1" : 104 }, "ifNotMode" :  1 ,
 	"thenDo" : {
 		"setMode" : 1,
-		"sendDeviceMessages" : [
-			{ "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 104, "data2" : 127 } ] } },
+		"sendDeviceMessage" : { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 104, "data2" : 127 }  } },
 	// exit select notes mode (top round pad)
-	{ "ifInput" : { "subDevice" : 1, "command" : 144, "data1" : 104 }, "ifModes" : [ 1 ],
+	{ "ifInput" : { "subDevice" : 1, "command" : 144, "data1" : 104 }, "ifMode" :  1 ,
 	"thenDo" : {
 		"clearMode" : 1,
-		"sendDeviceMessages" : [
-			{ "subDevice" : 1, "command" : 128, "channel" : 0, "data1" : 104, "data2" : 127 } ] } },
+		"sendDeviceMessage" : { "subDevice" : 1, "command" : 128, "channel" : 0, "data1" : 104, "data2" : 127 }  } },
 	// channel 1
-    { "ifInput" : { "subDevice" : 1, "command" : 144, "data1" : 96 }, "ifModes" : [ 1 ],
-		"thenDo" : { "sendHandlerCommands" : [ { "command" : "SELECT_NOTES", "parameter" : 1 } ] } },
+    { "ifInput" : { "subDevice" : 1, "command" : 144, "data1" : 96 }, "ifMode" :  1 ,
+		"thenDo" : { "sendHandlerCommand" :  { "command" : "SELECT_NOTES", "parameter" : 1 }  } },
 	// channel 2
-    { "ifInput" : { "subDevice" : 1, "command" : 144, "data1" : 97 }, "ifModes" : [ 1 ],
-		"thenDo" : { "sendHandlerCommands" : [ { "command" : "SELECT_NOTES", "parameter" : 2 } ] } },
+    { "ifInput" : { "subDevice" : 1, "command" : 144, "data1" : 97 }, "ifMode" :  1 ,
+		"thenDo" : { "sendHandlerCommand" :  { "command" : "SELECT_NOTES", "parameter" : 2 }  } },
 	// channel 3
-    { "ifInput" : { "subDevice" : 1, "command" : 144, "data1" : 98 }, "ifModes" : [ 1 ],
-		"thenDo" : { "sendHandlerCommands" : [ { "command" : "SELECT_NOTES", "parameter" : 3 } ] } },
+    { "ifInput" : { "subDevice" : 1, "command" : 144, "data1" : 98 }, "ifMode" :  1 ,
+		"thenDo" : { "sendHandlerCommand" :  { "command" : "SELECT_NOTES", "parameter" : 3 }  } },
 	// channel 3
-    { "ifInput" : { "subDevice" : 1, "command" : 144, "data1" : 99 }, "ifModes" : [ 1 ],
-		"thenDo" : { "sendHandlerCommands" : [ { "command" : "SELECT_NOTES", "parameter" : 4 } ] } },
+    { "ifInput" : { "subDevice" : 1, "command" : 144, "data1" : 99 }, "ifMode" :  1 ,
+		"thenDo" : { "sendHandlerCommand" :  { "command" : "SELECT_NOTES", "parameter" : 4 }  } },
 	// channel 3
-    { "ifInput" : { "subDevice" : 1, "command" : 144, "data1" : 100 }, "ifModes" : [ 1 ],
-		"thenDo" : { "sendHandlerCommands" : [ { "command" : "SELECT_NOTES", "parameter" : 5 } ] } },
+    { "ifInput" : { "subDevice" : 1, "command" : 144, "data1" : 100 }, "ifMode" :  1 ,
+		"thenDo" : { "sendHandlerCommand" :  { "command" : "SELECT_NOTES", "parameter" : 5 }  } },
 	// channel 3
-    { "ifInput" : { "subDevice" : 1, "command" : 144, "data1" : 101 }, "ifModes" : [ 1 ],
-		"thenDo" : { "sendHandlerCommands" : [ { "command" : "SELECT_NOTES", "parameter" : 6 } ] } },
+    { "ifInput" : { "subDevice" : 1, "command" : 144, "data1" : 101 }, "ifMode" :  1 ,
+		"thenDo" : { "sendHandlerCommand" :  { "command" : "SELECT_NOTES", "parameter" : 6 }  } },
 	// channel 3
-    { "ifInput" : { "subDevice" : 1, "command" : 144, "data1" : 102 }, "ifModes" : [ 1 ],
-		"thenDo" : { "sendHandlerCommands" : [ { "command" : "SELECT_NOTES", "parameter" : 7 } ] } },
+    { "ifInput" : { "subDevice" : 1, "command" : 144, "data1" : 102 }, "ifMode" :  1 ,
+		"thenDo" : { "sendHandlerCommand" :  { "command" : "SELECT_NOTES", "parameter" : 7 }  } },
 	// channel 3
-    { "ifInput" : { "subDevice" : 1, "command" : 144, "data1" : 103 }, "ifModes" : [ 1 ],
-		"thenDo" : { "sendHandlerCommands" : [ { "command" : "SELECT_NOTES", "parameter" : 8 } ] } },
+    { "ifInput" : { "subDevice" : 1, "command" : 144, "data1" : 103 }, "ifMode" :  1 ,
+		"thenDo" : { "sendHandlerCommand" :  { "command" : "SELECT_NOTES", "parameter" : 8 }  } },
 	// channel 3
-    { "ifInput" : { "subDevice" : 1, "command" : 144, "data1" : 112 }, "ifModes" : [ 1 ],
-		"thenDo" : { "sendHandlerCommands" : [ { "command" : "SELECT_NOTES", "parameter" : 9 } ] } },
+    { "ifInput" : { "subDevice" : 1, "command" : 144, "data1" : 112 }, "ifMode" :  1 ,
+		"thenDo" : { "sendHandlerCommand" :  { "command" : "SELECT_NOTES", "parameter" : 9 }  } },
 	// channel 3
-    { "ifInput" : { "subDevice" : 1, "command" : 144, "data1" : 113 }, "ifModes" : [ 1 ],
-		"thenDo" : { "sendHandlerCommands" : [ { "command" : "SELECT_NOTES", "parameter" : 10 } ] } },
+    { "ifInput" : { "subDevice" : 1, "command" : 144, "data1" : 113 }, "ifMode" :  1 ,
+		"thenDo" : { "sendHandlerCommand" :  { "command" : "SELECT_NOTES", "parameter" : 10 }  } },
 	// channel 3
-    { "ifInput" : { "subDevice" : 1, "command" : 144, "data1" : 114 }, "ifModes" : [ 1 ],
-		"thenDo" : { "sendHandlerCommands" : [ { "command" : "SELECT_NOTES", "parameter" : 11 } ] } },
+    { "ifInput" : { "subDevice" : 1, "command" : 144, "data1" : 114 }, "ifMode" :  1 ,
+		"thenDo" : { "sendHandlerCommand" :  { "command" : "SELECT_NOTES", "parameter" : 11 }  } },
 	// channel 3
-    { "ifInput" : { "subDevice" : 1, "command" : 144, "data1" : 115 }, "ifModes" : [ 1 ],
-		"thenDo" : { "sendHandlerCommands" : [ { "command" : "SELECT_NOTES", "parameter" : 12 } ] } },
+    { "ifInput" : { "subDevice" : 1, "command" : 144, "data1" : 115 }, "ifMode" :  1 ,
+		"thenDo" : { "sendHandlerCommand" :  { "command" : "SELECT_NOTES", "parameter" : 12 }  } },
 	// channel 3
-    { "ifInput" : { "subDevice" : 1, "command" : 144, "data1" : 116 }, "ifModes" : [ 1 ],
-		"thenDo" : { "sendHandlerCommands" : [ { "command" : "SELECT_NOTES", "parameter" : 13 } ] } },
+    { "ifInput" : { "subDevice" : 1, "command" : 144, "data1" : 116 }, "ifMode" :  1 ,
+		"thenDo" : { "sendHandlerCommand" :  { "command" : "SELECT_NOTES", "parameter" : 13 }  } },
 	// channel 3
-    { "ifInput" : { "subDevice" : 1, "command" : 144, "data1" : 117 }, "ifModes" : [ 1 ],
-		"thenDo" : { "sendHandlerCommands" : [ { "command" : "SELECT_NOTES", "parameter" : 14 } ] } },
+    { "ifInput" : { "subDevice" : 1, "command" : 144, "data1" : 117 }, "ifMode" :  1 ,
+		"thenDo" : { "sendHandlerCommand" :  { "command" : "SELECT_NOTES", "parameter" : 14 }  } },
 	// channel 3
-    { "ifInput" : { "subDevice" : 1, "command" : 144, "data1" : 118 }, "ifModes" : [ 1 ],
-		"thenDo" : { "sendHandlerCommands" : [ { "command" : "SELECT_NOTES", "parameter" : 15 } ] } },
+    { "ifInput" : { "subDevice" : 1, "command" : 144, "data1" : 118 }, "ifMode" :  1 ,
+		"thenDo" : { "sendHandlerCommand" :  { "command" : "SELECT_NOTES", "parameter" : 15 }  } },
 	// channel 3
-    { "ifInput" : { "subDevice" : 1, "command" : 144, "data1" : 119 }, "ifModes" : [ 1 ],
-		"thenDo" : { "sendHandlerCommands" : [ { "command" : "SELECT_NOTES", "parameter" : 16 } ] } },
+    { "ifInput" : { "subDevice" : 1, "command" : 144, "data1" : 119 }, "ifMode" :  1 ,
+		"thenDo" : { "sendHandlerCommand" :  { "command" : "SELECT_NOTES", "parameter" : 16 }  } },
   ],
   "outputActions" : [
 	// channel 1
     { "ifChannelStatus" : { "channelNumber" : 1, "state" : "ACTIVE" },
-      "thenSendDeviceMessages" : [ { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 96, "data2" : 52 } ] },
+      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 96, "data2" : 52 }  },
     { "ifChannelStatus" : { "channelNumber" : 1, "state" : "INACTIVE" },
-      "thenSendDeviceMessages" : [ { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 96, "data2" : 7 } ] }, 
+      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 96, "data2" : 7 }  }, 
     { "ifChannelStatus" : { "channelNumber" : 1, "state" : "SELECTED" },
-      "thenSendDeviceMessages" : [ { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 96, "data2" : 102 } ] },
+      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 96, "data2" : 102 }  },
 	// channel 2
     { "ifChannelStatus" : { "channelNumber" : 2, "state" : "ACTIVE" },
-      "thenSendDeviceMessages" : [ { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 97, "data2" : 52 } ] },
+      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 97, "data2" : 52 }  },
     { "ifChannelStatus" : { "channelNumber" : 2, "state" : "INACTIVE" },
-      "thenSendDeviceMessages" : [ { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 97, "data2" : 7 } ] },
+      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 97, "data2" : 7 }  },
     { "ifChannelStatus" : { "channelNumber" : 2, "state" : "SELECTED" },
-      "thenSendDeviceMessages" : [ { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 97, "data2" : 102 } ] },
+      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 97, "data2" : 102 }  },
 	// channel 3
     { "ifChannelStatus" : { "channelNumber" : 3, "state" : "ACTIVE" },
-      "thenSendDeviceMessages" : [ { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 98, "data2" : 52 } ] },
+      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 98, "data2" : 52 }  },
     { "ifChannelStatus" : { "channelNumber" : 3, "state" : "INACTIVE" },
-      "thenSendDeviceMessages" : [ { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 98, "data2" : 7 } ] },
+      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 98, "data2" : 7 }  },
     { "ifChannelStatus" : { "channelNumber" : 3, "state" : "SELECTED" },
-      "thenSendDeviceMessages" : [ { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 98, "data2" : 102 } ] },
+      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 98, "data2" : 102 }  },
 	// channel 4
     { "ifChannelStatus" : { "channelNumber" : 4, "state" : "ACTIVE" },
-      "thenSendDeviceMessages" : [ { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 99, "data2" : 52 } ] },
+      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 99, "data2" : 52 }  },
     { "ifChannelStatus" : { "channelNumber" : 4, "state" : "INACTIVE" },
-      "thenSendDeviceMessages" : [ { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 99, "data2" : 7 } ] },
+      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 99, "data2" : 7 }  },
     { "ifChannelStatus" : { "channelNumber" : 4, "state" : "SELECTED" },
-      "thenSendDeviceMessages" : [ { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 99, "data2" : 102 } ] },
+      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 99, "data2" : 102 }  },
 	// channel 5
     { "ifChannelStatus" : { "channelNumber" : 5, "state" : "ACTIVE" },
-      "thenSendDeviceMessages" : [ { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 100, "data2" : 52 } ] },
+      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 100, "data2" : 52 }  },
     { "ifChannelStatus" : { "channelNumber" : 5, "state" : "INACTIVE" },
-      "thenSendDeviceMessages" : [ { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 100, "data2" : 7 } ] },
+      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 100, "data2" : 7 }  },
     { "ifChannelStatus" : { "channelNumber" : 5, "state" : "SELECTED" },
-      "thenSendDeviceMessages" : [ { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 100, "data2" : 102 } ] },
+      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 100, "data2" : 102 }  },
 	// channel 6
     { "ifChannelStatus" : { "channelNumber" : 6, "state" : "ACTIVE" },
-      "thenSendDeviceMessages" : [ { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 101, "data2" : 52 } ] },
+      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 101, "data2" : 52 }  },
     { "ifChannelStatus" : { "channelNumber" : 6, "state" : "INACTIVE" },
-      "thenSendDeviceMessages" : [ { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 101, "data2" : 7 } ] },
+      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 101, "data2" : 7 }  },
     { "ifChannelStatus" : { "channelNumber" : 6, "state" : "SELECTED" },
-      "thenSendDeviceMessages" : [ { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 101, "data2" : 102 } ] },
+      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 101, "data2" : 102 }  },
 	// channel 7
     { "ifChannelStatus" : { "channelNumber" : 7, "state" : "ACTIVE" },
-      "thenSendDeviceMessages" : [ { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 102, "data2" : 52 } ] },
+      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 102, "data2" : 52 }  },
     { "ifChannelStatus" : { "channelNumber" : 7, "state" : "INACTIVE" },
-      "thenSendDeviceMessages" : [ { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 102, "data2" : 7 } ] },
+      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 102, "data2" : 7 }  },
     { "ifChannelStatus" : { "channelNumber" : 7, "state" : "SELECTED" },
-      "thenSendDeviceMessages" : [ { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 102, "data2" : 102 } ] },
+      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 102, "data2" : 102 }  },
 	// channel 8
     { "ifChannelStatus" : { "channelNumber" : 8, "state" : "ACTIVE" },
-      "thenSendDeviceMessages" : [ { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 103, "data2" : 52 } ] },
+      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 103, "data2" : 52 }  },
     { "ifChannelStatus" : { "channelNumber" : 8, "state" : "INACTIVE" },
-      "thenSendDeviceMessages" : [ { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 103, "data2" : 7 } ] },
+      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 103, "data2" : 7 }  },
     { "ifChannelStatus" : { "channelNumber" : 8, "state" : "SELECTED" },
-      "thenSendDeviceMessages" : [ { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 103, "data2" : 102 } ] },
+      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 103, "data2" : 102 }  },
 	// channel 9
     { "ifChannelStatus" : { "channelNumber" : 9, "state" : "ACTIVE" },
-      "thenSendDeviceMessages" : [ { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 112, "data2" : 52 } ] },
+      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 112, "data2" : 52 }  },
     { "ifChannelStatus" : { "channelNumber" : 9, "state" : "INACTIVE" },
-      "thenSendDeviceMessages" : [ { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 112, "data2" : 7 } ] },
+      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 112, "data2" : 7 }  },
     { "ifChannelStatus" : { "channelNumber" : 9, "state" : "SELECTED" },
-      "thenSendDeviceMessages" : [ { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 112, "data2" : 102 } ] },
+      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 112, "data2" : 102 }  },
 	// channel 10
     { "ifChannelStatus" : { "channelNumber" : 10, "state" : "ACTIVE" },
-      "thenSendDeviceMessages" : [ { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 113, "data2" : 52 } ] },
+      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 113, "data2" : 52 }  },
     { "ifChannelStatus" : { "channelNumber" : 10, "state" : "INACTIVE" },
-      "thenSendDeviceMessages" : [ { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 113, "data2" : 7 } ] },
+      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 113, "data2" : 7 }  },
     { "ifChannelStatus" : { "channelNumber" : 10, "state" : "SELECTED" },
-      "thenSendDeviceMessages" : [ { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 113, "data2" : 102 } ] },
+      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 113, "data2" : 102 }  },
 	// channel 11
     { "ifChannelStatus" : { "channelNumber" : 11, "state" : "ACTIVE" },
-      "thenSendDeviceMessages" : [ { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 114, "data2" : 52 } ] },
+      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 114, "data2" : 52 }  },
     { "ifChannelStatus" : { "channelNumber" : 11, "state" : "INACTIVE" },
-      "thenSendDeviceMessages" : [ { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 114, "data2" : 7 } ] },
+      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 114, "data2" : 7 }  },
     { "ifChannelStatus" : { "channelNumber" : 11, "state" : "SELECTED" },
-      "thenSendDeviceMessages" : [ { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 114, "data2" : 102 } ] },
+      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 114, "data2" : 102 }  },
 	// channel 12
     { "ifChannelStatus" : { "channelNumber" : 12, "state" : "ACTIVE" },
-      "thenSendDeviceMessages" : [ { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 115, "data2" : 52 } ] },
+      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 115, "data2" : 52 }  },
     { "ifChannelStatus" : { "channelNumber" : 12, "state" : "INACTIVE" },
-      "thenSendDeviceMessages" : [ { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 115, "data2" : 7 } ] },
+      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 115, "data2" : 7 }  },
     { "ifChannelStatus" : { "channelNumber" : 12, "state" : "SELECTED" },
-      "thenSendDeviceMessages" : [ { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 115, "data2" : 102 } ] },
+      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 115, "data2" : 102 }  },
 	// channel 13
     { "ifChannelStatus" : { "channelNumber" : 13, "state" : "ACTIVE" },
-      "thenSendDeviceMessages" : [ { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 116, "data2" : 52 } ] },
+      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 116, "data2" : 52 }  },
     { "ifChannelStatus" : { "channelNumber" : 13, "state" : "INACTIVE" },
-      "thenSendDeviceMessages" : [ { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 116, "data2" : 7 } ] },
+      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 116, "data2" : 7 }  },
     { "ifChannelStatus" : { "channelNumber" : 13, "state" : "SELECTED" },
-      "thenSendDeviceMessages" : [ { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 116, "data2" : 102 } ] },
+      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 116, "data2" : 102 }  },
 	// channel 14
     { "ifChannelStatus" : { "channelNumber" : 14, "state" : "ACTIVE" },
-      "thenSendDeviceMessages" : [ { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 117, "data2" : 52 } ] },
+      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 117, "data2" : 52 }  },
     { "ifChannelStatus" : { "channelNumber" : 14, "state" : "INACTIVE" },
-      "thenSendDeviceMessages" : [ { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 117, "data2" : 7 } ] },
+      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 117, "data2" : 7 }  },
     { "ifChannelStatus" : { "channelNumber" : 14, "state" : "SELECTED" },
-      "thenSendDeviceMessages" : [ { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 117, "data2" : 102 } ] },
+      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 117, "data2" : 102 }  },
 	// channel 15
     { "ifChannelStatus" : { "channelNumber" : 15, "state" : "ACTIVE" },
-      "thenSendDeviceMessages" : [ { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 118, "data2" : 52 } ] },
+      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 118, "data2" : 52 }  },
     { "ifChannelStatus" : { "channelNumber" : 15, "state" : "INACTIVE" },
-      "thenSendDeviceMessages" : [ { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 118, "data2" : 7 } ] },
+      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 118, "data2" : 7 }  },
     { "ifChannelStatus" : { "channelNumber" : 15, "state" : "SELECTED" },
-      "thenSendDeviceMessages" : [ { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 118, "data2" : 102 } ] },
+      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 118, "data2" : 102 }  },
 	// channel 16
     { "ifChannelStatus" : { "channelNumber" : 16, "state" : "ACTIVE" },
-      "thenSendDeviceMessages" : [ { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 119, "data2" : 52 } ] },
+      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 119, "data2" : 52 }  },
     { "ifChannelStatus" : { "channelNumber" : 16, "state" : "INACTIVE" },
-      "thenSendDeviceMessages" : [ { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 119, "data2" : 7 } ] },
+      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 119, "data2" : 7 }  },
     { "ifChannelStatus" : { "channelNumber" : 16, "state" : "SELECTED" },
-      "thenSendDeviceMessages" : [ { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 119, "data2" : 102 } ] }
-  ]
+      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 119, "data2" : 102 }  }
+	]
 }

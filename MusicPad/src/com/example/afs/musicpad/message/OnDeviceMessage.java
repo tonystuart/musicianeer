@@ -9,25 +9,23 @@
 
 package com.example.afs.musicpad.message;
 
-import java.util.List;
-
 import com.example.afs.musicpad.device.midi.MidiConfiguration.ChannelMessage;
 
-public class OnDeviceMessages implements Message {
+public class OnDeviceMessage implements Message {
 
-  private List<ChannelMessage> deviceMessages;
+  private ChannelMessage deviceMessage;
 
-  public OnDeviceMessages(List<ChannelMessage> deviceMessages) {
-    this.deviceMessages = deviceMessages;
+  public OnDeviceMessage(ChannelMessage deviceMessage) {
+    this.deviceMessage = deviceMessage;
   }
 
-  public List<ChannelMessage> getDeviceMessages() {
-    return deviceMessages;
+  public ChannelMessage getDeviceMessage() {
+    return deviceMessage;
   }
 
   @Override
   public String toString() {
-    return "OnDeviceMessages [deviceMessages=" + deviceMessages + "]";
+    return "OnDeviceMessage [deviceMessage=" + deviceMessage + "]";
   }
 
 }
