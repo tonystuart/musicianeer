@@ -82,7 +82,7 @@ public abstract class SimpleTask<M> {
         isTerminated = true;
       }
     }
-    System.out.println("SimpleTask: returning from run method in  " + name);
+    System.out.println("SimpleTask: returning from run method in " + name);
   }
 
   protected void setTimeoutMillis(long timeoutMillis) {

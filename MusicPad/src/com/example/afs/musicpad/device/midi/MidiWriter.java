@@ -35,8 +35,8 @@ public class MidiWriter extends BrokerTask<Message> implements Controllable {
   private MidiDeviceBundle device;
   private MidiConfiguration configuration;
   private RandomAccessList<Receiver> receivers = new DirectList<>();
-  private int selectedChannelNumber;
   private ChannelState[] channelStates = new ChannelState[Midi.CHANNELS];
+  private int selectedChannel = -1;
 
   public MidiWriter(Broker<Message> broker, MidiDeviceBundle device, MidiConfiguration configuration) {
     super(broker);
@@ -45,6 +45,12 @@ public class MidiWriter extends BrokerTask<Message> implements Controllable {
     subscribe(OnChannelState.class, message -> doChannelState(message.getChannel(), message.getChannelState()));
     subscribe(OnDeviceMessage.class, message -> doDeviceMessage(message.getDeviceMessage()));
     connectDevices();
+  }
+
+  @Override
+  public void terminate() {
+    super.terminate();
+    disconnectDevices();
   }
 
   private void connectDevices() {
@@ -59,12 +65,19 @@ public class MidiWriter extends BrokerTask<Message> implements Controllable {
     }
   }
 
+  private void disconnectDevices() {
+    for (MidiOutputDevice midiOutputDevice : device.getOutputDevices()) {
+      MidiDevice midiDevice = midiOutputDevice.getMidiDevice();
+      midiDevice.close();
+    }
+  }
+
   private void doChannelState(int channel, ChannelState channelState) {
     if (channelState == ChannelState.SELECTED) {
-      if (selectedChannelNumber != 0) {
-        setChannelState(selectedChannelNumber, channelStates[selectedChannelNumber]);
+      if (selectedChannel != -1) {
+        setChannelState(selectedChannel, channelStates[selectedChannel]);
       }
-      selectedChannelNumber = channel;
+      selectedChannel = channel;
     } else {
       channelStates[channel] = channelState;
     }

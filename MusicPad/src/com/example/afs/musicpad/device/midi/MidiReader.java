@@ -64,15 +64,16 @@ public class MidiReader implements Controllable {
     this.device = device;
     this.configuration = configuration;
     connectDevices();
-    initializeDevices();
   }
 
   @Override
   public void start() {
+    initializeDevices();
   }
 
   @Override
   public void terminate() {
+    disconnectDevices();
   }
 
   private void connectDevices() {
@@ -84,6 +85,13 @@ public class MidiReader implements Controllable {
       }
     } catch (MidiUnavailableException e) {
       throw new RuntimeException(e);
+    }
+  }
+
+  private void disconnectDevices() {
+    for (MidiInputDevice midiInputDevice : device.getInputDevices()) {
+      MidiDevice midiDevice = midiInputDevice.getMidiDevice();
+      midiDevice.close();
     }
   }
 
