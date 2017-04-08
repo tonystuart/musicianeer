@@ -11,6 +11,9 @@
 			"sendDeviceMessage" : { "subDevice" : 0, "command" : 0, "channel" : 0, "data1" : 0, "data2" : 0 } ,
 			"sendHandlerMessage" : { "subDevice" : 0, "command" : 0, "channel" : 0, "data1" : 0, "data2" : 0 },
 			"sendHandlerCommand" : { "command" : 0, "parameter" : 0 } } },
+	// device reporting it entered InControl mode
+	{ "ifInput" : { "subDevice" : 1, "command" : 144, "data1" : 12 },
+	"thenDo" : { } },
 	// enter select notes mode (top round pad)
 	{ "ifInput" : { "subDevice" : 1, "command" : 144, "data1" : 104 }, "ifNotMode" :  1 ,
 	"thenDo" : {

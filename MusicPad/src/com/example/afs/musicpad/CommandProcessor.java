@@ -69,8 +69,8 @@ public class CommandProcessor extends BrokerTask<Message> {
 
   private static final int PAGE_SIZE = 10;
 
-  public static boolean isTraceMusic() {
-    return false;
+  public static boolean isTraceConfiguration() {
+    return true;
   }
 
   public static boolean isTracePlay() {

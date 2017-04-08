@@ -19,6 +19,7 @@ import javax.sound.midi.MidiUnavailableException;
 import javax.sound.midi.Receiver;
 import javax.sound.midi.ShortMessage;
 
+import com.example.afs.musicpad.CommandProcessor;
 import com.example.afs.musicpad.device.common.ControllableGroup.Controllable;
 import com.example.afs.musicpad.device.midi.MidiConfiguration.Action;
 import com.example.afs.musicpad.device.midi.MidiConfiguration.ChannelMessage;
@@ -132,16 +133,25 @@ public class MidiReader implements Controllable {
       int channel = shortMessage.getChannel();
       int data1 = shortMessage.getData1();
       int data2 = shortMessage.getData2();
+      if (CommandProcessor.isTraceConfiguration()) {
+        System.out.println("Searching for subDevice=" + subDevice + ", command=" + command + ", channel=" + channel + ", data1=" + data1 + ", data2=" + data2);
+      }
       for (InputAction inputAction : configuration.getInputActions()) {
         if (inputAction != null) {
           if (inputAction.equals(subDevice, command, channel, data1, data2)) {
             if (inputAction.getIfMode() == null || currentModes.contains(inputAction.getIfMode())) {
               if (inputAction.getIfNotMode() == null || !currentModes.contains(inputAction.getIfNotMode())) {
+                if (CommandProcessor.isTraceConfiguration()) {
+                  System.out.println("Match on " + inputAction);
+                }
                 Action action = inputAction.getThenDo();
                 performAction(action);
                 return;
               }
             }
+          }
+          if (CommandProcessor.isTraceConfiguration()) {
+            System.out.println("No match on " + inputAction);
           }
         }
       }

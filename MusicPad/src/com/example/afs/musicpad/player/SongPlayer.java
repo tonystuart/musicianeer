@@ -72,7 +72,7 @@ public abstract class SongPlayer extends Player {
     viewer.getBottomLine().setText(words);
   }
 
-  protected abstract String getMusic(long x, long y, long z, int ticksPerCharacter);
+  protected abstract String getMusic(long currentTick, long firstTick, long lastTick, int ticksPerCharacter);
 
   protected String getWords(long currentTick, long firstTick, long lastTick, int ticksPerCharacter) {
     StringBuilder s = new StringBuilder();

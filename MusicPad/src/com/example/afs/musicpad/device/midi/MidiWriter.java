@@ -15,6 +15,7 @@ import javax.sound.midi.MidiUnavailableException;
 import javax.sound.midi.Receiver;
 import javax.sound.midi.ShortMessage;
 
+import com.example.afs.musicpad.CommandProcessor;
 import com.example.afs.musicpad.device.common.ControllableGroup.Controllable;
 import com.example.afs.musicpad.device.midi.MidiConfiguration.ChannelMessage;
 import com.example.afs.musicpad.device.midi.MidiConfiguration.ChannelState;
@@ -95,6 +96,9 @@ public class MidiWriter extends BrokerTask<Message> implements Controllable {
       int data1 = Value.getInt(deviceMessage.getData1());
       int data2 = Value.getInt(deviceMessage.getData2());
       ShortMessage shortMessage = new ShortMessage(command, channel, data1, data2);
+      if (CommandProcessor.isTraceConfiguration()) {
+        System.out.println("Sending device message " + deviceMessage);
+      }
       if (deviceMessage.getSubDevice() == null) {
         for (Receiver receiver : receivers) {
           receiver.send(shortMessage, -1);

@@ -23,6 +23,7 @@ import com.example.afs.musicpad.message.OnInputPress;
 import com.example.afs.musicpad.message.OnInputRelease;
 import com.example.afs.musicpad.message.OnSongSelected;
 import com.example.afs.musicpad.message.OnTick;
+import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.player.GeneralDrumPlayer;
 import com.example.afs.musicpad.player.KeyChordPlayer;
 import com.example.afs.musicpad.player.KeyNotePlayer;
@@ -30,33 +31,34 @@ import com.example.afs.musicpad.player.Player;
 import com.example.afs.musicpad.player.Player.Action;
 import com.example.afs.musicpad.player.SongChordPlayer;
 import com.example.afs.musicpad.player.SongDrumPlayer;
-import com.example.afs.musicpad.player.SongNotePlayer;
 import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.task.BrokerTask;
 import com.example.afs.musicpad.theory.Keys;
 import com.example.afs.musicpad.util.Broker;
+import com.example.afs.musicpad.util.Value;
 
-public class DeviceHandler extends BrokerTask<Message> implements Controllable {
-
-  private Player defaultPlayer;
-  private InputMapping inputMapping;
+public abstract class DeviceHandler extends BrokerTask<Message> implements Controllable {
 
   private Player player;
-  private Song currentSong;
-  private Synthesizer synthesizer;
+  protected Song currentSong;
+  protected Synthesizer synthesizer;
+  protected InputMapping inputMapping;
 
-  public DeviceHandler(Broker<Message> messageBroker, Synthesizer synthesizer, InputMapping inputMapping, Player defaultPlayer) {
+  public DeviceHandler(Broker<Message> messageBroker, Synthesizer synthesizer, InputMapping inputMapping) {
     super(messageBroker);
     this.synthesizer = synthesizer;
     this.inputMapping = inputMapping;
-    this.defaultPlayer = defaultPlayer;
-    this.player = defaultPlayer;
+    this.player = createDefaultPlayer();
     delegate(OnInputPress.class, message -> doInputPress(message.getInputCode()));
     delegate(OnInputRelease.class, message -> doInputRelease(message.getInputCode()));
     delegate(OnCommand.class, message -> doCommand(message));
     subscribe(OnSongSelected.class, message -> doSongSelected(message.getSong()));
     subscribe(OnTick.class, message -> doTick(message.getTick()));
   }
+
+  protected abstract Player createDefaultPlayer();
+
+  protected abstract Player createSongNotePlayer(int channel);
 
   private void doCommand(OnCommand message) {
     Command command = message.getCommand();
@@ -66,10 +68,7 @@ public class DeviceHandler extends BrokerTask<Message> implements Controllable {
       selectChords(parameter);
       break;
     case SELECT_NOTES:
-      selectContour(parameter);
-      break;
-    case SELECT_DRUMS:
-      selectDrums(parameter);
+      selectNotes(parameter);
       break;
     case SELECT_PROGRAM:
       selectProgram(parameter);
@@ -99,7 +98,7 @@ public class DeviceHandler extends BrokerTask<Message> implements Controllable {
   private void doSongSelected(Song song) {
     player.close();
     currentSong = song;
-    player = defaultPlayer;
+    player = createDefaultPlayer();
   }
 
   private void doTick(long tick) {
@@ -108,39 +107,38 @@ public class DeviceHandler extends BrokerTask<Message> implements Controllable {
 
   private void selectChords(int channelNumber) {
     player.close();
-    if (currentSong == null) {
-      defaultPlayer = new KeyChordPlayer(synthesizer, Keys.CMajor, 0);
-      player = defaultPlayer;
-    } else if (channelNumber == 10) {
-      System.err.println("Cannot select chords for drum channel");
+    int channel = Value.toIndex(channelNumber);
+    if (channel == Midi.DRUM) {
+      if (currentSong == null) {
+        player = new GeneralDrumPlayer(synthesizer);
+      } else {
+        player = new SongDrumPlayer(synthesizer, currentSong, inputMapping);
+      }
     } else {
-      int channelIndex = channelNumber - 1;
-      player = new SongChordPlayer(synthesizer, currentSong, channelIndex, inputMapping);
+      if (currentSong == null) {
+        player = new KeyChordPlayer(synthesizer, Keys.CMajor, 0);
+      } else {
+        player = new SongChordPlayer(synthesizer, currentSong, channel, inputMapping);
+      }
     }
   }
 
-  private void selectContour(int channelNumber) {
+  private void selectNotes(int channelNumber) {
     player.close();
-    if (currentSong == null) {
-      defaultPlayer = new KeyNotePlayer(synthesizer, Keys.CMajor, 0);
-      player = defaultPlayer;
-    } else if (channelNumber == 10) {
-      System.err.println("Cannot select contour for drum channel");
+    int channel = Value.toIndex(channelNumber);
+    if (channel == Midi.DRUM) {
+      if (currentSong == null) {
+        player = new GeneralDrumPlayer(synthesizer);
+      } else {
+        player = new SongDrumPlayer(synthesizer, currentSong, inputMapping);
+      }
     } else {
-      int channelIndex = channelNumber - 1;
-      player = new SongNotePlayer(synthesizer, currentSong, channelIndex, inputMapping);
-      getBroker().publish(new OnChannelState(channelIndex, ChannelState.SELECTED));
-    }
-  }
-
-  private void selectDrums(int kitNumber) {
-    player.close();
-    if (currentSong == null) {
-      int kitIndex = kitNumber - 1;
-      defaultPlayer = new GeneralDrumPlayer(synthesizer, kitIndex);
-      player = defaultPlayer;
-    } else {
-      player = new SongDrumPlayer(synthesizer, currentSong, inputMapping);
+      if (currentSong == null) {
+        player = new KeyNotePlayer(synthesizer, Keys.CMajor, 0);
+      } else {
+        player = createSongNotePlayer(channel);
+        getBroker().publish(new OnChannelState(channel, ChannelState.SELECTED));
+      }
     }
   }
 

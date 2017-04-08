@@ -13,13 +13,25 @@ import com.example.afs.fluidsynth.Synthesizer;
 import com.example.afs.musicpad.device.common.DeviceHandler;
 import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.player.KeyNotePlayer;
+import com.example.afs.musicpad.player.Player;
+import com.example.afs.musicpad.player.SongNotePlayer;
 import com.example.afs.musicpad.theory.Keys;
 import com.example.afs.musicpad.util.Broker;
 
 public class QwertyDeviceHandler extends DeviceHandler {
 
   public QwertyDeviceHandler(Broker<Message> broker, Synthesizer synthesizer) {
-    super(broker, synthesizer, new AlphaMapping(), new KeyNotePlayer(synthesizer, Keys.CMajor, 0));
+    super(broker, synthesizer, new AlphaMapping());
+  }
+
+  @Override
+  protected Player createDefaultPlayer() {
+    return new KeyNotePlayer(synthesizer, Keys.CMajor, 0);
+  }
+
+  @Override
+  protected Player createSongNotePlayer(int channel) {
+    return new SongNotePlayer(synthesizer, currentSong, channel, inputMapping);
   }
 
 }
