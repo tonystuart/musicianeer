@@ -11,20 +11,25 @@ package com.example.afs.musicpad.device.midi.configuration;
 
 public class IfState extends If {
 
-  private ChannelState channelState;
+  private ChannelState state;
 
   public IfState(int lineIndex, String[] tokens) {
     super(lineIndex);
     try {
-      channelState = ChannelState.valueOf(tokens[1]);
+      state = ChannelState.valueOf(tokens[1]);
     } catch (RuntimeException e) {
-      displayError("Expected ifData1 number");
+      displayError("Expected ifState number");
     }
   }
 
   @Override
+  public String toString() {
+    return "IfState [lineIndex=" + getLineIndex() + ", state=" + state + "]";
+  }
+
+  @Override
   protected boolean isMatch(Context context) {
-    return this.channelState == context.getChannelState();
+    return this.state == context.getChannelState();
   }
 
 }

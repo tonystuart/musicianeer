@@ -27,4 +27,9 @@ public class ThenSendHandlerMessage extends Then {
     context.getConfigurationSupport().sendHandlerMessage(data1);
   }
 
+  @Override
+  public String toString() {
+    return "SendHandlerMessage [lineIndex=" + getLineIndex() + ", data1=" + data1 + "]";
+  }
+
 }

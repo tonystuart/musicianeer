@@ -19,12 +19,18 @@ public abstract class If extends Node {
   public ReturnState execute(Context context) {
     ReturnState returnState;
     if (isMatch(context)) {
+      if (context.isTrace()) {
+        System.out.println("Match on " + this);
+      }
       returnState = ReturnState.IF_MATCH;
       ReturnState childReturnState = executeNodes(context);
       if (childReturnState == ReturnState.IF_NO_MATCH) {
         returnState = ReturnState.IF_NO_MATCH;
       }
     } else {
+      if (context.isTrace()) {
+        System.out.println("No match on " + this);
+      }
       returnState = ReturnState.IF_NO_MATCH;
     }
     return returnState;

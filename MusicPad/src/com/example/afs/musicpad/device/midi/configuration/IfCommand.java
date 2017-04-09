@@ -23,6 +23,11 @@ public class IfCommand extends If {
   }
 
   @Override
+  public String toString() {
+    return "IfCommand [lineIndex=" + getLineIndex() + ", command=" + command + "]";
+  }
+
+  @Override
   protected boolean isMatch(Context context) {
     return this.command == context.getCommand();
   }

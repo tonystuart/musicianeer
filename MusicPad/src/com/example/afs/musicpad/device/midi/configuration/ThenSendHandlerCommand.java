@@ -31,4 +31,9 @@ public class ThenSendHandlerCommand extends Then {
     context.getConfigurationSupport().sendHandlerCommand(command, parameter);
   }
 
+  @Override
+  public String toString() {
+    return "SendHandlerCommand [lineIndex=" + getLineIndex() + ", command=" + command + ", parameter=" + parameter + "]";
+  }
+
 }

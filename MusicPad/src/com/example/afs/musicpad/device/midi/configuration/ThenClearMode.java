@@ -27,4 +27,9 @@ public class ThenClearMode extends Then {
     context.getConfigurationSupport().clearMode(mode);
   }
 
+  @Override
+  public String toString() {
+    return "ClearMode [lineIndex=" + getLineIndex() + ", mode=" + mode + "]";
+  }
+
 }

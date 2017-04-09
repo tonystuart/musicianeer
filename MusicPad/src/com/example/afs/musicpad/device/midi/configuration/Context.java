@@ -66,9 +66,13 @@ public class Context {
     return port;
   }
 
+  public boolean isTrace() {
+    return true;
+  }
+
   @Override
   public String toString() {
-    return "Context [port=" + port + ", command=" + command + ", channel=" + channel + ", data1=" + data1 + ", data2=" + data2 + ", sender=" + configurationSupport + "]";
+    return "Context [port=" + port + ", command=" + command + ", channel=" + channel + ", data1=" + data1 + ", data2=" + data2 + ", channelState=" + channelState + "]";
   }
 
 }

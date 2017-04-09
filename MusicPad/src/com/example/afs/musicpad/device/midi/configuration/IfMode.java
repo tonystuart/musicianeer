@@ -23,6 +23,11 @@ public class IfMode extends If {
   }
 
   @Override
+  public String toString() {
+    return "IfMode [lineIndex=" + getLineIndex() + ", mode=" + mode + "]";
+  }
+
+  @Override
   protected boolean isMatch(Context context) {
     return context.getConfigurationSupport().isMode(mode);
   }

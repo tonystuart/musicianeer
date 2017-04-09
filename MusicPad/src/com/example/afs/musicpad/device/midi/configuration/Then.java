@@ -17,6 +17,9 @@ public abstract class Then extends Node {
 
   @Override
   public ReturnState execute(Context context) {
+    if (context.isTrace()) {
+      System.out.println("Executing " + this);
+    }
     executeThen(context);
     return ReturnState.THEN;
   }

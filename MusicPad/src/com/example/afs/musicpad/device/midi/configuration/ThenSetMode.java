@@ -27,4 +27,9 @@ public class ThenSetMode extends Then {
     context.getConfigurationSupport().setMode(mode);
   }
 
+  @Override
+  public String toString() {
+    return "SetMode [lineIndex=" + getLineIndex() + ", mode=" + mode + "]";
+  }
+
 }

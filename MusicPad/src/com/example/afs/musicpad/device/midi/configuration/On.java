@@ -17,6 +17,9 @@ public abstract class On extends Node {
 
   @Override
   public ReturnState execute(Context context) {
+    if (context.isTrace()) {
+      System.out.println("Searching for " + context);
+    }
     return executeNodes(context);
   }
 

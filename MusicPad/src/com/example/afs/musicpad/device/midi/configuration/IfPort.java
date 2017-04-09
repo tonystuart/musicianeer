@@ -23,6 +23,11 @@ public class IfPort extends If {
   }
 
   @Override
+  public String toString() {
+    return "IfPort [lineIndex=" + getLineIndex() + ", port=" + port + "]";
+  }
+
+  @Override
   protected boolean isMatch(Context context) {
     return this.port == context.getPort();
   }

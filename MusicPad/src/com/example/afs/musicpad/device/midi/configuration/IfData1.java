@@ -23,6 +23,11 @@ public class IfData1 extends If {
   }
 
   @Override
+  public String toString() {
+    return "IfData1 [lineIndex=" + getLineIndex() + ", data1=" + data1 + "]";
+  }
+
+  @Override
   protected boolean isMatch(Context context) {
     return this.data1 == context.getData1();
   }

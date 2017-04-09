@@ -23,6 +23,11 @@ public class IfChannel extends If {
   }
 
   @Override
+  public String toString() {
+    return "IfChannel [lineIndex=" + getLineIndex() + ", channel=" + channel + "]";
+  }
+
+  @Override
   protected boolean isMatch(Context context) {
     return this.channel == context.getChannel();
   }
