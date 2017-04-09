@@ -67,25 +67,29 @@ import com.example.afs.musicpad.util.Velocity;
 
 public class CommandProcessor extends BrokerTask<Message> {
 
+  public enum Trace {
+    CONFIGURATION, PLAY
+  }
+
   private static final int PAGE_SIZE = 10;
 
+  private static boolean isTraceConfiguration;
+  private static boolean isTracePlay;
+
   public static boolean isTraceConfiguration() {
-    return true;
+    return isTraceConfiguration;
   }
 
   public static boolean isTracePlay() {
-    return false;
+    return isTracePlay;
   }
 
   private Song currentSong;
-
   private MusicLibrary musicLibrary;
-
+  private Synthesizer synthesizer;
   private Random random = new Random();
 
-  private Synthesizer synthesizer;
-
-  protected CommandProcessor(Broker<Message> broker, Synthesizer synthesizer, MusicLibrary musicLibrary) {
+  public CommandProcessor(Broker<Message> broker, Synthesizer synthesizer, MusicLibrary musicLibrary) {
     super(broker);
     this.synthesizer = synthesizer;
     this.musicLibrary = musicLibrary;
@@ -106,6 +110,12 @@ public class CommandProcessor extends BrokerTask<Message> {
       break;
     case SET_PERCENT_GAIN:
       doSetPercentGain(parameter);
+      break;
+    case TRON:
+      doTron(parameter);
+      break;
+    case TROFF:
+      doTroff(parameter);
       break;
     case QUIT:
       System.exit(0);
@@ -161,6 +171,28 @@ public class CommandProcessor extends BrokerTask<Message> {
     float gain = Velocity.scalePercentGain(percentGain);
     System.out.println("Set " + percentGain + " percent gain (" + gain + ")");
     synthesizer.setGain(gain);
+  }
+
+  private void doTroff(int parameter) {
+    setTrace(parameter, false);
+  }
+
+  private void doTron(int parameter) {
+    setTrace(parameter, true);
+  }
+
+  private void setTrace(int parameter, boolean value) {
+    Trace trace = Trace.values()[parameter];
+    switch (trace) {
+    case CONFIGURATION:
+      isTraceConfiguration = value;
+      break;
+    case PLAY:
+      isTracePlay = value;
+      break;
+    default:
+      throw new UnsupportedOperationException();
+    }
   }
 
 }
