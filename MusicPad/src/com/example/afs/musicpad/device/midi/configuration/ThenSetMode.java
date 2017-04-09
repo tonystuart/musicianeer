@@ -29,7 +29,7 @@ public class ThenSetMode extends Then {
 
   @Override
   public String toString() {
-    return "SetMode [lineIndex=" + getLineIndex() + ", mode=" + mode + "]";
+    return "SetMode [lineNumber=" + getLineNumber() + ", mode=" + mode + "]";
   }
 
 }

@@ -33,7 +33,7 @@ public class ThenSendHandlerCommand extends Then {
 
   @Override
   public String toString() {
-    return "SendHandlerCommand [lineIndex=" + getLineIndex() + ", command=" + command + ", parameter=" + parameter + "]";
+    return "SendHandlerCommand [lineNumber=" + getLineNumber() + ", command=" + command + ", parameter=" + parameter + "]";
   }
 
 }

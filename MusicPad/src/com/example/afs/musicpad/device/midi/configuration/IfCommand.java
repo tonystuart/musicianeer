@@ -24,7 +24,7 @@ public class IfCommand extends If {
 
   @Override
   public String toString() {
-    return "IfCommand [lineIndex=" + getLineIndex() + ", command=" + command + "]";
+    return "IfCommand [lineNumber=" + getLineNumber() + ", command=" + command + "]";
   }
 
   @Override

@@ -29,7 +29,7 @@ public class ThenSendHandlerMessage extends Then {
 
   @Override
   public String toString() {
-    return "SendHandlerMessage [lineIndex=" + getLineIndex() + ", data1=" + data1 + "]";
+    return "SendHandlerMessage [lineNumber=" + getLineNumber() + ", data1=" + data1 + "]";
   }
 
 }

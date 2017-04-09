@@ -29,21 +29,21 @@ public class MidiConfiguration {
 
   public void setOnInitialization(OnInitialization onInitialization) {
     if (this.onInitialization != null) {
-      throw new IllegalStateException("Line " + (onInitialization.getLineIndex() + 1) + ": onInitialization already set at line " + (this.onInitialization.getLineIndex() + 1));
+      throw new IllegalStateException("Line " + (onInitialization.getLineNumber() + 1) + ": onInitialization already set at line " + (this.onInitialization.getLineNumber() + 1));
     }
     this.onInitialization = onInitialization;
   }
 
   public void setOnInput(OnInput onInput) {
     if (this.onInput != null) {
-      throw new IllegalStateException("Line " + (onInput.getLineIndex() + 1) + ": onInput already set at line " + (this.onInput.getLineIndex() + 1));
+      throw new IllegalStateException("Line " + (onInput.getLineNumber() + 1) + ": onInput already set at line " + (this.onInput.getLineNumber() + 1));
     }
     this.onInput = onInput;
   }
 
   public void setOnOutput(OnOutput onOutput) {
     if (this.onOutput != null) {
-      throw new IllegalStateException("Line " + (onOutput.getLineIndex() + 1) + ": onOutput already set at line " + (this.onOutput.getLineIndex() + 1));
+      throw new IllegalStateException("Line " + (onOutput.getLineNumber() + 1) + ": onOutput already set at line " + (this.onOutput.getLineNumber() + 1));
     }
     this.onOutput = onOutput;
   }

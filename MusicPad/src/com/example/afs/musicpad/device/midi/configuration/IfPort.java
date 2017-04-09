@@ -24,7 +24,7 @@ public class IfPort extends If {
 
   @Override
   public String toString() {
-    return "IfPort [lineIndex=" + getLineIndex() + ", port=" + port + "]";
+    return "IfPort [lineNumber=" + getLineNumber() + ", port=" + port + "]";
   }
 
   @Override

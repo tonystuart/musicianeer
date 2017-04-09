@@ -37,7 +37,7 @@ public class ThenSendDeviceMessage extends Then {
 
   @Override
   public String toString() {
-    return "SendDeviceMessage [lineIndex=" + getLineIndex() + ", port=" + port + ", command=" + command + ", channel=" + channel + ", data1=" + data1 + ", data2=" + data2 + "]";
+    return "SendDeviceMessage [lineNumber=" + getLineNumber() + ", port=" + port + ", command=" + command + ", channel=" + channel + ", data1=" + data1 + ", data2=" + data2 + "]";
   }
 
 }

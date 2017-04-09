@@ -24,7 +24,7 @@ public class IfState extends If {
 
   @Override
   public String toString() {
-    return "IfState [lineIndex=" + getLineIndex() + ", state=" + state + "]";
+    return "IfState [lineNumber=" + getLineNumber() + ", state=" + state + "]";
   }
 
   @Override

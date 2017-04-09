@@ -24,7 +24,7 @@ public class IfChannel extends If {
 
   @Override
   public String toString() {
-    return "IfChannel [lineIndex=" + getLineIndex() + ", channel=" + channel + "]";
+    return "IfChannel [lineNumber=" + getLineNumber() + ", channel=" + channel + "]";
   }
 
   @Override

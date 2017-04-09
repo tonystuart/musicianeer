@@ -29,7 +29,7 @@ public class ThenClearMode extends Then {
 
   @Override
   public String toString() {
-    return "ClearMode [lineIndex=" + getLineIndex() + ", mode=" + mode + "]";
+    return "ClearMode [lineNumber=" + getLineNumber() + ", mode=" + mode + "]";
   }
 
 }

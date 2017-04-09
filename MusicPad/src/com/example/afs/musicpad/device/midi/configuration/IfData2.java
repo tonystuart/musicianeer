@@ -24,7 +24,7 @@ public class IfData2 extends If {
 
   @Override
   public String toString() {
-    return "IfData2 [lineIndex=" + getLineIndex() + ", data2=" + data2 + "]";
+    return "IfData2 [lineNumber=" + getLineNumber() + ", data2=" + data2 + "]";
   }
 
   @Override

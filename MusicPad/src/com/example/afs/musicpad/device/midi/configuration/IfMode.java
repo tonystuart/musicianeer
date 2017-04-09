@@ -24,7 +24,7 @@ public class IfMode extends If {
 
   @Override
   public String toString() {
-    return "IfMode [lineIndex=" + getLineIndex() + ", mode=" + mode + "]";
+    return "IfMode [lineNumber=" + getLineNumber() + ", mode=" + mode + "]";
   }
 
   @Override

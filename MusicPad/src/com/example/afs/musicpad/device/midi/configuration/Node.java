@@ -20,11 +20,11 @@ public abstract class Node {
     IF_MATCH, IF_NO_MATCH, THEN
   }
 
-  private int lineIndex;
+  private int lineNumber;
   private RandomAccessList<Node> nodes = new DirectList<>();
 
-  public Node(int lineIndex) {
-    this.lineIndex = lineIndex;
+  public Node(int lineNumber) {
+    this.lineNumber = lineNumber;
   }
 
   public void add(Node child) {
@@ -33,8 +33,8 @@ public abstract class Node {
 
   public abstract ReturnState execute(Context context);
 
-  public int getLineIndex() {
-    return lineIndex;
+  public int getLineNumber() {
+    return lineNumber;
   }
 
   public List<Node> getNodes() {
@@ -43,11 +43,11 @@ public abstract class Node {
 
   @Override
   public String toString() {
-    return "Node [lineIndex=" + lineIndex + ", nodes=" + nodes + "]";
+    return "Node [lineNumber=" + lineNumber + ", nodes=" + nodes + "]";
   }
 
   protected void displayError(String message) {
-    System.err.println("Line " + (lineIndex + 1) + ": " + message);
+    System.err.println("Line " + (lineNumber + 1) + ": " + message);
   }
 
   protected ReturnState executeNodes(Context context) {
