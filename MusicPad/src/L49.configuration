@@ -18,68 +18,84 @@ onInput
      sendDeviceMessage 1 128 0 104 127 
    ifData1 96
     ifMode 1
-     # channel 1
      sendHandlerCommand SELECT_NOTES 1
+    ifNotMode 1
+     sendHandlerCommand PLAY 1
    ifData1 97
     ifMode 1
-     # channel 2
      sendHandlerCommand SELECT_NOTES 2
+    ifNotMode 1
+     sendHandlerCommand PLAY 2
    ifData1 98
     ifMode 1
-     # channel 3
      sendHandlerCommand SELECT_NOTES 3
+    ifNotMode 1
+     sendHandlerCommand PLAY 3
    ifData1 99
     ifMode 1
-     # channel 4
      sendHandlerCommand SELECT_NOTES 4
+    ifNotMode 1
+     sendHandlerCommand PLAY 4
    ifData1 100
     ifMode 1
-     # channel 5
      sendHandlerCommand SELECT_NOTES 5
+    ifNotMode 1
+     sendHandlerCommand PLAY 5
    ifData1 101
     ifMode 1
-     # channel 6
      sendHandlerCommand SELECT_NOTES 6
+    ifNotMode 1
+     sendHandlerCommand PLAY 6
    ifData1 102
     ifMode 1
-     # channel 7
      sendHandlerCommand SELECT_NOTES 7
+    ifNotMode 1
+     sendHandlerCommand PLAY 7
    ifData1 103
     ifMode 1
-     # channel 8
      sendHandlerCommand SELECT_NOTES 8
+    ifNotMode 1
+     sendHandlerCommand PLAY 8
    ifData1 112
     ifMode 1
-     # channel 9
      sendHandlerCommand SELECT_NOTES 9
+    ifNotMode 1
+     sendHandlerCommand PLAY 9
    ifData1 113
     ifMode 1
-     # channel 10
      sendHandlerCommand SELECT_NOTES 10
+    ifNotMode 1
+     sendHandlerCommand PLAY 10
    ifData1 114
     ifMode 1
-     # channel 11
      sendHandlerCommand SELECT_NOTES 11
+    ifNotMode 1
+     sendHandlerCommand PLAY 11
    ifData1 115
     ifMode 1
-     # channel 12
      sendHandlerCommand SELECT_NOTES 12
+    ifNotMode 1
+     sendHandlerCommand PLAY 12
    ifData1 116
     ifMode 1
-     # channel 13
      sendHandlerCommand SELECT_NOTES 13
+    ifNotMode 1
+     sendHandlerCommand PLAY 13
    ifData1 117
     ifMode 1
-     # channel 14
      sendHandlerCommand SELECT_NOTES 14
+    ifNotMode 1
+     sendHandlerCommand PLAY 14
    ifData1 118
     ifMode 1
-     # channel 15
      sendHandlerCommand SELECT_NOTES 15
+    ifNotMode 1
+     sendHandlerCommand PLAY 15
    ifData1 119
     ifMode 1
-     # channel 16
      sendHandlerCommand SELECT_NOTES 16
+    ifNotMode 1
+     sendHandlerCommand PLAY 16
 onOutput
  ifChannel 1
   ifState ACTIVE

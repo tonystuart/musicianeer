@@ -10,6 +10,7 @@
 package com.example.afs.musicpad.message;
 
 import com.example.afs.musicpad.Command;
+import com.example.afs.musicpad.Trace;
 
 public class OnCommand implements Message {
 
@@ -19,6 +20,9 @@ public class OnCommand implements Message {
   public OnCommand(Command command, int parameter) {
     this.command = command;
     this.parameter = parameter;
+    if (Trace.isTraceCommand()) {
+      System.out.println(command + "(" + parameter + ")");
+    }
   }
 
   public Command getCommand() {

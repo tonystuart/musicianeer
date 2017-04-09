@@ -9,7 +9,7 @@
 
 package com.example.afs.musicpad.device.midi.configuration;
 
-import com.example.afs.musicpad.CommandProcessor;
+import com.example.afs.musicpad.Trace;
 
 public class Context {
 
@@ -69,7 +69,7 @@ public class Context {
   }
 
   public boolean isTrace() {
-    return CommandProcessor.isTraceConfiguration();
+    return Trace.isTraceConfiguration();
   }
 
   @Override

@@ -67,26 +67,12 @@ import com.example.afs.musicpad.util.Velocity;
 
 public class CommandProcessor extends BrokerTask<Message> {
 
-  public enum Trace {
-    CONFIGURATION, PLAY
-  }
-
   private static final int PAGE_SIZE = 10;
-
-  private static boolean isTraceConfiguration;
-  private static boolean isTracePlay;
-
-  public static boolean isTraceConfiguration() {
-    return isTraceConfiguration;
-  }
-
-  public static boolean isTracePlay() {
-    return isTracePlay;
-  }
 
   private Song currentSong;
   private MusicLibrary musicLibrary;
   private Synthesizer synthesizer;
+
   private Random random = new Random();
 
   public CommandProcessor(Broker<Message> broker, Synthesizer synthesizer, MusicLibrary musicLibrary) {
@@ -182,13 +168,16 @@ public class CommandProcessor extends BrokerTask<Message> {
   }
 
   private void setTrace(int parameter, boolean value) {
-    Trace trace = Trace.values()[parameter];
-    switch (trace) {
+    Trace.TraceOption traceOption = Trace.TraceOption.values()[parameter];
+    switch (traceOption) {
+    case COMMAND:
+      Trace.setTraceCommand(value);
+      break;
     case CONFIGURATION:
-      isTraceConfiguration = value;
+      Trace.setTraceConfiguration(value);
       break;
     case PLAY:
-      isTracePlay = value;
+      Trace.setTracePlay(value);
       break;
     default:
       throw new UnsupportedOperationException();

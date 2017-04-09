@@ -91,6 +91,7 @@ public class TransportTask extends BrokerTask<Message> {
           long duration = note.getDuration();
           if (isFirstTick) {
             noteEventScheduler.setBaseTick(tick);
+            noteEventScheduler.resetBaseTime();
             isFirstTick = false;
           }
           sequencerTask.getInputQueue().add(new NoteEvent(Type.NOTE_ON, tick, note));

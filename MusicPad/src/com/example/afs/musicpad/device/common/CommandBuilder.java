@@ -15,8 +15,8 @@ import java.util.concurrent.BlockingQueue;
 import com.example.afs.musicpad.Command;
 import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnCommand;
-import com.example.afs.musicpad.message.OnInputRelease;
 import com.example.afs.musicpad.message.OnInputPress;
+import com.example.afs.musicpad.message.OnInputRelease;
 
 public class CommandBuilder {
 
@@ -88,7 +88,6 @@ public class CommandBuilder {
     Command[] values = Command.values();
     if (index < values.length) {
       Command command = values[index];
-      System.out.println("Processing " + command + "(" + parameter + ")");
       OnCommand onCommand = new OnCommand(command, parameter);
       queue.add(onCommand);
     } else {
