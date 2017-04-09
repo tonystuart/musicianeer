@@ -9,7 +9,7 @@
 
 package com.example.afs.musicpad.message;
 
-import com.example.afs.musicpad.device.midi.MidiConfiguration.ChannelState;
+import com.example.afs.musicpad.device.midi.configuration.ChannelState;
 
 public class OnChannelState implements Message {
 

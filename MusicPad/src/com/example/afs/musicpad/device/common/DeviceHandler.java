@@ -12,7 +12,7 @@ package com.example.afs.musicpad.device.common;
 import com.example.afs.fluidsynth.Synthesizer;
 import com.example.afs.musicpad.Command;
 import com.example.afs.musicpad.device.common.ControllableGroup.Controllable;
-import com.example.afs.musicpad.device.midi.MidiConfiguration.ChannelState;
+import com.example.afs.musicpad.device.midi.configuration.ChannelState;
 import com.example.afs.musicpad.device.midi.MidiMapping;
 import com.example.afs.musicpad.device.qwerty.AlphaMapping;
 import com.example.afs.musicpad.device.qwerty.NumericMapping;
@@ -137,6 +137,7 @@ public abstract class DeviceHandler extends BrokerTask<Message> implements Contr
         player = new KeyNotePlayer(synthesizer, Keys.CMajor, 0);
       } else {
         player = createSongNotePlayer(channel);
+        // TODO: Only put this on the queue of the associated device
         getBroker().publish(new OnChannelState(channel, ChannelState.SELECTED));
       }
     }

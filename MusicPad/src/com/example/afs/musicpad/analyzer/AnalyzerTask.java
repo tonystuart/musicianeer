@@ -10,7 +10,7 @@
 package com.example.afs.musicpad.analyzer;
 
 import com.example.afs.musicpad.Command;
-import com.example.afs.musicpad.device.midi.MidiConfiguration.ChannelState;
+import com.example.afs.musicpad.device.midi.configuration.ChannelState;
 import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnChannelState;
 import com.example.afs.musicpad.message.OnCommand;

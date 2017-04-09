@@ -19,28 +19,26 @@ import javax.sound.midi.MidiUnavailableException;
 import javax.sound.midi.Receiver;
 import javax.sound.midi.ShortMessage;
 
-import com.example.afs.musicpad.CommandProcessor;
+import com.example.afs.musicpad.Command;
 import com.example.afs.musicpad.device.common.ControllableGroup.Controllable;
-import com.example.afs.musicpad.device.midi.MidiConfiguration.Action;
-import com.example.afs.musicpad.device.midi.MidiConfiguration.ChannelMessage;
-import com.example.afs.musicpad.device.midi.MidiConfiguration.HandlerCommand;
-import com.example.afs.musicpad.device.midi.MidiConfiguration.InputAction;
+import com.example.afs.musicpad.device.midi.configuration.ConfigurationSupport;
+import com.example.afs.musicpad.device.midi.configuration.Context;
+import com.example.afs.musicpad.device.midi.configuration.MidiConfiguration;
 import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnDeviceMessage;
 import com.example.afs.musicpad.message.OnInputPress;
 import com.example.afs.musicpad.message.OnInputRelease;
 import com.example.afs.musicpad.util.Broker;
-import com.example.afs.musicpad.util.Value;
 
-public class MidiReader implements Controllable {
+public class MidiReader implements Controllable, ConfigurationSupport {
 
   private class MidiReceiver implements Receiver {
 
-    private int subdevice;
+    private int port;
 
-    public MidiReceiver(int subdevice) {
-      this.subdevice = subdevice;
+    public MidiReceiver(int port) {
+      this.port = port;
     }
 
     @Override
@@ -49,7 +47,7 @@ public class MidiReader implements Controllable {
 
     @Override
     public void send(MidiMessage message, long timestamp) {
-      receiveFromDevice(message, timestamp, subdevice);
+      receiveFromDevice(message, timestamp, port);
     }
   }
 
@@ -57,7 +55,7 @@ public class MidiReader implements Controllable {
   private MidiDeviceBundle device;
   private BlockingQueue<Message> queue;
   private MidiConfiguration configuration;
-  private Set<Integer> currentModes = new HashSet<>();
+  private Set<Integer> modes = new HashSet<>();
 
   public MidiReader(Broker<Message> broker, BlockingQueue<Message> queue, MidiDeviceBundle device, MidiConfiguration configuration) {
     this.broker = broker;
@@ -68,8 +66,46 @@ public class MidiReader implements Controllable {
   }
 
   @Override
+  public void clearMode(int mode) {
+    modes.remove(mode);
+  }
+
+  public Set<Integer> getModes() {
+    return modes;
+  }
+
+  @Override
+  public boolean isMode(int mode) {
+    return modes.contains(mode);
+  }
+
+  @Override
+  public boolean isNotMode(int mode) {
+    return !modes.contains(mode);
+  }
+
+  @Override
+  public void sendDeviceMessage(int port, int command, int channel, int data1, int data2) {
+    broker.publish(new OnDeviceMessage(port, command, channel, data1, data2));
+  }
+
+  @Override
+  public void sendHandlerCommand(Command handlerCommand, Integer parameter) {
+    queue.add(new OnCommand(handlerCommand, parameter));
+  }
+
+  @Override
+  public void sendHandlerMessage(int data1) {
+    queue.add(new OnInputPress(data1));
+  }
+
+  @Override
+  public void setMode(int mode) {
+    modes.add(mode);
+  }
+
+  @Override
   public void start() {
-    initializeDevices();
   }
 
   @Override
@@ -82,7 +118,7 @@ public class MidiReader implements Controllable {
       for (MidiInputDevice midiInputDevice : device.getInputDevices()) {
         MidiDevice midiDevice = midiInputDevice.getMidiDevice();
         midiDevice.open();
-        midiDevice.getTransmitter().setReceiver(new MidiReceiver(midiInputDevice.getSubdevice()));
+        midiDevice.getTransmitter().setReceiver(new MidiReceiver(midiInputDevice.getPort()));
       }
     } catch (MidiUnavailableException e) {
       throw new RuntimeException(e);
@@ -96,69 +132,20 @@ public class MidiReader implements Controllable {
     }
   }
 
-  private void initializeDevices() {
-    for (Action action : configuration.getInitializationActions()) {
-      performAction(action);
-    }
-  }
-
-  private void performAction(Action action) {
-    Integer setMode = action.getSetMode();
-    if (setMode != null) {
-      currentModes.add(setMode);
-    }
-    Integer clearMode = action.getClearMode();
-    if (clearMode != null) {
-      currentModes.remove(clearMode);
-    }
-    ChannelMessage deviceMessage = action.getSendDeviceMessage();
-    if (deviceMessage != null) {
-      broker.publish(new OnDeviceMessage(deviceMessage));
-    }
-    ChannelMessage handlerMessage = action.getSendHandlerMessage();
-    if (handlerMessage != null) {
-      int data1 = Value.getInt(handlerMessage.getData1());
-      queue.add(new OnInputPress(data1));
-    }
-    HandlerCommand handlerCommand = action.getSendHandlerCommand();
-    if (handlerCommand != null) {
-      queue.add(new OnCommand(handlerCommand.getCommand(), handlerCommand.getParameter()));
-    }
-  }
-
-  private void receiveFromDevice(MidiMessage message, long timestamp, int subDevice) {
+  private void receiveFromDevice(MidiMessage message, long timestamp, int port) {
     if (message instanceof ShortMessage) {
       ShortMessage shortMessage = (ShortMessage) message;
       int command = shortMessage.getCommand();
       int channel = shortMessage.getChannel();
       int data1 = shortMessage.getData1();
       int data2 = shortMessage.getData2();
-      if (CommandProcessor.isTraceConfiguration()) {
-        System.out.println("Searching for subDevice=" + subDevice + ", command=" + command + ", channel=" + channel + ", data1=" + data1 + ", data2=" + data2);
-      }
-      for (InputAction inputAction : configuration.getInputActions()) {
-        if (inputAction != null) {
-          if (inputAction.equals(subDevice, command, channel, data1, data2)) {
-            if (inputAction.getIfMode() == null || currentModes.contains(inputAction.getIfMode())) {
-              if (inputAction.getIfNotMode() == null || !currentModes.contains(inputAction.getIfNotMode())) {
-                if (CommandProcessor.isTraceConfiguration()) {
-                  System.out.println("Match on " + inputAction);
-                }
-                Action action = inputAction.getThenDo();
-                performAction(action);
-                return;
-              }
-            }
-          }
-          if (CommandProcessor.isTraceConfiguration()) {
-            System.out.println("No match on " + inputAction);
-          }
+      Context context = new Context(this, port, command, channel, data1, data2);
+      if (!configuration.getOnInput().execute(context)) {
+        if (command == ShortMessage.NOTE_ON) {
+          queue.add(new OnInputPress(data1));
+        } else if (command == ShortMessage.NOTE_OFF) {
+          queue.add(new OnInputRelease(data1));
         }
-      }
-      if (command == ShortMessage.NOTE_ON) {
-        queue.add(new OnInputPress(data1));
-      } else if (command == ShortMessage.NOTE_OFF) {
-        queue.add(new OnInputRelease(data1));
       }
     }
   }

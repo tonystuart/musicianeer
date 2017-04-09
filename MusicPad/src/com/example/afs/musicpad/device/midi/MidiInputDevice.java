@@ -14,24 +14,24 @@ import javax.sound.midi.MidiDevice;
 public class MidiInputDevice {
 
   private MidiDevice midiDevice;
-  private int subdevice;
+  private int port;
 
-  public MidiInputDevice(MidiDevice midiDevice, int subdevice) {
+  public MidiInputDevice(MidiDevice midiDevice, int port) {
     this.midiDevice = midiDevice;
-    this.subdevice = subdevice;
+    this.port = port;
   }
 
   public MidiDevice getMidiDevice() {
     return midiDevice;
   }
 
-  public int getSubdevice() {
-    return subdevice;
+  public int getPort() {
+    return port;
   }
 
   @Override
   public String toString() {
-    return "MidiInputDevice [midiDevice=" + midiDevice + ", subdevice=" + subdevice + "]";
+    return "MidiInputDevice [midiDevice=" + midiDevice + ", port=" + port + "]";
   }
 
 }

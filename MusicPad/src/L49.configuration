@@ -1,190 +1,195 @@
-{
-	"initializationActions" : [
-		// exit then enter InControl mode to initialize
-		{ "sendDeviceMessage" : { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 12, "data2" : 0 } },
-		{ "sendDeviceMessage" : { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 12, "data2" : 127 } }
-	],
-	"inputActions" : [
-		{ "ifInput" : { "subDevice" : -1, "command" : 0, "channel" : 0, "data1" : 0, "data2" : 0 }, "ifMode" :  0 , "ifNotMode" :  0 ,
-		"thenDo" : {
-			"setMode" : 0,
-			"sendDeviceMessage" : { "subDevice" : 0, "command" : 0, "channel" : 0, "data1" : 0, "data2" : 0 } ,
-			"sendHandlerMessage" : { "subDevice" : 0, "command" : 0, "channel" : 0, "data1" : 0, "data2" : 0 },
-			"sendHandlerCommand" : { "command" : 0, "parameter" : 0 } } },
-	// device reporting it entered InControl mode
-	{ "ifInput" : { "subDevice" : 1, "command" : 144, "data1" : 12 },
-	"thenDo" : { } },
-	// enter select notes mode (top round pad)
-	{ "ifInput" : { "subDevice" : 1, "command" : 144, "data1" : 104 }, "ifNotMode" :  1 ,
-	"thenDo" : {
-		"setMode" : 1,
-		"sendDeviceMessage" : { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 104, "data2" : 127 }  } },
-	// exit select notes mode (top round pad)
-	{ "ifInput" : { "subDevice" : 1, "command" : 144, "data1" : 104 }, "ifMode" :  1 ,
-	"thenDo" : {
-		"clearMode" : 1,
-		"sendDeviceMessage" : { "subDevice" : 1, "command" : 128, "channel" : 0, "data1" : 104, "data2" : 127 }  } },
-	// channel 1
-    { "ifInput" : { "subDevice" : 1, "command" : 144, "data1" : 96 }, "ifMode" :  1 ,
-		"thenDo" : { "sendHandlerCommand" :  { "command" : "SELECT_NOTES", "parameter" : 1 }  } },
-	// channel 2
-    { "ifInput" : { "subDevice" : 1, "command" : 144, "data1" : 97 }, "ifMode" :  1 ,
-		"thenDo" : { "sendHandlerCommand" :  { "command" : "SELECT_NOTES", "parameter" : 2 }  } },
-	// channel 3
-    { "ifInput" : { "subDevice" : 1, "command" : 144, "data1" : 98 }, "ifMode" :  1 ,
-		"thenDo" : { "sendHandlerCommand" :  { "command" : "SELECT_NOTES", "parameter" : 3 }  } },
-	// channel 3
-    { "ifInput" : { "subDevice" : 1, "command" : 144, "data1" : 99 }, "ifMode" :  1 ,
-		"thenDo" : { "sendHandlerCommand" :  { "command" : "SELECT_NOTES", "parameter" : 4 }  } },
-	// channel 3
-    { "ifInput" : { "subDevice" : 1, "command" : 144, "data1" : 100 }, "ifMode" :  1 ,
-		"thenDo" : { "sendHandlerCommand" :  { "command" : "SELECT_NOTES", "parameter" : 5 }  } },
-	// channel 3
-    { "ifInput" : { "subDevice" : 1, "command" : 144, "data1" : 101 }, "ifMode" :  1 ,
-		"thenDo" : { "sendHandlerCommand" :  { "command" : "SELECT_NOTES", "parameter" : 6 }  } },
-	// channel 3
-    { "ifInput" : { "subDevice" : 1, "command" : 144, "data1" : 102 }, "ifMode" :  1 ,
-		"thenDo" : { "sendHandlerCommand" :  { "command" : "SELECT_NOTES", "parameter" : 7 }  } },
-	// channel 3
-    { "ifInput" : { "subDevice" : 1, "command" : 144, "data1" : 103 }, "ifMode" :  1 ,
-		"thenDo" : { "sendHandlerCommand" :  { "command" : "SELECT_NOTES", "parameter" : 8 }  } },
-	// channel 3
-    { "ifInput" : { "subDevice" : 1, "command" : 144, "data1" : 112 }, "ifMode" :  1 ,
-		"thenDo" : { "sendHandlerCommand" :  { "command" : "SELECT_NOTES", "parameter" : 9 }  } },
-	// channel 3
-    { "ifInput" : { "subDevice" : 1, "command" : 144, "data1" : 113 }, "ifMode" :  1 ,
-		"thenDo" : { "sendHandlerCommand" :  { "command" : "SELECT_NOTES", "parameter" : 10 }  } },
-	// channel 3
-    { "ifInput" : { "subDevice" : 1, "command" : 144, "data1" : 114 }, "ifMode" :  1 ,
-		"thenDo" : { "sendHandlerCommand" :  { "command" : "SELECT_NOTES", "parameter" : 11 }  } },
-	// channel 3
-    { "ifInput" : { "subDevice" : 1, "command" : 144, "data1" : 115 }, "ifMode" :  1 ,
-		"thenDo" : { "sendHandlerCommand" :  { "command" : "SELECT_NOTES", "parameter" : 12 }  } },
-	// channel 3
-    { "ifInput" : { "subDevice" : 1, "command" : 144, "data1" : 116 }, "ifMode" :  1 ,
-		"thenDo" : { "sendHandlerCommand" :  { "command" : "SELECT_NOTES", "parameter" : 13 }  } },
-	// channel 3
-    { "ifInput" : { "subDevice" : 1, "command" : 144, "data1" : 117 }, "ifMode" :  1 ,
-		"thenDo" : { "sendHandlerCommand" :  { "command" : "SELECT_NOTES", "parameter" : 14 }  } },
-	// channel 3
-    { "ifInput" : { "subDevice" : 1, "command" : 144, "data1" : 118 }, "ifMode" :  1 ,
-		"thenDo" : { "sendHandlerCommand" :  { "command" : "SELECT_NOTES", "parameter" : 15 }  } },
-	// channel 3
-    { "ifInput" : { "subDevice" : 1, "command" : 144, "data1" : 119 }, "ifMode" :  1 ,
-		"thenDo" : { "sendHandlerCommand" :  { "command" : "SELECT_NOTES", "parameter" : 16 }  } },
-  ],
-  "outputActions" : [
-	// channel 1
-    { "ifChannelStatus" : { "channelNumber" : 1, "state" : "ACTIVE" },
-      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 96, "data2" : 52 }  },
-    { "ifChannelStatus" : { "channelNumber" : 1, "state" : "INACTIVE" },
-      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 96, "data2" : 7 }  }, 
-    { "ifChannelStatus" : { "channelNumber" : 1, "state" : "SELECTED" },
-      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 96, "data2" : 127 }  },
-	// channel 2
-    { "ifChannelStatus" : { "channelNumber" : 2, "state" : "ACTIVE" },
-      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 97, "data2" : 52 }  },
-    { "ifChannelStatus" : { "channelNumber" : 2, "state" : "INACTIVE" },
-      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 97, "data2" : 7 }  },
-    { "ifChannelStatus" : { "channelNumber" : 2, "state" : "SELECTED" },
-      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 97, "data2" : 127 }  },
-	// channel 3
-    { "ifChannelStatus" : { "channelNumber" : 3, "state" : "ACTIVE" },
-      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 98, "data2" : 52 }  },
-    { "ifChannelStatus" : { "channelNumber" : 3, "state" : "INACTIVE" },
-      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 98, "data2" : 7 }  },
-    { "ifChannelStatus" : { "channelNumber" : 3, "state" : "SELECTED" },
-      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 98, "data2" : 127 }  },
-	// channel 4
-    { "ifChannelStatus" : { "channelNumber" : 4, "state" : "ACTIVE" },
-      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 99, "data2" : 52 }  },
-    { "ifChannelStatus" : { "channelNumber" : 4, "state" : "INACTIVE" },
-      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 99, "data2" : 7 }  },
-    { "ifChannelStatus" : { "channelNumber" : 4, "state" : "SELECTED" },
-      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 99, "data2" : 127 }  },
-	// channel 5
-    { "ifChannelStatus" : { "channelNumber" : 5, "state" : "ACTIVE" },
-      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 100, "data2" : 52 }  },
-    { "ifChannelStatus" : { "channelNumber" : 5, "state" : "INACTIVE" },
-      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 100, "data2" : 7 }  },
-    { "ifChannelStatus" : { "channelNumber" : 5, "state" : "SELECTED" },
-      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 100, "data2" : 127 }  },
-	// channel 6
-    { "ifChannelStatus" : { "channelNumber" : 6, "state" : "ACTIVE" },
-      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 101, "data2" : 52 }  },
-    { "ifChannelStatus" : { "channelNumber" : 6, "state" : "INACTIVE" },
-      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 101, "data2" : 7 }  },
-    { "ifChannelStatus" : { "channelNumber" : 6, "state" : "SELECTED" },
-      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 101, "data2" : 127 }  },
-	// channel 7
-    { "ifChannelStatus" : { "channelNumber" : 7, "state" : "ACTIVE" },
-      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 102, "data2" : 52 }  },
-    { "ifChannelStatus" : { "channelNumber" : 7, "state" : "INACTIVE" },
-      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 102, "data2" : 7 }  },
-    { "ifChannelStatus" : { "channelNumber" : 7, "state" : "SELECTED" },
-      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 102, "data2" : 127 }  },
-	// channel 8
-    { "ifChannelStatus" : { "channelNumber" : 8, "state" : "ACTIVE" },
-      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 103, "data2" : 52 }  },
-    { "ifChannelStatus" : { "channelNumber" : 8, "state" : "INACTIVE" },
-      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 103, "data2" : 7 }  },
-    { "ifChannelStatus" : { "channelNumber" : 8, "state" : "SELECTED" },
-      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 103, "data2" : 127 }  },
-	// channel 9
-    { "ifChannelStatus" : { "channelNumber" : 9, "state" : "ACTIVE" },
-      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 112, "data2" : 52 }  },
-    { "ifChannelStatus" : { "channelNumber" : 9, "state" : "INACTIVE" },
-      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 112, "data2" : 7 }  },
-    { "ifChannelStatus" : { "channelNumber" : 9, "state" : "SELECTED" },
-      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 112, "data2" : 127 }  },
-	// channel 10
-    { "ifChannelStatus" : { "channelNumber" : 10, "state" : "ACTIVE" },
-      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 113, "data2" : 52 }  },
-    { "ifChannelStatus" : { "channelNumber" : 10, "state" : "INACTIVE" },
-      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 113, "data2" : 7 }  },
-    { "ifChannelStatus" : { "channelNumber" : 10, "state" : "SELECTED" },
-      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 113, "data2" : 127 }  },
-	// channel 11
-    { "ifChannelStatus" : { "channelNumber" : 11, "state" : "ACTIVE" },
-      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 114, "data2" : 52 }  },
-    { "ifChannelStatus" : { "channelNumber" : 11, "state" : "INACTIVE" },
-      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 114, "data2" : 7 }  },
-    { "ifChannelStatus" : { "channelNumber" : 11, "state" : "SELECTED" },
-      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 114, "data2" : 127 }  },
-	// channel 12
-    { "ifChannelStatus" : { "channelNumber" : 12, "state" : "ACTIVE" },
-      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 115, "data2" : 52 }  },
-    { "ifChannelStatus" : { "channelNumber" : 12, "state" : "INACTIVE" },
-      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 115, "data2" : 7 }  },
-    { "ifChannelStatus" : { "channelNumber" : 12, "state" : "SELECTED" },
-      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 115, "data2" : 127 }  },
-	// channel 13
-    { "ifChannelStatus" : { "channelNumber" : 13, "state" : "ACTIVE" },
-      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 116, "data2" : 52 }  },
-    { "ifChannelStatus" : { "channelNumber" : 13, "state" : "INACTIVE" },
-      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 116, "data2" : 7 }  },
-    { "ifChannelStatus" : { "channelNumber" : 13, "state" : "SELECTED" },
-      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 116, "data2" : 127 }  },
-	// channel 14
-    { "ifChannelStatus" : { "channelNumber" : 14, "state" : "ACTIVE" },
-      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 117, "data2" : 52 }  },
-    { "ifChannelStatus" : { "channelNumber" : 14, "state" : "INACTIVE" },
-      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 117, "data2" : 7 }  },
-    { "ifChannelStatus" : { "channelNumber" : 14, "state" : "SELECTED" },
-      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 117, "data2" : 127 }  },
-	// channel 15
-    { "ifChannelStatus" : { "channelNumber" : 15, "state" : "ACTIVE" },
-      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 118, "data2" : 52 }  },
-    { "ifChannelStatus" : { "channelNumber" : 15, "state" : "INACTIVE" },
-      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 118, "data2" : 7 }  },
-    { "ifChannelStatus" : { "channelNumber" : 15, "state" : "SELECTED" },
-      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 118, "data2" : 127 }  },
-	// channel 16
-    { "ifChannelStatus" : { "channelNumber" : 16, "state" : "ACTIVE" },
-      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 119, "data2" : 52 }  },
-    { "ifChannelStatus" : { "channelNumber" : 16, "state" : "INACTIVE" },
-      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 119, "data2" : 7 }  },
-    { "ifChannelStatus" : { "channelNumber" : 16, "state" : "SELECTED" },
-      "thenSendDeviceMessage" :  { "subDevice" : 1, "command" : 144, "channel" : 0, "data1" : 119, "data2" : 127 }  }
-	]
-}
+onInitialization
+ # Exit and enter InControl mode
+ sendDeviceMessage 1 144 0 12 0
+ sendDeviceMessage 1 144 0 12 127
+onInput
+ ifPort 1
+  ifCommand 144
+   ifData1 12
+    # Device entered / exited InControl mode
+   ifData1 104
+    ifNotMode 1
+     # Enter select notes mode (top round pad)
+     setMode 1
+     sendDeviceMessage 1 144 0 104 127  
+    ifMode 1
+     # Exit select notes mode (top round pad)
+     clearMode 1
+     sendDeviceMessage 1 128 0 104 127 
+   ifData1 96
+    ifMode 1
+     # channel 1
+     sendHandlerCommand SELECT_NOTES 1
+   ifData1 97
+    ifMode 1
+     # channel 2
+     sendHandlerCommand SELECT_NOTES 2
+   ifData1 98
+    ifMode 1
+     # channel 3
+     sendHandlerCommand SELECT_NOTES 3
+   ifData1 99
+    ifMode 1
+     # channel 4
+     sendHandlerCommand SELECT_NOTES 4
+   ifData1 100
+    ifMode 1
+     # channel 5
+     sendHandlerCommand SELECT_NOTES 5
+   ifData1 101
+    ifMode 1
+     # channel 6
+     sendHandlerCommand SELECT_NOTES 6
+   ifData1 102
+    ifMode 1
+     # channel 7
+     sendHandlerCommand SELECT_NOTES 7
+   ifData1 103
+    ifMode 1
+     # channel 8
+     sendHandlerCommand SELECT_NOTES 8
+   ifData1 112
+    ifMode 1
+     # channel 9
+     sendHandlerCommand SELECT_NOTES 9
+   ifData1 113
+    ifMode 1
+     # channel 10
+     sendHandlerCommand SELECT_NOTES 10
+   ifData1 114
+    ifMode 1
+     # channel 11
+     sendHandlerCommand SELECT_NOTES 11
+   ifData1 115
+    ifMode 1
+     # channel 12
+     sendHandlerCommand SELECT_NOTES 12
+   ifData1 116
+    ifMode 1
+     # channel 13
+     sendHandlerCommand SELECT_NOTES 13
+   ifData1 117
+    ifMode 1
+     # channel 14
+     sendHandlerCommand SELECT_NOTES 14
+   ifData1 118
+    ifMode 1
+     # channel 15
+     sendHandlerCommand SELECT_NOTES 15
+   ifData1 119
+    ifMode 1
+     # channel 16
+     sendHandlerCommand SELECT_NOTES 16
+onOutput
+ ifChannel 1
+  ifState ACTIVE
+   sendDeviceMessage 1 144 0 96 52
+  ifState INACTIVE
+   sendDeviceMessage 1 144 0 96 7
+  ifState INACTIVE
+   sendDeviceMessage 1 144 0 96 127
+ ifChannel 2
+  ifState ACTIVE
+   sendDeviceMessage 1 144 0 97 52
+  ifState INACTIVE
+   sendDeviceMessage 1 144 0 97 7
+  ifState INACTIVE
+   sendDeviceMessage 1 144 0 97 127
+ ifChannel 3
+  ifState ACTIVE
+   sendDeviceMessage 1 144 0 98 52
+  ifState INACTIVE
+   sendDeviceMessage 1 144 0 98 7
+  ifState INACTIVE
+   sendDeviceMessage 1 144 0 98 127
+ ifChannel 4
+  ifState ACTIVE
+   sendDeviceMessage 1 144 0 99 52
+  ifState INACTIVE
+   sendDeviceMessage 1 144 0 99 7
+  ifState INACTIVE
+   sendDeviceMessage 1 144 0 99 127
+ ifChannel 5
+  ifState ACTIVE
+   sendDeviceMessage 1 144 0 100 52
+  ifState INACTIVE
+   sendDeviceMessage 1 144 0 100 7
+  ifState INACTIVE
+   sendDeviceMessage 1 144 0 100 127
+ ifChannel 6
+  ifState ACTIVE
+   sendDeviceMessage 1 144 0 101 52
+  ifState INACTIVE
+   sendDeviceMessage 1 144 0 101 7
+  ifState INACTIVE
+   sendDeviceMessage 1 144 0 101 127
+ ifChannel 7
+  ifState ACTIVE
+   sendDeviceMessage 1 144 0 102 52
+  ifState INACTIVE
+   sendDeviceMessage 1 144 0 102 7
+  ifState INACTIVE
+   sendDeviceMessage 1 144 0 102 127
+ ifChannel 8
+  ifState ACTIVE
+   sendDeviceMessage 1 144 0 103 52
+  ifState INACTIVE
+   sendDeviceMessage 1 144 0 103 7
+  ifState INACTIVE
+   sendDeviceMessage 1 144 0 103 127
+ ifChannel 9
+  ifState ACTIVE
+   sendDeviceMessage 1 144 0 112 52
+  ifState INACTIVE
+   sendDeviceMessage 1 144 0 112 7
+  ifState INACTIVE
+   sendDeviceMessage 1 144 0 112 127
+ ifChannel 10
+  ifState ACTIVE
+   sendDeviceMessage 1 144 0 113 52
+  ifState INACTIVE
+   sendDeviceMessage 1 144 0 113 7
+  ifState INACTIVE
+   sendDeviceMessage 1 144 0 113 127
+ ifChannel 11
+  ifState ACTIVE
+   sendDeviceMessage 1 144 0 114 52
+  ifState INACTIVE
+   sendDeviceMessage 1 144 0 114 7
+  ifState INACTIVE
+   sendDeviceMessage 1 144 0 114 127
+ ifChannel 12
+  ifState ACTIVE
+   sendDeviceMessage 1 144 0 115 52
+  ifState INACTIVE
+   sendDeviceMessage 1 144 0 115 7
+  ifState INACTIVE
+   sendDeviceMessage 1 144 0 115 127
+ ifChannel 13
+  ifState ACTIVE
+   sendDeviceMessage 1 144 0 116 52
+  ifState INACTIVE
+   sendDeviceMessage 1 144 0 116 7
+  ifState INACTIVE
+   sendDeviceMessage 1 144 0 116 127
+ ifChannel 14
+  ifState ACTIVE
+   sendDeviceMessage 1 144 0 117 52
+  ifState INACTIVE
+   sendDeviceMessage 1 144 0 117 7
+  ifState INACTIVE
+   sendDeviceMessage 1 144 0 117 127
+ ifChannel 15
+  ifState ACTIVE
+   sendDeviceMessage 1 144 0 118 52
+  ifState INACTIVE
+   sendDeviceMessage 1 144 0 118 7
+  ifState INACTIVE
+   sendDeviceMessage 1 144 0 118 127
+ ifChannel 16
+  ifState ACTIVE
+   sendDeviceMessage 1 144 0 119 52
+  ifState INACTIVE
+   sendDeviceMessage 1 144 0 119 7
+  ifState INACTIVE
+   sendDeviceMessage 1 144 0 119 127

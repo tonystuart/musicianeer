@@ -18,31 +18,27 @@ public class MidiDeviceBundle {
 
   private String type;
   private int card;
-  private int device;
+  private int unit;
 
   private RandomAccessList<MidiInputDevice> inputDevices = new DirectList<>();
   private RandomAccessList<MidiOutputDevice> outputDevices = new DirectList<>();
 
-  public MidiDeviceBundle(String type, int card, int device) {
+  public MidiDeviceBundle(String type, int card, int unit) {
     this.type = type;
     this.card = card;
-    this.device = device;
+    this.unit = unit;
   }
 
-  public void addInput(MidiDevice midiDevice, int subdevice) {
-    inputDevices.add(new MidiInputDevice(midiDevice, subdevice));
+  public void addInput(MidiDevice midiDevice, int port) {
+    inputDevices.add(new MidiInputDevice(midiDevice, port));
   }
 
-  public void addOutput(MidiDevice midiDevice, int subdevice) {
-    outputDevices.add(new MidiOutputDevice(midiDevice, subdevice));
+  public void addOutput(MidiDevice midiDevice, int port) {
+    outputDevices.add(new MidiOutputDevice(midiDevice, port));
   }
 
   public int getCard() {
     return card;
-  }
-
-  public int getDevice() {
-    return device;
   }
 
   public RandomAccessList<MidiInputDevice> getInputDevices() {
@@ -57,9 +53,13 @@ public class MidiDeviceBundle {
     return type;
   }
 
+  public int getUnit() {
+    return unit;
+  }
+
   @Override
   public String toString() {
-    return "MidiDeviceBundle [type=" + type + ", card=" + card + ", device=" + device + ", inputDevices=" + inputDevices + ", outputDevices=" + outputDevices + "]";
+    return "MidiDeviceBundle [type=" + type + ", card=" + card + ", unit=" + unit + ", inputDevices=" + inputDevices + ", outputDevices=" + outputDevices + "]";
   }
 
 }

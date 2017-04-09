@@ -15,12 +15,12 @@ import javax.sound.midi.MidiUnavailableException;
 import javax.sound.midi.Receiver;
 import javax.sound.midi.ShortMessage;
 
-import com.example.afs.musicpad.CommandProcessor;
+import com.example.afs.musicpad.Command;
 import com.example.afs.musicpad.device.common.ControllableGroup.Controllable;
-import com.example.afs.musicpad.device.midi.MidiConfiguration.ChannelMessage;
-import com.example.afs.musicpad.device.midi.MidiConfiguration.ChannelState;
-import com.example.afs.musicpad.device.midi.MidiConfiguration.ChannelStatus;
-import com.example.afs.musicpad.device.midi.MidiConfiguration.OutputAction;
+import com.example.afs.musicpad.device.midi.configuration.ChannelState;
+import com.example.afs.musicpad.device.midi.configuration.ConfigurationSupport;
+import com.example.afs.musicpad.device.midi.configuration.Context;
+import com.example.afs.musicpad.device.midi.configuration.MidiConfiguration;
 import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnChannelState;
 import com.example.afs.musicpad.message.OnDeviceMessage;
@@ -31,7 +31,7 @@ import com.example.afs.musicpad.util.DirectList;
 import com.example.afs.musicpad.util.RandomAccessList;
 import com.example.afs.musicpad.util.Value;
 
-public class MidiWriter extends BrokerTask<Message> implements Controllable {
+public class MidiWriter extends BrokerTask<Message> implements Controllable, ConfigurationSupport {
 
   private MidiDeviceBundle device;
   private MidiConfiguration configuration;
@@ -44,8 +44,54 @@ public class MidiWriter extends BrokerTask<Message> implements Controllable {
     this.device = device;
     this.configuration = configuration;
     subscribe(OnChannelState.class, message -> doChannelState(message.getChannel(), message.getChannelState()));
-    subscribe(OnDeviceMessage.class, message -> doDeviceMessage(message.getDeviceMessage()));
+    subscribe(OnDeviceMessage.class, message -> sendDeviceMessage(message.getPort(), message.getCommand(), message.getChannel(), message.getData1(), message.getData2()));
     connectDevices();
+  }
+
+  @Override
+  public void clearMode(int mode) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public boolean isMode(int mode) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public boolean isNotMode(int mode) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public void sendDeviceMessage(int port, int command, int channel, int data1, int data2) {
+    try {
+      ShortMessage shortMessage = new ShortMessage(command, channel, data1, data2);
+      receivers.get(port).send(shortMessage, -1);
+    } catch (InvalidMidiDataException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  @Override
+  public void sendHandlerCommand(Command command, Integer parameter) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public void sendHandlerMessage(int data1) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public void setMode(int mode) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public void start() {
+    super.start();
+    initializeDevice();
   }
 
   @Override
@@ -85,48 +131,15 @@ public class MidiWriter extends BrokerTask<Message> implements Controllable {
     setChannelState(channel, channelState);
   }
 
-  private void doDeviceMessage(ChannelMessage deviceMessage) {
-    sendDeviceMessage(deviceMessage);
-  }
-
-  private void sendDeviceMessage(ChannelMessage deviceMessage) {
-    try {
-      int command = deviceMessage.getCommand();
-      int channel = deviceMessage.getChannel();
-      int data1 = Value.getInt(deviceMessage.getData1());
-      int data2 = Value.getInt(deviceMessage.getData2());
-      ShortMessage shortMessage = new ShortMessage(command, channel, data1, data2);
-      if (CommandProcessor.isTraceConfiguration()) {
-        System.out.println("Sending device message " + deviceMessage);
-      }
-      if (deviceMessage.getSubDevice() == null) {
-        for (Receiver receiver : receivers) {
-          receiver.send(shortMessage, -1);
-        }
-      } else {
-        receivers.get(deviceMessage.getSubDevice()).send(shortMessage, -1);
-      }
-    } catch (InvalidMidiDataException e) {
-      throw new RuntimeException(e);
-    }
+  private void initializeDevice() {
+    Context context = new Context(this);
+    configuration.getOnInitialization().execute(context);
   }
 
   private void setChannelState(int channel, ChannelState channelState) {
     int channelNumber = Value.toNumber(channel);
-    for (OutputAction outputAction : configuration.getOutputActions()) {
-      if (outputAction != null) {
-        ChannelStatus ifChannelStatus = outputAction.getIfChannelStatus();
-        if (ifChannelStatus != null) {
-          if (ifChannelStatus.getChannelNumber() != null) {
-            if (ifChannelStatus.getChannelNumber() == channelNumber) {
-              if (ifChannelStatus.getState() == channelState) {
-                sendDeviceMessage(outputAction.getThenSendDeviceMessage());
-              }
-            }
-          }
-        }
-      }
-    }
+    Context context = new Context(this, channelNumber, channelState);
+    configuration.getOnOutput().execute(context);
   }
 
 }

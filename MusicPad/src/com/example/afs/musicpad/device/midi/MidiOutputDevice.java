@@ -13,11 +13,11 @@ import javax.sound.midi.MidiDevice;
 
 public class MidiOutputDevice {
   private MidiDevice midiDevice;
-  private int subdevice;
+  private int port;
 
-  public MidiOutputDevice(MidiDevice midiDevice, int subdevice) {
+  public MidiOutputDevice(MidiDevice midiDevice, int port) {
     this.midiDevice = midiDevice;
-    this.subdevice = subdevice;
+    this.port = port;
   }
 
   public MidiDevice getMidiDevice() {
@@ -26,7 +26,7 @@ public class MidiOutputDevice {
 
   @Override
   public String toString() {
-    return "MidiOutputDevice [midiDevice=" + midiDevice + ", subdevice=" + subdevice + "]";
+    return "MidiOutputDevice [midiDevice=" + midiDevice + ", port=" + port + "]";
   }
 
 }

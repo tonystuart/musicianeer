@@ -26,11 +26,12 @@ import javax.sound.midi.MidiUnavailableException;
 import com.example.afs.fluidsynth.Synthesizer;
 import com.example.afs.musicpad.device.common.ControllableGroup;
 import com.example.afs.musicpad.device.common.DeviceHandler;
+import com.example.afs.musicpad.device.midi.configuration.MidiConfiguration;
+import com.example.afs.musicpad.device.midi.configuration.Parser;
 import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.task.BrokerTask;
 import com.example.afs.musicpad.util.Broker;
 import com.example.afs.musicpad.util.FileUtilities;
-import com.example.afs.musicpad.util.JsonUtilities;
 
 public class MidiWatcher extends BrokerTask<Message> {
 
@@ -88,20 +89,20 @@ public class MidiWatcher extends BrokerTask<Message> {
         if (matcher.matches()) {
           String type = matcher.group(1);
           int card = Integer.parseInt(matcher.group(2));
-          int device = Integer.parseInt(matcher.group(3));
-          int subdevice = Integer.parseInt(matcher.group(4));
-          String name = type + "-" + card + "-" + device;
+          int unit = Integer.parseInt(matcher.group(3));
+          int port = Integer.parseInt(matcher.group(4));
+          String name = type + "-" + card + "-" + unit;
           MidiDeviceBundle deviceBundle = devices.get(name);
           if (deviceBundle == null) {
-            deviceBundle = new MidiDeviceBundle(type, card, device);
+            deviceBundle = new MidiDeviceBundle(type, card, unit);
             devices.put(name, deviceBundle);
           }
           MidiDevice midiDevice = MidiSystem.getMidiDevice(deviceDescriptor);
           if (midiDevice.getMaxReceivers() != 0) {
-            deviceBundle.addOutput(midiDevice, subdevice);
+            deviceBundle.addOutput(midiDevice, port);
           }
           if (midiDevice.getMaxTransmitters() != 0) {
-            deviceBundle.addInput(midiDevice, subdevice);
+            deviceBundle.addInput(midiDevice, port);
           }
         }
       }
@@ -117,13 +118,14 @@ public class MidiWatcher extends BrokerTask<Message> {
     String overridePathName = home + File.separatorChar + ".musicpad" + File.separatorChar + fileName;
     File configurationFile = new File(overridePathName);
     if (configurationFile.isFile() && configurationFile.canRead()) {
-      MidiConfiguration configuration = FileUtilities.readJson(overridePathName, MidiConfiguration.class);
+      String contents = FileUtilities.read(fileName);
+      MidiConfiguration configuration = new Parser().parse(contents);
       return configuration;
     }
     InputStream inputStream = getClass().getClassLoader().getResourceAsStream(fileName);
     if (inputStream != null) {
       String contents = FileUtilities.read(inputStream);
-      MidiConfiguration configuration = JsonUtilities.fromJson(contents, MidiConfiguration.class);
+      MidiConfiguration configuration = new Parser().parse(contents);
       return configuration;
     }
     System.out.println("Cannot find configuration for " + device.getType() + ", using default");
