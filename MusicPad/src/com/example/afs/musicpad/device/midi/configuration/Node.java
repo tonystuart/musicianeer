@@ -9,9 +9,10 @@
 
 package com.example.afs.musicpad.device.midi.configuration;
 
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
+
+import com.example.afs.musicpad.util.DirectList;
+import com.example.afs.musicpad.util.RandomAccessList;
 
 public abstract class Node {
 
@@ -20,7 +21,7 @@ public abstract class Node {
   }
 
   private int lineIndex;
-  private List<Node> nodes = new LinkedList<>();
+  private RandomAccessList<Node> nodes = new DirectList<>();
 
   public Node(int lineIndex) {
     this.lineIndex = lineIndex;
@@ -50,10 +51,10 @@ public abstract class Node {
   }
 
   protected ReturnState executeNodes(Context context) {
+    int nodeCount = nodes.size();
     ReturnState returnState = ReturnState.THEN;
-    Iterator<Node> iterator = nodes.iterator();
-    while (iterator.hasNext() && returnState != ReturnState.IF_MATCH) {
-      Node node = iterator.next();
+    for (int i = 0; i < nodeCount && returnState != ReturnState.IF_MATCH; i++) {
+      Node node = nodes.get(i);
       returnState = node.execute(context);
     }
     return returnState;
