@@ -23,12 +23,12 @@ public class PausibleSequencerTask<T> extends SequencerTask<T> {
     super(scheduler, broker, timeoutMillis);
   }
 
-  public void pause() {
-    isPaused = true;
+  public boolean isPaused() {
+    return isPaused;
   }
 
-  public void resume() {
-    isPaused = false;
+  public void setPaused(boolean isPaused) {
+    this.isPaused = isPaused;
   }
 
   @Override

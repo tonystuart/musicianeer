@@ -99,6 +99,15 @@ onInput
   ifCommand 176
    ifData1 7
     sendHandlerCommand SET_MASTER_GAIN data2
+   ifData2 127
+    ifData1 112
+     sendHandlerCommand PREVIOUS_MEASURE 0
+    ifData1 113
+     sendHandlerCommand NEXT_MEASURE 0
+    ifData1 114
+     sendHandlerCommand STOP_PAUSE 0
+    ifData1 115
+     sendHandlerCommand PLAY_PAUSE 0
 onOutput
  ifChannel 1
   ifState ACTIVE

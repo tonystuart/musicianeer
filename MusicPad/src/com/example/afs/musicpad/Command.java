@@ -17,9 +17,13 @@ public enum Command {
   SELECT_CHORDS, //
   SELECT_PROGRAM, //
   PLAY, //
+  PLAY_PAUSE, //
   PAUSE, //
   RESUME, //
   STOP, //
+  STOP_PAUSE, //
+  PREVIOUS_MEASURE, //
+  NEXT_MEASURE, //
   SET_KEYBOARD_MAPPING, //
   SET_PLAYER_VELOCITY, //
   SET_TRANSPORT_TEMPO, //

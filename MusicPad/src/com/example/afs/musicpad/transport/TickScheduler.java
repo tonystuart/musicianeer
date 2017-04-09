@@ -50,6 +50,10 @@ public class TickScheduler {
     return percentTempo;
   }
 
+  public long getTick() {
+    return baseTick;
+  }
+
   public void resetAll() {
     this.baseTick = 0;
     this.baseTimeMillis = INITIALIZE_ON_NEXT_EVENT;
