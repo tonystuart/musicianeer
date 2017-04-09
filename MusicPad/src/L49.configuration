@@ -86,110 +86,110 @@ onOutput
    sendDeviceMessage 1 144 0 96 52
   ifState INACTIVE
    sendDeviceMessage 1 144 0 96 7
-  ifState INACTIVE
+  ifState SELECTED
    sendDeviceMessage 1 144 0 96 127
  ifChannel 2
   ifState ACTIVE
    sendDeviceMessage 1 144 0 97 52
   ifState INACTIVE
    sendDeviceMessage 1 144 0 97 7
-  ifState INACTIVE
+  ifState SELECTED
    sendDeviceMessage 1 144 0 97 127
  ifChannel 3
   ifState ACTIVE
    sendDeviceMessage 1 144 0 98 52
   ifState INACTIVE
    sendDeviceMessage 1 144 0 98 7
-  ifState INACTIVE
+  ifState SELECTED
    sendDeviceMessage 1 144 0 98 127
  ifChannel 4
   ifState ACTIVE
    sendDeviceMessage 1 144 0 99 52
   ifState INACTIVE
    sendDeviceMessage 1 144 0 99 7
-  ifState INACTIVE
+  ifState SELECTED
    sendDeviceMessage 1 144 0 99 127
  ifChannel 5
   ifState ACTIVE
    sendDeviceMessage 1 144 0 100 52
   ifState INACTIVE
    sendDeviceMessage 1 144 0 100 7
-  ifState INACTIVE
+  ifState SELECTED
    sendDeviceMessage 1 144 0 100 127
  ifChannel 6
   ifState ACTIVE
    sendDeviceMessage 1 144 0 101 52
   ifState INACTIVE
    sendDeviceMessage 1 144 0 101 7
-  ifState INACTIVE
+  ifState SELECTED
    sendDeviceMessage 1 144 0 101 127
  ifChannel 7
   ifState ACTIVE
    sendDeviceMessage 1 144 0 102 52
   ifState INACTIVE
    sendDeviceMessage 1 144 0 102 7
-  ifState INACTIVE
+  ifState SELECTED
    sendDeviceMessage 1 144 0 102 127
  ifChannel 8
   ifState ACTIVE
    sendDeviceMessage 1 144 0 103 52
   ifState INACTIVE
    sendDeviceMessage 1 144 0 103 7
-  ifState INACTIVE
+  ifState SELECTED
    sendDeviceMessage 1 144 0 103 127
  ifChannel 9
   ifState ACTIVE
    sendDeviceMessage 1 144 0 112 52
   ifState INACTIVE
    sendDeviceMessage 1 144 0 112 7
-  ifState INACTIVE
+  ifState SELECTED
    sendDeviceMessage 1 144 0 112 127
  ifChannel 10
   ifState ACTIVE
    sendDeviceMessage 1 144 0 113 52
   ifState INACTIVE
    sendDeviceMessage 1 144 0 113 7
-  ifState INACTIVE
+  ifState SELECTED
    sendDeviceMessage 1 144 0 113 127
  ifChannel 11
   ifState ACTIVE
    sendDeviceMessage 1 144 0 114 52
   ifState INACTIVE
    sendDeviceMessage 1 144 0 114 7
-  ifState INACTIVE
+  ifState SELECTED
    sendDeviceMessage 1 144 0 114 127
  ifChannel 12
   ifState ACTIVE
    sendDeviceMessage 1 144 0 115 52
   ifState INACTIVE
    sendDeviceMessage 1 144 0 115 7
-  ifState INACTIVE
+  ifState SELECTED
    sendDeviceMessage 1 144 0 115 127
  ifChannel 13
   ifState ACTIVE
    sendDeviceMessage 1 144 0 116 52
   ifState INACTIVE
    sendDeviceMessage 1 144 0 116 7
-  ifState INACTIVE
+  ifState SELECTED
    sendDeviceMessage 1 144 0 116 127
  ifChannel 14
   ifState ACTIVE
    sendDeviceMessage 1 144 0 117 52
   ifState INACTIVE
    sendDeviceMessage 1 144 0 117 7
-  ifState INACTIVE
+  ifState SELECTED
    sendDeviceMessage 1 144 0 117 127
  ifChannel 15
   ifState ACTIVE
    sendDeviceMessage 1 144 0 118 52
   ifState INACTIVE
    sendDeviceMessage 1 144 0 118 7
-  ifState INACTIVE
+  ifState SELECTED
    sendDeviceMessage 1 144 0 118 127
  ifChannel 16
   ifState ACTIVE
    sendDeviceMessage 1 144 0 119 52
   ifState INACTIVE
    sendDeviceMessage 1 144 0 119 7
-  ifState INACTIVE
+  ifState SELECTED
    sendDeviceMessage 1 144 0 119 127

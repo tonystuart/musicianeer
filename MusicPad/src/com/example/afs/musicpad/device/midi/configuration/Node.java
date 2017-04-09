@@ -15,7 +15,9 @@ import java.util.List;
 
 public abstract class Node {
 
-  // TODO: Consider adding support for return control (e.g. conditional, unconditional, return statement)
+  public enum ReturnState {
+    IF_MATCH, IF_NO_MATCH, THEN
+  }
 
   private int lineIndex;
   private List<Node> nodes = new LinkedList<>();
@@ -28,7 +30,7 @@ public abstract class Node {
     nodes.add(child);
   }
 
-  public abstract boolean execute(Context context);
+  public abstract ReturnState execute(Context context);
 
   public int getLineIndex() {
     return lineIndex;
@@ -47,14 +49,14 @@ public abstract class Node {
     System.err.println("Line " + (lineIndex + 1) + ": " + message);
   }
 
-  protected boolean executeNodes(Context context) {
-    boolean isMatch = false;
+  protected ReturnState executeNodes(Context context) {
+    ReturnState returnState = ReturnState.THEN;
     Iterator<Node> iterator = nodes.iterator();
-    while (iterator.hasNext() && !isMatch) {
+    while (iterator.hasNext() && returnState != ReturnState.IF_MATCH) {
       Node node = iterator.next();
-      isMatch = node.execute(context);
+      returnState = node.execute(context);
     }
-    return isMatch;
+    return returnState;
   }
 
 }

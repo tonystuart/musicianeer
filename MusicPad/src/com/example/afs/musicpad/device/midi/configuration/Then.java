@@ -16,9 +16,9 @@ public abstract class Then extends Node {
   }
 
   @Override
-  public boolean execute(Context context) {
+  public ReturnState execute(Context context) {
     executeThen(context);
-    return false;
+    return ReturnState.THEN;
   }
 
   public abstract void executeThen(Context context);

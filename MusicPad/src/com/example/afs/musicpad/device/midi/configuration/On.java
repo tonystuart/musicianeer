@@ -16,7 +16,7 @@ public abstract class On extends Node {
   }
 
   @Override
-  public boolean execute(Context context) {
+  public ReturnState execute(Context context) {
     return executeNodes(context);
   }
 

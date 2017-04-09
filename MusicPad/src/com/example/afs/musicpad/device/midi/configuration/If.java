@@ -16,15 +16,18 @@ public abstract class If extends Node {
   }
 
   @Override
-  public boolean execute(Context context) {
-    boolean isMatch;
+  public ReturnState execute(Context context) {
+    ReturnState returnState;
     if (isMatch(context)) {
-      isMatch = true;
-      executeNodes(context);
+      returnState = ReturnState.IF_MATCH;
+      ReturnState childReturnState = executeNodes(context);
+      if (childReturnState == ReturnState.IF_NO_MATCH) {
+        returnState = ReturnState.IF_NO_MATCH;
+      }
     } else {
-      isMatch = false;
+      returnState = ReturnState.IF_NO_MATCH;
     }
-    return isMatch;
+    return returnState;
   }
 
   protected abstract boolean isMatch(Context context);

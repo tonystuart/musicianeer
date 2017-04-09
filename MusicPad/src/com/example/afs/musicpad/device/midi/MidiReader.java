@@ -24,6 +24,7 @@ import com.example.afs.musicpad.device.common.ControllableGroup.Controllable;
 import com.example.afs.musicpad.device.midi.configuration.ConfigurationSupport;
 import com.example.afs.musicpad.device.midi.configuration.Context;
 import com.example.afs.musicpad.device.midi.configuration.MidiConfiguration;
+import com.example.afs.musicpad.device.midi.configuration.Node.ReturnState;
 import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnDeviceMessage;
@@ -140,7 +141,8 @@ public class MidiReader implements Controllable, ConfigurationSupport {
       int data1 = shortMessage.getData1();
       int data2 = shortMessage.getData2();
       Context context = new Context(this, port, command, channel, data1, data2);
-      if (!configuration.getOnInput().execute(context)) {
+      ReturnState returnState = configuration.getOnInput().execute(context);
+      if (returnState == ReturnState.IF_NO_MATCH) {
         if (command == ShortMessage.NOTE_ON) {
           queue.add(new OnInputPress(data1));
         } else if (command == ShortMessage.NOTE_OFF) {
