@@ -14,6 +14,7 @@ import com.example.afs.musicpad.player.Player;
 public class Synthesizer {
 
   public static class Settings {
+
     private static final String SOUND_FONT_FILE_NAME = "/usr/share/sounds/sf2/FluidR3_GM.sf2";
 
     private long settings;
@@ -48,6 +49,11 @@ public class Synthesizer {
   static {
     System.loadLibrary(FluidSynth.NATIVE_LIBRARY_NAME);
   }
+
+  // https://sourceforge.net/p/fluidsynth/wiki/FluidSettings/
+  public static final float MINIMUM_GAIN = 0f;
+  public static final float MAXIMUM_GAIN = 10f;
+  public static final float DEFAULT_GAIN = 0.200f;
 
   public static Settings createDefaultSettings() {
     Settings settings = new Settings();

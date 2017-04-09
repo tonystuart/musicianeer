@@ -13,14 +13,17 @@ import java.io.File;
 import java.util.Random;
 
 import com.example.afs.fluidsynth.Synthesizer;
+import com.example.afs.musicpad.Trace.TraceOption;
 import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnSongSelected;
+import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.parser.SongBuilder;
 import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.task.BrokerTask;
 import com.example.afs.musicpad.util.Broker;
-import com.example.afs.musicpad.util.Velocity;
+import com.example.afs.musicpad.util.Range;
+import com.example.afs.musicpad.util.Value;
 
 // new things
 // zero/enter when not in command mode are modulation down/up1550000550
@@ -68,11 +71,11 @@ import com.example.afs.musicpad.util.Velocity;
 public class CommandProcessor extends BrokerTask<Message> {
 
   private static final int PAGE_SIZE = 10;
+  private static final float DEFAULT_GAIN = 5 * Synthesizer.DEFAULT_GAIN;
 
   private Song currentSong;
   private MusicLibrary musicLibrary;
   private Synthesizer synthesizer;
-
   private Random random = new Random();
 
   public CommandProcessor(Broker<Message> broker, Synthesizer synthesizer, MusicLibrary musicLibrary) {
@@ -80,7 +83,7 @@ public class CommandProcessor extends BrokerTask<Message> {
     this.synthesizer = synthesizer;
     this.musicLibrary = musicLibrary;
     subscribe(OnCommand.class, message -> doCommand(message.getCommand(), message.getParameter()));
-    doSetPercentGain(100);
+    synthesizer.setGain(DEFAULT_GAIN);
   }
 
   private void doCommand(Command command, int parameter) {
@@ -94,8 +97,8 @@ public class CommandProcessor extends BrokerTask<Message> {
     case LIST_SONGS:
       doListSongs(parameter);
       break;
-    case SET_PERCENT_GAIN:
-      doSetPercentGain(parameter);
+    case SET_MASTER_GAIN:
+      doSetMasterGain(parameter);
       break;
     case TRON:
       doTron(parameter);
@@ -153,9 +156,8 @@ public class CommandProcessor extends BrokerTask<Message> {
     }
   }
 
-  private void doSetPercentGain(int percentGain) {
-    float gain = Velocity.scalePercentGain(percentGain);
-    System.out.println("Set " + percentGain + " percent gain (" + gain + ")");
+  private void doSetMasterGain(int masterGain) {
+    float gain = Range.scale(Synthesizer.MINIMUM_GAIN, Synthesizer.MAXIMUM_GAIN, Midi.MIN_VALUE, Midi.MAX_VALUE, masterGain);
     synthesizer.setGain(gain);
   }
 
@@ -167,20 +169,37 @@ public class CommandProcessor extends BrokerTask<Message> {
     setTrace(parameter, true);
   }
 
-  private void setTrace(int parameter, boolean value) {
-    Trace.TraceOption traceOption = Trace.TraceOption.values()[parameter];
-    switch (traceOption) {
-    case COMMAND:
-      Trace.setTraceCommand(value);
-      break;
-    case CONFIGURATION:
-      Trace.setTraceConfiguration(value);
-      break;
-    case PLAY:
-      Trace.setTracePlay(value);
-      break;
-    default:
-      throw new UnsupportedOperationException();
+  private TraceOption getTraceOption(int traceNumber) {
+    TraceOption traceOption;
+    int trace = Value.toIndex(traceNumber);
+    TraceOption[] traceOptions = TraceOption.values();
+    if (trace < 0 || trace >= traceOptions.length) {
+      traceOption = null;
+      for (int i = 0; i < traceOptions.length; i++) {
+        System.out.println((i + 1) + " -> " + traceOptions[i]);
+      }
+    } else {
+      traceOption = traceOptions[trace];
+    }
+    return traceOption;
+  }
+
+  private void setTrace(int traceNumber, boolean value) {
+    TraceOption traceOption = getTraceOption(traceNumber);
+    if (traceOption != null) {
+      switch (traceOption) {
+      case COMMAND:
+        Trace.setTraceCommand(value);
+        break;
+      case CONFIGURATION:
+        Trace.setTraceConfiguration(value);
+        break;
+      case PLAY:
+        Trace.setTracePlay(value);
+        break;
+      default:
+        throw new UnsupportedOperationException();
+      }
     }
   }
 

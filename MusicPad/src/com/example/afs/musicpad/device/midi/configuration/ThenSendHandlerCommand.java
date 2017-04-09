@@ -15,12 +15,17 @@ public class ThenSendHandlerCommand extends Then {
 
   private Command command;
   private Integer parameter;
+  private boolean isUseData2;
 
   public ThenSendHandlerCommand(int lineIndex, String[] tokens) {
     super(lineIndex);
     try {
       command = Command.valueOf(tokens[1]);
-      parameter = Integer.decode(tokens[2]);
+      if (tokens[2].equals("data2")) {
+        isUseData2 = true;
+      } else {
+        parameter = Integer.decode(tokens[2]);
+      }
     } catch (RuntimeException e) {
       displayError("Expected sendHandlerCommand command parameter");
     }
@@ -28,7 +33,7 @@ public class ThenSendHandlerCommand extends Then {
 
   @Override
   public void executeThen(Context context) {
-    context.getConfigurationSupport().sendHandlerCommand(command, parameter);
+    context.getConfigurationSupport().sendHandlerCommand(command, isUseData2 ? context.getData2() : parameter);
   }
 
   @Override

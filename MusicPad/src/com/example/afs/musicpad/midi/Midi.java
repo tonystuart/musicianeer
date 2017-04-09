@@ -18,6 +18,9 @@ public class Midi {
   public static final int PROGRAMS = 128;
   public static final int VELOCITIES = 128;
 
+  public static final int MIN_VALUE = 0;
+  public static final int MAX_VALUE = 127;
+
   public static final int MELODIC = -1;
   public static final int PIANO = 0;
   public static final int DRUM = 9;

@@ -96,6 +96,9 @@ onInput
      sendHandlerCommand SELECT_NOTES 16
     ifNotMode 1
      sendHandlerCommand PLAY 16
+  ifCommand 176
+   ifData1 7
+    sendHandlerCommand SET_MASTER_GAIN data2
 onOutput
  ifChannel 1
   ifState ACTIVE
