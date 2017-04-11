@@ -9,27 +9,32 @@
 
 package com.example.afs.musicpad.device.midi.configuration;
 
-public class ThenSetMode extends Then {
+import java.util.Arrays;
 
-  private int mode;
+public class ThenSet extends Then {
 
-  public ThenSetMode(int lineIndex, String[] tokens) {
+  private String[] tokens;
+
+  public ThenSet(int lineIndex, String[] tokens) {
     super(lineIndex);
-    try {
-      mode = Integer.decode(tokens[1]);
-    } catch (RuntimeException e) {
-      displayError("Expected ifMode number");
+    if (tokens.length < 2 || tokens.length > 3) {
+      throw new IllegalArgumentException(formatMessage("Expected set name [value]"));
     }
+    this.tokens = tokens;
   }
 
   @Override
   public void executeThen(Context context) {
-    context.getConfigurationSupport().setMode(mode);
+    if (tokens.length == 2) {
+      context.set(tokens[1], null);
+    } else {
+      context.set(tokens[1], context.getRight(tokens[2]));
+    }
   }
 
   @Override
   public String toString() {
-    return "SetMode [lineNumber=" + getLineNumber() + ", mode=" + mode + "]";
+    return "ThenSendDeviceMessage [tokens=" + Arrays.toString(tokens) + "]";
   }
 
 }

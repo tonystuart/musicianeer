@@ -15,11 +15,10 @@ import javax.sound.midi.MidiUnavailableException;
 import javax.sound.midi.Receiver;
 import javax.sound.midi.ShortMessage;
 
-import com.example.afs.musicpad.Command;
 import com.example.afs.musicpad.device.common.ControllableGroup.Controllable;
 import com.example.afs.musicpad.device.midi.configuration.ChannelState;
-import com.example.afs.musicpad.device.midi.configuration.ConfigurationSupport;
 import com.example.afs.musicpad.device.midi.configuration.Context;
+import com.example.afs.musicpad.device.midi.configuration.Context.HasSendDeviceMessage;
 import com.example.afs.musicpad.device.midi.configuration.MidiConfiguration;
 import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnChannelState;
@@ -31,10 +30,11 @@ import com.example.afs.musicpad.util.DirectList;
 import com.example.afs.musicpad.util.RandomAccessList;
 import com.example.afs.musicpad.util.Value;
 
-public class MidiWriter extends BrokerTask<Message> implements Controllable, ConfigurationSupport {
+public class MidiWriter extends BrokerTask<Message> implements Controllable, HasSendDeviceMessage {
 
   private MidiDeviceBundle device;
   private MidiConfiguration configuration;
+  private Context context = new Context();
   private RandomAccessList<Receiver> receivers = new DirectList<>();
   private ChannelState[] channelStates = new ChannelState[Midi.CHANNELS];
   private int selectedChannel = -1;
@@ -43,24 +43,10 @@ public class MidiWriter extends BrokerTask<Message> implements Controllable, Con
     super(broker);
     this.device = device;
     this.configuration = configuration;
+    context.setHasSendDeviceMessage(this);
     subscribe(OnChannelState.class, message -> doChannelState(message.getChannel(), message.getChannelState()));
     subscribe(OnDeviceMessage.class, message -> sendDeviceMessage(message.getPort(), message.getCommand(), message.getChannel(), message.getData1(), message.getData2()));
     connectDevices();
-  }
-
-  @Override
-  public void clearMode(int mode) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public boolean isMode(int mode) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public boolean isNotMode(int mode) {
-    throw new UnsupportedOperationException();
   }
 
   @Override
@@ -71,21 +57,6 @@ public class MidiWriter extends BrokerTask<Message> implements Controllable, Con
     } catch (InvalidMidiDataException e) {
       throw new RuntimeException(e);
     }
-  }
-
-  @Override
-  public void sendHandlerCommand(Command command, Integer parameter) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public void sendHandlerMessage(int data1) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public void setMode(int mode) {
-    throw new UnsupportedOperationException();
   }
 
   @Override
@@ -132,14 +103,14 @@ public class MidiWriter extends BrokerTask<Message> implements Controllable, Con
   }
 
   private void initializeDevice() {
-    Context context = new Context(this);
     configuration.getOnInitialization().execute(context);
   }
 
   private void setChannelState(int channel, ChannelState channelState) {
     int channelNumber = Value.toNumber(channel);
-    Context context = new Context(this, channelNumber, channelState);
-    configuration.getOnOutput().execute(context);
+    context.setChannel(channelNumber);
+    context.setChannelState(channelState);
+    configuration.getOnChannelStatus().execute(context);
   }
 
 }

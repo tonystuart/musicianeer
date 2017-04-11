@@ -29,29 +29,13 @@ public class Parser {
         consume();
       } else if (indent != expectedIndent) {
         throw new IllegalArgumentException();
+      } else if (tokens.length == 2 && tokens[0].equals("on")) {
+        consume();
+        On on = new On(lineIndex);
+        midiConfiguration.put(tokens[1], on);
+        parse(on, expectedIndent + 1);
       } else {
-        switch (tokens[0]) {
-        case "onInitialization":
-          consume();
-          OnInitialization onInitialization = new OnInitialization(lineIndex);
-          midiConfiguration.setOnInitialization(onInitialization);
-          parseOnInitialization(onInitialization, expectedIndent + 1);
-          break;
-        case "onInput":
-          consume();
-          OnInput onInput = new OnInput(lineIndex);
-          midiConfiguration.setOnInput(onInput);
-          parseOnInput(onInput, expectedIndent + 1);
-          break;
-        case "onOutput":
-          consume();
-          OnOutput onOutput = new OnOutput(lineIndex);
-          midiConfiguration.setOnOutput(onOutput);
-          parseOnOutput(onOutput, expectedIndent + 1);
-          break;
-        default:
-          throwUnsupportedOperation(tokens[0]);
-        }
+        throw new IllegalArgumentException(formatMessage("Expected on <name>"));
       }
     }
     return midiConfiguration;
@@ -69,24 +53,51 @@ public class Parser {
     return indent;
   }
 
-  private void parseOnInitialization(OnInitialization parent, int expectedIndent) {
+  private String formatMessage(String message) {
+    return "Line " + (lineIndex + 1) + ": " + message;
+  }
+
+  private void parse(Node parent, int expectedIndent) {
     while (lineIndex < lines.length) {
       String line = lines[lineIndex];
       int indent = countIndent(line);
       String[] tokens = line.substring(indent).split("\\s+");
-      if (tokens.length == 0) {
+      if (tokens.length == 0 || tokens[0].isEmpty()) {
         consume();
       } else if (tokens[0].startsWith("#")) {
         consume();
       } else if (indent > expectedIndent) {
-        throw new IllegalArgumentException("Line " + (lineIndex + 1) + ": incorrect indentation");
+        throw new IllegalArgumentException(formatMessage("Expected indent of " + expectedIndent + " space(s), got " + indent + " space(s)"));
       } else if (indent < expectedIndent) {
         return;
       } else {
         switch (tokens[0]) {
-        case "clearMode":
+        case "if":
           consume();
-          parent.add(new ThenClearMode(lineIndex, tokens));
+          Node child = new If(lineIndex, tokens);
+          parent.add(child);
+          parse(child, expectedIndent + 1);
+          break;
+        case "else":
+          consume();
+          if (!(parent.getLastNode() instanceof If)) {
+            throw new IllegalArgumentException(formatMessage("Expected 'if' to be previous node at this level"));
+          }
+          child = new Else(lineIndex, tokens);
+          parent.add(child);
+          parse(child, expectedIndent + 1);
+          break;
+        case "return":
+          consume();
+          parent.add(new Return(lineIndex, tokens));
+          break;
+        case "set":
+          consume();
+          parent.add(new ThenSet(lineIndex, tokens));
+          break;
+        case "clear":
+          consume();
+          parent.add(new ThenClear(lineIndex, tokens));
           break;
         case "sendDeviceMessage":
           consume();
@@ -100,148 +111,10 @@ public class Parser {
           consume();
           parent.add(new ThenSendHandlerMessage(lineIndex, tokens));
           break;
-        case "setMode":
-          consume();
-          parent.add(new ThenSetMode(lineIndex, tokens));
-          break;
         default:
-          throwUnsupportedOperation(tokens[0]);
+          throw new IllegalArgumentException(formatMessage("Expected directive"));
         }
       }
     }
-  }
-
-  private void parseOnInput(Node parent, int expectedIndent) {
-    while (lineIndex < lines.length) {
-      String line = lines[lineIndex];
-      int indent = countIndent(line);
-      String[] tokens = line.substring(indent).split("\\s+");
-      if (tokens.length == 0) {
-        consume();
-      } else if (tokens[0].startsWith("#")) {
-        consume();
-      } else if (indent > expectedIndent) {
-        throw new IllegalArgumentException("Line " + (lineIndex + 1) + ": incorrect indentation");
-      } else if (indent < expectedIndent) {
-        return;
-      } else {
-        switch (tokens[0]) {
-        case "ifChannel":
-          consume();
-          If child = new IfChannel(lineIndex, tokens);
-          parent.add(child);
-          parseOnInput(child, expectedIndent + 1);
-          break;
-        case "ifCommand":
-          consume();
-          child = new IfCommand(lineIndex, tokens);
-          parent.add(child);
-          parseOnInput(child, expectedIndent + 1);
-          break;
-        case "ifData1":
-          consume();
-          child = new IfData1(lineIndex, tokens);
-          parent.add(child);
-          parseOnInput(child, expectedIndent + 1);
-          break;
-        case "ifData2":
-          consume();
-          child = new IfData2(lineIndex, tokens);
-          parent.add(child);
-          parseOnInput(child, expectedIndent + 1);
-          break;
-        case "ifMode":
-          consume();
-          child = new IfMode(lineIndex, tokens);
-          parent.add(child);
-          parseOnInput(child, expectedIndent + 1);
-          break;
-        case "ifNotMode":
-          consume();
-          child = new IfNotMode(lineIndex, tokens);
-          parent.add(child);
-          parseOnInput(child, expectedIndent + 1);
-          break;
-        case "ifPort":
-          consume();
-          child = new IfPort(lineIndex, tokens);
-          parent.add(child);
-          parseOnInput(child, expectedIndent + 1);
-          break;
-        case "clearMode":
-          consume();
-          parent.add(new ThenClearMode(lineIndex, tokens));
-          break;
-        case "sendDeviceMessage":
-          consume();
-          parent.add(new ThenSendDeviceMessage(lineIndex, tokens));
-          break;
-        case "sendHandlerCommand":
-          consume();
-          parent.add(new ThenSendHandlerCommand(lineIndex, tokens));
-          break;
-        case "sendHandlerMessage":
-          consume();
-          parent.add(new ThenSendHandlerMessage(lineIndex, tokens));
-          break;
-        case "setMode":
-          consume();
-          parent.add(new ThenSetMode(lineIndex, tokens));
-          break;
-        default:
-          throwUnsupportedOperation(tokens[0]);
-        }
-      }
-    }
-  }
-
-  private void parseOnOutput(Node parent, int expectedIndent) {
-    while (lineIndex < lines.length) {
-      String line = lines[lineIndex];
-      int indent = countIndent(line);
-      String[] tokens = line.substring(indent).split("\\s+");
-      if (tokens.length == 0) {
-        consume();
-      } else if (tokens[0].startsWith("#")) {
-        consume();
-      } else if (indent > expectedIndent) {
-        throw new IllegalArgumentException("Line " + (lineIndex + 1) + ": incorrect indentation");
-      } else if (indent < expectedIndent) {
-        return;
-      } else {
-        switch (tokens[0]) {
-        case "ifChannel":
-          consume();
-          If child = new IfChannel(lineIndex, tokens);
-          parent.add(child);
-          parseOnOutput(child, expectedIndent + 1);
-          break;
-        case "ifState":
-          consume();
-          child = new IfState(lineIndex, tokens);
-          parent.add(child);
-          parseOnOutput(child, expectedIndent + 1);
-          break;
-        case "clearMode":
-          consume();
-          parent.add(new ThenClearMode(lineIndex, tokens));
-          break;
-        case "sendDeviceMessage":
-          consume();
-          parent.add(new ThenSendDeviceMessage(lineIndex, tokens));
-          break;
-        case "setMode":
-          consume();
-          parent.add(new ThenSetMode(lineIndex, tokens));
-          break;
-        default:
-          throwUnsupportedOperation(tokens[0]);
-        }
-      }
-    }
-  }
-
-  private void throwUnsupportedOperation(String token) {
-    throw new UnsupportedOperationException("Line " + (lineIndex + 1) + ": " + token + " (check spelling and capitalization)");
   }
 }

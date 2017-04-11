@@ -9,27 +9,28 @@
 
 package com.example.afs.musicpad.device.midi.configuration;
 
-public class IfData1 extends If {
+import java.util.Arrays;
 
-  private int data1;
+public class ThenClear extends Then {
 
-  public IfData1(int lineIndex, String[] tokens) {
+  private String[] tokens;
+
+  public ThenClear(int lineIndex, String[] tokens) {
     super(lineIndex);
-    try {
-      data1 = Integer.decode(tokens[1]);
-    } catch (RuntimeException e) {
-      displayError("Expected ifData1 number");
+    if (tokens.length != 2) {
+      throw new IllegalArgumentException(formatMessage("Expected clear name"));
     }
+    this.tokens = tokens;
+  }
+
+  @Override
+  public void executeThen(Context context) {
+    context.remove(tokens[1]);
   }
 
   @Override
   public String toString() {
-    return "IfData1 [lineNumber=" + getLineNumber() + ", data1=" + data1 + "]";
-  }
-
-  @Override
-  protected boolean isMatch(Context context) {
-    return this.data1 == context.getData1();
+    return "ThenSendDeviceMessage [tokens=" + Arrays.toString(tokens) + "]";
   }
 
 }

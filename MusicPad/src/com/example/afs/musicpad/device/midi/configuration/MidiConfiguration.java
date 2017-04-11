@@ -9,47 +9,34 @@
 
 package com.example.afs.musicpad.device.midi.configuration;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class MidiConfiguration {
 
-  private OnInitialization onInitialization;
-  private OnInput onInput;
-  private OnOutput onOutput;
+  public static final String INPUT = "input";
+  public static final String INITIALIZATION = "initialization";
+  public static final String CHANNEL_STATUS = "channelStatus";
 
-  public OnInitialization getOnInitialization() {
-    return onInitialization;
+  private Map<String, On> onBlocks = new HashMap<>();
+
+  public Node getOn(String key) {
+    return onBlocks.get(key);
   }
 
-  public OnInput getOnInput() {
-    return onInput;
+  public Node getOnChannelStatus() {
+    return onBlocks.get(CHANNEL_STATUS);
   }
 
-  public OnOutput getOnOutput() {
-    return onOutput;
+  public Node getOnInitialization() {
+    return onBlocks.get(INITIALIZATION);
   }
 
-  public void setOnInitialization(OnInitialization onInitialization) {
-    if (this.onInitialization != null) {
-      throw new IllegalStateException("Line " + (onInitialization.getLineNumber() + 1) + ": onInitialization already set at line " + (this.onInitialization.getLineNumber() + 1));
-    }
-    this.onInitialization = onInitialization;
+  public Node getOnInput() {
+    return onBlocks.get(INPUT);
   }
 
-  public void setOnInput(OnInput onInput) {
-    if (this.onInput != null) {
-      throw new IllegalStateException("Line " + (onInput.getLineNumber() + 1) + ": onInput already set at line " + (this.onInput.getLineNumber() + 1));
-    }
-    this.onInput = onInput;
-  }
-
-  public void setOnOutput(OnOutput onOutput) {
-    if (this.onOutput != null) {
-      throw new IllegalStateException("Line " + (onOutput.getLineNumber() + 1) + ": onOutput already set at line " + (this.onOutput.getLineNumber() + 1));
-    }
-    this.onOutput = onOutput;
-  }
-
-  @Override
-  public String toString() {
-    return "MidiConfiguration [onInitialization=" + onInitialization + ", onInput=" + onInput + ", onOutput=" + onOutput + "]";
+  public void put(String key, On onBlock) {
+    onBlocks.put(key, onBlock);
   }
 }

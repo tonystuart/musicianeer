@@ -9,10 +9,16 @@
 
 package com.example.afs.musicpad.device.midi.configuration;
 
-public abstract class If extends Node {
+public class If extends Node {
 
-  public If(int lineIndex) {
+  private String[] tokens;
+
+  public If(int lineIndex, String[] tokens) {
     super(lineIndex);
+    if (tokens.length < 2 || tokens.length > 3) {
+      throw new IllegalArgumentException(formatMessage("Expected if variable or if variable value"));
+    }
+    this.tokens = tokens;
   }
 
   @Override
@@ -24,8 +30,8 @@ public abstract class If extends Node {
       }
       returnState = ReturnState.IF_MATCH;
       ReturnState childReturnState = executeNodes(context);
-      if (childReturnState == ReturnState.IF_NO_MATCH) {
-        returnState = ReturnState.IF_NO_MATCH;
+      if (childReturnState == ReturnState.RETURN) {
+        returnState = ReturnState.RETURN;
       }
     } else {
       if (context.isTrace()) {
@@ -36,6 +42,20 @@ public abstract class If extends Node {
     return returnState;
   }
 
-  protected abstract boolean isMatch(Context context);
+  protected boolean isMatch(Context context) {
+    if (!context.contains(tokens[1])) {
+      return false;
+    }
+    Object left = context.getLeft(tokens[1]);
+    if (tokens.length == 2) {
+      return true;
+    }
+    if (left == null) {
+      return false;
+    }
+    Object right = context.getRight(tokens[2]);
+    boolean isMatch = left.equals(right);
+    return isMatch;
+  }
 
 }

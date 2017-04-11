@@ -9,8 +9,6 @@
 
 package com.example.afs.musicpad.device.midi;
 
-import java.util.HashSet;
-import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 
 import javax.sound.midi.MidiDevice;
@@ -21,8 +19,10 @@ import javax.sound.midi.ShortMessage;
 
 import com.example.afs.musicpad.Command;
 import com.example.afs.musicpad.device.common.ControllableGroup.Controllable;
-import com.example.afs.musicpad.device.midi.configuration.ConfigurationSupport;
 import com.example.afs.musicpad.device.midi.configuration.Context;
+import com.example.afs.musicpad.device.midi.configuration.Context.HasSendDeviceMessage;
+import com.example.afs.musicpad.device.midi.configuration.Context.HasSendHandlerCommand;
+import com.example.afs.musicpad.device.midi.configuration.Context.HasSendHandlerMessage;
 import com.example.afs.musicpad.device.midi.configuration.MidiConfiguration;
 import com.example.afs.musicpad.device.midi.configuration.Node.ReturnState;
 import com.example.afs.musicpad.message.Message;
@@ -32,7 +32,7 @@ import com.example.afs.musicpad.message.OnInputPress;
 import com.example.afs.musicpad.message.OnInputRelease;
 import com.example.afs.musicpad.util.Broker;
 
-public class MidiReader implements Controllable, ConfigurationSupport {
+public class MidiReader implements Controllable, HasSendDeviceMessage, HasSendHandlerCommand, HasSendHandlerMessage {
 
   private class MidiReceiver implements Receiver {
 
@@ -56,33 +56,17 @@ public class MidiReader implements Controllable, ConfigurationSupport {
   private MidiDeviceBundle device;
   private BlockingQueue<Message> queue;
   private MidiConfiguration configuration;
-  private Set<Integer> modes = new HashSet<>();
+  private Context context = new Context();
 
   public MidiReader(Broker<Message> broker, BlockingQueue<Message> queue, MidiDeviceBundle device, MidiConfiguration configuration) {
     this.broker = broker;
     this.queue = queue;
     this.device = device;
     this.configuration = configuration;
+    context.setHasSendDeviceMessage(this);
+    context.setHasSendHandlerCommand(this);
+    context.setHasSendHandlerMessage(this);
     connectDevices();
-  }
-
-  @Override
-  public void clearMode(int mode) {
-    modes.remove(mode);
-  }
-
-  public Set<Integer> getModes() {
-    return modes;
-  }
-
-  @Override
-  public boolean isMode(int mode) {
-    return modes.contains(mode);
-  }
-
-  @Override
-  public boolean isNotMode(int mode) {
-    return !modes.contains(mode);
   }
 
   @Override
@@ -98,11 +82,6 @@ public class MidiReader implements Controllable, ConfigurationSupport {
   @Override
   public void sendHandlerMessage(int data1) {
     queue.add(new OnInputPress(data1));
-  }
-
-  @Override
-  public void setMode(int mode) {
-    modes.add(mode);
   }
 
   @Override
@@ -136,17 +115,17 @@ public class MidiReader implements Controllable, ConfigurationSupport {
   private void receiveFromDevice(MidiMessage message, long timestamp, int port) {
     if (message instanceof ShortMessage) {
       ShortMessage shortMessage = (ShortMessage) message;
-      int command = shortMessage.getCommand();
-      int channel = shortMessage.getChannel();
-      int data1 = shortMessage.getData1();
-      int data2 = shortMessage.getData2();
-      Context context = new Context(this, port, command, channel, data1, data2);
+      context.setPort(port);
+      context.setCommand(shortMessage.getCommand());
+      context.setChannel(shortMessage.getChannel());
+      context.setData1(shortMessage.getData1());
+      context.setData2(shortMessage.getData2());
       ReturnState returnState = configuration.getOnInput().execute(context);
       if (returnState == ReturnState.IF_NO_MATCH) {
-        if (command == ShortMessage.NOTE_ON) {
-          queue.add(new OnInputPress(data1));
-        } else if (command == ShortMessage.NOTE_OFF) {
-          queue.add(new OnInputRelease(data1));
+        if (shortMessage.getCommand() == ShortMessage.NOTE_ON) {
+          queue.add(new OnInputPress(shortMessage.getData1()));
+        } else if (shortMessage.getCommand() == ShortMessage.NOTE_OFF) {
+          queue.add(new OnInputRelease(shortMessage.getData1()));
         }
       }
     }

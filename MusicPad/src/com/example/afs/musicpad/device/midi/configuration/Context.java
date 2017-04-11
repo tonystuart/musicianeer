@@ -9,72 +9,120 @@
 
 package com.example.afs.musicpad.device.midi.configuration;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import com.example.afs.musicpad.Command;
 import com.example.afs.musicpad.Trace;
 
 public class Context {
 
-  private int port;
-  private int command;
-  private int channel;
-  private int data1;
-  private int data2;
-  private ChannelState channelState;
-  private ConfigurationSupport configurationSupport;
-
-  public Context(ConfigurationSupport configurationSupport) {
-    this.configurationSupport = configurationSupport;
+  public interface HasSendDeviceMessage {
+    void sendDeviceMessage(int port, int command, int channel, int data1, int data2);
   }
 
-  public Context(ConfigurationSupport configurationSupport, int channel, ChannelState channelState) {
-    this.configurationSupport = configurationSupport;
-    this.channel = channel;
-    this.channelState = channelState;
+  public interface HasSendHandlerCommand {
+    void sendHandlerCommand(Command command, Integer parameter);
   }
 
-  public Context(ConfigurationSupport configurationSupport, int port, int command, int channel, int data1, int data2) {
-    this.configurationSupport = configurationSupport;
-    this.port = port;
-    this.command = command;
-    this.channel = channel;
-    this.data1 = data1;
-    this.data2 = data2;
+  public interface HasSendHandlerMessage {
+    void sendHandlerMessage(int data1);
   }
 
-  public int getChannel() {
-    return channel;
+  public static final String PORT = "port";
+  public static final String COMMAND = "command";
+  public static final String CHANNEL = "channel";
+  public static final String DATA1 = "data1";
+  public static final String DATA2 = "data2";
+  public static final String CHANNEL_STATE = "channelState";
+
+  private HasSendDeviceMessage hasSendDeviceMessage;
+  private HasSendHandlerCommand hasSendHandlerCommand;
+  private HasSendHandlerMessage hasSendHandlerMessage;
+
+  private Map<String, Object> context = new HashMap<>();
+
+  public void remove(String key) {
+    context.remove(key);
   }
 
-  public ChannelState getChannelState() {
-    return channelState;
+  public boolean contains(String key) {
+    return context.containsKey(key);
   }
 
-  public int getCommand() {
-    return command;
+  public HasSendDeviceMessage getHasSendDeviceMessage() {
+    return hasSendDeviceMessage;
   }
 
-  public ConfigurationSupport getConfigurationSupport() {
-    return configurationSupport;
+  public HasSendHandlerCommand getHasSendHandlerCommand() {
+    return hasSendHandlerCommand;
   }
 
-  public int getData1() {
-    return data1;
+  public HasSendHandlerMessage getHasSendHandlerMessage() {
+    return hasSendHandlerMessage;
   }
 
-  public int getData2() {
-    return data2;
+  public Object getLeft(String key) {
+    return context.get(key);
   }
 
-  public int getPort() {
-    return port;
+  public Object getRight(String value) {
+    Object right;
+    try {
+      right = Integer.decode(value);
+    } catch (NumberFormatException e) {
+      right = context.get(value);
+    }
+    return right;
   }
 
   public boolean isTrace() {
     return Trace.isTraceConfiguration();
   }
 
+  public void set(String key, Object value) {
+    context.put(key, value);
+  }
+
+  public void setChannel(int channel) {
+    context.put(CHANNEL, channel);
+  }
+
+  public void setChannelState(ChannelState channelState) {
+    context.put(CHANNEL_STATE, channelState);
+  }
+
+  public void setCommand(int command) {
+    context.put(COMMAND, command);
+  }
+
+  public void setData1(int data1) {
+    context.put(DATA1, data1);
+  }
+
+  public void setData2(int data2) {
+    context.put(DATA2, data2);
+  }
+
+  public void setHasSendDeviceMessage(HasSendDeviceMessage hasSendDeviceMessage) {
+    this.hasSendDeviceMessage = hasSendDeviceMessage;
+  }
+
+  public void setHasSendHandlerCommand(HasSendHandlerCommand hasSendHandlerCommand) {
+    this.hasSendHandlerCommand = hasSendHandlerCommand;
+  }
+
+  public void setHasSendHandlerMessage(HasSendHandlerMessage hasSendHandlerMessage) {
+    this.hasSendHandlerMessage = hasSendHandlerMessage;
+  }
+
+  public void setPort(int port) {
+    context.put(PORT, port);
+  }
+
   @Override
   public String toString() {
-    return "Context [port=" + port + ", command=" + command + ", channel=" + channel + ", data1=" + data1 + ", data2=" + data2 + ", channelState=" + channelState + "]";
+    return "Context [context=" + context + "]";
   }
 
 }

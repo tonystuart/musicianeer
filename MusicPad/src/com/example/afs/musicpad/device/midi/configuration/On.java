@@ -9,7 +9,7 @@
 
 package com.example.afs.musicpad.device.midi.configuration;
 
-public abstract class On extends Node {
+public class On extends Node {
 
   public On(int lineIndex) {
     super(lineIndex);

@@ -9,10 +9,18 @@
 
 package com.example.afs.musicpad.device.midi.configuration;
 
-public class OnOutput extends On {
+public class Else extends Node {
 
-  public OnOutput(int lineIndex) {
-    super(lineIndex);
+  public Else(int lineNumber, String[] tokens) {
+    super(lineNumber);
+    if (tokens.length != 1) {
+      throw new IllegalArgumentException(formatMessage("Expected else"));
+    }
+  }
+
+  @Override
+  public ReturnState execute(Context context) {
+    return executeNodes(context);
   }
 
 }

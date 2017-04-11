@@ -9,22 +9,18 @@
 
 package com.example.afs.musicpad.device.midi.configuration;
 
-import com.example.afs.musicpad.Command;
+public class Return extends Node {
 
-public interface ConfigurationSupport {
+  public Return(int lineNumber, String[] tokens) {
+    super(lineNumber);
+    if (tokens.length != 1) {
+      throw new IllegalArgumentException(formatMessage("Expected return"));
+    }
+  }
 
-  void clearMode(int mode);
-
-  boolean isMode(int mode);
-
-  boolean isNotMode(int mode);
-
-  void sendDeviceMessage(int port, int command, int channel, int data1, int data2);
-
-  void sendHandlerCommand(Command command, Integer parameter);
-
-  void sendHandlerMessage(int data1);
-
-  void setMode(int mode);
+  @Override
+  public ReturnState execute(Context context) {
+    return ReturnState.RETURN;
+  }
 
 }

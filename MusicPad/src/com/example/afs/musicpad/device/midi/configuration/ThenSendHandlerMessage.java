@@ -9,27 +9,29 @@
 
 package com.example.afs.musicpad.device.midi.configuration;
 
+import java.util.Arrays;
+
 public class ThenSendHandlerMessage extends Then {
 
-  private int data1;
+  private String[] tokens;
 
   public ThenSendHandlerMessage(int lineIndex, String[] tokens) {
     super(lineIndex);
-    try {
-      data1 = Integer.decode(tokens[1]);
-    } catch (RuntimeException e) {
-      displayError("Expected sendHandlerMessage data1");
+    if (tokens.length != 2) {
+      throw new IllegalArgumentException(formatMessage("Expected sendHandlerMessage data1"));
     }
+    this.tokens = tokens;
   }
 
   @Override
   public void executeThen(Context context) {
-    context.getConfigurationSupport().sendHandlerMessage(data1);
+    int data1 = (int) context.getRight(tokens[1]);
+    context.getHasSendHandlerMessage().sendHandlerMessage(data1);
   }
 
   @Override
   public String toString() {
-    return "SendHandlerMessage [lineNumber=" + getLineNumber() + ", data1=" + data1 + "]";
+    return "ThenSendHandlerMessage [tokens=" + Arrays.toString(tokens) + "]";
   }
 
 }

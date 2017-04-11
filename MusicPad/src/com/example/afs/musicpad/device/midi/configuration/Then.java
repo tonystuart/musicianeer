@@ -21,7 +21,7 @@ public abstract class Then extends Node {
       System.out.println("Executing " + this);
     }
     executeThen(context);
-    return ReturnState.THEN;
+    return ReturnState.UNCONDITIONAL;
   }
 
   public abstract void executeThen(Context context);

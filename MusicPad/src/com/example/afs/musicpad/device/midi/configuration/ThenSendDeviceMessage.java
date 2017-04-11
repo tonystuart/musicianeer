@@ -9,35 +9,33 @@
 
 package com.example.afs.musicpad.device.midi.configuration;
 
+import java.util.Arrays;
+
 public class ThenSendDeviceMessage extends Then {
 
-  private int port;
-  private int command;
-  private int channel;
-  private int data1;
-  private int data2;
+  private String[] tokens;
 
   public ThenSendDeviceMessage(int lineIndex, String[] tokens) {
     super(lineIndex);
-    try {
-      port = Integer.decode(tokens[1]);
-      command = Integer.decode(tokens[2]);
-      channel = Integer.decode(tokens[3]);
-      data1 = Integer.decode(tokens[4]);
-      data2 = Integer.decode(tokens[5]);
-    } catch (RuntimeException e) {
-      displayError("Expected sendDeviceMessage port command channel data1 data2");
+    if (tokens.length != 6) {
+      throw new IllegalArgumentException(formatMessage("Expected sendDeviceMessage port command channel data1 data2"));
     }
+    this.tokens = tokens;
   }
 
   @Override
   public void executeThen(Context context) {
-    context.getConfigurationSupport().sendDeviceMessage(port, command, channel, data1, data2);
+    int port = (int) context.getRight(tokens[1]);
+    int command = (int) context.getRight(tokens[2]);
+    int channel = (int) context.getRight(tokens[3]);
+    int data1 = (int) context.getRight(tokens[4]);
+    int data2 = (int) context.getRight(tokens[5]);
+    context.getHasSendDeviceMessage().sendDeviceMessage(port, command, channel, data1, data2);
   }
 
   @Override
   public String toString() {
-    return "SendDeviceMessage [lineNumber=" + getLineNumber() + ", port=" + port + ", command=" + command + ", channel=" + channel + ", data1=" + data1 + ", data2=" + data2 + "]";
+    return "ThenSendDeviceMessage [tokens=" + Arrays.toString(tokens) + "]";
   }
 
 }

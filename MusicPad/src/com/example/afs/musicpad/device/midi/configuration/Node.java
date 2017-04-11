@@ -17,7 +17,7 @@ import com.example.afs.musicpad.util.RandomAccessList;
 public abstract class Node {
 
   public enum ReturnState {
-    IF_MATCH, IF_NO_MATCH, THEN
+    IF_MATCH, IF_NO_MATCH, UNCONDITIONAL, RETURN
   }
 
   private int lineNumber;
@@ -33,6 +33,10 @@ public abstract class Node {
 
   public abstract ReturnState execute(Context context);
 
+  public Node getLastNode() {
+    return nodes.size() == 0 ? null : nodes.get(nodes.size() - 1);
+  }
+
   public int getLineNumber() {
     return lineNumber;
   }
@@ -47,17 +51,23 @@ public abstract class Node {
   }
 
   protected void displayError(String message) {
-    System.err.println("Line " + (lineNumber + 1) + ": " + message);
+    System.err.println(formatMessage(message));
   }
 
   protected ReturnState executeNodes(Context context) {
     int nodeCount = nodes.size();
-    ReturnState returnState = ReturnState.THEN;
-    for (int i = 0; i < nodeCount && returnState != ReturnState.IF_MATCH; i++) {
+    ReturnState returnState = ReturnState.UNCONDITIONAL;
+    for (int i = 0; i < nodeCount && returnState != ReturnState.RETURN; i++) {
       Node node = nodes.get(i);
-      returnState = node.execute(context);
+      if (!(node instanceof Else) || returnState == ReturnState.IF_NO_MATCH) {
+        returnState = node.execute(context);
+      }
     }
     return returnState;
+  }
+
+  protected String formatMessage(String message) {
+    return "Line " + lineNumber + ": " + message;
   }
 
 }

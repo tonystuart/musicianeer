@@ -9,36 +9,32 @@
 
 package com.example.afs.musicpad.device.midi.configuration;
 
+import java.util.Arrays;
+
 import com.example.afs.musicpad.Command;
 
 public class ThenSendHandlerCommand extends Then {
 
-  private Command command;
-  private Integer parameter;
-  private boolean isUseData2;
+  private String[] tokens;
 
   public ThenSendHandlerCommand(int lineIndex, String[] tokens) {
     super(lineIndex);
-    try {
-      command = Command.valueOf(tokens[1]);
-      if (tokens[2].equals("data2")) {
-        isUseData2 = true;
-      } else {
-        parameter = Integer.decode(tokens[2]);
-      }
-    } catch (RuntimeException e) {
-      displayError("Expected sendHandlerCommand command parameter");
+    if (tokens.length != 3) {
+      throw new IllegalArgumentException(formatMessage("Expected sendHandlerCommand command parameter"));
     }
+    this.tokens = tokens;
   }
 
   @Override
   public void executeThen(Context context) {
-    context.getConfigurationSupport().sendHandlerCommand(command, isUseData2 ? context.getData2() : parameter);
+    Command command = Command.valueOf((String) context.getRight(tokens[1]));
+    int parameter = (int) context.getRight(tokens[2]);
+    context.getHasSendHandlerCommand().sendHandlerCommand(command, parameter);
   }
 
   @Override
   public String toString() {
-    return "SendHandlerCommand [lineNumber=" + getLineNumber() + ", command=" + command + ", parameter=" + parameter + "]";
+    return "ThenSendHandlerCommand [tokens=" + Arrays.toString(tokens) + "]";
   }
 
 }

@@ -1,223 +1,281 @@
-onInitialization
+on initialization
  # Exit and enter InControl mode
  sendDeviceMessage 1 144 0 12 0
  sendDeviceMessage 1 144 0 12 127
-onInput
- ifPort 1
-  ifCommand 144
-   ifData1 12
+
+on input
+ if port 1
+  if command 128
+   if data1 104
+    clear shiftKeyDown
+    sendDeviceMessage 1 128 0 104 127 
+    return
+  if command 144
+   if data1 12
     # Device entered / exited InControl mode
-   ifData1 104
-    ifNotMode 1
-     # Enter select notes mode (top round pad)
-     setMode 1
-     sendDeviceMessage 1 144 0 104 127  
-    ifMode 1
-     # Exit select notes mode (top round pad)
-     clearMode 1
-     sendDeviceMessage 1 128 0 104 127 
-   ifData1 96
-    ifMode 1
-     sendHandlerCommand SELECT_NOTES 1
-    ifNotMode 1
+    return
+   if data1 104
+    set shiftKeyDown
+    sendDeviceMessage 1 144 0 104 127  
+    return
+   if shiftKeyDown
+    if data1 96
+     sendHandlerCommand TRANSPOSE 0
+     return
+   else
+    if data1 96
+     set selectedChannel 1
      sendHandlerCommand PLAY 1
-   ifData1 97
-    ifMode 1
-     sendHandlerCommand SELECT_NOTES 2
-    ifNotMode 1
+     sendHandlerCommand SELECT_NOTES 1
+     return
+    if data1 97
+     set selectedChannel 2
      sendHandlerCommand PLAY 2
-   ifData1 98
-    ifMode 1
-     sendHandlerCommand SELECT_NOTES 3
-    ifNotMode 1
+     sendHandlerCommand SELECT_NOTES 2
+     return
+    if data1 98
+     set selectedChannel 3
      sendHandlerCommand PLAY 3
-   ifData1 99
-    ifMode 1
-     sendHandlerCommand SELECT_NOTES 4
-    ifNotMode 1
+     sendHandlerCommand SELECT_NOTES 3
+     return
+    if data1 99
+     set selectedChannel 4
      sendHandlerCommand PLAY 4
-   ifData1 100
-    ifMode 1
-     sendHandlerCommand SELECT_NOTES 5
-    ifNotMode 1
+     sendHandlerCommand SELECT_NOTES 4
+     return
+    if data1 100
+     set selectedChannel 5
      sendHandlerCommand PLAY 5
-   ifData1 101
-    ifMode 1
-     sendHandlerCommand SELECT_NOTES 6
-    ifNotMode 1
+     sendHandlerCommand SELECT_NOTES 5
+     return
+    if data1 101
+     set selectedChannel 6
      sendHandlerCommand PLAY 6
-   ifData1 102
-    ifMode 1
-     sendHandlerCommand SELECT_NOTES 7
-    ifNotMode 1
+     sendHandlerCommand SELECT_NOTES 6
+     return
+    if data1 102
+     set selectedChannel 7
      sendHandlerCommand PLAY 7
-   ifData1 103
-    ifMode 1
-     sendHandlerCommand SELECT_NOTES 8
-    ifNotMode 1
+     sendHandlerCommand SELECT_NOTES 7
+     return
+    if data1 103
+     set selectedChannel 8
      sendHandlerCommand PLAY 8
-   ifData1 112
-    ifMode 1
-     sendHandlerCommand SELECT_NOTES 9
-    ifNotMode 1
+     sendHandlerCommand SELECT_NOTES 8
+     return
+    if data1 112
+     set selectedChannel 9
      sendHandlerCommand PLAY 9
-   ifData1 113
-    ifMode 1
-     sendHandlerCommand SELECT_NOTES 10
-    ifNotMode 1
+     sendHandlerCommand SELECT_NOTES 9
+     return
+    if data1 113
+     set selectedChannel 10
      sendHandlerCommand PLAY 10
-   ifData1 114
-    ifMode 1
-     sendHandlerCommand SELECT_NOTES 11
-    ifNotMode 1
+     sendHandlerCommand SELECT_NOTES 10
+     return
+    if data1 114
+     set selectedChannel 11
      sendHandlerCommand PLAY 11
-   ifData1 115
-    ifMode 1
-     sendHandlerCommand SELECT_NOTES 12
-    ifNotMode 1
+     sendHandlerCommand SELECT_NOTES 11
+     return
+    if data1 115
+     set selectedChannel 12
      sendHandlerCommand PLAY 12
-   ifData1 116
-    ifMode 1
-     sendHandlerCommand SELECT_NOTES 13
-    ifNotMode 1
+     sendHandlerCommand SELECT_NOTES 12
+     return
+    if data1 116
+     set selectedChannel 13
      sendHandlerCommand PLAY 13
-   ifData1 117
-    ifMode 1
-     sendHandlerCommand SELECT_NOTES 14
-    ifNotMode 1
+     sendHandlerCommand SELECT_NOTES 13
+     return
+    if data1 117
+     set selectedChannel 14
      sendHandlerCommand PLAY 14
-   ifData1 118
-    ifMode 1
-     sendHandlerCommand SELECT_NOTES 15
-    ifNotMode 1
+     sendHandlerCommand SELECT_NOTES 14
+     return
+    if data1 118
+     set selectedChannel 15
      sendHandlerCommand PLAY 15
-   ifData1 119
-    ifMode 1
-     sendHandlerCommand SELECT_NOTES 16
-    ifNotMode 1
+     sendHandlerCommand SELECT_NOTES 15
+     return
+    if data1 119
+     set selectedChannel 16
      sendHandlerCommand PLAY 16
-  ifCommand 176
-   ifData1 7
+     sendHandlerCommand SELECT_NOTES 16
+     return
+  if command 176
+   if data1 7
     sendHandlerCommand SET_MASTER_GAIN data2
-   ifData2 127
-    ifData1 112
+    return
+   if data2 127
+    if data1 112
      sendHandlerCommand PREVIOUS_MEASURE 0
-    ifData1 113
+     return
+    if data1 113
      sendHandlerCommand NEXT_MEASURE 0
-    ifData1 114
+     return
+    if data1 114
      sendHandlerCommand STOP_PAUSE 0
-    ifData1 115
+     return
+    if data1 115
      sendHandlerCommand PLAY_PAUSE 0
-onOutput
- ifChannel 1
-  ifState ACTIVE
-   sendDeviceMessage 1 144 0 96 52
-  ifState INACTIVE
-   sendDeviceMessage 1 144 0 96 7
-  ifState SELECTED
+     return
+
+on channelStatus
+ if channel 1
+  if selectedChannel 1
    sendDeviceMessage 1 144 0 96 127
- ifChannel 2
-  ifState ACTIVE
-   sendDeviceMessage 1 144 0 97 52
-  ifState INACTIVE
-   sendDeviceMessage 1 144 0 97 7
-  ifState SELECTED
+   return
+  if channelState ACTIVE
+   sendDeviceMessage 1 144 0 96 52
+   return
+  if channelState INACTIVE
+   sendDeviceMessage 1 144 0 96 7
+   return
+ if channel 2
+  if selectedChannel 2
    sendDeviceMessage 1 144 0 97 127
- ifChannel 3
-  ifState ACTIVE
-   sendDeviceMessage 1 144 0 98 52
-  ifState INACTIVE
-   sendDeviceMessage 1 144 0 98 7
-  ifState SELECTED
+   return
+  if channelState ACTIVE
+   sendDeviceMessage 1 144 0 97 52
+   return
+  if channelState INACTIVE
+   sendDeviceMessage 1 144 0 97 7
+   return
+ if channel 3
+  if selectedChannel 3
    sendDeviceMessage 1 144 0 98 127
- ifChannel 4
-  ifState ACTIVE
-   sendDeviceMessage 1 144 0 99 52
-  ifState INACTIVE
-   sendDeviceMessage 1 144 0 99 7
-  ifState SELECTED
+   return
+  if channelState ACTIVE
+   sendDeviceMessage 1 144 0 98 52
+   return
+  if channelState INACTIVE
+   sendDeviceMessage 1 144 0 98 7
+   return
+ if channel 4
+  if selectedChannel 4
    sendDeviceMessage 1 144 0 99 127
- ifChannel 5
-  ifState ACTIVE
-   sendDeviceMessage 1 144 0 100 52
-  ifState INACTIVE
-   sendDeviceMessage 1 144 0 100 7
-  ifState SELECTED
+   return
+  if channelState ACTIVE
+   sendDeviceMessage 1 144 0 99 52
+   return
+  if channelState INACTIVE
+   sendDeviceMessage 1 144 0 99 7
+   return
+ if channel 5
+  if selectedChannel 5
    sendDeviceMessage 1 144 0 100 127
- ifChannel 6
-  ifState ACTIVE
-   sendDeviceMessage 1 144 0 101 52
-  ifState INACTIVE
-   sendDeviceMessage 1 144 0 101 7
-  ifState SELECTED
+   return
+  if channelState ACTIVE
+   sendDeviceMessage 1 144 0 100 52
+   return
+  if channelState INACTIVE
+   sendDeviceMessage 1 144 0 100 7
+   return
+ if channel 6
+  if selectedChannel 6
    sendDeviceMessage 1 144 0 101 127
- ifChannel 7
-  ifState ACTIVE
-   sendDeviceMessage 1 144 0 102 52
-  ifState INACTIVE
-   sendDeviceMessage 1 144 0 102 7
-  ifState SELECTED
+   return
+  if channelState ACTIVE
+   sendDeviceMessage 1 144 0 101 52
+   return
+  if channelState INACTIVE
+   sendDeviceMessage 1 144 0 101 7
+   return
+ if channel 7
+  if selectedChannel 7
    sendDeviceMessage 1 144 0 102 127
- ifChannel 8
-  ifState ACTIVE
-   sendDeviceMessage 1 144 0 103 52
-  ifState INACTIVE
-   sendDeviceMessage 1 144 0 103 7
-  ifState SELECTED
+   return
+  if channelState ACTIVE
+   sendDeviceMessage 1 144 0 102 52
+   return
+  if channelState INACTIVE
+   sendDeviceMessage 1 144 0 102 7
+   return
+ if channel 8
+  if selectedChannel 8
    sendDeviceMessage 1 144 0 103 127
- ifChannel 9
-  ifState ACTIVE
-   sendDeviceMessage 1 144 0 112 52
-  ifState INACTIVE
-   sendDeviceMessage 1 144 0 112 7
-  ifState SELECTED
+   return
+  if channelState ACTIVE
+   sendDeviceMessage 1 144 0 103 52
+   return
+  if channelState INACTIVE
+   sendDeviceMessage 1 144 0 103 7
+   return
+ if channel 9
+  if selectedChannel 9
    sendDeviceMessage 1 144 0 112 127
- ifChannel 10
-  ifState ACTIVE
-   sendDeviceMessage 1 144 0 113 52
-  ifState INACTIVE
-   sendDeviceMessage 1 144 0 113 7
-  ifState SELECTED
+   return
+  if channelState ACTIVE
+   sendDeviceMessage 1 144 0 112 52
+   return
+  if channelState INACTIVE
+   sendDeviceMessage 1 144 0 112 7
+   return
+ if channel 10
+  if selectedChannel 10
    sendDeviceMessage 1 144 0 113 127
- ifChannel 11
-  ifState ACTIVE
-   sendDeviceMessage 1 144 0 114 52
-  ifState INACTIVE
-   sendDeviceMessage 1 144 0 114 7
-  ifState SELECTED
+   return
+  if channelState ACTIVE
+   sendDeviceMessage 1 144 0 113 52
+   return
+  if channelState INACTIVE
+   sendDeviceMessage 1 144 0 113 7
+   return
+ if channel 11
+  if selectedChannel 11
    sendDeviceMessage 1 144 0 114 127
- ifChannel 12
-  ifState ACTIVE
-   sendDeviceMessage 1 144 0 115 52
-  ifState INACTIVE
-   sendDeviceMessage 1 144 0 115 7
-  ifState SELECTED
+   return
+  if channelState ACTIVE
+   sendDeviceMessage 1 144 0 114 52
+   return
+  if channelState INACTIVE
+   sendDeviceMessage 1 144 0 114 7
+   return
+ if channel 12
+  if selectedChannel 12
    sendDeviceMessage 1 144 0 115 127
- ifChannel 13
-  ifState ACTIVE
-   sendDeviceMessage 1 144 0 116 52
-  ifState INACTIVE
-   sendDeviceMessage 1 144 0 116 7
-  ifState SELECTED
+   return
+  if channelState ACTIVE
+   sendDeviceMessage 1 144 0 115 52
+   return
+  if channelState INACTIVE
+   sendDeviceMessage 1 144 0 115 7
+   return
+ if channel 13
+  if selectedChannel 13
    sendDeviceMessage 1 144 0 116 127
- ifChannel 14
-  ifState ACTIVE
-   sendDeviceMessage 1 144 0 117 52
-  ifState INACTIVE
+   return
+  if channelState ACTIVE
+   sendDeviceMessage 1 144 0 116 52
+   return
+  if channelState INACTIVE
+   sendDeviceMessage 1 144 0 116 7
+   return
+ if channel 14
+  if selectedChannel 14
    sendDeviceMessage 1 144 0 117 7
-  ifState SELECTED
-   sendDeviceMessage 1 144 0 117 127
- ifChannel 15
-  ifState ACTIVE
-   sendDeviceMessage 1 144 0 118 52
-  ifState INACTIVE
-   sendDeviceMessage 1 144 0 118 7
-  ifState SELECTED
+   return
+  if channelState ACTIVE
+   sendDeviceMessage 1 144 0 117 52
+   return
+ if channel 15
+  if selectedChannel 15
    sendDeviceMessage 1 144 0 118 127
- ifChannel 16
-  ifState ACTIVE
-   sendDeviceMessage 1 144 0 119 52
-  ifState INACTIVE
-   sendDeviceMessage 1 144 0 119 7
-  ifState SELECTED
+   return
+  if channelState ACTIVE
+   sendDeviceMessage 1 144 0 118 52
+   return
+  if channelState INACTIVE
+   sendDeviceMessage 1 144 0 118 7
+   return
+ if channel 16
+  if selectedChannel 16
    sendDeviceMessage 1 144 0 119 127
+   return
+  if channelState ACTIVE
+   sendDeviceMessage 1 144 0 119 52
+   return
+  if channelState INACTIVE
+   sendDeviceMessage 1 144 0 119 7
+   return
