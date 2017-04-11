@@ -11,14 +11,11 @@ package com.example.afs.musicpad.device.midi.configuration;
 
 public class If extends Node {
 
-  private String[] tokens;
-
   public If(int lineIndex, String[] tokens) {
-    super(lineIndex);
+    super(lineIndex, tokens);
     if (tokens.length < 2 || tokens.length > 3) {
       throw new IllegalArgumentException(formatMessage("Expected if variable or if variable value"));
     }
-    this.tokens = tokens;
   }
 
   @Override
@@ -54,6 +51,12 @@ public class If extends Node {
       return false;
     }
     Object right = context.getRight(tokens[2]);
+    if (right == null) {
+      if (left instanceof Enum<?>) {
+        left = ((Enum<?>) left).name();
+        right = tokens[2];
+      }
+    }
     boolean isMatch = left.equals(right);
     return isMatch;
   }

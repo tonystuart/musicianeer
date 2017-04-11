@@ -13,14 +13,11 @@ import java.util.Arrays;
 
 public class ThenClear extends Then {
 
-  private String[] tokens;
-
   public ThenClear(int lineIndex, String[] tokens) {
-    super(lineIndex);
+    super(lineIndex, tokens);
     if (tokens.length != 2) {
       throw new IllegalArgumentException(formatMessage("Expected clear name"));
     }
-    this.tokens = tokens;
   }
 
   @Override

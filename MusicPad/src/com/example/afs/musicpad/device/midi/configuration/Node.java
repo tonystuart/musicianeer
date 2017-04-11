@@ -9,6 +9,7 @@
 
 package com.example.afs.musicpad.device.midi.configuration;
 
+import java.util.Arrays;
 import java.util.List;
 
 import com.example.afs.musicpad.util.DirectList;
@@ -20,11 +21,13 @@ public abstract class Node {
     IF_MATCH, IF_NO_MATCH, UNCONDITIONAL, RETURN
   }
 
-  private int lineNumber;
-  private RandomAccessList<Node> nodes = new DirectList<>();
+  private final int lineNumber;
+  protected final String[] tokens;
+  private final RandomAccessList<Node> nodes = new DirectList<>();
 
-  public Node(int lineNumber) {
+  public Node(int lineNumber, String[] tokens) {
     this.lineNumber = lineNumber;
+    this.tokens = tokens;
   }
 
   public void add(Node child) {
@@ -47,7 +50,7 @@ public abstract class Node {
 
   @Override
   public String toString() {
-    return "Node [lineNumber=" + lineNumber + ", nodes=" + nodes + "]";
+    return "Node [lineNumber=" + lineNumber + ", tokens=" + Arrays.toString(tokens) + "]";
   }
 
   protected void displayError(String message) {

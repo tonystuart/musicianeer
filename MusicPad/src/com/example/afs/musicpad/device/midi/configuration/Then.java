@@ -11,8 +11,8 @@ package com.example.afs.musicpad.device.midi.configuration;
 
 public abstract class Then extends Node {
 
-  public Then(int lineIndex) {
-    super(lineIndex);
+  public Then(int lineIndex, String[] tokens) {
+    super(lineIndex, tokens);
   }
 
   @Override

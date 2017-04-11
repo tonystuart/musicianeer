@@ -13,14 +13,11 @@ import java.util.Arrays;
 
 public class ThenSendHandlerMessage extends Then {
 
-  private String[] tokens;
-
   public ThenSendHandlerMessage(int lineIndex, String[] tokens) {
-    super(lineIndex);
+    super(lineIndex, tokens);
     if (tokens.length != 2) {
       throw new IllegalArgumentException(formatMessage("Expected sendHandlerMessage data1"));
     }
-    this.tokens = tokens;
   }
 
   @Override

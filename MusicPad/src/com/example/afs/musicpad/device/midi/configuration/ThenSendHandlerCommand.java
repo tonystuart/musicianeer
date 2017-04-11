@@ -15,14 +15,11 @@ import com.example.afs.musicpad.Command;
 
 public class ThenSendHandlerCommand extends Then {
 
-  private String[] tokens;
-
   public ThenSendHandlerCommand(int lineIndex, String[] tokens) {
-    super(lineIndex);
+    super(lineIndex, tokens);
     if (tokens.length != 3) {
       throw new IllegalArgumentException(formatMessage("Expected sendHandlerCommand command parameter"));
     }
-    this.tokens = tokens;
   }
 
   @Override

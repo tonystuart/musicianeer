@@ -25,6 +25,7 @@ import com.example.afs.musicpad.device.midi.configuration.Context.HasSendHandler
 import com.example.afs.musicpad.device.midi.configuration.Context.HasSendHandlerMessage;
 import com.example.afs.musicpad.device.midi.configuration.MidiConfiguration;
 import com.example.afs.musicpad.device.midi.configuration.Node.ReturnState;
+import com.example.afs.musicpad.device.midi.configuration.On;
 import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnDeviceMessage;
@@ -93,6 +94,11 @@ public class MidiReader implements Controllable, HasSendDeviceMessage, HasSendHa
     disconnectDevices();
   }
 
+  @Override
+  public String toString() {
+    return "MidiReader [type=" + device.getType() + ", card=" + device.getCard() + ", unit=" + device.getUnit() + "]";
+  }
+
   private void connectDevices() {
     try {
       for (MidiInputDevice midiInputDevice : device.getInputDevices()) {
@@ -115,13 +121,13 @@ public class MidiReader implements Controllable, HasSendDeviceMessage, HasSendHa
   private void receiveFromDevice(MidiMessage message, long timestamp, int port) {
     if (message instanceof ShortMessage) {
       ShortMessage shortMessage = (ShortMessage) message;
-      context.setPort(port);
-      context.setCommand(shortMessage.getCommand());
-      context.setChannel(shortMessage.getChannel());
-      context.setData1(shortMessage.getData1());
-      context.setData2(shortMessage.getData2());
-      ReturnState returnState = configuration.getOnInput().execute(context);
-      if (returnState == ReturnState.IF_NO_MATCH) {
+      context.set(Context.PORT, port);
+      context.set(Context.COMMAND, shortMessage.getCommand());
+      context.set(Context.CHANNEL, shortMessage.getChannel());
+      context.set(Context.DATA1, shortMessage.getData1());
+      context.set(Context.DATA2, shortMessage.getData2());
+      On onInput = configuration.getOn(MidiConfiguration.INPUT);
+      if (onInput == null || onInput.execute(context) == ReturnState.IF_NO_MATCH) {
         if (shortMessage.getCommand() == ShortMessage.NOTE_ON) {
           queue.add(new OnInputPress(shortMessage.getData1()));
         } else if (shortMessage.getCommand() == ShortMessage.NOTE_OFF) {

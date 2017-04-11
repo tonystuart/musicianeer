@@ -31,7 +31,7 @@ public class Parser {
         throw new IllegalArgumentException();
       } else if (tokens.length == 2 && tokens[0].equals("on")) {
         consume();
-        On on = new On(lineIndex);
+        On on = new On(lineIndex, tokens);
         midiConfiguration.put(tokens[1], on);
         parse(on, expectedIndent + 1);
       } else {

@@ -20,20 +20,8 @@ public class MidiConfiguration {
 
   private Map<String, On> onBlocks = new HashMap<>();
 
-  public Node getOn(String key) {
+  public On getOn(String key) {
     return onBlocks.get(key);
-  }
-
-  public Node getOnChannelStatus() {
-    return onBlocks.get(CHANNEL_STATUS);
-  }
-
-  public Node getOnInitialization() {
-    return onBlocks.get(INITIALIZATION);
-  }
-
-  public Node getOnInput() {
-    return onBlocks.get(INPUT);
   }
 
   public void put(String key, On onBlock) {

@@ -42,10 +42,6 @@ public class Context {
 
   private Map<String, Object> context = new HashMap<>();
 
-  public void remove(String key) {
-    context.remove(key);
-  }
-
   public boolean contains(String key) {
     return context.containsKey(key);
   }
@@ -80,28 +76,8 @@ public class Context {
     return Trace.isTraceConfiguration();
   }
 
-  public void set(String key, Object value) {
-    context.put(key, value);
-  }
-
-  public void setChannel(int channel) {
-    context.put(CHANNEL, channel);
-  }
-
-  public void setChannelState(ChannelState channelState) {
-    context.put(CHANNEL_STATE, channelState);
-  }
-
-  public void setCommand(int command) {
-    context.put(COMMAND, command);
-  }
-
-  public void setData1(int data1) {
-    context.put(DATA1, data1);
-  }
-
-  public void setData2(int data2) {
-    context.put(DATA2, data2);
+  public void remove(String key) {
+    context.remove(key);
   }
 
   public void setHasSendDeviceMessage(HasSendDeviceMessage hasSendDeviceMessage) {
@@ -116,8 +92,8 @@ public class Context {
     this.hasSendHandlerMessage = hasSendHandlerMessage;
   }
 
-  public void setPort(int port) {
-    context.put(PORT, port);
+  public void set(String key, Object value) {
+    context.put(key, value);
   }
 
   @Override

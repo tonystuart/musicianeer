@@ -12,7 +12,7 @@ package com.example.afs.musicpad.device.midi.configuration;
 public class Else extends Node {
 
   public Else(int lineNumber, String[] tokens) {
-    super(lineNumber);
+    super(lineNumber, tokens);
     if (tokens.length != 1) {
       throw new IllegalArgumentException(formatMessage("Expected else"));
     }

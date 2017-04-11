@@ -13,14 +13,11 @@ import java.util.Arrays;
 
 public class ThenSet extends Then {
 
-  private String[] tokens;
-
   public ThenSet(int lineIndex, String[] tokens) {
-    super(lineIndex);
+    super(lineIndex, tokens);
     if (tokens.length < 2 || tokens.length > 3) {
       throw new IllegalArgumentException(formatMessage("Expected set name [value]"));
     }
-    this.tokens = tokens;
   }
 
   @Override

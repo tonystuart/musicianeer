@@ -12,7 +12,7 @@ package com.example.afs.musicpad.device.midi.configuration;
 public class Return extends Node {
 
   public Return(int lineNumber, String[] tokens) {
-    super(lineNumber);
+    super(lineNumber, tokens);
     if (tokens.length != 1) {
       throw new IllegalArgumentException(formatMessage("Expected return"));
     }
@@ -20,6 +20,9 @@ public class Return extends Node {
 
   @Override
   public ReturnState execute(Context context) {
+    if (context.isTrace()) {
+      System.out.println("Executing " + this);
+    }
     return ReturnState.RETURN;
   }
 

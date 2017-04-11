@@ -13,14 +13,11 @@ import java.util.Arrays;
 
 public class ThenSendDeviceMessage extends Then {
 
-  private String[] tokens;
-
   public ThenSendDeviceMessage(int lineIndex, String[] tokens) {
-    super(lineIndex);
+    super(lineIndex, tokens);
     if (tokens.length != 6) {
       throw new IllegalArgumentException(formatMessage("Expected sendDeviceMessage port command channel data1 data2"));
     }
-    this.tokens = tokens;
   }
 
   @Override

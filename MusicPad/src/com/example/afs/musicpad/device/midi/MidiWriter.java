@@ -20,6 +20,7 @@ import com.example.afs.musicpad.device.midi.configuration.ChannelState;
 import com.example.afs.musicpad.device.midi.configuration.Context;
 import com.example.afs.musicpad.device.midi.configuration.Context.HasSendDeviceMessage;
 import com.example.afs.musicpad.device.midi.configuration.MidiConfiguration;
+import com.example.afs.musicpad.device.midi.configuration.On;
 import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnChannelState;
 import com.example.afs.musicpad.message.OnDeviceMessage;
@@ -71,6 +72,11 @@ public class MidiWriter extends BrokerTask<Message> implements Controllable, Has
     disconnectDevices();
   }
 
+  @Override
+  public String toString() {
+    return "MidiWriter [type=" + device.getType() + ", card=" + device.getCard() + ", unit=" + device.getUnit() + "]";
+  }
+
   private void connectDevices() {
     try {
       for (MidiOutputDevice midiOutputDevice : device.getOutputDevices()) {
@@ -103,14 +109,20 @@ public class MidiWriter extends BrokerTask<Message> implements Controllable, Has
   }
 
   private void initializeDevice() {
-    configuration.getOnInitialization().execute(context);
+    On onInitialization = configuration.getOn(MidiConfiguration.INITIALIZATION);
+    if (onInitialization != null) {
+      onInitialization.execute(context);
+    }
   }
 
   private void setChannelState(int channel, ChannelState channelState) {
     int channelNumber = Value.toNumber(channel);
-    context.setChannel(channelNumber);
-    context.setChannelState(channelState);
-    configuration.getOnChannelStatus().execute(context);
+    context.set(Context.CHANNEL, channelNumber);
+    context.set(Context.CHANNEL_STATE, channelState);
+    On onChannelStatus = configuration.getOn(MidiConfiguration.CHANNEL_STATUS);
+    if (onChannelStatus != null) {
+      onChannelStatus.execute(context);
+    }
   }
 
 }

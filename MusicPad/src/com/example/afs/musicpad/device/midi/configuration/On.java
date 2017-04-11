@@ -11,14 +11,14 @@ package com.example.afs.musicpad.device.midi.configuration;
 
 public class On extends Node {
 
-  public On(int lineIndex) {
-    super(lineIndex);
+  public On(int lineIndex, String[] tokens) {
+    super(lineIndex, tokens);
   }
 
   @Override
   public ReturnState execute(Context context) {
     if (context.isTrace()) {
-      System.out.println("Searching for " + context);
+      System.out.println("Searching " + tokens[1] + " for " + context);
     }
     return executeNodes(context);
   }
