@@ -16,7 +16,7 @@ public class Trace {
   }
 
   private static boolean isTraceCommand = true;
-  private static boolean isTraceConfiguration = true;
+  private static boolean isTraceConfiguration;
   private static boolean isTracePlay;
 
   public static boolean isTraceCommand() {

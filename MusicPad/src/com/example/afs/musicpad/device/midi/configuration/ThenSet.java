@@ -9,7 +9,6 @@
 
 package com.example.afs.musicpad.device.midi.configuration;
 
-import java.util.Arrays;
 
 public class ThenSet extends Then {
 
@@ -27,11 +26,6 @@ public class ThenSet extends Then {
     } else {
       context.set(tokens[1], context.getRight(tokens[2]));
     }
-  }
-
-  @Override
-  public String toString() {
-    return "ThenSendDeviceMessage [tokens=" + Arrays.toString(tokens) + "]";
   }
 
 }

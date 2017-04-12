@@ -9,7 +9,6 @@
 
 package com.example.afs.musicpad.device.midi.configuration;
 
-import java.util.Arrays;
 
 public class ThenSendHandlerMessage extends Then {
 
@@ -24,11 +23,6 @@ public class ThenSendHandlerMessage extends Then {
   public void executeThen(Context context) {
     int data1 = (int) context.getRight(tokens[1]);
     context.getHasSendHandlerMessage().sendHandlerMessage(data1);
-  }
-
-  @Override
-  public String toString() {
-    return "ThenSendHandlerMessage [tokens=" + Arrays.toString(tokens) + "]";
   }
 
 }

@@ -9,7 +9,6 @@
 
 package com.example.afs.musicpad.device.midi.configuration;
 
-import java.util.Arrays;
 
 public class ThenClear extends Then {
 
@@ -23,11 +22,6 @@ public class ThenClear extends Then {
   @Override
   public void executeThen(Context context) {
     context.remove(tokens[1]);
-  }
-
-  @Override
-  public String toString() {
-    return "ThenSendDeviceMessage [tokens=" + Arrays.toString(tokens) + "]";
   }
 
 }

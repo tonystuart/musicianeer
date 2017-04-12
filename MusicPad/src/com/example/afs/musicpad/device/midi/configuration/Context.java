@@ -46,6 +46,23 @@ public class Context {
     return context.containsKey(key);
   }
 
+  public <T extends Enum<T>> T get(Class<T> type, String key) {
+    T enumValue = null;
+    Object objectValue = context.get(key);
+    if (objectValue == null) {
+      T[] enumConstants = type.getEnumConstants();
+      for (int i = 0; i < enumConstants.length && enumValue == null; i++) {
+        T enumType = enumConstants[i];
+        if (enumType.name().equals(key)) {
+          enumValue = enumType;
+        }
+      }
+    } else if (objectValue instanceof Integer) {
+      enumValue = type.getEnumConstants()[(int) objectValue];
+    }
+    return enumValue;
+  }
+
   public HasSendDeviceMessage getHasSendDeviceMessage() {
     return hasSendDeviceMessage;
   }
@@ -80,6 +97,10 @@ public class Context {
     context.remove(key);
   }
 
+  public void set(String key, Object value) {
+    context.put(key, value);
+  }
+
   public void setHasSendDeviceMessage(HasSendDeviceMessage hasSendDeviceMessage) {
     this.hasSendDeviceMessage = hasSendDeviceMessage;
   }
@@ -90,10 +111,6 @@ public class Context {
 
   public void setHasSendHandlerMessage(HasSendHandlerMessage hasSendHandlerMessage) {
     this.hasSendHandlerMessage = hasSendHandlerMessage;
-  }
-
-  public void set(String key, Object value) {
-    context.put(key, value);
   }
 
   @Override

@@ -119,21 +119,26 @@ public class MidiReader implements Controllable, HasSendDeviceMessage, HasSendHa
   }
 
   private void receiveFromDevice(MidiMessage message, long timestamp, int port) {
-    if (message instanceof ShortMessage) {
-      ShortMessage shortMessage = (ShortMessage) message;
-      context.set(Context.PORT, port);
-      context.set(Context.COMMAND, shortMessage.getCommand());
-      context.set(Context.CHANNEL, shortMessage.getChannel());
-      context.set(Context.DATA1, shortMessage.getData1());
-      context.set(Context.DATA2, shortMessage.getData2());
-      On onInput = configuration.getOn(MidiConfiguration.INPUT);
-      if (onInput == null || onInput.execute(context) == ReturnState.IF_NO_MATCH) {
-        if (shortMessage.getCommand() == ShortMessage.NOTE_ON) {
-          queue.add(new OnInputPress(shortMessage.getData1()));
-        } else if (shortMessage.getCommand() == ShortMessage.NOTE_OFF) {
-          queue.add(new OnInputRelease(shortMessage.getData1()));
+    try {
+      if (message instanceof ShortMessage) {
+        ShortMessage shortMessage = (ShortMessage) message;
+        context.set(Context.PORT, port);
+        context.set(Context.COMMAND, shortMessage.getCommand());
+        context.set(Context.CHANNEL, shortMessage.getChannel());
+        context.set(Context.DATA1, shortMessage.getData1());
+        context.set(Context.DATA2, shortMessage.getData2());
+        On onInput = configuration.getOn(MidiConfiguration.INPUT);
+        if (onInput == null || onInput.execute(context) == ReturnState.IF_NO_MATCH) {
+          if (shortMessage.getCommand() == ShortMessage.NOTE_ON) {
+            queue.add(new OnInputPress(shortMessage.getData1()));
+          } else if (shortMessage.getCommand() == ShortMessage.NOTE_OFF) {
+            queue.add(new OnInputRelease(shortMessage.getData1()));
+          }
         }
       }
+    } catch (RuntimeException e) {
+      e.printStackTrace();
+      System.err.println("Ignoring exception");
     }
   }
 

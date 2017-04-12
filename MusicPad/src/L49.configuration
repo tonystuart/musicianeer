@@ -259,6 +259,9 @@ on channelStatus
   if channelState ACTIVE
    sendDeviceMessage 1 144 0 117 52
    return
+  if channelState INACTIVE
+   sendDeviceMessage 1 144 0 117 7
+   return
  if channel 15
   if selectedChannel 15
    sendDeviceMessage 1 144 0 118 127
