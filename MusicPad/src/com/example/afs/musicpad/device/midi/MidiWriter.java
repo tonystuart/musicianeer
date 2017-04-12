@@ -35,7 +35,7 @@ public class MidiWriter extends BrokerTask<Message> implements Controllable, Has
 
   private MidiDeviceBundle device;
   private MidiConfiguration configuration;
-  private Context context = new Context();
+  private Context context;
   private RandomAccessList<Receiver> receivers = new DirectList<>();
   private ChannelState[] channelStates = new ChannelState[Midi.CHANNELS];
   private int selectedChannel = -1;
@@ -44,6 +44,7 @@ public class MidiWriter extends BrokerTask<Message> implements Controllable, Has
     super(broker);
     this.device = device;
     this.configuration = configuration;
+    this.context = configuration.getContext();
     context.setHasSendDeviceMessage(this);
     subscribe(OnChannelState.class, message -> doChannelState(message.getChannel(), message.getChannelState()));
     subscribe(OnDeviceMessage.class, message -> sendDeviceMessage(message.getPort(), message.getCommand(), message.getChannel(), message.getData1(), message.getData2()));
@@ -117,8 +118,8 @@ public class MidiWriter extends BrokerTask<Message> implements Controllable, Has
 
   private void setChannelState(int channel, ChannelState channelState) {
     int channelNumber = Value.toNumber(channel);
-    context.set(Context.CHANNEL, channelNumber);
-    context.set(Context.CHANNEL_STATE, channelState);
+    context.setStatusChannel(channelNumber);
+    context.setChannelState(channelState);
     On onChannelStatus = configuration.getOn(MidiConfiguration.CHANNEL_STATUS);
     if (onChannelStatus != null) {
       onChannelStatus.execute(context);

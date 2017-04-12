@@ -40,7 +40,7 @@ public class If extends Node {
   }
 
   protected boolean isMatch(Context context) {
-    if (!context.contains(tokens[1])) {
+    if (!context.isSet(tokens[1])) {
       return false;
     }
     Object left = context.getLeft(tokens[1]);

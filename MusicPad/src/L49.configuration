@@ -122,7 +122,7 @@ on input
      return
 
 on channelStatus
- if channel 1
+ if statusChannel 1
   if selectedChannel 1
    sendDeviceMessage 1 144 0 96 127
    return
@@ -132,7 +132,7 @@ on channelStatus
   if channelState INACTIVE
    sendDeviceMessage 1 144 0 96 7
    return
- if channel 2
+ if statusChannel 2
   if selectedChannel 2
    sendDeviceMessage 1 144 0 97 127
    return
@@ -142,7 +142,7 @@ on channelStatus
   if channelState INACTIVE
    sendDeviceMessage 1 144 0 97 7
    return
- if channel 3
+ if statusChannel 3
   if selectedChannel 3
    sendDeviceMessage 1 144 0 98 127
    return
@@ -152,7 +152,7 @@ on channelStatus
   if channelState INACTIVE
    sendDeviceMessage 1 144 0 98 7
    return
- if channel 4
+ if statusChannel 4
   if selectedChannel 4
    sendDeviceMessage 1 144 0 99 127
    return
@@ -162,7 +162,7 @@ on channelStatus
   if channelState INACTIVE
    sendDeviceMessage 1 144 0 99 7
    return
- if channel 5
+ if statusChannel 5
   if selectedChannel 5
    sendDeviceMessage 1 144 0 100 127
    return
@@ -172,7 +172,7 @@ on channelStatus
   if channelState INACTIVE
    sendDeviceMessage 1 144 0 100 7
    return
- if channel 6
+ if statusChannel 6
   if selectedChannel 6
    sendDeviceMessage 1 144 0 101 127
    return
@@ -182,7 +182,7 @@ on channelStatus
   if channelState INACTIVE
    sendDeviceMessage 1 144 0 101 7
    return
- if channel 7
+ if statusChannel 7
   if selectedChannel 7
    sendDeviceMessage 1 144 0 102 127
    return
@@ -192,7 +192,7 @@ on channelStatus
   if channelState INACTIVE
    sendDeviceMessage 1 144 0 102 7
    return
- if channel 8
+ if statusChannel 8
   if selectedChannel 8
    sendDeviceMessage 1 144 0 103 127
    return
@@ -202,7 +202,7 @@ on channelStatus
   if channelState INACTIVE
    sendDeviceMessage 1 144 0 103 7
    return
- if channel 9
+ if statusChannel 9
   if selectedChannel 9
    sendDeviceMessage 1 144 0 112 127
    return
@@ -212,7 +212,7 @@ on channelStatus
   if channelState INACTIVE
    sendDeviceMessage 1 144 0 112 7
    return
- if channel 10
+ if statusChannel 10
   if selectedChannel 10
    sendDeviceMessage 1 144 0 113 127
    return
@@ -222,7 +222,7 @@ on channelStatus
   if channelState INACTIVE
    sendDeviceMessage 1 144 0 113 7
    return
- if channel 11
+ if statusChannel 11
   if selectedChannel 11
    sendDeviceMessage 1 144 0 114 127
    return
@@ -232,7 +232,7 @@ on channelStatus
   if channelState INACTIVE
    sendDeviceMessage 1 144 0 114 7
    return
- if channel 12
+ if statusChannel 12
   if selectedChannel 12
    sendDeviceMessage 1 144 0 115 127
    return
@@ -242,7 +242,7 @@ on channelStatus
   if channelState INACTIVE
    sendDeviceMessage 1 144 0 115 7
    return
- if channel 13
+ if statusChannel 13
   if selectedChannel 13
    sendDeviceMessage 1 144 0 116 127
    return
@@ -252,7 +252,7 @@ on channelStatus
   if channelState INACTIVE
    sendDeviceMessage 1 144 0 116 7
    return
- if channel 14
+ if statusChannel 14
   if selectedChannel 14
    sendDeviceMessage 1 144 0 117 7
    return
@@ -262,7 +262,7 @@ on channelStatus
   if channelState INACTIVE
    sendDeviceMessage 1 144 0 117 7
    return
- if channel 15
+ if statusChannel 15
   if selectedChannel 15
    sendDeviceMessage 1 144 0 118 127
    return
@@ -272,7 +272,7 @@ on channelStatus
   if channelState INACTIVE
    sendDeviceMessage 1 144 0 118 7
    return
- if channel 16
+ if statusChannel 16
   if selectedChannel 16
    sendDeviceMessage 1 144 0 119 127
    return

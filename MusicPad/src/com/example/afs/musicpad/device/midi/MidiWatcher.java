@@ -65,8 +65,8 @@ public class MidiWatcher extends BrokerTask<Message> {
 
   private void attachDevice(String name, MidiDeviceBundle device) {
     System.out.println("Attaching MIDI device " + name);
-    DeviceHandler deviceHandler = new MidiDeviceHandler(getBroker(), synthesizer);
     MidiConfiguration configuration = readConfiguration(device);
+    DeviceHandler deviceHandler = new MidiDeviceHandler(getBroker(), synthesizer);
     MidiReader midiReader = new MidiReader(getBroker(), deviceHandler.getInputQueue(), device, configuration);
     MidiWriter midiWriter = new MidiWriter(getBroker(), device, configuration);
     ControllableGroup controllableGroup = new ControllableGroup(deviceHandler, midiReader, midiWriter);

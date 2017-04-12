@@ -119,6 +119,8 @@ public abstract class DeviceHandler extends BrokerTask<Message> implements Contr
         player = new SongChordPlayer(synthesizer, currentSong, channel, inputMapping);
       }
     }
+    // Let device update previous channel
+    getBroker().publish(new OnCommand(Command.SHOW_CHANNEL_INFO, 0));
   }
 
   private void selectNotes(int channelNumber) {
@@ -137,6 +139,8 @@ public abstract class DeviceHandler extends BrokerTask<Message> implements Contr
         player = createSongNotePlayer(channel);
       }
     }
+    // Let device update previous channel
+    getBroker().publish(new OnCommand(Command.SHOW_CHANNEL_INFO, 0));
   }
 
   private void selectProgram(int programNumber) {

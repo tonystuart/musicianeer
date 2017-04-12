@@ -57,13 +57,14 @@ public class MidiReader implements Controllable, HasSendDeviceMessage, HasSendHa
   private MidiDeviceBundle device;
   private BlockingQueue<Message> queue;
   private MidiConfiguration configuration;
-  private Context context = new Context();
+  private Context context;
 
   public MidiReader(Broker<Message> broker, BlockingQueue<Message> queue, MidiDeviceBundle device, MidiConfiguration configuration) {
     this.broker = broker;
     this.queue = queue;
     this.device = device;
     this.configuration = configuration;
+    this.context = configuration.getContext();
     context.setHasSendDeviceMessage(this);
     context.setHasSendHandlerCommand(this);
     context.setHasSendHandlerMessage(this);
@@ -122,11 +123,11 @@ public class MidiReader implements Controllable, HasSendDeviceMessage, HasSendHa
     try {
       if (message instanceof ShortMessage) {
         ShortMessage shortMessage = (ShortMessage) message;
-        context.set(Context.PORT, port);
-        context.set(Context.COMMAND, shortMessage.getCommand());
-        context.set(Context.CHANNEL, shortMessage.getChannel());
-        context.set(Context.DATA1, shortMessage.getData1());
-        context.set(Context.DATA2, shortMessage.getData2());
+        context.setPort(port);
+        context.setCommand(shortMessage.getCommand());
+        context.setChannel(shortMessage.getChannel());
+        context.setData1(shortMessage.getData1());
+        context.setData2(shortMessage.getData2());
         On onInput = configuration.getOn(MidiConfiguration.INPUT);
         if (onInput == null || onInput.execute(context) == ReturnState.IF_NO_MATCH) {
           if (shortMessage.getCommand() == ShortMessage.NOTE_ON) {
