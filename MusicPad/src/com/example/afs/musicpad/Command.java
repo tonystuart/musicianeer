@@ -18,6 +18,7 @@ public enum Command {
   SELECT_PROGRAM, //
   PLAY, //
   PLAY_PAUSE, //
+  PLAY_SAMPLE, //
   PAUSE, //
   RESUME, //
   STOP, //

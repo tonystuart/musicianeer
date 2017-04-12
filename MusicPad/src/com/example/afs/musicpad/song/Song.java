@@ -23,6 +23,8 @@ import com.example.afs.musicpad.util.Value;
 
 public class Song {
 
+  public static final Song DEFAULT = new Song();
+
   private String name;
   private TreeSet<Note> notes = new TreeSet<>();
   private TreeSet<Word> words = new TreeSet<>();

@@ -25,82 +25,82 @@ on input
    else
     if data1 96
      set selectedChannel 1
-     sendHandlerCommand PLAY 1
+     sendHandlerCommand PLAY_SAMPLE 1
      sendHandlerCommand SELECT_NOTES 1
      return
     if data1 97
      set selectedChannel 2
-     sendHandlerCommand PLAY 2
+     sendHandlerCommand PLAY_SAMPLE 2
      sendHandlerCommand SELECT_NOTES 2
      return
     if data1 98
      set selectedChannel 3
-     sendHandlerCommand PLAY 3
+     sendHandlerCommand PLAY_SAMPLE 3
      sendHandlerCommand SELECT_NOTES 3
      return
     if data1 99
      set selectedChannel 4
-     sendHandlerCommand PLAY 4
+     sendHandlerCommand PLAY_SAMPLE 4
      sendHandlerCommand SELECT_NOTES 4
      return
     if data1 100
      set selectedChannel 5
-     sendHandlerCommand PLAY 5
+     sendHandlerCommand PLAY_SAMPLE 5
      sendHandlerCommand SELECT_NOTES 5
      return
     if data1 101
      set selectedChannel 6
-     sendHandlerCommand PLAY 6
+     sendHandlerCommand PLAY_SAMPLE 6
      sendHandlerCommand SELECT_NOTES 6
      return
     if data1 102
      set selectedChannel 7
-     sendHandlerCommand PLAY 7
+     sendHandlerCommand PLAY_SAMPLE 7
      sendHandlerCommand SELECT_NOTES 7
      return
     if data1 103
      set selectedChannel 8
-     sendHandlerCommand PLAY 8
+     sendHandlerCommand PLAY_SAMPLE 8
      sendHandlerCommand SELECT_NOTES 8
      return
     if data1 112
      set selectedChannel 9
-     sendHandlerCommand PLAY 9
+     sendHandlerCommand PLAY_SAMPLE 9
      sendHandlerCommand SELECT_NOTES 9
      return
     if data1 113
      set selectedChannel 10
-     sendHandlerCommand PLAY 10
+     sendHandlerCommand PLAY_SAMPLE 10
      sendHandlerCommand SELECT_NOTES 10
      return
     if data1 114
      set selectedChannel 11
-     sendHandlerCommand PLAY 11
+     sendHandlerCommand PLAY_SAMPLE 11
      sendHandlerCommand SELECT_NOTES 11
      return
     if data1 115
      set selectedChannel 12
-     sendHandlerCommand PLAY 12
+     sendHandlerCommand PLAY_SAMPLE 12
      sendHandlerCommand SELECT_NOTES 12
      return
     if data1 116
      set selectedChannel 13
-     sendHandlerCommand PLAY 13
+     sendHandlerCommand PLAY_SAMPLE 13
      sendHandlerCommand SELECT_NOTES 13
      return
     if data1 117
      set selectedChannel 14
-     sendHandlerCommand PLAY 14
+     sendHandlerCommand PLAY_SAMPLE 14
      sendHandlerCommand SELECT_NOTES 14
      return
     if data1 118
      set selectedChannel 15
-     sendHandlerCommand PLAY 15
+     sendHandlerCommand PLAY_SAMPLE 15
      sendHandlerCommand SELECT_NOTES 15
      return
     if data1 119
      set selectedChannel 16
-     sendHandlerCommand PLAY 16
+     sendHandlerCommand PLAY_SAMPLE 16
      sendHandlerCommand SELECT_NOTES 16
      return
   if command 176
