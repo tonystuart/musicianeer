@@ -30,7 +30,7 @@ import com.example.afs.musicpad.util.Velocity;
 
 public class TransportTask extends BrokerTask<Message> {
 
-  public static final int DEFAULT_PERCENT_VELOCITY = 75;
+  public static final int DEFAULT_PERCENT_VELOCITY = 25;
 
   private static final long FIRST_NOTE = -1;
   private static final long LAST_NOTE = -1;
