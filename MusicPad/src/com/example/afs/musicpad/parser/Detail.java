@@ -35,10 +35,6 @@ public class Detail {
     return activeNotes.size() == 0;
   }
 
-  public ActiveNote get(int midiNote) {
-    return activeNotes.get(midiNote);
-  }
-
   public ActiveNote getActiveNote(int midiNote) {
     return activeNotes.get(midiNote);
   }

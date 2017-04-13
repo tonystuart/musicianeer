@@ -121,7 +121,7 @@ public class MidiParser {
       return;
     }
     Detail detail = channelDetails.getDetail(channel);
-    if (detail.get(midiNote) != null) {
+    if (detail.getActiveNote(midiNote) != null) {
       processNoteOff(tick, message);
     }
     detail.add(tick, midiNote, velocity);
