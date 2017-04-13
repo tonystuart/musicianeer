@@ -135,7 +135,7 @@ public abstract class DeviceHandler extends BrokerTask<Message> implements Contr
         player = new SongDrumPlayer(synthesizer, currentSong, inputMapping);
       }
     } else {
-      if (currentSong == null) {
+      if (currentSong == null || channel == -1) {
         player = new KeyNotePlayer(synthesizer, Keys.CMajor, 0);
       } else {
         player = createSongNotePlayer(channel);

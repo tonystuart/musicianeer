@@ -16,9 +16,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import com.example.afs.fluidsynth.Synthesizer;
-import com.example.afs.musicpad.analyzer.ContourFinder;
 import com.example.afs.musicpad.device.common.InputMapping;
-import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.song.Contour;
 import com.example.afs.musicpad.song.Song;
 
@@ -100,13 +98,7 @@ public class SongNotePlayer extends SongPlayer {
   }
 
   private TreeSet<Contour> getContours(Song song, int channel) {
-    TreeSet<Contour> contours;
-    if (channel == Midi.MELODIC) {
-      ContourFinder contourFinder = new ContourFinder();
-      contours = contourFinder.getContours(song.getNotes());
-    } else {
-      contours = song.getContours(channel);
-    }
+    TreeSet<Contour> contours = song.getContours(channel);
     return contours;
   }
 
