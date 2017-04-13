@@ -17,21 +17,21 @@ import java.util.TreeSet;
 
 import com.example.afs.fluidsynth.Synthesizer;
 import com.example.afs.musicpad.device.common.InputMapping;
-import com.example.afs.musicpad.song.Contour;
+import com.example.afs.musicpad.song.Note;
 import com.example.afs.musicpad.song.Song;
 
 public class SongNotePlayer extends SongPlayer {
 
   private int[] noteIndexToNote;
   private Map<Integer, String> noteToKeySequence;
-  private TreeSet<Contour> contours;
+  private TreeSet<Note> notes;
 
   public SongNotePlayer(Synthesizer synthesizer, Song song, int channel, InputMapping inputMapping) {
     super(synthesizer, song, channel);
-    contours = getContours(song, channel);
+    notes = song.getNotes(channel);
     noteIndexToNote = getUniqueMidiNotes();
     noteToKeySequence = new HashMap<>();
-    System.out.println("Total notes: " + contours.size() + ", Unique notes: " + noteIndexToNote.length);
+    System.out.println("Total notes: " + notes.size() + ", Unique notes: " + noteIndexToNote.length);
     updateInputDevice(inputMapping);
     setTitle("Channel " + (channel + 1) + " Notes");
   }
@@ -58,11 +58,11 @@ public class SongNotePlayer extends SongPlayer {
   protected String getMusic(long currentTick, long firstTick, long lastTick, int ticksPerCharacter) {
     StringBuilder s = new StringBuilder();
     long untilTick;
-    Contour previousContour = contours.lower(new Contour(currentTick));
-    if (previousContour == null) {
+    Note previousNote = notes.lower(new Note(currentTick));
+    if (previousNote == null) {
       untilTick = 0;
     } else {
-      untilTick = previousContour.getTick() + previousContour.getDuration();
+      untilTick = previousNote.getTick() + previousNote.getDuration();
     }
     for (long tick = firstTick; tick < lastTick; tick += ticksPerCharacter) {
       long nextTick = tick + ticksPerCharacter;
@@ -71,41 +71,36 @@ public class SongNotePlayer extends SongPlayer {
       } else {
         s.append(" ");
       }
-      SortedSet<Contour> tickContours = contours.subSet(new Contour(tick), new Contour(nextTick));
-      int contourCount = tickContours.size();
-      if (contourCount == 0) {
+      SortedSet<Note> tickNotes = notes.subSet(new Note(tick), new Note(nextTick));
+      int noteCount = tickNotes.size();
+      if (noteCount == 0) {
         if (tick < untilTick) {
           s.append("~");
         } else {
           s.append(".");
         }
       } else {
-        if (contourCount > 1) {
-          //System.out.println("Squeezing " + contourCount + " contours into space for one contour");
+        if (noteCount > 1) {
+          //System.out.println("Squeezing " + noteCount + " notes into space for one note");
         }
-        for (Contour contour : tickContours) {
-          int midiNote = contour.getMidiNote();
+        for (Note note : tickNotes) {
+          int midiNote = note.getMidiNote();
           String keySequence = noteToKeySequence.get(midiNote);
           if (keySequence.length() > 1) {
             //System.out.println("Squeezing " + keySequence.length() + " characters into space for one character");
           }
           s.append(keySequence);
-          untilTick = contour.getTick() + contour.getDuration();
+          untilTick = note.getTick() + note.getDuration();
         }
       }
     }
     return s.toString();
   }
 
-  private TreeSet<Contour> getContours(Song song, int channel) {
-    TreeSet<Contour> contours = song.getContours(channel);
-    return contours;
-  }
-
   private int[] getUniqueMidiNotes() {
     Set<Integer> uniqueNotes = new TreeSet<>();
-    for (Contour contour : contours) {
-      int midiNote = contour.getMidiNote();
+    for (Note note : notes) {
+      int midiNote = note.getMidiNote();
       uniqueNotes.add(midiNote);
     }
     int noteIndex = 0;

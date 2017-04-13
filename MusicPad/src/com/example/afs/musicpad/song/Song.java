@@ -103,10 +103,6 @@ public class Song {
     return channelFacets.getFacet(channel).getConcurrency();
   };
 
-  public TreeSet<Contour> getContours(int channel) {
-    return channelFacets.getFacet(channel).getContour();
-  };
-
   public Note getControllingNote(long tick) {
     Note tickNote = new Note(tick);
     Note controllingNote = notes.floor(tickNote);
@@ -138,6 +134,16 @@ public class Song {
     return notes;
   };
 
+  public TreeSet<Note> getNotes(int channel) {
+    TreeSet<Note> channelNotes = new TreeSet<>();
+    for (Note note : notes) {
+      if (note.getChannel() == channel) {
+        channelNotes.add(note);
+      }
+    }
+    return channelNotes;
+  }
+
   public NavigableSet<Note> getNotes(long fromTick, long toTick) {
     Note firstNote = new Note(fromTick);
     Note lastNote = new Note(toTick);
@@ -157,7 +163,7 @@ public class Song {
       programNames.add(programName);
     }
     return programNames;
-  }
+  };
 
   public Set<Integer> getPrograms(int channel) {
     Set<Integer> programs;
@@ -186,14 +192,10 @@ public class Song {
   public long roundTickToThisMeasure(long tick) {
     int ticksPerMeasure = getTicksPerMeasure(tick);
     return (tick / ticksPerMeasure) * ticksPerMeasure;
-  };
+  }
 
   public void setConcurrency(int channel, int concurrency) {
     channelFacets.getFacet(channel).setConcurrency(concurrency);
-  }
-
-  public void setContour(int channel, TreeSet<Contour> contour) {
-    channelFacets.getFacet(channel).setContour(contour);
   }
 
   public void setOccupancy(int channel, int occupancy) {

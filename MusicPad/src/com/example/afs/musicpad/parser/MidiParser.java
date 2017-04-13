@@ -38,7 +38,6 @@ public class MidiParser {
         Detail detail = channelDetails.getDetail(channel);
         listener.onOccupancy(channel, detail.getOccupancy());
         listener.onConcurrency(channel, detail.getConcurrency());
-        listener.onContour(channel, detail.getContour());
       }
       listener.onEnd(fileName);
     } catch (InvalidMidiDataException | IOException e) {

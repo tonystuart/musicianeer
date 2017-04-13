@@ -11,7 +11,6 @@ package com.example.afs.musicpad.song;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
-import java.util.TreeSet;
 
 import com.example.afs.musicpad.midi.Midi;
 
@@ -20,7 +19,6 @@ public class Facet {
   private int occupancy;
   private int concurrency;
   private int totalNoteCount;
-  private TreeSet<Contour> contour;
   private Set<Integer> programs = new LinkedHashSet<>();
   private int[] distinctNoteCounts = new int[Midi.NOTES];
   private int[] commonNoteCounts = new int[Midi.SEMITONES_PER_OCTAVE];
@@ -41,10 +39,6 @@ public class Facet {
 
   public int getConcurrency() {
     return concurrency;
-  }
-
-  public TreeSet<Contour> getContour() {
-    return contour;
   }
 
   public int[] getDistinctNoteCounts() {
@@ -69,10 +63,6 @@ public class Facet {
 
   public void setConcurrency(int concurrency) {
     this.concurrency = concurrency;
-  }
-
-  public void setContour(TreeSet<Contour> contour) {
-    this.contour = contour;
   }
 
   public void setOccupancy(int occupancy) {

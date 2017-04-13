@@ -2,9 +2,7 @@ package com.example.afs.musicpad.parser;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.TreeSet;
 
-import com.example.afs.musicpad.song.Contour;
 import com.example.afs.musicpad.song.Default;
 
 public class Detail {
@@ -13,7 +11,6 @@ public class Detail {
   private long previousTick;
   private long concurrentTicks;
   private ActiveNote contourNote;
-  private TreeSet<Contour> contour = new TreeSet<>();
   private Map<Integer, ActiveNote> activeNotes = new HashMap<>();
   private int program;
   private long xtick;
@@ -47,10 +44,6 @@ public class Detail {
       concurrency = (int) ((concurrentTicks * 100) / occupancyTicks);
     }
     return concurrency;
-  }
-
-  public TreeSet<Contour> getContour() {
-    return contour;
   }
 
   public int getOccupancy() {
@@ -92,7 +85,7 @@ public class Detail {
       if (contourNote != null) {
         long xduration = tick - xtick;
         if (xduration > Default.TICKS_PER_BEAT / 8) {
-          contour.add(new Contour(xtick, contourNote.getMidiNote(), xduration));
+          // contour.add(new Contour(xtick, contourNote.getMidiNote(), xduration));
         }
       }
       xtick = tick;

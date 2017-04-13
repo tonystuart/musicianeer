@@ -9,17 +9,12 @@
 
 package com.example.afs.musicpad.parser;
 
-import java.util.TreeSet;
-
-import com.example.afs.musicpad.song.Contour;
 
 public interface Listener {
 
   void onBegin(String fileName);
 
   void onConcurrency(int channel, int concurrency);
-
-  void onContour(int channel, TreeSet<Contour> contour);
 
   void onEnd(String fileName);
 
