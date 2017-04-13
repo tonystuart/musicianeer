@@ -20,8 +20,8 @@ import javax.sound.midi.ShortMessage;
 import com.example.afs.musicpad.Command;
 import com.example.afs.musicpad.device.common.ControllableGroup.Controllable;
 import com.example.afs.musicpad.device.midi.configuration.Context;
+import com.example.afs.musicpad.device.midi.configuration.Context.HasSendCommand;
 import com.example.afs.musicpad.device.midi.configuration.Context.HasSendDeviceMessage;
-import com.example.afs.musicpad.device.midi.configuration.Context.HasSendHandlerCommand;
 import com.example.afs.musicpad.device.midi.configuration.Context.HasSendHandlerMessage;
 import com.example.afs.musicpad.device.midi.configuration.MidiConfiguration;
 import com.example.afs.musicpad.device.midi.configuration.Node.ReturnState;
@@ -33,7 +33,7 @@ import com.example.afs.musicpad.message.OnInputPress;
 import com.example.afs.musicpad.message.OnInputRelease;
 import com.example.afs.musicpad.util.Broker;
 
-public class MidiReader implements Controllable, HasSendDeviceMessage, HasSendHandlerCommand, HasSendHandlerMessage {
+public class MidiReader implements Controllable, HasSendCommand, HasSendDeviceMessage, HasSendHandlerMessage {
 
   private class MidiReceiver implements Receiver {
 
@@ -65,20 +65,20 @@ public class MidiReader implements Controllable, HasSendDeviceMessage, HasSendHa
     this.device = device;
     this.configuration = configuration;
     this.context = configuration.getContext();
+    context.setHasSendCommand(this);
     context.setHasSendDeviceMessage(this);
-    context.setHasSendHandlerCommand(this);
     context.setHasSendHandlerMessage(this);
     connectDevices();
   }
 
   @Override
-  public void sendDeviceMessage(int port, int command, int channel, int data1, int data2) {
-    broker.publish(new OnDeviceMessage(port, command, channel, data1, data2));
+  public void sendCommand(Command handlerCommand, Integer parameter) {
+    queue.add(new OnCommand(handlerCommand, parameter));
   }
 
   @Override
-  public void sendHandlerCommand(Command handlerCommand, Integer parameter) {
-    queue.add(new OnCommand(handlerCommand, parameter));
+  public void sendDeviceMessage(int port, int command, int channel, int data1, int data2) {
+    broker.publish(new OnDeviceMessage(port, command, channel, data1, data2));
   }
 
   @Override
@@ -124,7 +124,7 @@ public class MidiReader implements Controllable, HasSendDeviceMessage, HasSendHa
       if (message instanceof ShortMessage) {
         ShortMessage shortMessage = (ShortMessage) message;
         context.setPort(port);
-        context.setCommand(shortMessage.getCommand());
+        context.setType(shortMessage.getCommand());
         context.setChannel(shortMessage.getChannel());
         context.setData1(shortMessage.getData1());
         context.setData2(shortMessage.getData2());

@@ -17,6 +17,7 @@ public class MidiConfiguration {
   public static final String INPUT = "input";
   public static final String INITIALIZATION = "initialization";
   public static final String CHANNEL_STATUS = "channelStatus";
+  public static final String COMMAND = "command";
 
   private Context context = new Context();
   private Map<String, On> onBlocks = new HashMap<>();

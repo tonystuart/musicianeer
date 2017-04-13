@@ -15,18 +15,18 @@ public class ThenSendDeviceMessage extends Then {
   public ThenSendDeviceMessage(int lineIndex, String[] tokens) {
     super(lineIndex, tokens);
     if (tokens.length != 6) {
-      throw new IllegalArgumentException(formatMessage("Expected sendDeviceMessage port command channel data1 data2"));
+      throw new IllegalArgumentException(formatMessage("Expected sendDeviceMessage port type channel data1 data2"));
     }
   }
 
   @Override
   public void executeThen(Context context) {
     int port = (int) context.getRight(tokens[1]);
-    int command = (int) context.getRight(tokens[2]);
+    int type = (int) context.getRight(tokens[2]);
     int channel = (int) context.getRight(tokens[3]);
     int data1 = (int) context.getRight(tokens[4]);
     int data2 = (int) context.getRight(tokens[5]);
-    context.getHasSendDeviceMessage().sendDeviceMessage(port, command, channel, data1, data2);
+    context.getHasSendDeviceMessage().sendDeviceMessage(port, type, channel, data1, data2);
   }
 
 }

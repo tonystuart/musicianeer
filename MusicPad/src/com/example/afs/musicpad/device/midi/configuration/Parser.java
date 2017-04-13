@@ -99,13 +99,13 @@ public class Parser {
           consume();
           parent.add(new ThenClear(lineIndex, tokens));
           break;
+        case "sendCommand":
+          consume();
+          parent.add(new ThenSendCommand(lineIndex, tokens));
+          break;
         case "sendDeviceMessage":
           consume();
           parent.add(new ThenSendDeviceMessage(lineIndex, tokens));
-          break;
-        case "sendHandlerCommand":
-          consume();
-          parent.add(new ThenSendHandlerCommand(lineIndex, tokens));
           break;
         case "sendHandlerMessage":
           consume();

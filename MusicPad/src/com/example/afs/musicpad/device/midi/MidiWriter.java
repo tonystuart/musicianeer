@@ -15,6 +15,7 @@ import javax.sound.midi.MidiUnavailableException;
 import javax.sound.midi.Receiver;
 import javax.sound.midi.ShortMessage;
 
+import com.example.afs.musicpad.Command;
 import com.example.afs.musicpad.device.common.ControllableGroup.Controllable;
 import com.example.afs.musicpad.device.midi.configuration.ChannelState;
 import com.example.afs.musicpad.device.midi.configuration.Context;
@@ -23,8 +24,8 @@ import com.example.afs.musicpad.device.midi.configuration.MidiConfiguration;
 import com.example.afs.musicpad.device.midi.configuration.On;
 import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnChannelState;
+import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnDeviceMessage;
-import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.task.BrokerTask;
 import com.example.afs.musicpad.util.Broker;
 import com.example.afs.musicpad.util.DirectList;
@@ -33,12 +34,10 @@ import com.example.afs.musicpad.util.Value;
 
 public class MidiWriter extends BrokerTask<Message> implements Controllable, HasSendDeviceMessage {
 
+  private Context context;
   private MidiDeviceBundle device;
   private MidiConfiguration configuration;
-  private Context context;
   private RandomAccessList<Receiver> receivers = new DirectList<>();
-  private ChannelState[] channelStates = new ChannelState[Midi.CHANNELS];
-  private int selectedChannel = -1;
 
   public MidiWriter(Broker<Message> broker, MidiDeviceBundle device, MidiConfiguration configuration) {
     super(broker);
@@ -46,6 +45,7 @@ public class MidiWriter extends BrokerTask<Message> implements Controllable, Has
     this.configuration = configuration;
     this.context = configuration.getContext();
     context.setHasSendDeviceMessage(this);
+    subscribe(OnCommand.class, message -> doCommand(message.getCommand(), message.getParameter()));
     subscribe(OnChannelState.class, message -> doChannelState(message.getChannel(), message.getChannelState()));
     subscribe(OnDeviceMessage.class, message -> sendDeviceMessage(message.getPort(), message.getCommand(), message.getChannel(), message.getData1(), message.getData2()));
     connectDevices();
@@ -98,15 +98,16 @@ public class MidiWriter extends BrokerTask<Message> implements Controllable, Has
   }
 
   private void doChannelState(int channel, ChannelState channelState) {
-    if (channelState == ChannelState.SELECTED) {
-      if (selectedChannel != -1) {
-        setChannelState(selectedChannel, channelStates[selectedChannel]);
-      }
-      selectedChannel = channel;
-    } else {
-      channelStates[channel] = channelState;
-    }
     setChannelState(channel, channelState);
+  }
+
+  private void doCommand(Command command, int parameter) {
+    context.set("command", command);
+    context.set("parameter", parameter);
+    On onCommand = configuration.getOn(MidiConfiguration.COMMAND);
+    if (onCommand != null) {
+      onCommand.execute(context);
+    }
   }
 
   private void initializeDevice() {

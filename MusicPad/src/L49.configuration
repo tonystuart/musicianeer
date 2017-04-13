@@ -5,12 +5,12 @@ on initialization
 
 on input
  if port 1
-  if command 128
+  if type 128
    if data1 104
     clear shiftKeyDown
     sendDeviceMessage 1 128 0 104 127 
     return
-  if command 144
+  if type 144
    if data1 12
     # Device entered / exited InControl mode
     return
@@ -20,105 +20,105 @@ on input
     return
    if shiftKeyDown
     if data1 96
-     sendHandlerCommand TRANSPOSE 0
+     sendCommand TRANSPOSE 0
      return
    else
     if data1 96
      set selectedChannel 1
-     sendHandlerCommand PLAY_SAMPLE 1
-     sendHandlerCommand SELECT_NOTES 1
+     sendCommand PLAY_SAMPLE 1
+     sendCommand SELECT_NOTES 1
      return
     if data1 97
      set selectedChannel 2
-     sendHandlerCommand PLAY_SAMPLE 2
-     sendHandlerCommand SELECT_NOTES 2
+     sendCommand PLAY_SAMPLE 2
+     sendCommand SELECT_NOTES 2
      return
     if data1 98
      set selectedChannel 3
-     sendHandlerCommand PLAY_SAMPLE 3
-     sendHandlerCommand SELECT_NOTES 3
+     sendCommand PLAY_SAMPLE 3
+     sendCommand SELECT_NOTES 3
      return
     if data1 99
      set selectedChannel 4
-     sendHandlerCommand PLAY_SAMPLE 4
-     sendHandlerCommand SELECT_NOTES 4
+     sendCommand PLAY_SAMPLE 4
+     sendCommand SELECT_NOTES 4
      return
     if data1 100
      set selectedChannel 5
-     sendHandlerCommand PLAY_SAMPLE 5
-     sendHandlerCommand SELECT_NOTES 5
+     sendCommand PLAY_SAMPLE 5
+     sendCommand SELECT_NOTES 5
      return
     if data1 101
      set selectedChannel 6
-     sendHandlerCommand PLAY_SAMPLE 6
-     sendHandlerCommand SELECT_NOTES 6
+     sendCommand PLAY_SAMPLE 6
+     sendCommand SELECT_NOTES 6
      return
     if data1 102
      set selectedChannel 7
-     sendHandlerCommand PLAY_SAMPLE 7
-     sendHandlerCommand SELECT_NOTES 7
+     sendCommand PLAY_SAMPLE 7
+     sendCommand SELECT_NOTES 7
      return
     if data1 103
      set selectedChannel 8
-     sendHandlerCommand PLAY_SAMPLE 8
-     sendHandlerCommand SELECT_NOTES 8
+     sendCommand PLAY_SAMPLE 8
+     sendCommand SELECT_NOTES 8
      return
     if data1 112
      set selectedChannel 9
-     sendHandlerCommand PLAY_SAMPLE 9
-     sendHandlerCommand SELECT_NOTES 9
+     sendCommand PLAY_SAMPLE 9
+     sendCommand SELECT_NOTES 9
      return
     if data1 113
      set selectedChannel 10
-     sendHandlerCommand PLAY_SAMPLE 10
-     sendHandlerCommand SELECT_NOTES 10
+     sendCommand PLAY_SAMPLE 10
+     sendCommand SELECT_NOTES 10
      return
     if data1 114
      set selectedChannel 11
-     sendHandlerCommand PLAY_SAMPLE 11
-     sendHandlerCommand SELECT_NOTES 11
+     sendCommand PLAY_SAMPLE 11
+     sendCommand SELECT_NOTES 11
      return
     if data1 115
      set selectedChannel 12
-     sendHandlerCommand PLAY_SAMPLE 12
-     sendHandlerCommand SELECT_NOTES 12
+     sendCommand PLAY_SAMPLE 12
+     sendCommand SELECT_NOTES 12
      return
     if data1 116
      set selectedChannel 13
-     sendHandlerCommand PLAY_SAMPLE 13
-     sendHandlerCommand SELECT_NOTES 13
+     sendCommand PLAY_SAMPLE 13
+     sendCommand SELECT_NOTES 13
      return
     if data1 117
      set selectedChannel 14
-     sendHandlerCommand PLAY_SAMPLE 14
-     sendHandlerCommand SELECT_NOTES 14
+     sendCommand PLAY_SAMPLE 14
+     sendCommand SELECT_NOTES 14
      return
     if data1 118
      set selectedChannel 15
-     sendHandlerCommand PLAY_SAMPLE 15
-     sendHandlerCommand SELECT_NOTES 15
+     sendCommand PLAY_SAMPLE 15
+     sendCommand SELECT_NOTES 15
      return
     if data1 119
      set selectedChannel 16
-     sendHandlerCommand PLAY_SAMPLE 16
-     sendHandlerCommand SELECT_NOTES 16
+     sendCommand PLAY_SAMPLE 16
+     sendCommand SELECT_NOTES 16
      return
-  if command 176
+  if type 176
    if data1 7
-    sendHandlerCommand SET_MASTER_GAIN data2
+    sendCommand SET_MASTER_GAIN data2
     return
    if data2 127
     if data1 112
-     sendHandlerCommand PREVIOUS_MEASURE 0
+     sendCommand PREVIOUS_MEASURE 0
      return
     if data1 113
-     sendHandlerCommand NEXT_MEASURE 0
+     sendCommand NEXT_MEASURE 0
      return
     if data1 114
-     sendHandlerCommand STOP_PAUSE 0
+     sendCommand STOP_PAUSE 0
      return
     if data1 115
-     sendHandlerCommand PLAY_PAUSE 0
+     sendCommand PLAY_PAUSE 0
      return
 
 on channelStatus
@@ -282,3 +282,7 @@ on channelStatus
   if channelState INACTIVE
    sendDeviceMessage 1 144 0 119 7
    return
+
+on command
+ if command SELECT_SONG
+  clear selectedChannel

@@ -25,12 +25,12 @@ import com.example.afs.musicpad.Trace;
  */
 public class Context {
 
-  public interface HasSendDeviceMessage {
-    void sendDeviceMessage(int port, int command, int channel, int data1, int data2);
+  public interface HasSendCommand {
+    void sendCommand(Command command, Integer parameter);
   }
 
-  public interface HasSendHandlerCommand {
-    void sendHandlerCommand(Command command, Integer parameter);
+  public interface HasSendDeviceMessage {
+    void sendDeviceMessage(int port, int type, int channel, int data1, int data2);
   }
 
   public interface HasSendHandlerMessage {
@@ -38,19 +38,19 @@ public class Context {
   }
 
   private static final String PORT = "port";
-  private static final String COMMAND = "command";
+  private static final String TYPE = "type";
   private static final String CHANNEL = "channel";
   private static final String DATA1 = "data1";
   private static final String DATA2 = "data2";
   private static final String STATUS_CHANNEL = "statusChannel";
   private static final String CHANNEL_STATE = "channelState";
 
+  private HasSendCommand hasSendCommand;
   private HasSendDeviceMessage hasSendDeviceMessage;
-  private HasSendHandlerCommand hasSendHandlerCommand;
   private HasSendHandlerMessage hasSendHandlerMessage;
 
   private Integer port;
-  private Integer command;
+  private Integer type;
   private Integer channel;
   private Integer data1;
   private Integer data2;
@@ -75,12 +75,12 @@ public class Context {
     return enumValue;
   }
 
-  public HasSendDeviceMessage getHasSendDeviceMessage() {
-    return hasSendDeviceMessage;
+  public HasSendCommand getHasSendCommand() {
+    return hasSendCommand;
   }
 
-  public HasSendHandlerCommand getHasSendHandlerCommand() {
-    return hasSendHandlerCommand;
+  public HasSendDeviceMessage getHasSendDeviceMessage() {
+    return hasSendDeviceMessage;
   }
 
   public HasSendHandlerMessage getHasSendHandlerMessage() {
@@ -125,10 +125,6 @@ public class Context {
     this.channelState = channelState;
   }
 
-  public void setCommand(int command) {
-    this.command = command;
-  }
-
   public void setData1(int data1) {
     this.data1 = data1;
   }
@@ -137,12 +133,12 @@ public class Context {
     this.data2 = data2;
   }
 
-  public void setHasSendDeviceMessage(HasSendDeviceMessage hasSendDeviceMessage) {
-    this.hasSendDeviceMessage = hasSendDeviceMessage;
+  public void setHasSendCommand(HasSendCommand hasSendCommand) {
+    this.hasSendCommand = hasSendCommand;
   }
 
-  public void setHasSendHandlerCommand(HasSendHandlerCommand hasSendHandlerCommand) {
-    this.hasSendHandlerCommand = hasSendHandlerCommand;
+  public void setHasSendDeviceMessage(HasSendDeviceMessage hasSendDeviceMessage) {
+    this.hasSendDeviceMessage = hasSendDeviceMessage;
   }
 
   public void setHasSendHandlerMessage(HasSendHandlerMessage hasSendHandlerMessage) {
@@ -157,9 +153,13 @@ public class Context {
     statusChannel = channelNumber;
   }
 
+  public void setType(int type) {
+    this.type = type;
+  }
+
   @Override
   public String toString() {
-    return "Context [port=" + port + ", command=" + command + ", channel=" + channel + ", data1=" + data1 + ", data2=" + data2 + ", channelState=" + channelState + ", context=" + context + "]";
+    return "Context [port=" + port + ", type=" + type + ", channel=" + channel + ", data1=" + data1 + ", data2=" + data2 + ", channelState=" + channelState + ", context=" + context + "]";
   }
 
   private boolean contains(String key) {
@@ -168,7 +168,7 @@ public class Context {
     case PORT:
       contains = true;
       break;
-    case COMMAND:
+    case TYPE:
       contains = true;
       break;
     case CHANNEL:
@@ -199,8 +199,8 @@ public class Context {
     case PORT:
       value = port;
       break;
-    case COMMAND:
-      value = command;
+    case TYPE:
+      value = type;
       break;
     case CHANNEL:
       value = channel;
@@ -229,8 +229,8 @@ public class Context {
     case PORT:
       port = (Integer) value;
       break;
-    case COMMAND:
-      command = (Integer) value;
+    case TYPE:
+      type = (Integer) value;
       break;
     case CHANNEL:
       channel = (Integer) value;
