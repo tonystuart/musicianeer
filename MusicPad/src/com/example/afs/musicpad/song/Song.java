@@ -230,6 +230,7 @@ public class Song {
         }
       }
     }
+    newSong.words.addAll(words);
     for (int channel = 0; channel < Midi.CHANNELS; channel++) {
       newSong.setConcurrency(channel, getConcurrency(channel));
       newSong.setOccupancy(channel, getOccupancy(channel));
