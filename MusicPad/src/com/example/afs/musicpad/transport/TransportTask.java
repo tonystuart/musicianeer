@@ -25,6 +25,7 @@ import com.example.afs.musicpad.task.BrokerTask;
 import com.example.afs.musicpad.task.PausibleSequencerTask;
 import com.example.afs.musicpad.transport.NoteEvent.Type;
 import com.example.afs.musicpad.util.Broker;
+import com.example.afs.musicpad.util.Range;
 import com.example.afs.musicpad.util.Value;
 import com.example.afs.musicpad.util.Velocity;
 
@@ -84,10 +85,10 @@ public class TransportTask extends BrokerTask<Message> {
       doNextMeasure();
       break;
     case SET_TRANSPORT_TEMPO:
-      doSetPercentTempo(parameter);
+      doSetTempo(parameter);
       break;
     case SET_TRANSPORT_VELOCITY:
-      doSetPercentVelocity(parameter);
+      doSetVelocity(parameter);
       break;
     default:
       break;
@@ -157,12 +158,12 @@ public class TransportTask extends BrokerTask<Message> {
     resume();
   }
 
-  private void doSetPercentTempo(int percentTempo) {
-    noteEventScheduler.setPercentTempo(percentTempo);
+  private void doSetTempo(int tempo) {
+    noteEventScheduler.setPercentTempo(Range.scaleMidiToPercent(tempo));
   }
 
-  private void doSetPercentVelocity(int percentVelocity) {
-    this.percentVelocity = percentVelocity;
+  private void doSetVelocity(int velocity) {
+    this.percentVelocity = Range.scaleMidiToPercent(velocity);
   }
 
   private void doSongSelected(Song song) {

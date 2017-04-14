@@ -33,6 +33,7 @@ import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.task.BrokerTask;
 import com.example.afs.musicpad.theory.Keys;
 import com.example.afs.musicpad.util.Broker;
+import com.example.afs.musicpad.util.Range;
 import com.example.afs.musicpad.util.Value;
 
 public abstract class DeviceHandler extends BrokerTask<Message> implements Controllable {
@@ -72,7 +73,7 @@ public abstract class DeviceHandler extends BrokerTask<Message> implements Contr
       selectProgram(parameter);
       break;
     case SET_PLAYER_VELOCITY:
-      setPercentVelocity(parameter);
+      setVelocity(parameter);
       break;
     case SET_KEYBOARD_MAPPING:
       setKeyboardMapping(parameter);
@@ -163,8 +164,8 @@ public abstract class DeviceHandler extends BrokerTask<Message> implements Contr
     player.updateInputDevice(inputMapping);
   }
 
-  private void setPercentVelocity(int percentVelocity) {
-    player.setPercentVelocity(percentVelocity);
+  private void setVelocity(int velocity) {
+    player.setPercentVelocity(Range.scaleMidiToPercent(velocity));
   }
 
 }

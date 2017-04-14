@@ -105,7 +105,20 @@ on input
      return
   if type 176
    if data1 7
+    # Slider 9
     sendCommand SET_MASTER_GAIN data2
+    return
+   if data1 47
+    # Slider 7
+    sendCommand SET_PLAYER_VELOCITY data2
+    return
+   if data1 48
+    # Slider 8
+    sendCommand SET_TRANSPORT_VELOCITY data2
+    return
+   if data1 28
+    # Rotary 8
+    sendCommand SET_TRANSPORT_TEMPO data2
     return
    if data2 127
     if data1 112

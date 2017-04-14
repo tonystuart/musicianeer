@@ -9,6 +9,8 @@
 
 package com.example.afs.musicpad.util;
 
+import com.example.afs.musicpad.midi.Midi;
+
 public class Range {
 
   public static int conform(int inputValue, int minimum, int maximum) {
@@ -51,6 +53,10 @@ public class Range {
     }
     System.out.println("control=" + controlValue + " in " + controlMinimum + " to " + controlMaximum + " is " + scaledValue + " in range " + dataMinimum + " to " + dataMaximum);
     return scaledValue;
+  }
+
+  public static int scaleMidiToPercent(int midiValue) {
+    return scale(0, 200, Midi.MIN_VALUE, Midi.MAX_VALUE, midiValue);
   }
 
 }
