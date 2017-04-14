@@ -14,7 +14,7 @@ import java.util.Random;
 
 import com.example.afs.fluidsynth.Synthesizer;
 import com.example.afs.musicpad.Trace.TraceOption;
-import com.example.afs.musicpad.analyzer.Transposer;
+import com.example.afs.musicpad.analyzer.TranspositionFinder;
 import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnSongSelected;
@@ -167,14 +167,12 @@ public class CommandProcessor extends BrokerTask<Message> {
 
   private void doTranspose() {
     Song oldSong = currentSong;
-    Transposer transposer = new Transposer();
-    int distanceToWhiteKeys = transposer.getDistanceToWhiteKeys(oldSong);
+    TranspositionFinder transpositionFinder = new TranspositionFinder();
+    int distanceToWhiteKeys = transpositionFinder.getDistanceToWhiteKeys(oldSong);
     if (distanceToWhiteKeys == 0) {
       System.out.println("No transposition is required");
     } else {
-      Song newSong = new Song(oldSong.getName() + " (transposed by " + distanceToWhiteKeys + " semitones)");
-      transposer.transpose(oldSong, newSong, distanceToWhiteKeys);
-      currentSong = newSong;
+      currentSong = currentSong.transpose(distanceToWhiteKeys);
       System.out.println("Selecting song " + currentSong.getName());
       publish(new OnSongSelected(currentSong));
     }

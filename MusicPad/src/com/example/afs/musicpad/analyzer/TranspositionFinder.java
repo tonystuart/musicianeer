@@ -9,14 +9,10 @@
 
 package com.example.afs.musicpad.analyzer;
 
-import java.util.TreeSet;
-
 import com.example.afs.musicpad.midi.Midi;
-import com.example.afs.musicpad.song.Note;
-import com.example.afs.musicpad.song.Note.NoteBuilder;
 import com.example.afs.musicpad.song.Song;
 
-public class Transposer {
+public class TranspositionFinder {
 
   public static final boolean[] isWhite = new boolean[] {
       true, // C
@@ -64,20 +60,4 @@ public class Transposer {
     return bestTransposition;
   }
 
-  public void transpose(Song oldSong, Song newSong, int distance) {
-    TreeSet<Note> oldNotes = oldSong.getNotes();
-    for (Note oldNote : oldNotes) {
-      int channel = oldNote.getChannel();
-      if (channel == Midi.DRUM) {
-        newSong.add(oldNote);
-      } else {
-        int oldMidiNote = oldNote.getMidiNote();
-        int newMidiNote = oldMidiNote + distance;
-        if (newMidiNote >= 0 && newMidiNote < Midi.NOTES) {
-          Note newNote = new NoteBuilder().withNote(oldNote).withMidiNote(newMidiNote).create();
-          newSong.add(newNote);
-        }
-      }
-    }
-  }
 }

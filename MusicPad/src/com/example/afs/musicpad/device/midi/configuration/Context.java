@@ -10,6 +10,7 @@
 package com.example.afs.musicpad.device.midi.configuration;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.example.afs.musicpad.Command;
@@ -44,6 +45,7 @@ public class Context {
   private static final String DATA2 = "data2";
   private static final String STATUS_CHANNEL = "statusChannel";
   private static final String CHANNEL_STATE = "channelState";
+  private static final Object NULL = Optional.empty();
 
   private HasSendCommand hasSendCommand;
   private HasSendDeviceMessage hasSendDeviceMessage;
@@ -219,6 +221,9 @@ public class Context {
       break;
     default:
       value = context.get(key);
+      if (value == NULL) {
+        value = null;
+      }
       break;
     }
     return value;
@@ -248,6 +253,9 @@ public class Context {
       channelState = (ChannelState) value;
       break;
     default:
+      if (value == null) {
+        value = NULL;
+      }
       context.put(key, value);
       break;
     }

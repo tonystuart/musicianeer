@@ -30,11 +30,18 @@ public class Song {
   private TreeSet<Word> words = new TreeSet<>();
   private ChannelFacets channelFacets = new ChannelFacets();
 
+  private int transposition;
+
   public Song() {
   }
 
   public Song(String name) {
     this.name = name;
+  }
+
+  public Song(String name, int transposition) {
+    this.name = name;
+    this.transposition = transposition;
   }
 
   public void add(Note note) {
@@ -127,7 +134,7 @@ public class Song {
   };
 
   public String getName() {
-    return name;
+    return transposition == 0 ? name : (name + " (" + transposition + ")");
   };
 
   public TreeSet<Note> getNotes() {
@@ -204,6 +211,29 @@ public class Song {
 
   @Override
   public String toString() {
-    return "Song [name=" + name + "]";
+    return "Song [name=" + name + ", transposition=" + transposition + "]";
+  }
+
+  public Song transpose(int transposition) {
+    Song newSong = new Song(getName(), transposition);
+    TreeSet<Note> oldNotes = notes;
+    for (Note oldNote : oldNotes) {
+      int channel = oldNote.getChannel();
+      if (channel == Midi.DRUM) {
+        newSong.add(oldNote);
+      } else {
+        int oldMidiNote = oldNote.getMidiNote();
+        int newMidiNote = oldMidiNote + transposition;
+        if (newMidiNote >= 0 && newMidiNote < Midi.NOTES) {
+          Note newNote = new NoteBuilder().withNote(oldNote).withMidiNote(newMidiNote).create();
+          newSong.add(newNote);
+        }
+      }
+    }
+    for (int channel = 0; channel < Midi.CHANNELS; channel++) {
+      newSong.setConcurrency(channel, getConcurrency(channel));
+      newSong.setOccupancy(channel, getOccupancy(channel));
+    }
+    return newSong;
   };
 }

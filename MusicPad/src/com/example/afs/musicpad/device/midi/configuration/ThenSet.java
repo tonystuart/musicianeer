@@ -9,7 +9,6 @@
 
 package com.example.afs.musicpad.device.midi.configuration;
 
-
 public class ThenSet extends Then {
 
   public ThenSet(int lineIndex, String[] tokens) {
