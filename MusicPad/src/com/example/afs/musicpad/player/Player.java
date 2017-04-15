@@ -30,7 +30,7 @@ public abstract class Player {
   public static final int DEFAULT_VELOCITY = 96;
   public static final int DEFAULT_PERCENT_VELOCITY = 100;
 
-  private int channel;
+  protected int channel;
   private int percentVelocity = DEFAULT_PERCENT_VELOCITY;
   private Synthesizer synthesizer;
 

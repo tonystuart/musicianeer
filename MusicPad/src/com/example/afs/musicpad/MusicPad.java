@@ -20,6 +20,7 @@ import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.player.Player;
 import com.example.afs.musicpad.transport.TransportTask;
 import com.example.afs.musicpad.util.Broker;
+import com.example.afs.musicpad.webapp.WebApp;
 
 public class MusicPad {
 
@@ -40,6 +41,7 @@ public class MusicPad {
   private TransportTask transportTask;
   private AnalyzerTask analyzerTask;
   private CommandProcessor commandProcessor;
+  private WebApp webApp;
   private Synthesizer synthesizer = createSynthesizer();
 
   public MusicPad(String libraryPath) {
@@ -49,6 +51,7 @@ public class MusicPad {
     this.qwertyWatcher = new QwertyWatcher(broker, synthesizer);
     this.transportTask = new TransportTask(broker, synthesizer);
     this.analyzerTask = new AnalyzerTask(broker);
+    this.webApp = new WebApp(broker);
     this.commandProcessor = new CommandProcessor(broker, synthesizer, musicLibrary);
   }
 
@@ -68,6 +71,7 @@ public class MusicPad {
     transportTask.start();
     analyzerTask.start();
     commandProcessor.start();
+    webApp.start();
   }
 
 }

@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset='UTF-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0'>
+<title>MusicPad</title>
+<link rel='stylesheet' type='text/css' href='MusicPad.css'>
+<script src='MusicPad.js'></script>
+</head>
+<body onload='musicPad.onLoad()' onclick='musicPad.onClick(event)'>
+    <div class='row'>
+        <button type='button' id='tab-prompter'>Prompter</button>
+        <button type='button' id='tab-home'>Home</button>
+        <button type='button' id='tab-info'>Info</button>
+        <button type='button' id='tab-instruments'>Instruments</button>
+        <button type='button' id='tab-metrics'>Metrics</button>
+        <button type='button' id='tab-settings'>Settings</button>
+    </div>
+    <div id='prompter' class='tab'>
+        <div>Prompter
+        <div id='prompter-container'></div>
+        </div>
+    </div>
+    <div id='home' class='tab'>
+        <div>
+            <img id='current-frame' src='currentFrame.jpg' alt='Current Frame' />
+        </div>
+    </div>
+    <div id='instruments' class='tab'>
+        <h2>Instruments</h2>
+        <form id='instrument-form'>
+            <div>
+                <label>
+                    <input type='checkbox' id='instrument-acoustic-grand-piano'>
+                    Grand Piano
+                </label>
+                <label>
+                    <input type='checkbox' id='instrument-tubular-bells'>
+                    Tubular Bells
+                </label>
+                <label>
+                    <input type='checkbox' id='instrument-church-organ'>
+                    Church Organ
+                </label>
+                <label>
+                    <input type='checkbox' id='instrument-acoustic-guitar-nylon'>
+                    Guitar
+                </label>
+                <label>
+                    <input type='checkbox' id='instrument-acoustic-bass'>
+                    Bass
+                </label>
+                <label>
+                    <input type='checkbox' id='instrument-tremolo-strings'>
+                    Tremelo Strings
+                </label>
+                <label>
+                    <input type='checkbox' id='instrument-choir-aahs'>
+                    Choir Aahs
+                </label>
+                <label>
+                    <input type='checkbox' id='instrument-trumpet'>
+                    Trumpet
+                </label>
+                <label>
+                    <input type='checkbox' id='instrument-alto-sax'>
+                    Alto Sax
+                </label>
+                <label>
+                    <input type='checkbox' id='instrument-clarinet'>
+                    Clarinet
+                </label>
+                <label>
+                    <input type='checkbox' id='instrument-flute'>
+                    Flute
+                </label>
+                <label>
+                    <input type='checkbox' id='instrument-lead-3-calliope'>
+                    Calliope
+                </label>
+                <label>
+                    <input type='checkbox' id='instrument-pad-1-new-age'>
+                    New Age
+                </label>
+                <label>
+                    <input type='checkbox' id='instrument-fx-8-sci-fi'>
+                    Sci-Fi
+                </label>
+                <label>
+                    <input type='checkbox' id='instrument-sitar'>
+                    Sitar
+                </label>
+                <label>
+                    <input type='checkbox' id='instrument-taiko-drum'>
+                    Taiko Drum
+                </label>
+                <label>
+                    <input type='checkbox' id='instrument-bird-tweet'>
+                    Bird Tweet
+                </label>
+                <label>
+                    <input type='checkbox' id='instrument-drum-kit-1'>
+                    Drum Kit 1
+                </label>
+                <label>
+                    <input type='checkbox' id='instrument-drum-kit-2'>
+                    Drum Kit 2
+                </label>
+                <label>
+                    <input type='checkbox' id='instrument-drum-kit-3'>
+                    Drum Kit 3
+                </label>
+            </div>
+            <div>
+                How would you like to assign the instruments?
+                <label>
+                    <input type='radio' name='enum-assignment-method' value='position'
+                        id='enum-assignment-method-position'>
+                    By vertical position (top to bottom)
+                </label>
+                <label>
+                    <input type='radio' name='enum-assignment-method' value='color'
+                        id='enum-assignment-method-color'>
+                    By color (red, orange, yellow, green, blue, violet)
+                </label>
+            </div>
+        </form>
+    </div>
+    <div id='info' class='tab'>
+        <h2>Info</h2>
+        <div>
+            <p>Here is some interesting information.</p>
+            <p>This is trying to be interesting too.</p>
+        </div>
+    </div>
+    <div id='metrics' class='tab'>
+        <h2>Metrics</h2>
+        <div id='metrics-container'></div>
+    </div>
+    <div id='settings' class='tab'>
+        <h2>Settings</h2>
+        <div class='field'>
+            <div>
+                Maximum Number of Concurrent Notes:
+                <div class='row'>
+                    <input type='number' min='1' max='100' step='1' value='10' id='maximum-concurrent-notes'>
+                    <button type='button' id='property-maximum-concurrent-notes'>Set</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
