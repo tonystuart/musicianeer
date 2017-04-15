@@ -21,6 +21,19 @@ public class ChannelFacets {
     }
   }
 
+  public void add(Note note) {
+    int channel = note.getChannel();
+    int program = note.getProgram();
+    int midiNote = note.getMidiNote();
+    Facet facet = channelFacets[channel];
+    facet.countNote(midiNote);
+    if (channel == Midi.DRUM) {
+      facet.addProgram(midiNote);
+    } else {
+      facet.addProgram(program);
+    }
+  }
+
   public Facet getFacet(int channel) {
     return channelFacets[channel];
   }

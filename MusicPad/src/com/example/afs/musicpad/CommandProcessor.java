@@ -102,7 +102,7 @@ public class CommandProcessor extends BrokerTask<Message> {
       doSetMasterGain(parameter);
       break;
     case TRANSPOSE:
-      doTranspose();
+      doTranspose(parameter);
       break;
     case TRON:
       doTron(parameter);
@@ -153,7 +153,9 @@ public class CommandProcessor extends BrokerTask<Message> {
       File midiFile = musicLibrary.getMidiFile(songIndex);
       SongBuilder songBuilder = new SongBuilder();
       currentSong = songBuilder.createSong(midiFile);
+      int distanceToWhiteKeys = TranspositionFinder.getDistanceToWhiteKeys(currentSong);
       System.out.println("Selecting song " + songNumber + " - " + currentSong.getName());
+      System.out.println("Transpose by " + distanceToWhiteKeys + " to minimize sharps and flats");
       publish(new OnSongSelected(currentSong));
     } else {
       System.out.println("Song " + songNumber + " is out of range");
@@ -165,17 +167,10 @@ public class CommandProcessor extends BrokerTask<Message> {
     synthesizer.setGain(gain);
   }
 
-  private void doTranspose() {
-    Song oldSong = currentSong;
-    TranspositionFinder transpositionFinder = new TranspositionFinder();
-    int distanceToWhiteKeys = transpositionFinder.getDistanceToWhiteKeys(oldSong);
-    if (distanceToWhiteKeys == 0) {
-      System.out.println("No transposition is required");
-    } else {
-      currentSong = currentSong.transpose(distanceToWhiteKeys);
-      System.out.println("Selecting song " + currentSong.getName());
-      publish(new OnSongSelected(currentSong));
-    }
+  private void doTranspose(int midiTransposition) {
+    int transposition = Range.scale(-24, 24, Midi.MIN_VALUE, Midi.MAX_VALUE, midiTransposition);
+    currentSong.transpose(transposition);
+    synthesizer.allNotesOff(); // turn off notes that were playing before transpose
   }
 
   private void doTroff(int parameter) {

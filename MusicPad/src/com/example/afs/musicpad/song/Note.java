@@ -247,6 +247,10 @@ public class Note extends Item<Note> {
     return "Note [tick=" + tick + ", channel=" + channel + ", midiNote=" + midiNote + ", velocity=" + velocity + ", duration=" + duration + ", instrument=" + program + ", bpm=" + beatsPerMinute + ", time=" + beatsPerMeasure + "/" + beatUnit + " " + noteDescription + "]";
   }
 
+  public void transpose(int distance) {
+    midiNote += distance;
+  }
+
   private String getNoteDescription() {
     String noteDescription;
     if (channel == Midi.DRUM) {

@@ -20,7 +20,6 @@ on input
     return
    if shiftKeyDown
     if data1 96
-     sendCommand TRANSPOSE 0
      return
    else
     if data1 96
@@ -115,6 +114,10 @@ on input
    if data1 48
     # Slider 8
     sendCommand SET_TRANSPORT_VELOCITY data2
+    return
+   if data1 27
+    # Rotary 7
+    sendCommand TRANSPOSE data2
     return
    if data1 28
     # Rotary 8

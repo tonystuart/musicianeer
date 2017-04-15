@@ -46,16 +46,7 @@ public class Song {
 
   public void add(Note note) {
     notes.add(note);
-    int channel = note.getChannel();
-    int program = note.getProgram();
-    int midiNote = note.getMidiNote();
-    Facet facet = channelFacets.getFacet(channel);
-    facet.countNote(midiNote);
-    if (channel == Midi.DRUM) {
-      facet.addProgram(midiNote);
-    } else {
-      facet.addProgram(program);
-    }
+    channelFacets.add(note);
   }
 
   public void add(Word word) {
@@ -96,19 +87,19 @@ public class Song {
       beatsPerMinute = note.getBeatsPerMinute();
     }
     return beatsPerMinute;
-  };
+  }
 
   public int getChannelNoteCount(int channel) {
     return channelFacets.getFacet(channel).getTotalNoteCount();
-  };
+  }
 
   public int[] getCommonNoteCounts(int channel) {
     return channelFacets.getFacet(channel).getCommonNoteCounts();
-  };
+  }
 
   public int getConcurrency(int channel) {
     return channelFacets.getFacet(channel).getConcurrency();
-  };
+  }
 
   public Note getControllingNote(long tick) {
     Note tickNote = new Note(tick);
@@ -117,11 +108,11 @@ public class Song {
       controllingNote = notes.ceiling(tickNote);
     }
     return controllingNote;
-  };
+  }
 
   public int[] getDistinctNoteCount(int channel) {
     return channelFacets.getFacet(channel).getDistinctNoteCounts();
-  };
+  }
 
   public long getLength() {
     long length;
@@ -131,15 +122,15 @@ public class Song {
       length = notes.last().getTick();
     }
     return length;
-  };
+  }
 
   public String getName() {
     return transposition == 0 ? name : (name + " (" + transposition + ")");
-  };
+  }
 
   public TreeSet<Note> getNotes() {
     return notes;
-  };
+  }
 
   public TreeSet<Note> getNotes(int channel) {
     TreeSet<Note> channelNotes = new TreeSet<>();
@@ -170,7 +161,7 @@ public class Song {
       programNames.add(programName);
     }
     return programNames;
-  };
+  }
 
   public Set<Integer> getPrograms(int channel) {
     Set<Integer> programs;
@@ -180,21 +171,21 @@ public class Song {
       programs = channelFacets.getFacet(channel).getPrograms();
     }
     return programs;
-  };
+  }
 
   public int getTicksPerMeasure(long tick) {
     int ticksPerMeasure = getBeatsPerMeasure(tick) * Default.TICKS_PER_BEAT;
     return ticksPerMeasure;
-  };
+  }
 
   public TreeSet<Word> getWords() {
     return words;
-  };
+  }
 
   public long roundTickToNextMeasure(long tick) {
     int ticksPerMeasure = getTicksPerMeasure(tick);
     return ((tick + (ticksPerMeasure - 1)) / ticksPerMeasure) * ticksPerMeasure;
-  };
+  }
 
   public long roundTickToThisMeasure(long tick) {
     int ticksPerMeasure = getTicksPerMeasure(tick);
@@ -214,27 +205,26 @@ public class Song {
     return "Song [name=" + name + ", transposition=" + transposition + "]";
   }
 
-  public Song transpose(int transposition) {
-    Song newSong = new Song(getName(), transposition);
-    TreeSet<Note> oldNotes = notes;
-    for (Note oldNote : oldNotes) {
-      int channel = oldNote.getChannel();
-      if (channel == Midi.DRUM) {
-        newSong.add(oldNote);
-      } else {
-        int oldMidiNote = oldNote.getMidiNote();
-        int newMidiNote = oldMidiNote + transposition;
-        if (newMidiNote >= 0 && newMidiNote < Midi.NOTES) {
-          Note newNote = new NoteBuilder().withNote(oldNote).withMidiNote(newMidiNote).create();
-          newSong.add(newNote);
-        }
+  public void transpose(int desiredDistance) {
+    int distance = desiredDistance - this.transposition;
+    if (distance != 0) {
+      this.transposition = desiredDistance;
+      ChannelFacets newChannelFacets = new ChannelFacets();
+      for (int channel = 0; channel < Midi.CHANNELS; channel++) {
+        Facet channelFacet = channelFacets.getFacet(channel);
+        Facet newChannelFacet = newChannelFacets.getFacet(channel);
+        newChannelFacet.setConcurrency(channelFacet.getConcurrency());
+        newChannelFacet.setOccupancy(channelFacet.getOccupancy());
       }
+      for (Note note : notes) {
+        int channel = note.getChannel();
+        if (channel != Midi.DRUM) {
+          note.transpose(distance);
+        }
+        newChannelFacets.add(note);
+      }
+      channelFacets = newChannelFacets;
     }
-    newSong.words.addAll(words);
-    for (int channel = 0; channel < Midi.CHANNELS; channel++) {
-      newSong.setConcurrency(channel, getConcurrency(channel));
-      newSong.setOccupancy(channel, getOccupancy(channel));
-    }
-    return newSong;
-  };
+  }
+
 }

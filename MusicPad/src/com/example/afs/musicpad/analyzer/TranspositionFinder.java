@@ -29,10 +29,10 @@ public class TranspositionFinder {
       true, //B
   };
 
-  public int getDistanceToWhiteKeys(Song song) {
+  public static int getDistanceToWhiteKeys(Song song) {
     int bestTransposition = 0;
     int bestScore = Integer.MIN_VALUE;
-    for (int transposeDistance = -11; transposeDistance <= 0; transposeDistance++) {
+    for (int transposeDistance = -6; transposeDistance < 6; transposeDistance++) {
       int naturals = 0;
       int accidentals = 0;
       for (int channel = 0; channel < Midi.CHANNELS; channel++) {
