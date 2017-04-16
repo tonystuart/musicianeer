@@ -19,6 +19,7 @@ import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnInputPress;
 import com.example.afs.musicpad.message.OnInputRelease;
+import com.example.afs.musicpad.message.OnPrompter;
 import com.example.afs.musicpad.message.OnSongSelected;
 import com.example.afs.musicpad.message.OnTick;
 import com.example.afs.musicpad.midi.Midi;
@@ -27,6 +28,7 @@ import com.example.afs.musicpad.player.KeyChordPlayer;
 import com.example.afs.musicpad.player.KeyNotePlayer;
 import com.example.afs.musicpad.player.Player;
 import com.example.afs.musicpad.player.Player.Action;
+import com.example.afs.musicpad.player.Prompter;
 import com.example.afs.musicpad.player.SongChordPlayer;
 import com.example.afs.musicpad.player.SongDrumPlayer;
 import com.example.afs.musicpad.song.Song;
@@ -140,6 +142,8 @@ public abstract class DeviceHandler extends BrokerTask<Message> implements Contr
         player = new KeyNotePlayer(synthesizer, Keys.CMajor, 0);
       } else {
         player = createSongNotePlayer(channel);
+        Prompter prompter = new Prompter(currentSong, channel);
+        getBroker().publish(new OnPrompter(prompter));
       }
     }
   }

@@ -10,37 +10,46 @@
 package com.example.afs.musicpad.webapp;
 
 import java.io.IOException;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.example.afs.musicpad.player.Prompter.PrompterChannel;
+import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.util.FileUtilities;
 
 public class RestServlet extends HttpServlet {
 
-  private static final long serialVersionUID = 1L;
+  public static class OnConnect extends Message {
 
-  // TODO: properly decouple
-  public static BlockingQueue<PrompterChannel> queue = new LinkedBlockingQueue<>();
+  }
+
+  private static final long serialVersionUID = 1L;
+  private MessageQueue messageQueue;
 
   private Matchers matchers = new Matchers();
 
+  public RestServlet(MessageQueue messageQueue) {
+    this.messageQueue = messageQueue;
+  }
+
   @Override
   protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-    if (matchers.isMatch("^/prompter$", request.getPathInfo())) {
-      getPrompter(request, response);
-    } else if (matchers.isMatch("^/instruments$", request.getPathInfo())) {
-    } else if (matchers.isMatch("^/metrics$", request.getPathInfo())) {
-    } else if (matchers.isMatch("^/settings$", request.getPathInfo())) {
+    String[] matches;
+    String pathInfo = request.getPathInfo();
+    if (matchers.isMatch("^/connect$", pathInfo)) {
+      OnConnect onConnect = new OnConnect();
+      FileUtilities.writeJson(response.getOutputStream(), onConnect);
+    } else if ((matches = matchers.getMatches("^/poll/([0-9]+)$", pathInfo)).length > 0) {
+      returnFirstMessage(response, Integer.parseInt(matches[0]));
+    } else {
+      System.err.println("Unsupported operation " + pathInfo);
     }
   }
 
   @Override
+  @SuppressWarnings("unused")
   protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
     String[] matches;
     String pathInfo = request.getPathInfo();
@@ -51,13 +60,9 @@ public class RestServlet extends HttpServlet {
     }
   }
 
-  private void getPrompter(HttpServletRequest request, HttpServletResponse response) {
-    try {
-      PrompterChannel prompterChannel = queue.take();
-      FileUtilities.writeJson(response.getOutputStream(), prompterChannel);
-    } catch (InterruptedException | IOException e) {
-      throw new RuntimeException(e);
-    }
+  private void returnFirstMessage(HttpServletResponse response, int since) throws IOException {
+    Message message = messageQueue.getMessage(since);
+    FileUtilities.writeJson(response.getOutputStream(), message);
   }
 
 }

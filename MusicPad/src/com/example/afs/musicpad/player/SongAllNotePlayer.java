@@ -11,20 +11,12 @@ package com.example.afs.musicpad.player;
 
 import com.example.afs.fluidsynth.Synthesizer;
 import com.example.afs.musicpad.midi.Midi;
-import com.example.afs.musicpad.player.Prompter.PrompterChannel;
 import com.example.afs.musicpad.song.Song;
-import com.example.afs.musicpad.util.JsonUtilities;
-import com.example.afs.musicpad.webapp.RestServlet;
 
 public class SongAllNotePlayer extends SongPlayer {
 
   public SongAllNotePlayer(Synthesizer synthesizer, Song song, int channel) {
     super(synthesizer, song, channel);
-    Prompter prompter = new Prompter(song, channel);
-    PrompterChannel prompterChannel = prompter.getPrompterChannel();
-    String json = JsonUtilities.toJson(prompterChannel);
-    System.out.println(json);
-    RestServlet.queue.add(prompterChannel);
   }
 
   @Override

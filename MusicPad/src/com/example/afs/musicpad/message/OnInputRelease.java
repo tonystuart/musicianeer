@@ -9,7 +9,7 @@
 
 package com.example.afs.musicpad.message;
 
-public class OnInputRelease implements Message {
+public class OnInputRelease extends Message {
 
   private int inputCode;
 

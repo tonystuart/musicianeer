@@ -9,7 +9,7 @@
 
 package com.example.afs.musicpad.message;
 
-public class OnTick implements Message {
+public class OnTick extends Message {
 
   private long tick;
 

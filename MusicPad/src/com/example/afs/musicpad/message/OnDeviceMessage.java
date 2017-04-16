@@ -9,7 +9,7 @@
 
 package com.example.afs.musicpad.message;
 
-public class OnDeviceMessage implements Message {
+public class OnDeviceMessage extends Message {
 
   private int port;
   private int command;

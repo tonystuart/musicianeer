@@ -23,8 +23,6 @@ public class CurrentFrameServlet extends HttpServlet {
   public synchronized static void getImage(HttpServletResponse resp) throws ServletException, IOException {
   }
 
-  private int imageCount;
-
   @Override
   public void init(ServletConfig config) throws ServletException {
     super.init(config);

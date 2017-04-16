@@ -9,25 +9,26 @@
 
 package com.example.afs.musicpad.message;
 
-import java.util.concurrent.atomic.AtomicInteger;
+import com.example.afs.musicpad.player.Prompter;
 
-public class Message {
+public class OnPrompter extends Message {
 
-  private static final AtomicInteger NEXT = new AtomicInteger(1);
+  private Prompter prompter;
 
-  private String type = getClass().getSimpleName();
-  private long timestamp = System.currentTimeMillis();
-  private int number = NEXT.getAndIncrement();
-
-  public int getNumber() {
-    return number;
+  public OnPrompter() {
   }
 
-  public long getTimestamp() {
-    return timestamp;
+  public OnPrompter(Prompter prompter) {
+    this.prompter = prompter;
   }
 
-  public String getType() {
-    return type;
+  public Prompter getPrompter() {
+    return prompter;
   }
+
+  @Override
+  public String toString() {
+    return "OnPrompter [prompter=" + prompter + "]";
+  }
+
 }

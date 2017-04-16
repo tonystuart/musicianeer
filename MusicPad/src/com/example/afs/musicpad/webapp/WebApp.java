@@ -9,12 +9,7 @@
 
 package com.example.afs.musicpad.webapp;
 
-import java.io.IOException;
 import java.net.URL;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
@@ -27,37 +22,23 @@ import org.eclipse.jetty.util.log.Log;
 import org.eclipse.jetty.util.log.Logger;
 
 import com.example.afs.musicpad.message.Message;
+import com.example.afs.musicpad.message.OnPrompter;
 import com.example.afs.musicpad.task.BrokerTask;
 import com.example.afs.musicpad.util.Broker;
 
 public class WebApp extends BrokerTask<Message> {
 
-  public static class RedirectingDefaultServlet extends DefaultServlet {
-
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-      //      if (!request.getServerName().equals(request.getLocalAddr())) {
-      //        LOG.info("requestURL=" + request.getRequestURL());
-      //        String redirectLocation = "http://" + request.getLocalAddr() + ":" + PORT;
-      //        response.setHeader("Location", redirectLocation);
-      //        response.setStatus(Response.SC_TEMPORARY_REDIRECT);
-      //      } else {
-      //        super.doGet(request, response);
-      //        if ("/MakingMusic.html".equals(request.getRequestURI())) {
-      //        }
-      //      }
-      super.doGet(request, response);
-    }
-  }
-
   private static final Logger LOG = Log.getLogger(WebApp.class);
   private static final int PORT = 8080;
+  private static final int BACKLOG = 10;
 
   private Server server;
+  private MessageQueue messageQueue = new MessageQueue(BACKLOG);
 
   public WebApp(Broker<Message> broker) {
     super(broker);
     createServer();
+    subscribe(OnPrompter.class, message -> onMessage(message));
   }
 
   @Override
@@ -71,24 +52,34 @@ public class WebApp extends BrokerTask<Message> {
     }
   }
 
-  private void createServer() {
-    server = new Server(PORT);
-    DefaultServlet defaultServlet = new RedirectingDefaultServlet();
+  private ServletHolder createDefaultServlet() {
+    DefaultServlet defaultServlet = new DefaultServlet();
     ServletHolder defaultServletHolder = new ServletHolder(defaultServlet);
     defaultServletHolder.setInitParameter("resourceBase", getResourceBase());
     LOG.info("resourceBase=" + defaultServletHolder.getInitParameter("resourceBase"));
+    return defaultServletHolder;
+  }
+
+  private ServletHolder createRestServlet() {
+    RestServlet restServlet = new RestServlet(messageQueue);
+    ServletHolder restServletHolder = new ServletHolder(restServlet);
+    return restServletHolder;
+  }
+
+  private void createServer() {
     ServletContextHandler context = new ServletContextHandler();
     context.setWelcomeFiles(new String[] {
-      "MakingMusic.html"
+      "MusicPad.html"
     });
-    context.addServlet(defaultServletHolder, "/");
+    context.addServlet(createDefaultServlet(), "/");
     context.addServlet(CurrentFrameServlet.class, "/currentFrame.jpg");
-    context.addServlet(RestServlet.class, "/rest/v1/*");
+    context.addServlet(createRestServlet(), "/rest/v1/*");
     HandlerCollection handlers = new HandlerCollection();
     handlers.setHandlers(new Handler[] {
         context,
         new DefaultHandler()
     });
+    server = new Server(PORT);
     server.setHandler(handlers);
   }
 
@@ -99,4 +90,9 @@ public class WebApp extends BrokerTask<Message> {
     String resourceBase = resource.toExternalForm();
     return resourceBase;
   }
+
+  private void onMessage(Message message) {
+    messageQueue.add(message);
+  }
+
 }

@@ -11,7 +11,7 @@ package com.example.afs.musicpad.message;
 
 import com.example.afs.musicpad.device.midi.configuration.ChannelState;
 
-public class OnChannelState implements Message {
+public class OnChannelState extends Message {
 
   private int channel;
   private ChannelState channelState;
