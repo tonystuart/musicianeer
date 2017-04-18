@@ -9,23 +9,10 @@
 
 package com.example.afs.musicpad.message;
 
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class Message {
 
-  private static final AtomicInteger NEXT = new AtomicInteger(1);
-
   private String type = getClass().getSimpleName();
-  private long timestamp = System.currentTimeMillis();
-  private int number = NEXT.getAndIncrement();
-
-  public int getNumber() {
-    return number;
-  }
-
-  public long getTimestamp() {
-    return timestamp;
-  }
 
   public String getType() {
     return type;

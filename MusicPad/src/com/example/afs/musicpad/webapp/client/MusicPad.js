@@ -10,7 +10,7 @@ musicPad.onPrompter = function(prompter) {
   var words = [];
   var table = document.createElement("TABLE");
   var columnCount = (prompter.highest - prompter.lowest) + 1;
-  var rowCount = Math.floor(prompter.duration / prompter.resolution) + 1;
+  var rowCount = Math.floor(prompter.duration / prompter.resolution) + 20; // +20 due to unknown duration (we need highest ending tick)
   for (var i = 0; i < rowCount; i++) {
     var row = table.insertRow();
     words[i] = row.insertCell();
@@ -59,7 +59,17 @@ musicPad.onClick = function() {
 }
 
 musicPad.onLoad = function() {
-  musicPad.request("connect");
+  var ws = new WebSocket("ws://localhost:8080/v1/message");
+  ws.onopen = function() {
+    console.log("ws.onopen: entered");
+  }
+  ws.onmessage = function(message) {
+    console.log("ws.onmessage: entered");
+    musicPad.processResponse(message.data);
+  }
+  ws.onclose = function() {
+    console.log("ws.onclose: entered");
+  }
 }
 
 musicPad.request = function(resource) {
@@ -69,7 +79,7 @@ musicPad.request = function(resource) {
       musicPad.processResponse(httpRequest.responseText);
     }
   };
-  httpRequest.open("GET", "rest/v1/" + resource, true);
+  httpRequest.open("GET", "v1/rest/" + resource, true);
   httpRequest.send();
 }
 
@@ -79,5 +89,4 @@ musicPad.processResponse = function(json) {
   case "OnPrompter":
     musicPad.onPrompter(response.prompter);
   }
-  musicPad.request("poll/" + response.number);
 }

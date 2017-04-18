@@ -10,6 +10,8 @@
 package com.example.afs.musicpad.webapp;
 
 import java.net.URL;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
@@ -30,15 +32,23 @@ public class WebApp extends BrokerTask<Message> {
 
   private static final Logger LOG = Log.getLogger(WebApp.class);
   private static final int PORT = 8080;
-  private static final int BACKLOG = 10;
+  private static final int CLIENTS = 10;
 
   private Server server;
-  private MessageQueue messageQueue = new MessageQueue(BACKLOG);
+  private BlockingQueue<MessageWebSocket> messageWebSockets = new LinkedBlockingQueue<>(CLIENTS);
 
   public WebApp(Broker<Message> broker) {
     super(broker);
     createServer();
     subscribe(OnPrompter.class, message -> onMessage(message));
+  }
+
+  public void addMessageWebSocket(MessageWebSocket messageWebSocket) {
+    messageWebSockets.add(messageWebSocket);
+  }
+
+  public void removeMessageWebSocket(MessageWebSocket messageWebSocket) {
+    messageWebSockets.remove(messageWebSocket);
   }
 
   @Override
@@ -61,7 +71,7 @@ public class WebApp extends BrokerTask<Message> {
   }
 
   private ServletHolder createRestServlet() {
-    RestServlet restServlet = new RestServlet(messageQueue);
+    RestServlet restServlet = new RestServlet();
     ServletHolder restServletHolder = new ServletHolder(restServlet);
     return restServletHolder;
   }
@@ -73,7 +83,8 @@ public class WebApp extends BrokerTask<Message> {
     });
     context.addServlet(createDefaultServlet(), "/");
     context.addServlet(CurrentFrameServlet.class, "/currentFrame.jpg");
-    context.addServlet(createRestServlet(), "/rest/v1/*");
+    context.addServlet(createRestServlet(), "/v1/rest/*");
+    context.addServlet(createWebSocketServlet(), "/v1/message/*");
     HandlerCollection handlers = new HandlerCollection();
     handlers.setHandlers(new Handler[] {
         context,
@@ -81,6 +92,11 @@ public class WebApp extends BrokerTask<Message> {
     });
     server = new Server(PORT);
     server.setHandler(handlers);
+  }
+
+  private ServletHolder createWebSocketServlet() {
+    ServletHolder webSocketServletHolder = new ServletHolder("ws-events", new MessageServlet(this));
+    return webSocketServletHolder;
   }
 
   private String getResourceBase() {
@@ -92,7 +108,9 @@ public class WebApp extends BrokerTask<Message> {
   }
 
   private void onMessage(Message message) {
-    messageQueue.add(message);
+    for (MessageWebSocket messageWebSocket : messageWebSockets) {
+      messageWebSocket.write(message);
+    }
   }
 
 }
