@@ -14,17 +14,25 @@ import com.example.afs.musicpad.song.Note;
 public class NoteEvent implements Comparable<NoteEvent> {
 
   public enum Type {
-    NOTE_OFF, NOTE_ON, // NB: order is used by compareTo
+    TICK, NOTE_OFF, NOTE_ON, // NB: order is used by compareTo
   }
 
-  private NoteEvent.Type type;
+  private Type type;
   private long tick;
+  private int beatsPerMinute;
   private Note note;
 
-  public NoteEvent(NoteEvent.Type type, long tick, Note note) {
+  public NoteEvent(Type type, long tick, int beatsPerMinute) {
+    this.type = type;
+    this.tick = tick;
+    this.beatsPerMinute = beatsPerMinute;
+  }
+
+  public NoteEvent(Type type, long tick, Note note) {
     this.type = type;
     this.tick = tick;
     this.note = note;
+    this.beatsPerMinute = note.getBeatsPerMinute();
   }
 
   @Override
@@ -74,6 +82,10 @@ public class NoteEvent implements Comparable<NoteEvent> {
     return true;
   }
 
+  public int getBeatsPerMinute() {
+    return beatsPerMinute;
+  }
+
   public Note getNote() {
     return note;
   }
@@ -82,7 +94,7 @@ public class NoteEvent implements Comparable<NoteEvent> {
     return tick;
   }
 
-  public NoteEvent.Type getType() {
+  public Type getType() {
     return type;
   }
 

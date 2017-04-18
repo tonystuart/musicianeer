@@ -32,6 +32,8 @@ public class Song {
 
   private int transposition;
 
+  private long duration;
+
   public Song() {
   }
 
@@ -47,6 +49,10 @@ public class Song {
   public void add(Note note) {
     notes.add(note);
     channelFacets.add(note);
+    long noteEnd = note.getTick() + note.getDuration();
+    if (noteEnd > duration) {
+      duration = noteEnd;
+    }
   }
 
   public void add(Word word) {
@@ -112,6 +118,10 @@ public class Song {
 
   public int[] getDistinctNoteCount(int channel) {
     return channelFacets.getFacet(channel).getDistinctNoteCounts();
+  }
+
+  public long getDuration() {
+    return duration;
   }
 
   public long getLength() {

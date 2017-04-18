@@ -9,26 +9,26 @@
 
 package com.example.afs.musicpad.message;
 
-import com.example.afs.musicpad.player.Prompter;
+import com.example.afs.musicpad.player.WordsAndMusic;
 
-public class OnPrompter extends Message {
+public class OnWordsAndMusic extends Message {
 
-  private Prompter prompter;
+  private WordsAndMusic wordsAndMusic;
 
-  public OnPrompter() {
+  public OnWordsAndMusic() {
   }
 
-  public OnPrompter(Prompter prompter) {
-    this.prompter = prompter;
+  public OnWordsAndMusic(WordsAndMusic wordsAndMusic) {
+    this.wordsAndMusic = wordsAndMusic;
   }
 
-  public Prompter getPrompter() {
-    return prompter;
+  public WordsAndMusic getWordsAndMusic() {
+    return wordsAndMusic;
   }
 
   @Override
   public String toString() {
-    return "OnPrompter [prompter=" + prompter + "]";
+    return "OnWordsAndMusic [wordsAndMusic=" + wordsAndMusic + "]";
   }
 
 }

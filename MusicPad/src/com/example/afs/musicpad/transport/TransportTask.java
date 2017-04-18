@@ -10,7 +10,9 @@
 package com.example.afs.musicpad.transport;
 
 import java.util.Iterator;
+import java.util.NavigableSet;
 import java.util.TreeSet;
+import java.util.concurrent.BlockingQueue;
 
 import com.example.afs.fluidsynth.Synthesizer;
 import com.example.afs.musicpad.Command;
@@ -228,13 +230,25 @@ public class TransportTask extends BrokerTask<Message> {
       } else {
         lastNote = new Note(firstTick + baseDuration);
       }
-      for (Note note : song.getNotes().subSet(firstNote, lastNote)) {
+      BlockingQueue<NoteEvent> inputQueue = sequencerTask.getInputQueue();
+      NavigableSet<Note> notes = song.getNotes().subSet(firstNote, true, lastNote, false);
+      for (Note note : notes) {
         if (channel == -1 || channel == note.getChannel()) {
           long tick = note.getTick();
           long duration = note.getDuration();
-          sequencerTask.getInputQueue().add(new NoteEvent(Type.NOTE_ON, tick, note));
-          sequencerTask.getInputQueue().add(new NoteEvent(Type.NOTE_OFF, tick + duration, note));
+          inputQueue.add(new NoteEvent(Type.NOTE_ON, tick, note));
+          inputQueue.add(new NoteEvent(Type.NOTE_OFF, tick + duration, note));
         }
+      }
+      for (long tick = 0; tick < lastNote.getTick(); tick += 4 * Default.RESOLUTION) {
+        int beatsPerMinute;
+        Note previousNote = notes.lower(new Note(tick));
+        if (previousNote == null) {
+          beatsPerMinute = Default.BEATS_PER_MINUTE;
+        } else {
+          beatsPerMinute = previousNote.getBeatsPerMinute();
+        }
+        inputQueue.add(new NoteEvent(Type.TICK, tick, beatsPerMinute));
       }
     }
   }
@@ -248,6 +262,8 @@ public class TransportTask extends BrokerTask<Message> {
     case NOTE_ON:
       synthesizer.changeProgram(note.getChannel(), note.getProgram());
       synthesizer.pressKey(note.getChannel(), note.getMidiNote(), Velocity.scale(note.getVelocity(), percentVelocity));
+      break;
+    case TICK:
       getBroker().publish(new OnTick(noteEvent.getTick()));
       break;
     default:

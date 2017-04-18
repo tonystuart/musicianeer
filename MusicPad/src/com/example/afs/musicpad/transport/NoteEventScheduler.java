@@ -19,6 +19,6 @@ public class NoteEventScheduler extends TickScheduler implements Scheduler<NoteE
 
   @Override
   public long getEventTimeMillis(NoteEvent noteEvent) {
-    return getEventTimeMillis(noteEvent.getTick(), noteEvent.getNote().getBeatsPerMinute());
+    return getEventTimeMillis(noteEvent.getTick(), noteEvent.getBeatsPerMinute());
   }
 }
