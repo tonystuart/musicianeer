@@ -12,11 +12,7 @@ package com.example.afs.musicpad.player;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.song.Default;
-import com.example.afs.musicpad.song.Note;
-import com.example.afs.musicpad.song.Song;
-import com.example.afs.musicpad.song.Word;
 
 public class WordsAndMusic {
 
@@ -84,31 +80,14 @@ public class WordsAndMusic {
   private List<BrowserWords> words = new LinkedList<>();
   private List<BrowserMusic> music = new LinkedList<>();
 
-  public WordsAndMusic(Song song, int channel) {
+  public WordsAndMusic(String title, long duration, int channel, int lowest, int highest, List<BrowserWords> words, List<BrowserMusic> music) {
+    this.title = title;
+    this.duration = duration;
     this.channel = channel;
-    this.lowest = Midi.NOTES;
-    this.highest = 0;
-    this.duration = song.getDuration();
-    this.title = song.getName();
-    for (Word word : song.getWords()) {
-      BrowserWords browserWords = new BrowserWords(word.getTick(), word.getText());
-      words.add(browserWords);
-    }
-    for (Note note : song.getNotes()) {
-      if (note.getChannel() == channel) {
-        int midiNote = note.getMidiNote();
-        long noteTick = note.getTick();
-        int noteDuration = (int) note.getDuration();
-        BrowserMusic browserMusic = new BrowserMusic(noteTick, midiNote, noteDuration);
-        music.add(browserMusic);
-        if (midiNote < lowest) {
-          lowest = midiNote;
-        }
-        if (midiNote > highest) {
-          highest = midiNote;
-        }
-      }
-    }
+    this.lowest = lowest;
+    this.highest = highest;
+    this.words = words;
+    this.music = music;
   }
 
   public int getChannel() {
