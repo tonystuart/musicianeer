@@ -14,8 +14,8 @@ package com.example.afs.musicpad.device.qwerty;
 public class NumericMapping extends QwertyMapping {
 
   @Override
-  public int fromNoteIndex(int noteIndex) {
-    int inputCode = -1;
+  public int toInputCode(int noteIndex) {
+    int inputCode = NO_CODE_FOR_NOTE;
     switch (noteIndex) {
     case 0:
       inputCode = '1';

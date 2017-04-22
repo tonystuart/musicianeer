@@ -18,8 +18,9 @@ public class Default {
   public static final int BEATS_PER_MINUTE = 120;
   public static final int BEAT_UNIT = 4;
   public static final int GAP_BEAT_UNIT = 64;
-  public static final int OCTAVE = 4;
+  public static final int OCTAVE = 3;
   public static final int OCTAVE_SEMITONE = OCTAVE * Midi.SEMITONES_PER_OCTAVE;
   public static final int RESOLUTION = TICKS_PER_BEAT / 2;
+  public static final Song SONG = new Song();
 
 }

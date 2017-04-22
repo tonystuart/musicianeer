@@ -12,8 +12,9 @@ package com.example.afs.musicpad.device.qwerty;
 import java.awt.event.KeyEvent;
 
 import com.example.afs.musicpad.device.common.InputMapping;
+import com.example.afs.musicpad.theory.Keys;
 
-public abstract class QwertyMapping extends InputMapping {
+public abstract class QwertyMapping implements InputMapping {
 
   // http://www.fileformat.info/
   protected static final int ENTER = '\u23ce';
@@ -21,8 +22,13 @@ public abstract class QwertyMapping extends InputMapping {
   protected static final int NUM_LOCK = '#';
 
   @Override
+  public int toMidiNote(int noteIndex) {
+    return Keys.CMajor.getMidiNotes()[noteIndex];
+  }
+
+  @Override
   public int toNoteIndex(int inputCode) {
-    int noteIndex = -1;
+    int noteIndex = NO_NOTE_FOR_CODE; // could use these (e.g. F1) for shortcuts
     if (inputCode >= 'A' && inputCode <= 'Z') {
       noteIndex = inputCode - 'A';
     } else {

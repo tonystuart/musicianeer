@@ -19,8 +19,12 @@ import java.util.Set;
 
 import com.example.afs.fluidsynth.Synthesizer;
 import com.example.afs.musicpad.device.common.ControllableGroup;
+import com.example.afs.musicpad.device.common.Device;
 import com.example.afs.musicpad.device.common.DeviceHandler;
 import com.example.afs.musicpad.message.Message;
+import com.example.afs.musicpad.player.Player.KeyType;
+import com.example.afs.musicpad.player.Player.MappingType;
+import com.example.afs.musicpad.player.Player.UnitType;
 import com.example.afs.musicpad.task.BrokerTask;
 import com.example.afs.musicpad.util.Broker;
 
@@ -53,8 +57,12 @@ public class QwertyWatcher extends BrokerTask<Message> {
   }
 
   private void attachDevice(String name) {
-    System.out.println("Attaching QWERTY device " + name);
-    DeviceHandler deviceHandler = new QwertyDeviceHandler(getBroker(), synthesizer);
+    System.out.println("Attaching QWERY device " + name);
+    Device device = new Device(name);
+    device.setMappingType(MappingType.ALPHA);
+    device.setKeyType(KeyType.INSTRUMENT);
+    device.setUnitType(UnitType.NOTE);
+    DeviceHandler deviceHandler = new DeviceHandler(getBroker(), synthesizer, device);
     QwertyReader qwertyReader = new QwertyReader(deviceHandler.getInputQueue(), name);
     ControllableGroup controllableGroup = new ControllableGroup(deviceHandler, qwertyReader);
     oldDevices.put(name, controllableGroup);

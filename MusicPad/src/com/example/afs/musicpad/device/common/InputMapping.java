@@ -9,21 +9,15 @@
 
 package com.example.afs.musicpad.device.common;
 
-public abstract class InputMapping {
+public interface InputMapping {
 
-  public String fromIndexToSequence(int noteIndex) {
-    String keySequence;
-    int inputCode = fromNoteIndex(noteIndex);
-    if (inputCode == -1) {
-      keySequence = "?";
-    } else {
-      keySequence = Character.toString((char) inputCode);
-    }
-    return keySequence;
-  }
+  int NO_NOTE_FOR_CODE = -1;
+  int NO_CODE_FOR_NOTE = -1;
 
-  public abstract int fromNoteIndex(int noteIndex);
+  int toInputCode(int noteIndex);
 
-  public abstract int toNoteIndex(int inputCode);
+  int toMidiNote(int noteIndex);
+
+  int toNoteIndex(int inputCode);
 
 }

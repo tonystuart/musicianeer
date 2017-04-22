@@ -13,7 +13,7 @@ import com.example.afs.musicpad.device.common.InputMapping;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.song.Default;
 
-public class MidiMapping extends InputMapping {
+public class MidiMapping implements InputMapping {
 
   private static final int[] KEY_NOTES = new int[] {
       0, // C
@@ -31,8 +31,13 @@ public class MidiMapping extends InputMapping {
   };
 
   @Override
-  public int fromNoteIndex(int noteIndex) {
-    return 0;
+  public int toInputCode(int noteIndex) {
+    return noteIndex;
+  }
+
+  @Override
+  public int toMidiNote(int noteIndex) {
+    return noteIndex;
   }
 
   @Override

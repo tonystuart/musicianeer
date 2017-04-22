@@ -24,7 +24,7 @@ import org.eclipse.jetty.util.log.Log;
 import org.eclipse.jetty.util.log.Logger;
 
 import com.example.afs.musicpad.message.Message;
-import com.example.afs.musicpad.message.OnWordsAndMusic;
+import com.example.afs.musicpad.message.OnPrompterData;
 import com.example.afs.musicpad.message.OnTick;
 import com.example.afs.musicpad.task.BrokerTask;
 import com.example.afs.musicpad.util.Broker;
@@ -41,7 +41,7 @@ public class WebApp extends BrokerTask<Message> {
   public WebApp(Broker<Message> broker) {
     super(broker);
     createServer();
-    subscribe(OnWordsAndMusic.class, message -> onMessage(message));
+    subscribe(OnPrompterData.class, message -> onMessage(message));
     subscribe(OnTick.class, message -> onMessage(message));
   }
 

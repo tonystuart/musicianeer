@@ -56,16 +56,24 @@ public class QwertyReader implements Controllable {
     }
   }
 
-  public void processKeyPress(short keyCode) {
-    char inputCode = QwertyKeyCodes.inputCodes[keyCode];
-    if (inputCode == KeyEvent.VK_ESCAPE) {
-      terminate();
+  public int processKeyDown(short keyCode) {
+    int ignoreKeyUp;
+    if (keyCode < QwertyKeyCodes.inputCodes.length) {
+      char inputCode = QwertyKeyCodes.inputCodes[keyCode];
+      if (inputCode == KeyEvent.VK_ESCAPE) {
+        terminate();
+        ignoreKeyUp = 1;
+      } else {
+        ignoreKeyUp = commandBuilder.processInputPress(inputCode);
+      }
     } else {
-      commandBuilder.processInputPress(inputCode);
+      // e.g. windows meta key (125)
+      ignoreKeyUp = 1;
     }
+    return ignoreKeyUp;
   }
 
-  public void processKeyRelease(short keyCode) {
+  public void processKeyUp(short keyCode) {
     char inputCode = QwertyKeyCodes.inputCodes[keyCode];
     commandBuilder.processInputRelease(inputCode);
   }
@@ -84,6 +92,7 @@ public class QwertyReader implements Controllable {
   private void run() {
     try (FileInputStream fileInputStream = new FileInputStream(deviceName)) {
       capture(fileInputStream);
+      int ignoreKeyUp = 0;
       byte[] buffer = new byte[16];
       while (!isTerminated) {
         try {
@@ -94,10 +103,14 @@ public class QwertyReader implements Controllable {
             int value = ByteArray.toNativeInteger(buffer, 12);
             if (value == 0) {
               short code = ByteArray.toNativeShort(buffer, 10);
-              processKeyRelease(code);
+              if (ignoreKeyUp > 0) {
+                ignoreKeyUp--;
+              } else {
+                processKeyUp(code);
+              }
             } else if (value == 1) {
               short code = ByteArray.toNativeShort(buffer, 10);
-              processKeyPress(code);
+              ignoreKeyUp += processKeyDown(code);
             }
           }
         } catch (RuntimeException e) {

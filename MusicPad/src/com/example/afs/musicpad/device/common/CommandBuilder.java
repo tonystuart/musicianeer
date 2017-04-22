@@ -30,16 +30,25 @@ public class CommandBuilder {
     this.queue = queue;
   }
 
-  public void processInputPress(int inputCode) {
+  public int processInputPress(int inputCode) {
+    int ignoreCount;
     if (currentField == null) {
       if (inputCode == '.') {
         currentField = left;
+        ignoreCount = 1;
       } else if (inputCode != -1) {
         queue.add(new OnInputPress(inputCode));
+        ignoreCount = 0;
+      } else {
+        // TODO: I don't think inputCode can be -1, so remove the check.
+        System.out.println("How does inputCode get to be -1?");
+        ignoreCount = 0;
       }
     } else {
       composeField(inputCode);
+      ignoreCount = 1;
     }
+    return ignoreCount;
   }
 
   public void processInputRelease(int inputCode) {

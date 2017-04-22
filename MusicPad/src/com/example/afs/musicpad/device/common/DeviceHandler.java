@@ -12,73 +12,59 @@ package com.example.afs.musicpad.device.common;
 import com.example.afs.fluidsynth.Synthesizer;
 import com.example.afs.musicpad.Command;
 import com.example.afs.musicpad.device.common.ControllableGroup.Controllable;
-import com.example.afs.musicpad.device.midi.MidiMapping;
-import com.example.afs.musicpad.device.qwerty.AlphaMapping;
-import com.example.afs.musicpad.device.qwerty.NumericMapping;
 import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnInputPress;
 import com.example.afs.musicpad.message.OnInputRelease;
-import com.example.afs.musicpad.message.OnWordsAndMusic;
 import com.example.afs.musicpad.message.OnSongSelected;
-import com.example.afs.musicpad.message.OnTick;
-import com.example.afs.musicpad.midi.Midi;
-import com.example.afs.musicpad.player.GeneralDrumPlayer;
-import com.example.afs.musicpad.player.KeyChordPlayer;
-import com.example.afs.musicpad.player.KeyNotePlayer;
+import com.example.afs.musicpad.message.OnPrompterData;
 import com.example.afs.musicpad.player.Player;
 import com.example.afs.musicpad.player.Player.Action;
-import com.example.afs.musicpad.player.WordsAndMusic;
-import com.example.afs.musicpad.player.SongChordPlayer;
-import com.example.afs.musicpad.player.SongDrumPlayer;
+import com.example.afs.musicpad.player.Player.MappingType;
+import com.example.afs.musicpad.player.Player.UnitType;
+import com.example.afs.musicpad.song.Default;
 import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.task.BrokerTask;
-import com.example.afs.musicpad.theory.Keys;
 import com.example.afs.musicpad.util.Broker;
 import com.example.afs.musicpad.util.Range;
 import com.example.afs.musicpad.util.Value;
 
-public abstract class DeviceHandler extends BrokerTask<Message> implements Controllable {
+public class DeviceHandler extends BrokerTask<Message> implements Controllable {
 
+  private Device device;
   private Player player;
-  protected Song currentSong;
-  protected Synthesizer synthesizer;
-  protected InputMapping inputMapping;
+  private Synthesizer synthesizer;
+  private Song song = Default.SONG;
 
-  public DeviceHandler(Broker<Message> messageBroker, Synthesizer synthesizer, InputMapping inputMapping) {
+  public DeviceHandler(Broker<Message> messageBroker, Synthesizer synthesizer, Device device) {
     super(messageBroker);
     this.synthesizer = synthesizer;
-    this.inputMapping = inputMapping;
-    this.player = createDefaultPlayer();
+    this.device = device;
+    this.player = new Player(synthesizer, song, device);
     delegate(OnInputPress.class, message -> doInputPress(message.getInputCode()));
     delegate(OnInputRelease.class, message -> doInputRelease(message.getInputCode()));
     delegate(OnCommand.class, message -> doCommand(message));
     subscribe(OnSongSelected.class, message -> doSongSelected(message.getSong()));
-    subscribe(OnTick.class, message -> doTick(message.getTick()));
   }
-
-  protected abstract Player createDefaultPlayer();
-
-  protected abstract Player createSongNotePlayer(int channel);
 
   private void doCommand(OnCommand message) {
     Command command = message.getCommand();
     int parameter = message.getParameter();
     switch (command) {
     case SELECT_CHORDS:
-      selectChords(parameter);
+      selectChords(Value.toIndex(parameter));
       break;
     case SELECT_NOTES:
-      selectNotes(parameter);
+      selectNotes(Value.toIndex(parameter));
       break;
     case SELECT_PROGRAM:
-      selectProgram(parameter);
+      selectProgram(Value.toIndex(parameter));
       break;
     case SET_PLAYER_VELOCITY:
       setVelocity(parameter);
       break;
     case SET_KEYBOARD_MAPPING:
-      setKeyboardMapping(parameter);
+      setKeyboardMapping(Value.toIndex(parameter));
       break;
     default:
       getBroker().publish(message);
@@ -87,89 +73,47 @@ public abstract class DeviceHandler extends BrokerTask<Message> implements Contr
   }
 
   private void doInputPress(int inputCode) {
-    int noteIndex = inputMapping.toNoteIndex(inputCode);
-    player.play(Action.PRESS, noteIndex);
+    player.play(Action.PRESS, inputCode);
   }
 
   private void doInputRelease(int inputCode) {
-    int noteIndex = inputMapping.toNoteIndex(inputCode);
-    player.play(Action.RELEASE, noteIndex);
+    player.play(Action.RELEASE, inputCode);
   }
 
   private void doSongSelected(Song song) {
-    player.close();
-    currentSong = song;
-    player = createDefaultPlayer();
+    this.song = song;
+    updatePlayer();
   }
 
-  private void doTick(long tick) {
-    player.onTick(tick);
+  private void selectChords(int channel) {
+    device.setChannel(channel);
+    device.setUnitType(UnitType.CHORD);
+    updatePlayer();
   }
 
-  private void selectChords(int channelNumber) {
-    player.close();
-    // Let device update previous channel
-    getBroker().publish(new OnCommand(Command.SHOW_CHANNEL_INFO, 0));
-    int channel = Value.toIndex(channelNumber);
-    if (channel == Midi.DRUM) {
-      if (currentSong == null) {
-        player = new GeneralDrumPlayer(synthesizer);
-      } else {
-        player = new SongDrumPlayer(synthesizer, currentSong, inputMapping);
-      }
-    } else {
-      if (currentSong == null) {
-        player = new KeyChordPlayer(synthesizer, Keys.CMajor, 0);
-      } else {
-        player = new SongChordPlayer(synthesizer, currentSong, channel, inputMapping);
-      }
-    }
+  private void selectNotes(int channel) {
+    device.setChannel(channel);
+    device.setUnitType(UnitType.NOTE);
+    updatePlayer();
   }
 
-  private void selectNotes(int channelNumber) {
-    player.close();
-    // Let device update previous channel
-    getBroker().publish(new OnCommand(Command.SHOW_CHANNEL_INFO, 0));
-    int channel = Value.toIndex(channelNumber);
-    if (channel == Midi.DRUM) {
-      if (currentSong == null) {
-        player = new GeneralDrumPlayer(synthesizer);
-      } else {
-        player = new SongDrumPlayer(synthesizer, currentSong, inputMapping);
-      }
-    } else {
-      if (currentSong == null || channel == -1) {
-        player = new KeyNotePlayer(synthesizer, Keys.CMajor, 0);
-      } else {
-        player = createSongNotePlayer(channel);
-        WordsAndMusic wordsAndMusic = new WordsAndMusic(currentSong, channel);
-        getBroker().publish(new OnWordsAndMusic(wordsAndMusic));
-      }
-    }
+  private void selectProgram(int program) {
+    player.selectProgram(program);
   }
 
-  private void selectProgram(int programNumber) {
-    int programIndex = programNumber - 1;
-    player.selectProgram(programIndex);
-  }
-
-  private void setKeyboardMapping(int mapping) {
-    switch (mapping) {
-    case 1:
-      inputMapping = new NumericMapping();
-      break;
-    case 2:
-      inputMapping = new AlphaMapping();
-      break;
-    case 3:
-      inputMapping = new MidiMapping();
-      break;
-    }
-    player.updateInputDevice(inputMapping);
+  private void setKeyboardMapping(int index) {
+    device.setMappingType(MappingType.values()[index]); // TODO: Create generic enum converter, see Trace.
+    updatePlayer();
   }
 
   private void setVelocity(int velocity) {
     player.setPercentVelocity(Range.scaleMidiToPercent(velocity));
+  }
+
+  private void updatePlayer() {
+    this.player = new Player(synthesizer, song, device);
+    getBroker().publish(new OnCommand(Command.SHOW_CHANNEL_INFO, 0));
+    getBroker().publish(new OnPrompterData(player.getPrompterData()));
   }
 
 }

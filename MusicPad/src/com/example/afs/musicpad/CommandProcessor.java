@@ -173,17 +173,16 @@ public class CommandProcessor extends BrokerTask<Message> {
     synthesizer.allNotesOff(); // turn off notes that were playing before transpose
   }
 
-  private void doTroff(int parameter) {
-    setTrace(parameter, false);
+  private void doTroff(int traceNumber) {
+    setTrace(Value.toIndex(traceNumber), false);
   }
 
-  private void doTron(int parameter) {
-    setTrace(parameter, true);
+  private void doTron(int traceNumber) {
+    setTrace(Value.toIndex(traceNumber), true);
   }
 
-  private TraceOption getTraceOption(int traceNumber) {
+  private TraceOption getTraceOption(int trace) {
     TraceOption traceOption;
-    int trace = Value.toIndex(traceNumber);
     TraceOption[] traceOptions = TraceOption.values();
     if (trace < 0 || trace >= traceOptions.length) {
       traceOption = null;
@@ -196,8 +195,8 @@ public class CommandProcessor extends BrokerTask<Message> {
     return traceOption;
   }
 
-  private void setTrace(int traceNumber, boolean value) {
-    TraceOption traceOption = getTraceOption(traceNumber);
+  private void setTrace(int traceIndex, boolean value) {
+    TraceOption traceOption = getTraceOption(traceIndex);
     if (traceOption != null) {
       switch (traceOption) {
       case COMMAND:

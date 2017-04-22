@@ -1,34 +1,19 @@
 @CHARSET "UTF-8";
+
+html {
+	height: 100%;
+	width: 100%;
+}
+
 body {
-  background-color: black;
-  color: #0e0;
   font-family: sans-serif;
-  max-width: 600px;
+  height: 100%;
+  width: 100%;
+  padding: 0px;
+  margin: 0px;
 }
 
 button {
-  background-color: black;
-  border: 1px solid #0e0;
-  color: #0e0;
-}
-
-div {
-  display: flex;
-  flex-direction: column;
-  padding: 10px 0px;
-}
-
-h1 {
-  font-size: 2rem;
-  font-weight: bold;
-  text-align: center;
-  font-weight: bold;
-}
-
-h2 {
-  font-size: 1.5rem;
-  font-weight: normal;
-  text-align: center;
 }
 
 img {
@@ -42,9 +27,6 @@ label {
 }
 
 input {
-  background-color: gray;
-  border: 1px solid #0e0;
-  color: #0e0;
   padding: 5px;
 }
 
@@ -56,19 +38,10 @@ input[type='text'] {
   flex-grow: 1;
 }
 
-.field button {
-  margin-left: 10px;
-}
-
 .row {
   flex-direction: row;
   flex-wrap: wrap;
   justify-content: space-between;
-}
-
-#info img {
-	max-width: 134px;
-	border-top: 1px solid white;
 }
 
 .centered {
@@ -76,5 +49,34 @@ input[type='text'] {
 }
 
 .tab {
+	display: none;
+}
+
+#prompters {
+	display: flex;
+	flex-direction: row;
+	height: 100%;
+	width: 100%;
+}
+
+.prompter {
+	border: 1px solid black;
+	flex-grow: 1;
+	flex-shrink: 1;
+}
+
+.title {
+	display: none;
+}
+
+.music {
+	overflow-y: auto;
+	height: 100%;
+}
+
+tr:nth-child(even) {/* background: #CCC */}
+tr:nth-child(odd) {/* background: #FFF */}
+
+#templates {
 	display: none;
 }

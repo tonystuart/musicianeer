@@ -12,9 +12,11 @@ package com.example.afs.musicpad.player;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.example.afs.musicpad.device.common.Device;
 import com.example.afs.musicpad.song.Default;
+import com.example.afs.musicpad.song.Song;
 
-public class WordsAndMusic {
+public class PrompterData {
 
   public static class BrowserMusic {
 
@@ -71,7 +73,7 @@ public class WordsAndMusic {
   }
 
   private String title;
-  private String device;
+  private int index;
   private int channel;
   private int lowest;
   private int highest;
@@ -80,10 +82,11 @@ public class WordsAndMusic {
   private List<BrowserWords> words = new LinkedList<>();
   private List<BrowserMusic> music = new LinkedList<>();
 
-  public WordsAndMusic(String title, long duration, int channel, int lowest, int highest, List<BrowserWords> words, List<BrowserMusic> music) {
-    this.title = title;
-    this.duration = duration;
-    this.channel = channel;
+  public PrompterData(Song song, Device device, int lowest, int highest, List<BrowserWords> words, List<BrowserMusic> music) {
+    this.title = song.getName();
+    this.duration = song.getDuration();
+    this.index = device.getIndex();
+    this.channel = device.getChannel();
     this.lowest = lowest;
     this.highest = highest;
     this.words = words;
@@ -94,16 +97,16 @@ public class WordsAndMusic {
     return channel;
   }
 
-  public String getDevice() {
-    return device;
-  }
-
   public long getDuration() {
     return duration;
   }
 
   public int getHighest() {
     return highest;
+  }
+
+  public int getIndex() {
+    return index;
   }
 
   public int getLowest() {
@@ -128,7 +131,7 @@ public class WordsAndMusic {
 
   @Override
   public String toString() {
-    return "WordsAndMusic [title=" + title + ", device=" + device + ", channel=" + channel + ", lowest=" + lowest + ", highest=" + highest + ", duration=" + duration + ", resolution=" + resolution + "]";
+    return "prompterData [title=" + title + ", deviceIndex=" + index + ", channel=" + channel + ", lowest=" + lowest + ", highest=" + highest + ", duration=" + duration + ", resolution=" + resolution + "]";
   }
 
 }

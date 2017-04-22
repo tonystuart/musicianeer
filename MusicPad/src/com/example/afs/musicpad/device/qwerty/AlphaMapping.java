@@ -9,12 +9,11 @@
 
 package com.example.afs.musicpad.device.qwerty;
 
-
 public class AlphaMapping extends QwertyMapping {
 
   @Override
-  public int fromNoteIndex(int noteIndex) {
-    int inputCode = -1;
+  public int toInputCode(int noteIndex) {
+    int inputCode = NO_CODE_FOR_NOTE;
     if (noteIndex >= 0 && noteIndex < 26) {
       inputCode = 'A' + noteIndex;
     }

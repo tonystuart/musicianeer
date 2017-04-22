@@ -25,10 +25,14 @@ import javax.sound.midi.MidiUnavailableException;
 
 import com.example.afs.fluidsynth.Synthesizer;
 import com.example.afs.musicpad.device.common.ControllableGroup;
+import com.example.afs.musicpad.device.common.Device;
 import com.example.afs.musicpad.device.common.DeviceHandler;
 import com.example.afs.musicpad.device.midi.configuration.MidiConfiguration;
 import com.example.afs.musicpad.device.midi.configuration.Parser;
 import com.example.afs.musicpad.message.Message;
+import com.example.afs.musicpad.player.Player.KeyType;
+import com.example.afs.musicpad.player.Player.MappingType;
+import com.example.afs.musicpad.player.Player.UnitType;
 import com.example.afs.musicpad.task.BrokerTask;
 import com.example.afs.musicpad.util.Broker;
 import com.example.afs.musicpad.util.FileUtilities;
@@ -63,12 +67,16 @@ public class MidiWatcher extends BrokerTask<Message> {
     }
   }
 
-  private void attachDevice(String name, MidiDeviceBundle device) {
+  private void attachDevice(String name, MidiDeviceBundle deviceBundle) {
     System.out.println("Attaching MIDI device " + name);
-    MidiConfiguration configuration = readConfiguration(device);
-    DeviceHandler deviceHandler = new MidiDeviceHandler(getBroker(), synthesizer);
-    MidiReader midiReader = new MidiReader(getBroker(), deviceHandler.getInputQueue(), device, configuration);
-    MidiWriter midiWriter = new MidiWriter(getBroker(), device, configuration);
+    MidiConfiguration configuration = readConfiguration(deviceBundle);
+    Device device = new Device(name);
+    device.setMappingType(MappingType.MIDI);
+    device.setKeyType(KeyType.INSTRUMENT);
+    device.setUnitType(UnitType.NOTE);
+    DeviceHandler deviceHandler = new DeviceHandler(getBroker(), synthesizer, device);
+    MidiReader midiReader = new MidiReader(getBroker(), deviceHandler.getInputQueue(), deviceBundle, configuration);
+    MidiWriter midiWriter = new MidiWriter(getBroker(), deviceBundle, configuration);
     ControllableGroup controllableGroup = new ControllableGroup(deviceHandler, midiReader, midiWriter);
     oldDevices.put(name, controllableGroup);
     controllableGroup.start();

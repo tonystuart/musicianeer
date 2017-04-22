@@ -240,7 +240,7 @@ public class TransportTask extends BrokerTask<Message> {
           inputQueue.add(new NoteEvent(Type.NOTE_OFF, tick + duration, note));
         }
       }
-      for (long tick = 0; tick < lastNote.getTick(); tick += 4 * Default.RESOLUTION) {
+      for (long tick = 0; tick < lastNote.getTick(); tick += Default.RESOLUTION) {
         int beatsPerMinute;
         Note previousNote = notes.lower(new Note(tick));
         if (previousNote == null) {
