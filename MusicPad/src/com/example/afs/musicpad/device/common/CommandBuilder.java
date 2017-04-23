@@ -15,33 +15,55 @@ import java.util.concurrent.BlockingQueue;
 import com.example.afs.musicpad.Command;
 import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnCommand;
-import com.example.afs.musicpad.message.OnInputPress;
-import com.example.afs.musicpad.message.OnInputRelease;
+import com.example.afs.musicpad.message.OnNoteOff;
+import com.example.afs.musicpad.message.OnNoteOn;
+import com.example.afs.musicpad.midi.Midi;
 
 public class CommandBuilder {
 
   private BlockingQueue<Message> queue;
+  private Device device;
 
+  private StringBuilder currentField;
   private StringBuilder left = new StringBuilder();
   private StringBuilder right = new StringBuilder();
-  private StringBuilder currentField;
 
-  public CommandBuilder(BlockingQueue<Message> queue) {
+  private int octave;
+  private boolean sharp;
+  private int[] activeMidiNotes = new int[Midi.NOTES];
+
+  public CommandBuilder(BlockingQueue<Message> queue, Device device) {
     this.queue = queue;
+    this.device = device;
   }
 
-  public int processInputPress(int inputCode) {
+  public int processKeyDown(int inputCode) {
     int ignoreCount;
     if (currentField == null) {
       if (inputCode == '.') {
         currentField = left;
         ignoreCount = 1;
-      } else if (inputCode != -1) {
-        queue.add(new OnInputPress(inputCode));
+      } else if (inputCode == KeyEvent.VK_SHIFT || inputCode == KeyEvent.VK_NUM_LOCK) {
+        sharp = true;
+        ignoreCount = 0;
+      } else if (inputCode == '-') {
+        octave = -1;
+        ignoreCount = 0;
+      } else if (inputCode == '+') {
+        octave = +1;
+        ignoreCount = 0;
+      } else if (inputCode == '/') {
+        octave = -1;
+        sharp = true;
+        ignoreCount = 0;
+      } else if (inputCode == '*') {
+        octave = +1;
+        sharp = true;
         ignoreCount = 0;
       } else {
-        // TODO: I don't think inputCode can be -1, so remove the check.
-        System.out.println("How does inputCode get to be -1?");
+        int midiNote = getMidiNote(inputCode);
+        activeMidiNotes[inputCode] = midiNote;
+        queue.add(new OnNoteOn(midiNote));
         ignoreCount = 0;
       }
     } else {
@@ -51,10 +73,26 @@ public class CommandBuilder {
     return ignoreCount;
   }
 
-  public void processInputRelease(int inputCode) {
+  public void processKeyUp(int inputCode) {
     if (currentField == null) {
-      if (inputCode != -1) {
-        queue.add(new OnInputRelease(inputCode));
+      if (inputCode == KeyEvent.VK_SHIFT || inputCode == KeyEvent.VK_NUM_LOCK) {
+        sharp = false;
+      } else if (inputCode == '-') {
+        octave = 0;
+      } else if (inputCode == '+') {
+        octave = 0;
+      } else if (inputCode == '/') {
+        octave = 0;
+        sharp = false;
+      } else if (inputCode == '*') {
+        octave = 0;
+        sharp = false;
+      } else {
+        int midiNote = activeMidiNotes[inputCode];
+        if (midiNote != 0) {
+          queue.add(new OnNoteOff(midiNote));
+          activeMidiNotes[inputCode] = 0;
+        }
       }
     }
   }
@@ -102,6 +140,15 @@ public class CommandBuilder {
     } else {
       System.err.println("Command " + index + " is out of range.");
     }
+  }
+
+  private int getMidiNote(int inputCode) {
+    int midiNote = device.getInputMapping().toMidiNote(inputCode);
+    midiNote += octave * 12;
+    if (sharp) {
+      midiNote++;
+    }
+    return midiNote;
   }
 
   private int parseInteger(String string) {

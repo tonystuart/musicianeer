@@ -9,53 +9,18 @@
 
 package com.example.afs.musicpad.device.midi;
 
+import com.example.afs.musicpad.analyzer.Names;
 import com.example.afs.musicpad.device.common.InputMapping;
-import com.example.afs.musicpad.midi.Midi;
-import com.example.afs.musicpad.song.Default;
 
 public class MidiMapping implements InputMapping {
 
-  private static final int[] KEY_NOTES = new int[] {
-      0, // C
-      -1, // C#
-      1, // D
-      -1, // D#
-      2, // E
-      3, // F
-      -1, // F#
-      4, // G
-      -1, // G#
-      5, // A
-      -1, // A#
-      6, //
-  };
-
   @Override
-  public int toInputCode(int noteIndex) {
-    return noteIndex;
+  public String toKeyCap(int midiNote) {
+    return Names.getNoteName(midiNote);
   }
 
   @Override
   public int toMidiNote(int noteIndex) {
-    return noteIndex;
-  }
-
-  @Override
-  public int toNoteIndex(int inputCode) {
-    return inputCode;
-  }
-
-  public int toNoteIndexOld(int inputCode) {
-    int noteIndex = -1;
-    if (inputCode >= Default.OCTAVE_SEMITONE) {
-      int octave = inputCode / Midi.SEMITONES_PER_OCTAVE;
-      int deltaOctave = octave - Default.OCTAVE;
-      int baseNote = deltaOctave * Midi.NOTES_PER_OCTAVE;
-      int noteInKey = KEY_NOTES[inputCode % KEY_NOTES.length];
-      if (noteInKey != -1) {
-        noteIndex = baseNote + noteInKey;
-      }
-    }
     return noteIndex;
   }
 

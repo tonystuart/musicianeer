@@ -11,13 +11,7 @@ package com.example.afs.musicpad.device.common;
 
 public interface InputMapping {
 
-  int NO_NOTE_FOR_CODE = -1;
-  int NO_CODE_FOR_NOTE = -1;
+  String toKeyCap(int midiNote);
 
-  int toInputCode(int noteIndex);
-
-  int toMidiNote(int noteIndex);
-
-  int toNoteIndex(int inputCode);
-
+  int toMidiNote(int inputCode);
 }

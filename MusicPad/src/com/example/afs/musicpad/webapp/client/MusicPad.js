@@ -2,7 +2,6 @@
 var musicPad = musicPad || {};
 
 musicPad.refreshIntervalMillis = 60000;
-musicPad.noteNames = [ "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
 musicPad.lastMessageNumber = -1;
 
 musicPad.onPrompterData = function(data) {
@@ -36,7 +35,7 @@ musicPad.onPrompterData = function(data) {
     var music = data.music[m];
     var row = Math.floor(music.tick / data.resolution);
     var column = music.note - data.lowest;
-    var noteName = musicPad.formatNoteName(music.note)
+    var noteName = data.names[music.note - data.lowest];
     cells[row][column].innerHTML = noteName;
     var count = Math.floor(music.duration / data.resolution);
     for (var i = 1; i < count; i++) {
@@ -77,14 +76,14 @@ musicPad.formatText = function(text) {
   return text;
 }
 
-musicPad.formatNoteName = function(note) {
-  return musicPad.noteNames[note % musicPad.noteNames.length];
-}
-
 musicPad.onClick = function() {
 }
 
 musicPad.onLoad = function() {
+  musicPad.createWebSocketClient();
+}
+
+musicPad.createWebSocketClient = function() {
   var ws = new WebSocket("ws://localhost:8080/v1/message");
   ws.onopen = function() {
     console.log("ws.onopen: entered");
@@ -94,7 +93,8 @@ musicPad.onLoad = function() {
     musicPad.processResponse(message.data);
   }
   ws.onclose = function() {
-    console.log("ws.onclose: entered");
+    console.log("ws.onclose: entered, connecting again in 1000 ms.");
+    setTimeout(musicPad.createWebSocketClient, 1000);
   }
 }
 

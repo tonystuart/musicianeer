@@ -29,8 +29,8 @@ import com.example.afs.musicpad.device.midi.configuration.On;
 import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnDeviceMessage;
-import com.example.afs.musicpad.message.OnInputPress;
-import com.example.afs.musicpad.message.OnInputRelease;
+import com.example.afs.musicpad.message.OnNoteOn;
+import com.example.afs.musicpad.message.OnNoteOff;
 import com.example.afs.musicpad.util.Broker;
 
 public class MidiReader implements Controllable, HasSendCommand, HasSendDeviceMessage, HasSendHandlerMessage {
@@ -83,7 +83,7 @@ public class MidiReader implements Controllable, HasSendCommand, HasSendDeviceMe
 
   @Override
   public void sendHandlerMessage(int data1) {
-    queue.add(new OnInputPress(data1));
+    queue.add(new OnNoteOn(data1));
   }
 
   @Override
@@ -131,9 +131,9 @@ public class MidiReader implements Controllable, HasSendCommand, HasSendDeviceMe
         On onInput = configuration.getOn(MidiConfiguration.INPUT);
         if (onInput == null || onInput.execute(context) == ReturnState.IF_NO_MATCH) {
           if (shortMessage.getCommand() == ShortMessage.NOTE_ON) {
-            queue.add(new OnInputPress(shortMessage.getData1()));
+            queue.add(new OnNoteOn(shortMessage.getData1()));
           } else if (shortMessage.getCommand() == ShortMessage.NOTE_OFF) {
-            queue.add(new OnInputRelease(shortMessage.getData1()));
+            queue.add(new OnNoteOff(shortMessage.getData1()));
           }
         }
       }

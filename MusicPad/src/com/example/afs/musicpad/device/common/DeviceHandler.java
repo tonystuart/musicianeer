@@ -12,15 +12,17 @@ package com.example.afs.musicpad.device.common;
 import com.example.afs.fluidsynth.Synthesizer;
 import com.example.afs.musicpad.Command;
 import com.example.afs.musicpad.device.common.ControllableGroup.Controllable;
+import com.example.afs.musicpad.device.midi.MidiMapping;
+import com.example.afs.musicpad.device.qwerty.AlphaMapping;
+import com.example.afs.musicpad.device.qwerty.NumericMapping;
 import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnCommand;
-import com.example.afs.musicpad.message.OnInputPress;
-import com.example.afs.musicpad.message.OnInputRelease;
-import com.example.afs.musicpad.message.OnSongSelected;
+import com.example.afs.musicpad.message.OnNoteOff;
+import com.example.afs.musicpad.message.OnNoteOn;
 import com.example.afs.musicpad.message.OnPrompterData;
+import com.example.afs.musicpad.message.OnSongSelected;
 import com.example.afs.musicpad.player.Player;
 import com.example.afs.musicpad.player.Player.Action;
-import com.example.afs.musicpad.player.Player.MappingType;
 import com.example.afs.musicpad.player.Player.UnitType;
 import com.example.afs.musicpad.song.Default;
 import com.example.afs.musicpad.song.Song;
@@ -41,8 +43,8 @@ public class DeviceHandler extends BrokerTask<Message> implements Controllable {
     this.synthesizer = synthesizer;
     this.device = device;
     this.player = new Player(synthesizer, song, device);
-    delegate(OnInputPress.class, message -> doInputPress(message.getInputCode()));
-    delegate(OnInputRelease.class, message -> doInputRelease(message.getInputCode()));
+    delegate(OnNoteOn.class, message -> doNoteOn(message.getMidiNote()));
+    delegate(OnNoteOff.class, message -> doNoteOff(message.getMidiNote()));
     delegate(OnCommand.class, message -> doCommand(message));
     subscribe(OnSongSelected.class, message -> doSongSelected(message.getSong()));
   }
@@ -51,8 +53,11 @@ public class DeviceHandler extends BrokerTask<Message> implements Controllable {
     Command command = message.getCommand();
     int parameter = message.getParameter();
     switch (command) {
-    case SELECT_CHORDS:
-      selectChords(Value.toIndex(parameter));
+    case SELECT_SCALE_CHORDS:
+      selectScaleChords(Value.toIndex(parameter));
+      break;
+    case SELECT_SONG_CHORDS:
+      selectSongChords(Value.toIndex(parameter));
       break;
     case SELECT_NOTES:
       selectNotes(Value.toIndex(parameter));
@@ -63,8 +68,14 @@ public class DeviceHandler extends BrokerTask<Message> implements Controllable {
     case SET_PLAYER_VELOCITY:
       setVelocity(parameter);
       break;
-    case SET_KEYBOARD_MAPPING:
-      setKeyboardMapping(Value.toIndex(parameter));
+    case SET_ALPHA_MAPPING:
+      setMapping(new AlphaMapping());
+      break;
+    case SET_NUMERIC_MAPPING:
+      setMapping(new NumericMapping());
+      break;
+    case SET_MIDI_MAPPING:
+      setMapping(new MidiMapping());
       break;
     default:
       getBroker().publish(message);
@@ -72,22 +83,16 @@ public class DeviceHandler extends BrokerTask<Message> implements Controllable {
     }
   }
 
-  private void doInputPress(int inputCode) {
-    player.play(Action.PRESS, inputCode);
+  private void doNoteOff(int midiNote) {
+    player.play(Action.RELEASE, midiNote);
   }
 
-  private void doInputRelease(int inputCode) {
-    player.play(Action.RELEASE, inputCode);
+  private void doNoteOn(int midiNote) {
+    player.play(Action.PRESS, midiNote);
   }
 
   private void doSongSelected(Song song) {
     this.song = song;
-    updatePlayer();
-  }
-
-  private void selectChords(int channel) {
-    device.setChannel(channel);
-    device.setUnitType(UnitType.CHORD);
     updatePlayer();
   }
 
@@ -101,8 +106,20 @@ public class DeviceHandler extends BrokerTask<Message> implements Controllable {
     player.selectProgram(program);
   }
 
-  private void setKeyboardMapping(int index) {
-    device.setMappingType(MappingType.values()[index]); // TODO: Create generic enum converter, see Trace.
+  private void selectScaleChords(int channel) {
+    device.setChannel(channel);
+    device.setUnitType(UnitType.SCALE_CHORDS);
+    updatePlayer();
+  }
+
+  private void selectSongChords(int channel) {
+    device.setChannel(channel);
+    device.setUnitType(UnitType.SONG_CHORDS);
+    updatePlayer();
+  }
+
+  private void setMapping(InputMapping inputMapping) {
+    device.setInputMapping(inputMapping);
     updatePlayer();
   }
 

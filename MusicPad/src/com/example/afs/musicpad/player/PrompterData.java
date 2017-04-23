@@ -78,15 +78,17 @@ public class PrompterData {
   private int lowest;
   private int highest;
   private long duration;
+  private String[] names;
   private int resolution = Default.RESOLUTION;
   private List<BrowserWords> words = new LinkedList<>();
   private List<BrowserMusic> music = new LinkedList<>();
 
-  public PrompterData(Song song, Device device, int lowest, int highest, List<BrowserWords> words, List<BrowserMusic> music) {
+  public PrompterData(Song song, Device device, String[] names, int lowest, int highest, List<BrowserWords> words, List<BrowserMusic> music) {
     this.title = song.getName();
     this.duration = song.getDuration();
     this.index = device.getIndex();
     this.channel = device.getChannel();
+    this.names = names;
     this.lowest = lowest;
     this.highest = highest;
     this.words = words;
@@ -115,6 +117,10 @@ public class PrompterData {
 
   public List<BrowserMusic> getMusic() {
     return music;
+  }
+
+  public String[] getNames() {
+    return names;
   }
 
   public int getResolution() {

@@ -9,21 +9,21 @@
 
 package com.example.afs.musicpad.message;
 
-public class OnInputPress extends Message {
+public class OnNoteOff extends Message {
 
-  private int inputCode;
+  private int midiNote;
 
-  public OnInputPress(int inputCode) {
-    this.inputCode = inputCode;
+  public OnNoteOff(int midiNote) {
+    this.midiNote = midiNote;
   }
 
-  public int getInputCode() {
-    return inputCode;
+  public int getMidiNote() {
+    return midiNote;
   }
 
   @Override
   public String toString() {
-    return "OnInputPress [inputCode=" + inputCode + "]";
+    return "OnNoteOff [midiNote=" + midiNote + "]";
   }
 
 }

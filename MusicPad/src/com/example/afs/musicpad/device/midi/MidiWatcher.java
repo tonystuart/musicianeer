@@ -30,8 +30,6 @@ import com.example.afs.musicpad.device.common.DeviceHandler;
 import com.example.afs.musicpad.device.midi.configuration.MidiConfiguration;
 import com.example.afs.musicpad.device.midi.configuration.Parser;
 import com.example.afs.musicpad.message.Message;
-import com.example.afs.musicpad.player.Player.KeyType;
-import com.example.afs.musicpad.player.Player.MappingType;
 import com.example.afs.musicpad.player.Player.UnitType;
 import com.example.afs.musicpad.task.BrokerTask;
 import com.example.afs.musicpad.util.Broker;
@@ -71,8 +69,7 @@ public class MidiWatcher extends BrokerTask<Message> {
     System.out.println("Attaching MIDI device " + name);
     MidiConfiguration configuration = readConfiguration(deviceBundle);
     Device device = new Device(name);
-    device.setMappingType(MappingType.MIDI);
-    device.setKeyType(KeyType.INSTRUMENT);
+    device.setInputMapping(new MidiMapping());
     device.setUnitType(UnitType.NOTE);
     DeviceHandler deviceHandler = new DeviceHandler(getBroker(), synthesizer, device);
     MidiReader midiReader = new MidiReader(getBroker(), deviceHandler.getInputQueue(), deviceBundle, configuration);

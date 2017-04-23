@@ -22,9 +22,6 @@ import com.example.afs.musicpad.Trace;
 import com.example.afs.musicpad.analyzer.ChordFinder;
 import com.example.afs.musicpad.analyzer.Names;
 import com.example.afs.musicpad.device.common.Device;
-import com.example.afs.musicpad.device.common.InputMapping;
-import com.example.afs.musicpad.device.midi.MidiMapping;
-import com.example.afs.musicpad.device.qwerty.AlphaMapping;
 import com.example.afs.musicpad.device.qwerty.NumericMapping;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.player.PrompterData.BrowserMusic;
@@ -35,7 +32,6 @@ import com.example.afs.musicpad.song.Note;
 import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.song.Word;
 import com.example.afs.musicpad.theory.ChordType;
-import com.example.afs.musicpad.theory.Keys;
 import com.example.afs.musicpad.theory.ScaleBasedChordTypes;
 import com.example.afs.musicpad.util.DirectList;
 import com.example.afs.musicpad.util.RandomAccessList;
@@ -47,16 +43,8 @@ public class Player {
     PRESS, RELEASE
   }
 
-  public enum KeyType {
-    INSTRUMENT, SONG
-  }
-
-  public enum MappingType {
-    MIDI, ALPHA, NUMERIC
-  }
-
   public enum UnitType {
-    NOTE, CHORD
+    NOTE, SCALE_CHORDS, SONG_CHORDS
   }
 
   public static final int PLAYER_BASE = Midi.CHANNELS;
@@ -70,11 +58,8 @@ public class Player {
   private Song song;
   private Device device;
   private Synthesizer synthesizer;
-  private InputMapping inputMapping;
   private TreeSet<Chord> chords;
-  private RandomAccessList<Integer> noteMapping;
   private RandomAccessList<ChordType> chordMapping;
-  private Map<Integer, Integer> reverseNoteMapping;
   private Map<ChordType, Integer> reverseChordMapping;
   private ScaleBasedChordTypes scaleBasedChordTypes;
   private int percentVelocity = DEFAULT_PERCENT_VELOCITY;
@@ -84,49 +69,28 @@ public class Player {
     this.song = song;
     this.device = device;
 
-    if (device.getUnitType() == UnitType.NOTE) {
-      if (device.getKeyType() == KeyType.SONG) {
-        Set<Integer> uniqueMidiNotes = new HashSet<>();
-        for (Note note : song.getNotes()) {
-          if (note.getChannel() == device.getChannel()) {
-            uniqueMidiNotes.add(note.getMidiNote());
-          }
-        }
-        noteMapping = new DirectList<>(uniqueMidiNotes);
-        noteMapping.sort((o1, o2) -> o1.compareTo(o2));
-        reverseNoteMapping = new HashMap<>();
-        for (int i = 0; i < noteMapping.size(); i++) {
-          reverseNoteMapping.put(noteMapping.get(i), i);
-        }
-      } else {
-        // calculated in player
+    // TODO: Modify caller to select default channel based on device index
+
+    UnitType unitType = device.getUnitType();
+    if (unitType == UnitType.NOTE) {
+      // calculated in player
+    } else if (unitType == UnitType.SCALE_CHORDS || isEmptySong()) {
+      // calculated in player
+    } else if (unitType == UnitType.SONG_CHORDS) {
+      ChordFinder chordFinder = new ChordFinder();
+      chords = chordFinder.getChords(song.getNotes(), device.getChannel());
+      Set<ChordType> uniqueChordTypes = new HashSet<>();
+      for (Chord chord : chords) {
+        uniqueChordTypes.add(chord.getChordType());
+      }
+      chordMapping = new DirectList<>(uniqueChordTypes);
+      chordMapping.sort((o1, o2) -> o1.compareTo(o2));
+      reverseChordMapping = new HashMap<>();
+      for (int i = 0; i < chordMapping.size(); i++) {
+        reverseChordMapping.put(chordMapping.get(i), i);
       }
     } else {
-      if (device.getKeyType() == KeyType.SONG) {
-        ChordFinder chordFinder = new ChordFinder();
-        chords = chordFinder.getChords(song.getNotes(), device.getChannel());
-        Set<ChordType> uniqueChordTypes = new HashSet<>();
-        for (Chord chord : chords) {
-          uniqueChordTypes.add(chord.getChordType());
-        }
-        chordMapping = new DirectList<>(uniqueChordTypes);
-        chordMapping.sort((o1, o2) -> o1.compareTo(o2));
-        reverseChordMapping = new HashMap<>();
-        for (int i = 0; i < chordMapping.size(); i++) {
-          reverseChordMapping.put(chordMapping.get(i), i);
-        }
-      } else {
-        scaleBasedChordTypes = new ScaleBasedChordTypes(Keys.CMajor);
-        // calculated in player
-      }
-    }
-
-    if (device.getMappingType() == MappingType.ALPHA) {
-      inputMapping = new AlphaMapping();
-    } else if (device.getMappingType() == MappingType.NUMERIC) {
-      inputMapping = new NumericMapping();
-    } else if (device.getMappingType() == MappingType.MIDI) {
-      inputMapping = new MidiMapping();
+      throw new UnsupportedOperationException();
     }
 
     Set<Integer> programs = song.getPrograms(device.getChannel());
@@ -137,98 +101,70 @@ public class Player {
   }
 
   public PrompterData getPrompterData() {
+    // TODO: Handle empty song
     PrompterData prompterData = null;
     int lowest = Midi.NOTES;
     int highest = 0;
     List<BrowserWords> words = getWords();
     List<BrowserMusic> music = new LinkedList<>();
-    if (device.getUnitType() == UnitType.NOTE) {
-      if (device.getKeyType() == KeyType.SONG) {
-        for (Note note : song.getNotes()) {
-          if (note.getChannel() == device.getChannel()) {
-            int midiNote = note.getMidiNote();
-            long tick = note.getTick();
-            int duration = (int) note.getDuration();
-            int index = reverseNoteMapping.get(midiNote);
-            int inputCode = inputMapping.toInputCode(index);
-            BrowserMusic browserMusic = new BrowserMusic(tick, inputCode, duration);
-            music.add(browserMusic);
-            if (index < lowest) {
-              lowest = index;
-            }
-            if (index > highest) {
-              highest = index;
-            }
-          }
-        }
-      } else {
-        for (Note note : song.getNotes()) {
-          if (note.getChannel() == device.getChannel()) {
-            int midiNote = note.getMidiNote();
-            long tick = note.getTick();
-            int duration = (int) note.getDuration();
-            int index = midiNote; // TODO: handle notes that are not in key of instrument (e.g. sharps on alpha)
-            int inputCode = index;
-            BrowserMusic browserMusic = new BrowserMusic(tick, inputCode, duration);
-            music.add(browserMusic);
-            if (index < lowest) {
-              lowest = index;
-            }
-            if (index > highest) {
-              highest = index;
-            }
-          }
-        }
-      }
-      prompterData = new PrompterData(song, device, lowest, highest, words, music);
-    } else {
-      if (device.getKeyType() == KeyType.SONG) {
-        for (Chord chord : chords) {
-          ChordType chordType = chord.getChordType();
-          long tick = chord.getTick();
-          int duration = (int) chord.getDuration();
-          int index = reverseChordMapping.get(chordType);
-          int inputCode = inputMapping.toInputCode(index);
-          BrowserMusic browserMusic = new BrowserMusic(tick, inputCode, duration);
+    UnitType unitType = device.getUnitType();
+    if (unitType == UnitType.NOTE) {
+      for (Note note : song.getNotes()) {
+        if (note.getChannel() == device.getChannel()) {
+          int midiNote = note.getMidiNote();
+          long tick = note.getTick();
+          int duration = (int) note.getDuration();
+          BrowserMusic browserMusic = new BrowserMusic(tick, midiNote, duration);
           music.add(browserMusic);
-          if (index < lowest) {
-            lowest = index;
+          if (midiNote < lowest) {
+            lowest = midiNote;
           }
-          if (index > highest) {
-            highest = index;
+          if (midiNote > highest) {
+            highest = midiNote;
           }
         }
-      } else {
-        // TODO: use scale based chords
       }
+      String[] names = getKeyCaps(lowest, highest);
+      prompterData = new PrompterData(song, device, names, lowest, highest, words, music);
+    } else if (unitType == UnitType.SCALE_CHORDS || isEmptySong()) {
+    } else if (unitType == UnitType.SONG_CHORDS) {
+      for (Chord chord : chords) {
+        ChordType chordType = chord.getChordType();
+        long tick = chord.getTick();
+        int duration = (int) chord.getDuration();
+        int index = reverseChordMapping.get(chordType);
+        int midiNote = index + NumericMapping.OPTIMUM;
+        BrowserMusic browserMusic = new BrowserMusic(tick, midiNote, duration);
+        music.add(browserMusic);
+        if (midiNote < lowest) {
+          lowest = midiNote;
+        }
+        if (midiNote > highest) {
+          highest = midiNote;
+        }
+        String[] names = getKeyCaps(lowest, highest);
+        prompterData = new PrompterData(song, device, names, lowest, highest, words, music);
+      }
+    } else {
+      throw new UnsupportedOperationException();
     }
     return prompterData;
   }
 
-  public void play(Action action, int inputCode) {
-    int noteIndex = inputMapping.toNoteIndex(inputCode);
-    if (noteIndex != InputMapping.NO_NOTE_FOR_CODE) {
-      if (device.getUnitType() == UnitType.NOTE) {
-        int midiNote;
-        if (device.getKeyType() == KeyType.SONG) {
-          midiNote = noteMapping.get(noteIndex);
-        } else {
-          midiNote = inputMapping.toMidiNote(noteIndex);
-        }
-        playMidiNote(action, midiNote);
-      } else if (device.getUnitType() == UnitType.CHORD) {
-        int octave;
-        ChordType chordType;
-        if (device.getKeyType() == KeyType.SONG) {
-          chordType = chordMapping.get(noteIndex);
-          octave = Default.OCTAVE_SEMITONE;
-        } else {
-          int degree = noteIndex % Midi.NOTES_PER_OCTAVE;
-          octave = (noteIndex / Midi.NOTES_PER_OCTAVE) * Midi.SEMITONES_PER_OCTAVE;
-          chordType = scaleBasedChordTypes.get(degree);
-        }
-        playMidiChord(action, octave, chordType);
-      }
+  public void play(Action action, int midiNote) {
+    UnitType unitType = device.getUnitType();
+    if (unitType == UnitType.NOTE) {
+      playMidiNote(action, midiNote);
+    } else if (unitType == UnitType.SCALE_CHORDS || isEmptySong()) {
+      int degree = midiNote % Midi.NOTES_PER_OCTAVE;
+      int octave = (midiNote / Midi.NOTES_PER_OCTAVE) * Midi.SEMITONES_PER_OCTAVE;
+      ChordType chordType = scaleBasedChordTypes.get(degree);
+      playMidiChord(action, octave, chordType);
+    } else if (unitType == UnitType.SONG_CHORDS) {
+      int index = midiNote - NumericMapping.OPTIMUM;
+      ChordType chordType = chordMapping.get(index);
+      int octave = Default.OCTAVE_SEMITONE;
+      playMidiChord(action, octave, chordType);
     }
   }
 
@@ -240,6 +176,15 @@ public class Player {
     this.percentVelocity = percentVelocity;
   }
 
+  private String[] getKeyCaps(int lowest, int highest) {
+    int count = (highest - lowest) + 1;
+    String[] names = new String[count];
+    for (int midiNote = lowest; midiNote <= highest; midiNote++) {
+      names[midiNote - lowest] = device.getInputMapping().toKeyCap(midiNote);
+    }
+    return names;
+  }
+
   private LinkedList<BrowserWords> getWords() {
     LinkedList<BrowserWords> words = new LinkedList<>();
     for (Word word : song.getWords()) {
@@ -247,6 +192,10 @@ public class Player {
       words.add(browserWords);
     }
     return words;
+  }
+
+  private boolean isEmptySong() {
+    return song == null || song.getNotes().size() == 0;
   }
 
   private void playMidiChord(Action action, int octave, ChordType chordType) {

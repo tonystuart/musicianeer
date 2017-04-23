@@ -9,10 +9,7 @@
 
 package com.example.afs.musicpad.device.qwerty;
 
-import java.awt.event.KeyEvent;
-
 import com.example.afs.musicpad.device.common.InputMapping;
-import com.example.afs.musicpad.theory.Keys;
 
 public abstract class QwertyMapping implements InputMapping {
 
@@ -22,69 +19,117 @@ public abstract class QwertyMapping implements InputMapping {
   protected static final int NUM_LOCK = '#';
 
   @Override
-  public int toMidiNote(int noteIndex) {
-    return Keys.CMajor.getMidiNotes()[noteIndex];
-  }
-
-  @Override
-  public int toNoteIndex(int inputCode) {
-    int noteIndex = NO_NOTE_FOR_CODE; // could use these (e.g. F1) for shortcuts
-    if (inputCode >= 'A' && inputCode <= 'Z') {
-      noteIndex = inputCode - 'A';
-    } else {
-      switch (inputCode) {
-      case '1':
-        noteIndex = 0;
-        break;
-      case '2':
-        noteIndex = 1;
-        break;
-      case '3':
-        noteIndex = 2;
-        break;
-      case ENTER:
-      case KeyEvent.VK_ENTER:
-        noteIndex = 3;
-        break;
-      case '4':
-        noteIndex = 4;
-        break;
-      case '5':
-        noteIndex = 5;
-        break;
-      case '6':
-        noteIndex = 6;
-        break;
-      case '+':
-        noteIndex = 7;
-        break;
-      case '7':
-        noteIndex = 8;
-        break;
-      case '8':
-        noteIndex = 9;
-        break;
-      case '9':
-        noteIndex = 10;
-        break;
-      case '-':
-        noteIndex = 11;
-        break;
-      case NUM_LOCK:
-      case KeyEvent.VK_NUM_LOCK:
-        noteIndex = 12;
-        break;
-      case '/':
-        noteIndex = 13;
-        break;
-      case '*':
-        noteIndex = 14;
-        break;
-      case BACK_SPACE:
-      case KeyEvent.VK_BACK_SPACE:
-        noteIndex = 15;
-        break;
-      }
+  public int toMidiNote(int inputCode) {
+    int noteIndex;
+    switch (inputCode) {
+    case 'A':
+      noteIndex = 45;
+      break;
+    case 'B':
+      noteIndex = 47;
+      break;
+    case 'C':
+      noteIndex = 48;
+      break;
+    case 'D':
+      noteIndex = 50;
+      break;
+    case 'E':
+      noteIndex = 52;
+      break;
+    case 'F':
+      noteIndex = 53;
+      break;
+    case 'G':
+      noteIndex = 55;
+      break;
+    case 'H': // A
+      noteIndex = 57;
+      break;
+    case 'I': // B
+      noteIndex = 59;
+      break;
+    case 'J': // C
+      noteIndex = 60;
+      break;
+    case 'K': // D
+      noteIndex = 62;
+      break;
+    case 'L': // E
+      noteIndex = 64;
+      break;
+    case 'M': // F
+      noteIndex = 65;
+      break;
+    case 'N': // G
+      noteIndex = 67;
+      break;
+    case 'O': // A
+      noteIndex = 69;
+      break;
+    case 'P': // B
+      noteIndex = 71;
+      break;
+    case 'Q': // C
+      noteIndex = 72;
+      break;
+    case 'R': // D
+      noteIndex = 74;
+      break;
+    case 'S': // E
+      noteIndex = 76;
+      break;
+    case 'T': // F
+      noteIndex = 77;
+      break;
+    case 'U': // G
+      noteIndex = 79;
+      break;
+    case 'V': // A
+      noteIndex = 81;
+      break;
+    case 'W': // B
+      noteIndex = 83;
+      break;
+    case 'X': // C
+      noteIndex = 84;
+      break;
+    case 'Y': // D
+      noteIndex = 86;
+      break;
+    case 'Z': // E
+      noteIndex = 88;
+      break;
+    case '1': // F
+      noteIndex = 53;
+      break;
+    case '2': // G
+      noteIndex = 55;
+      break;
+    case '3': // A
+      noteIndex = 57;
+      break;
+    case '4': // B
+      noteIndex = 59;
+      break;
+    case '5': // C
+      noteIndex = 60;
+      break;
+    case '6': // D
+      noteIndex = 62;
+      break;
+    case '7': // E
+      noteIndex = 64;
+      break;
+    case '8': // F
+      noteIndex = 65;
+      break;
+    case '9': // G
+      noteIndex = 67;
+      break;
+    default:
+      noteIndex = 0; // could use these (e.g. F1) for shortcuts
+      break;
     }
     return noteIndex;
   }

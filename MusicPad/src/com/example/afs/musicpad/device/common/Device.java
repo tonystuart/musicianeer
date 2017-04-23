@@ -12,8 +12,6 @@ package com.example.afs.musicpad.device.common;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.example.afs.musicpad.player.Player.KeyType;
-import com.example.afs.musicpad.player.Player.MappingType;
 import com.example.afs.musicpad.player.Player.UnitType;
 
 public class Device {
@@ -33,8 +31,7 @@ public class Device {
   private final String name;
   private final int index;
   private int channel;
-  private MappingType mappingType;
-  private KeyType keyType;
+  private InputMapping inputMapping;
   private UnitType unitType;
 
   public Device(String name) {
@@ -50,12 +47,8 @@ public class Device {
     return index;
   }
 
-  public KeyType getKeyType() {
-    return keyType;
-  }
-
-  public MappingType getMappingType() {
-    return mappingType;
+  public InputMapping getInputMapping() {
+    return inputMapping;
   }
 
   public String getName() {
@@ -70,12 +63,8 @@ public class Device {
     this.channel = channel;
   }
 
-  public void setKeyType(KeyType keyType) {
-    this.keyType = keyType;
-  }
-
-  public void setMappingType(MappingType mappingType) {
-    this.mappingType = mappingType;
+  public void setInputMapping(InputMapping inputMapping) {
+    this.inputMapping = inputMapping;
   }
 
   public void setUnitType(UnitType unitType) {
@@ -84,7 +73,7 @@ public class Device {
 
   @Override
   public String toString() {
-    return "Device [name=" + name + ", index=" + index + ", channel=" + channel + ", mappingType=" + mappingType + ", keyType=" + keyType + ", unitType=" + unitType + "]";
+    return "Device [name=" + name + ", index=" + index + ", channel=" + channel + ", unitType=" + unitType + "]";
   }
 
 }
