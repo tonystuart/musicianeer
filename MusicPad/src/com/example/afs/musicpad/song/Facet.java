@@ -19,6 +19,8 @@ public class Facet {
   private int occupancy;
   private int concurrency;
   private int totalNoteCount;
+  private int highestMidiNote;
+  private int lowestMidiNote = Midi.NOTES;
   private Set<Integer> programs = new LinkedHashSet<>();
   private int[] distinctNoteCounts = new int[Midi.NOTES];
   private int[] commonNoteCounts = new int[Midi.SEMITONES_PER_OCTAVE];
@@ -31,6 +33,12 @@ public class Facet {
     totalNoteCount++;
     distinctNoteCounts[midiNote]++;
     commonNoteCounts[midiNote % Midi.SEMITONES_PER_OCTAVE]++;
+    if (midiNote < lowestMidiNote) {
+      lowestMidiNote = midiNote;
+    }
+    if (midiNote > highestMidiNote) {
+      highestMidiNote = midiNote;
+    }
   }
 
   public int[] getCommonNoteCounts() {
@@ -43,6 +51,14 @@ public class Facet {
 
   public int[] getDistinctNoteCounts() {
     return distinctNoteCounts;
+  }
+
+  public int getHighestMidiNote() {
+    return totalNoteCount == 0 ? -1 : highestMidiNote;
+  }
+
+  public int getLowestMidiNote() {
+    return totalNoteCount == 0 ? -1 : lowestMidiNote;
   }
 
   public int getOccupancy() {

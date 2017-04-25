@@ -144,7 +144,7 @@ public class CommandBuilder {
 
   private int getMidiNote(int inputCode) {
     int midiNote = device.getInputMapping().toMidiNote(inputCode);
-    midiNote += octave * 12;
+    midiNote += octave * Midi.SEMITONES_PER_OCTAVE;
     if (sharp) {
       midiNote++;
     }

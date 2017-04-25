@@ -11,60 +11,57 @@ package com.example.afs.musicpad.device.qwerty;
 
 public class NumericMapping extends QwertyMapping {
 
-  private static final int FIRST = 43;
-  private static final int LAST = 78;
-  public static final int OPTIMUM = 55;
+  private static final String LN = "-"; // low normal
+  private static final String LS = "/"; // low sharp
 
-  private static final String[] KEY_CAPS = new String[] {
-      "-2", // G (FIRST)
-      "/2", // G#
-      "-3", // A
-      "/3", // A#
-      "-4", // B
-      "-5", // C4 (48)
-      "/5", // C#
-      "-6", // D
-      "/6", // D#
-      "-7", // E
-      "-8", // F
-      "/8", // F#
-      //
-      "2", // G 55 (OPTIMUM)
-      "#2", // G# 56
-      "3", // A 57
-      "#3", // A# 58
-      "4", // B 59
-      "5", // C5 60
-      "#5", // C# 61
-      "6", // D 62
-      "#6", // D# 63
-      "7", // E 64
-      "8", // F 65
-      "#8", // F# 66
-      //
-      "+2", // G 67
-      "*2", // G# 68
-      "+3", // A 69
-      "*3", // A# 70
-      "+4", // B 71
-      "+5", // C6 72
-      "*5", // C# 73
-      "+6", // D 74
-      "*6", // D# 75
-      "+7", // E 76
-      "+8", // F 77
-      "*8", // F# 78 (LAST)
+  private static final String MN = ""; // middle normal
+  private static final String MS = "#"; // middle sharp
+
+  private static final String HN = "+"; // high normal
+  private static final String HS = "*"; // high sharp
+
+  private static final String[] KEY_SEQUENCE = new String[] {
+      LN + "1", // C
+      LS + "1", // C#
+      LN + "2", // D
+      LS + "2", // D#
+      LN + "3", // E
+      LN + "4", // F
+      LS + "4", // F#
+      LN + "5", // G
+      LS + "5", // G#
+      LN + "6", // A
+      LS + "6", // A#
+      LN + "7", // B
+      MN + "1", // C
+      MS + "1", // C#
+      MN + "2", // D
+      MS + "2", // D#
+      MN + "3", // E
+      MN + "4", // F
+      MS + "4", // F#
+      MN + "5", // G
+      MS + "5", // G#
+      MN + "6", // A
+      MS + "6", // A#
+      MN + "7", // B
+      HN + "1", // C
+      HS + "1", // C#
+      HN + "2", // D
+      HS + "2", // D#
+      HN + "3", // E
+      HN + "4", // F
+      HS + "4", // F#
+      HN + "5", // G
+      HS + "5", // G#
+      HN + "6", // A
+      HS + "6", // A#
+      HN + "7", // B
   };
 
   @Override
-  public String toKeyCap(int midiNote) {
-    String keyCap;
-    if (midiNote >= FIRST && midiNote <= LAST) {
-      keyCap = KEY_CAPS[midiNote - FIRST];
-    } else {
-      keyCap = "?";
-    }
-    return keyCap;
+  protected String[] getKeySequence() {
+    return KEY_SEQUENCE;
   }
 
 }

@@ -135,7 +135,7 @@ public class Names {
   }
 
   public static String formatNote(int midiNote) {
-    return SHARPS[midiNote % 12] + (midiNote / 12) + " (" + midiNote + ")";
+    return SHARPS[midiNote % Midi.SEMITONES_PER_OCTAVE] + (midiNote / Midi.SEMITONES_PER_OCTAVE) + " (" + midiNote + ")";
   }
 
   public static String formatNote(long tick, int midiNote, long duration) {
@@ -143,7 +143,7 @@ public class Names {
   }
 
   public static String formatNoteName(int midiNote) {
-    return SHARPS[midiNote % 12] + (midiNote / 12);
+    return SHARPS[midiNote % Midi.SEMITONES_PER_OCTAVE] + (midiNote / Midi.SEMITONES_PER_OCTAVE);
   }
 
   public static String getIntervalName(int interval) {
@@ -158,7 +158,7 @@ public class Names {
   }
 
   public static String getNoteName(int midiNote) {
-    return SHARPS[midiNote % 12];
+    return SHARPS[midiNote % Midi.SEMITONES_PER_OCTAVE];
   }
 
   public static String getSynopsis(int sharpsOrFlats) {

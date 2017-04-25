@@ -10,6 +10,8 @@
 package com.example.afs.musicpad.device.qwerty;
 
 import com.example.afs.musicpad.device.common.InputMapping;
+import com.example.afs.musicpad.midi.Midi;
+import com.example.afs.musicpad.song.Default;
 
 public abstract class QwertyMapping implements InputMapping {
 
@@ -18,120 +20,150 @@ public abstract class QwertyMapping implements InputMapping {
   protected static final int BACK_SPACE = '\u2190';
   protected static final int NUM_LOCK = '#';
 
+  protected int octave = Default.OCTAVE;
+  protected final String[] keySequence;
+
+  protected QwertyMapping() {
+    keySequence = getKeySequence();
+  }
+
+  public int getOctave() {
+    return octave;
+  }
+
+  @Override
+  public void setOctave(int octave) {
+    this.octave = octave;
+  }
+
+  @Override
+  public String toKeySequence(int midiNote) {
+    String keyCap;
+    int noteIndex = midiNote - octave * Midi.SEMITONES_PER_OCTAVE;
+    if (noteIndex >= 0 && noteIndex < keySequence.length) {
+      keyCap = keySequence[noteIndex];
+    } else {
+      keyCap = "?";
+    }
+    return keyCap;
+  }
+
   @Override
   public int toMidiNote(int inputCode) {
-    int noteIndex;
+    int semitone;
     switch (inputCode) {
-    case 'A':
-      noteIndex = 45;
+    case 'Z':
+      semitone = 0; // C
       break;
-    case 'B':
-      noteIndex = 47;
+    case 'X':
+      semitone = 2; // D
       break;
     case 'C':
-      noteIndex = 48;
+      semitone = 4; // E
+      break;
+    case 'V':
+      semitone = 5; // F
+      break;
+    case 'B':
+      semitone = 7; // G
+      break;
+    case 'N':
+      semitone = 9; // A
+      break;
+    case 'M':
+      semitone = 11; // B
+      break;
+    case 'A':
+      semitone = 12; // C
+      break;
+    case 'S':
+      semitone = 14; // D
       break;
     case 'D':
-      noteIndex = 50;
-      break;
-    case 'E':
-      noteIndex = 52;
+      semitone = 16; // E
       break;
     case 'F':
-      noteIndex = 53;
+      semitone = 17; // F
       break;
     case 'G':
-      noteIndex = 55;
+      semitone = 19; // G
       break;
-    case 'H': // A
-      noteIndex = 57;
+    case 'H':
+      semitone = 21; // A
       break;
-    case 'I': // B
-      noteIndex = 59;
+    case 'J':
+      semitone = 23; // B
       break;
-    case 'J': // C
-      noteIndex = 60;
+    case 'K':
+      semitone = 24; // C
       break;
-    case 'K': // D
-      noteIndex = 62;
+    case 'L':
+      semitone = 26; // D
       break;
-    case 'L': // E
-      noteIndex = 64;
+    case 'Q':
+      semitone = 28; // E
       break;
-    case 'M': // F
-      noteIndex = 65;
+    case 'W':
+      semitone = 29; // F
       break;
-    case 'N': // G
-      noteIndex = 67;
+    case 'E':
+      semitone = 31; // G
       break;
-    case 'O': // A
-      noteIndex = 69;
+    case 'R':
+      semitone = 33; // A
       break;
-    case 'P': // B
-      noteIndex = 71;
+    case 'T':
+      semitone = 35; // B
       break;
-    case 'Q': // C
-      noteIndex = 72;
+    case 'Y':
+      semitone = 36; // C
       break;
-    case 'R': // D
-      noteIndex = 74;
+    case 'U':
+      semitone = 38; // D
       break;
-    case 'S': // E
-      noteIndex = 76;
+    case 'I':
+      semitone = 40; // E
       break;
-    case 'T': // F
-      noteIndex = 77;
+    case 'O':
+      semitone = 41; // F
       break;
-    case 'U': // G
-      noteIndex = 79;
+    case 'P':
+      semitone = 43; // G
       break;
-    case 'V': // A
-      noteIndex = 81;
+    case '1':
+      semitone = 0; // C
       break;
-    case 'W': // B
-      noteIndex = 83;
+    case '2':
+      semitone = 2; // D
       break;
-    case 'X': // C
-      noteIndex = 84;
+    case '3':
+      semitone = 4; // E
       break;
-    case 'Y': // D
-      noteIndex = 86;
+    case '4':
+      semitone = 5; // F
       break;
-    case 'Z': // E
-      noteIndex = 88;
+    case '5':
+      semitone = 7; // G
       break;
-    case '1': // F
-      noteIndex = 53;
+    case '6':
+      semitone = 9; // A
       break;
-    case '2': // G
-      noteIndex = 55;
+    case '7':
+      semitone = 11; // B
       break;
-    case '3': // A
-      noteIndex = 57;
+    case '8':
+      semitone = 12; // C
       break;
-    case '4': // B
-      noteIndex = 59;
-      break;
-    case '5': // C
-      noteIndex = 60;
-      break;
-    case '6': // D
-      noteIndex = 62;
-      break;
-    case '7': // E
-      noteIndex = 64;
-      break;
-    case '8': // F
-      noteIndex = 65;
-      break;
-    case '9': // G
-      noteIndex = 67;
+    case '9':
+      semitone = 14; // D
       break;
     default:
-      noteIndex = 0; // could use these (e.g. F1) for shortcuts
+      semitone = 0; // could use these (e.g. F1) for shortcuts
       break;
     }
-    return noteIndex;
+    return (octave * Midi.SEMITONES_PER_OCTAVE) + semitone;
   }
+
+  protected abstract String[] getKeySequence();
 
 }

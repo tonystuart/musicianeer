@@ -22,7 +22,6 @@ import com.example.afs.musicpad.Trace;
 import com.example.afs.musicpad.analyzer.ChordFinder;
 import com.example.afs.musicpad.analyzer.Names;
 import com.example.afs.musicpad.device.common.Device;
-import com.example.afs.musicpad.device.qwerty.NumericMapping;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.player.PrompterData.BrowserMusic;
 import com.example.afs.musicpad.player.PrompterData.BrowserWords;
@@ -73,7 +72,11 @@ public class Player {
 
     UnitType unitType = device.getUnitType();
     if (unitType == UnitType.NOTE) {
-      // calculated in player
+      if (!isEmptySong()) {
+        int lowestMidiNote = song.getLowestMidiNote(device.getChannel());
+        int octave = lowestMidiNote / Midi.SEMITONES_PER_OCTAVE;
+        device.getInputMapping().setOctave(octave);
+      }
     } else if (unitType == UnitType.SCALE_CHORDS || isEmptySong()) {
       // calculated in player
     } else if (unitType == UnitType.SONG_CHORDS) {
@@ -116,6 +119,7 @@ public class Player {
           int duration = (int) note.getDuration();
           BrowserMusic browserMusic = new BrowserMusic(tick, midiNote, duration);
           music.add(browserMusic);
+          // TODO Use lowest/highest from Song
           if (midiNote < lowest) {
             lowest = midiNote;
           }
@@ -133,9 +137,10 @@ public class Player {
         long tick = chord.getTick();
         int duration = (int) chord.getDuration();
         int index = reverseChordMapping.get(chordType);
-        int midiNote = index + NumericMapping.OPTIMUM;
+        int midiNote = 48 + index;
         BrowserMusic browserMusic = new BrowserMusic(tick, midiNote, duration);
         music.add(browserMusic);
+        // TODO Use lowest/highest from Song
         if (midiNote < lowest) {
           lowest = midiNote;
         }
@@ -154,6 +159,7 @@ public class Player {
   public void play(Action action, int midiNote) {
     UnitType unitType = device.getUnitType();
     if (unitType == UnitType.NOTE) {
+      System.out.println("play: midiNote=" + Names.formatNote(midiNote));
       playMidiNote(action, midiNote);
     } else if (unitType == UnitType.SCALE_CHORDS || isEmptySong()) {
       int degree = midiNote % Midi.NOTES_PER_OCTAVE;
@@ -161,7 +167,7 @@ public class Player {
       ChordType chordType = scaleBasedChordTypes.get(degree);
       playMidiChord(action, octave, chordType);
     } else if (unitType == UnitType.SONG_CHORDS) {
-      int index = midiNote - NumericMapping.OPTIMUM;
+      int index = 48 + midiNote;
       ChordType chordType = chordMapping.get(index);
       int octave = Default.OCTAVE_SEMITONE;
       playMidiChord(action, octave, chordType);
@@ -180,7 +186,7 @@ public class Player {
     int count = (highest - lowest) + 1;
     String[] names = new String[count];
     for (int midiNote = lowest; midiNote <= highest; midiNote++) {
-      names[midiNote - lowest] = device.getInputMapping().toKeyCap(midiNote);
+      names[midiNote - lowest] = device.getInputMapping().toKeySequence(midiNote);
     }
     return names;
   }

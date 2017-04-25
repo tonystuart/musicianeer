@@ -124,6 +124,10 @@ public class Song {
     return duration;
   }
 
+  public int getHighestMidiNote(int channel) {
+    return channelFacets.getFacet(channel).getHighestMidiNote();
+  }
+
   public long getLength() {
     long length;
     if (notes.size() == 0) {
@@ -132,6 +136,10 @@ public class Song {
       length = notes.last().getTick();
     }
     return length;
+  }
+
+  public int getLowestMidiNote(int channel) {
+    return channelFacets.getFacet(channel).getLowestMidiNote();
   }
 
   public String getName() {

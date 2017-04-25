@@ -177,7 +177,7 @@ public class BeatFinder {
           }
         }
         int midiNote = note.getMidiNote();
-        int commonNote = midiNote % 12;
+        int commonNote = midiNote % Midi.SEMITONES_PER_OCTAVE;
         BeatNote beatNote = new BeatNote(commonNote);
         beat.add(beatNote);
         long until = note.getTick() + note.getDuration();

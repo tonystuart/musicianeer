@@ -29,8 +29,8 @@ import com.example.afs.musicpad.device.midi.configuration.On;
 import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnDeviceMessage;
-import com.example.afs.musicpad.message.OnNoteOn;
 import com.example.afs.musicpad.message.OnNoteOff;
+import com.example.afs.musicpad.message.OnNoteOn;
 import com.example.afs.musicpad.util.Broker;
 
 public class MidiReader implements Controllable, HasSendCommand, HasSendDeviceMessage, HasSendHandlerMessage {
