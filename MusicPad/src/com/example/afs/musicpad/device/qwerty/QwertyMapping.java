@@ -9,6 +9,8 @@
 
 package com.example.afs.musicpad.device.qwerty;
 
+import java.awt.event.KeyEvent;
+
 import com.example.afs.musicpad.device.common.InputMapping;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.song.Default;
@@ -134,28 +136,49 @@ public abstract class QwertyMapping implements InputMapping {
       semitone = 0; // C
       break;
     case '2':
-      semitone = 2; // D
+      semitone = 1; // D
       break;
     case '3':
-      semitone = 4; // E
+      semitone = 2; // E
+      break;
+    case KeyEvent.VK_ENTER:
+      semitone = 3; // F
       break;
     case '4':
-      semitone = 5; // F
+      semitone = 4; // G
       break;
     case '5':
-      semitone = 7; // G
+      semitone = 5; // A
       break;
     case '6':
-      semitone = 9; // A
+      semitone = 6; // B
+      break;
+    case '+':
+      semitone = 7; // C
       break;
     case '7':
-      semitone = 11; // B
+      semitone = 8; // D
       break;
     case '8':
-      semitone = 12; // C
+      semitone = 9; // E
       break;
     case '9':
-      semitone = 14; // D
+      semitone = 10; // F
+      break;
+    case '-':
+      semitone = 11; // G
+      break;
+    case KeyEvent.VK_NUM_LOCK:
+      semitone = 12; // A
+      break;
+    case '/':
+      semitone = 13; // B
+      break;
+    case '*':
+      semitone = 14; // C
+      break;
+    case KeyEvent.VK_BACK_SPACE:
+      semitone = 15; // D
       break;
     default:
       semitone = 0; // could use these (e.g. F1) for shortcuts

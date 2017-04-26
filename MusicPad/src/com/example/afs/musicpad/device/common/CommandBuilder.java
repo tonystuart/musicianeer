@@ -17,7 +17,6 @@ import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnNoteOff;
 import com.example.afs.musicpad.message.OnNoteOn;
-import com.example.afs.musicpad.midi.Midi;
 
 public class CommandBuilder {
 
@@ -28,9 +27,8 @@ public class CommandBuilder {
   private StringBuilder left = new StringBuilder();
   private StringBuilder right = new StringBuilder();
 
-  private int octave;
   private boolean sharp;
-  private int[] activeMidiNotes = new int[Midi.NOTES];
+  private int[] activeMidiNotes = new int[256]; // NB: KeyEvents VK codes, not midiNotes
 
   public CommandBuilder(BlockingQueue<Message> queue, Device device) {
     this.queue = queue;
@@ -43,21 +41,7 @@ public class CommandBuilder {
       if (inputCode == '.') {
         currentField = left;
         ignoreCount = 1;
-      } else if (inputCode == KeyEvent.VK_SHIFT || inputCode == KeyEvent.VK_NUM_LOCK) {
-        sharp = true;
-        ignoreCount = 0;
-      } else if (inputCode == '-') {
-        octave = -1;
-        ignoreCount = 0;
-      } else if (inputCode == '+') {
-        octave = +1;
-        ignoreCount = 0;
-      } else if (inputCode == '/') {
-        octave = -1;
-        sharp = true;
-        ignoreCount = 0;
-      } else if (inputCode == '*') {
-        octave = +1;
+      } else if (inputCode == KeyEvent.VK_SHIFT) {
         sharp = true;
         ignoreCount = 0;
       } else {
@@ -75,17 +59,7 @@ public class CommandBuilder {
 
   public void processKeyUp(int inputCode) {
     if (currentField == null) {
-      if (inputCode == KeyEvent.VK_SHIFT || inputCode == KeyEvent.VK_NUM_LOCK) {
-        sharp = false;
-      } else if (inputCode == '-') {
-        octave = 0;
-      } else if (inputCode == '+') {
-        octave = 0;
-      } else if (inputCode == '/') {
-        octave = 0;
-        sharp = false;
-      } else if (inputCode == '*') {
-        octave = 0;
+      if (inputCode == KeyEvent.VK_SHIFT) {
         sharp = false;
       } else {
         int midiNote = activeMidiNotes[inputCode];
@@ -144,7 +118,6 @@ public class CommandBuilder {
 
   private int getMidiNote(int inputCode) {
     int midiNote = device.getInputMapping().toMidiNote(inputCode);
-    midiNote += octave * Midi.SEMITONES_PER_OCTAVE;
     if (sharp) {
       midiNote++;
     }

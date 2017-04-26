@@ -34,34 +34,10 @@ public class MappingTool {
 
   public static void numericMapping() {
     int midiNote = 0;
-    String hasSharp = "1101110";
-    String numeric = "1234567";
+    String numeric = "123E456+789-N/+B";
     for (int i = 0; i < numeric.length(); i++) {
       char thisChar = numeric.charAt(i);
-      if (hasSharp.charAt(i % hasSharp.length()) == '1') {
-        System.out.println("LN + " + "\"" + thisChar + "\", // " + Names.getNoteName(midiNote++));
-        System.out.println("LS + " + "\"" + thisChar + "\", // " + Names.getNoteName(midiNote++));
-      } else {
-        System.out.println("LN + " + "\"" + thisChar + "\", // " + Names.getNoteName(midiNote++));
-      }
-    }
-    for (int i = 0; i < numeric.length(); i++) {
-      char thisChar = numeric.charAt(i);
-      if (hasSharp.charAt(i % hasSharp.length()) == '1') {
-        System.out.println("MN + " + "\"" + thisChar + "\", // " + Names.getNoteName(midiNote++));
-        System.out.println("MS + " + "\"" + thisChar + "\", // " + Names.getNoteName(midiNote++));
-      } else {
-        System.out.println("MN + " + "\"" + thisChar + "\", // " + Names.getNoteName(midiNote++));
-      }
-    }
-    for (int i = 0; i < numeric.length(); i++) {
-      char thisChar = numeric.charAt(i);
-      if (hasSharp.charAt(i % hasSharp.length()) == '1') {
-        System.out.println("HN + " + "\"" + thisChar + "\", // " + Names.getNoteName(midiNote++));
-        System.out.println("HS + " + "\"" + thisChar + "\", // " + Names.getNoteName(midiNote++));
-      } else {
-        System.out.println("HN + " + "\"" + thisChar + "\", // " + Names.getNoteName(midiNote++));
-      }
+      System.out.println("\"" + thisChar + "\", // " + Names.getNoteName(midiNote++));
     }
   }
 
@@ -69,7 +45,7 @@ public class MappingTool {
     String cMajor = "101011010101";
     String alpha = "ZXCVBNMASDFGHJKLQWERTYUIOP";
     toMidiNote(cMajor, alpha);
-    String numeric = "123456789";
+    String numeric = "123E456+789-N/*B";
     toMidiNote(cMajor, numeric);
   }
 
