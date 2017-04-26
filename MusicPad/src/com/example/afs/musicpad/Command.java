@@ -13,9 +13,7 @@ public enum Command {
   HELP, //
   LIST_SONGS, //
   SELECT_SONG, //
-  SELECT_NOTES, //
-  SELECT_SCALE_CHORDS, //
-  SELECT_SONG_CHORDS, //
+  SELECT_CHANNEL, //
   SELECT_PROGRAM, //
   PLAY, //
   PLAY_PAUSE, //

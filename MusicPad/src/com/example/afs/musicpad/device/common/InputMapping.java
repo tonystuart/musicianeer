@@ -11,9 +11,11 @@ package com.example.afs.musicpad.device.common;
 
 public interface InputMapping {
 
+  int getBaseOctave();
+
   void setOctave(int octave);
 
-  String toKeySequence(int midiNote);
+  String toLegend(int midiNote);
 
   int toMidiNote(int inputCode);
 }

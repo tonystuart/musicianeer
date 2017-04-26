@@ -22,7 +22,6 @@ import com.example.afs.musicpad.device.common.ControllableGroup;
 import com.example.afs.musicpad.device.common.Device;
 import com.example.afs.musicpad.device.common.DeviceHandler;
 import com.example.afs.musicpad.message.Message;
-import com.example.afs.musicpad.player.Player.UnitType;
 import com.example.afs.musicpad.task.BrokerTask;
 import com.example.afs.musicpad.util.Broker;
 
@@ -58,7 +57,6 @@ public class QwertyWatcher extends BrokerTask<Message> {
     System.out.println("Attaching QWERY device " + name);
     Device device = new Device(name);
     device.setInputMapping(new AlphaMapping());
-    device.setUnitType(UnitType.NOTE);
     DeviceHandler deviceHandler = new DeviceHandler(getBroker(), synthesizer, device);
     QwertyReader qwertyReader = new QwertyReader(deviceHandler.getInputQueue(), device);
     ControllableGroup controllableGroup = new ControllableGroup(deviceHandler, qwertyReader);

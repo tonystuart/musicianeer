@@ -60,6 +60,11 @@ public class NumericMapping extends QwertyMapping {
   };
 
   @Override
+  public int getBaseOctave() {
+    return 4;
+  }
+
+  @Override
   protected String[] getKeySequence() {
     return KEY_SEQUENCE;
   }

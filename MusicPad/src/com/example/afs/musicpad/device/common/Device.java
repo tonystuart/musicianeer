@@ -12,8 +12,6 @@ package com.example.afs.musicpad.device.common;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.example.afs.musicpad.player.Player.UnitType;
-
 public class Device {
 
   private static int nextDeviceIndex;
@@ -32,7 +30,6 @@ public class Device {
   private final int index;
   private int channel;
   private InputMapping inputMapping;
-  private UnitType unitType;
 
   public Device(String name) {
     this.name = name;
@@ -55,10 +52,6 @@ public class Device {
     return name;
   }
 
-  public UnitType getUnitType() {
-    return unitType;
-  }
-
   public void setChannel(int channel) {
     this.channel = channel;
   }
@@ -67,13 +60,9 @@ public class Device {
     this.inputMapping = inputMapping;
   }
 
-  public void setUnitType(UnitType unitType) {
-    this.unitType = unitType;
-  }
-
   @Override
   public String toString() {
-    return "Device [name=" + name + ", index=" + index + ", channel=" + channel + ", unitType=" + unitType + "]";
+    return "Device [name=" + name + ", index=" + index + ", channel=" + channel + "]";
   }
 
 }

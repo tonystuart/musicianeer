@@ -15,11 +15,16 @@ import com.example.afs.musicpad.device.common.InputMapping;
 public class MidiMapping implements InputMapping {
 
   @Override
+  public int getBaseOctave() {
+    return 36;
+  }
+
+  @Override
   public void setOctave(int octave) {
   }
 
   @Override
-  public String toKeySequence(int midiNote) {
+  public String toLegend(int midiNote) {
     return Names.getNoteName(midiNote);
   }
 

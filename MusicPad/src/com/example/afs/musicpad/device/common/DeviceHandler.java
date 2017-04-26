@@ -23,7 +23,7 @@ import com.example.afs.musicpad.message.OnPrompterData;
 import com.example.afs.musicpad.message.OnSongSelected;
 import com.example.afs.musicpad.player.Player;
 import com.example.afs.musicpad.player.Player.Action;
-import com.example.afs.musicpad.player.Player.UnitType;
+import com.example.afs.musicpad.player.PlayerFactory;
 import com.example.afs.musicpad.song.Default;
 import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.task.BrokerTask;
@@ -35,6 +35,7 @@ public class DeviceHandler extends BrokerTask<Message> implements Controllable {
 
   private Device device;
   private Player player;
+  private PlayerFactory playerFactory;
   private Synthesizer synthesizer;
   private Song song = Default.SONG;
 
@@ -42,7 +43,7 @@ public class DeviceHandler extends BrokerTask<Message> implements Controllable {
     super(messageBroker);
     this.synthesizer = synthesizer;
     this.device = device;
-    this.player = new Player(synthesizer, song, device);
+    this.playerFactory = new PlayerFactory(synthesizer);
     delegate(OnNoteOn.class, message -> doNoteOn(message.getMidiNote()));
     delegate(OnNoteOff.class, message -> doNoteOff(message.getMidiNote()));
     delegate(OnCommand.class, message -> doCommand(message));
@@ -53,14 +54,8 @@ public class DeviceHandler extends BrokerTask<Message> implements Controllable {
     Command command = message.getCommand();
     int parameter = message.getParameter();
     switch (command) {
-    case SELECT_SCALE_CHORDS:
-      selectScaleChords(Value.toIndex(parameter));
-      break;
-    case SELECT_SONG_CHORDS:
-      selectSongChords(Value.toIndex(parameter));
-      break;
-    case SELECT_NOTES:
-      selectNotes(Value.toIndex(parameter));
+    case SELECT_CHANNEL:
+      selectChannel(Value.toIndex(parameter));
       break;
     case SELECT_PROGRAM:
       selectProgram(Value.toIndex(parameter));
@@ -93,29 +88,17 @@ public class DeviceHandler extends BrokerTask<Message> implements Controllable {
 
   private void doSongSelected(Song song) {
     this.song = song;
+    // TODO: Select default channel based on device index and capabilities
     updatePlayer();
   }
 
-  private void selectNotes(int channel) {
+  private void selectChannel(int channel) {
     device.setChannel(channel);
-    device.setUnitType(UnitType.NOTE);
     updatePlayer();
   }
 
   private void selectProgram(int program) {
     player.selectProgram(program);
-  }
-
-  private void selectScaleChords(int channel) {
-    device.setChannel(channel);
-    device.setUnitType(UnitType.SCALE_CHORDS);
-    updatePlayer();
-  }
-
-  private void selectSongChords(int channel) {
-    device.setChannel(channel);
-    device.setUnitType(UnitType.SONG_CHORDS);
-    updatePlayer();
   }
 
   private void setMapping(InputMapping inputMapping) {
@@ -128,7 +111,7 @@ public class DeviceHandler extends BrokerTask<Message> implements Controllable {
   }
 
   private void updatePlayer() {
-    this.player = new Player(synthesizer, song, device);
+    this.player = playerFactory.createPlayer(song, device);
     getBroker().publish(new OnCommand(Command.SHOW_CHANNEL_INFO, 0));
     getBroker().publish(new OnPrompterData(player.getPrompterData()));
   }

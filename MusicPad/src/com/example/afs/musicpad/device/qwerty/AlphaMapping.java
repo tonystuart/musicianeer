@@ -63,6 +63,11 @@ public class AlphaMapping extends QwertyMapping {
   };
 
   @Override
+  public int getBaseOctave() {
+    return 3;
+  }
+
+  @Override
   protected String[] getKeySequence() {
     return KEY_SEQUENCE;
   }
