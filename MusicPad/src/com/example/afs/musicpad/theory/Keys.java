@@ -9,10 +9,9 @@
 
 package com.example.afs.musicpad.theory;
 
-import com.example.afs.musicpad.song.Default;
 
 public class Keys {
 
-  public static final Key CMajor = new Key("C Major", Default.OCTAVE_SEMITONE, 5, Scales.major);
+  public static final Key CMajorFull = new Key("C Major", 0, 10, Scales.major);
 
 }

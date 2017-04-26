@@ -29,6 +29,7 @@ public abstract class QwertyMapping implements InputMapping {
     keySequence = getKeySequence();
   }
 
+  @Override
   public int getOctave() {
     return octave;
   }
@@ -136,49 +137,49 @@ public abstract class QwertyMapping implements InputMapping {
       semitone = 0; // C
       break;
     case '2':
-      semitone = 1; // D
+      semitone = 2; // D
       break;
     case '3':
-      semitone = 2; // E
+      semitone = 4; // E
       break;
     case KeyEvent.VK_ENTER:
-      semitone = 3; // F
+      semitone = 5; // F
       break;
     case '4':
-      semitone = 4; // G
+      semitone = 7; // G
       break;
     case '5':
-      semitone = 5; // A
+      semitone = 9; // A
       break;
     case '6':
-      semitone = 6; // B
+      semitone = 11; // B
       break;
     case '+':
-      semitone = 7; // C
+      semitone = 12; // C
       break;
     case '7':
-      semitone = 8; // D
+      semitone = 14; // D
       break;
     case '8':
-      semitone = 9; // E
+      semitone = 16; // E
       break;
     case '9':
-      semitone = 10; // F
+      semitone = 17; // F
       break;
     case '-':
-      semitone = 11; // G
+      semitone = 19; // G
       break;
     case KeyEvent.VK_NUM_LOCK:
-      semitone = 12; // A
+      semitone = 21; // A
       break;
     case '/':
-      semitone = 13; // B
+      semitone = 23; // B
       break;
     case '*':
-      semitone = 14; // C
+      semitone = 24; // C
       break;
     case KeyEvent.VK_BACK_SPACE:
-      semitone = 15; // D
+      semitone = 26; // D
       break;
     default:
       semitone = 0; // could use these (e.g. F1) for shortcuts

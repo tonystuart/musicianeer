@@ -14,13 +14,21 @@ import com.example.afs.musicpad.device.common.InputMapping;
 
 public class MidiMapping implements InputMapping {
 
+  private int octave;
+
   @Override
   public int getBaseOctave() {
     return 36;
   }
 
   @Override
+  public int getOctave() {
+    return octave;
+  }
+
+  @Override
   public void setOctave(int octave) {
+    this.octave = octave;
   }
 
   @Override

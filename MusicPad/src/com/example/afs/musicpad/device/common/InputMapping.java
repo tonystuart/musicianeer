@@ -13,6 +13,8 @@ public interface InputMapping {
 
   int getBaseOctave();
 
+  int getOctave();
+
   void setOctave(int octave);
 
   String toLegend(int midiNote);

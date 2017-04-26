@@ -14,8 +14,6 @@ import java.util.List;
 
 import com.example.afs.fluidsynth.Synthesizer;
 import com.example.afs.musicpad.device.common.Device;
-import com.example.afs.musicpad.device.common.InputMapping;
-import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.player.PrompterData.BrowserMusic;
 import com.example.afs.musicpad.player.PrompterData.BrowserWords;
 import com.example.afs.musicpad.song.Note;
@@ -25,15 +23,6 @@ public class NotePlayer extends Player {
 
   public NotePlayer(Synthesizer synthesizer, Song song, Device device) {
     super(synthesizer, song, device);
-    int channel = device.getChannel();
-    InputMapping inputMapping = device.getInputMapping();
-    int octave = inputMapping.getBaseOctave();
-    int lowestMidiNote = song.getLowestMidiNote(channel);
-    int lowestOctave = lowestMidiNote / Midi.SEMITONES_PER_OCTAVE;
-    if (lowestOctave < octave) {
-      octave = lowestOctave;
-    }
-    inputMapping.setOctave(octave);
   }
 
   @Override

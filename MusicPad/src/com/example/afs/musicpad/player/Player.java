@@ -16,6 +16,7 @@ import com.example.afs.fluidsynth.Synthesizer;
 import com.example.afs.musicpad.Trace;
 import com.example.afs.musicpad.analyzer.Names;
 import com.example.afs.musicpad.device.common.Device;
+import com.example.afs.musicpad.device.common.InputMapping;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.player.PrompterData.BrowserWords;
 import com.example.afs.musicpad.song.Song;
@@ -47,6 +48,15 @@ public abstract class Player {
     this.song = song;
     this.device = device;
 
+    int channel = device.getChannel();
+    InputMapping inputMapping = device.getInputMapping();
+    int octave = inputMapping.getBaseOctave();
+    int lowestMidiNote = song.getLowestMidiNote(channel);
+    int lowestOctave = lowestMidiNote / Midi.SEMITONES_PER_OCTAVE;
+    if (lowestOctave < octave) {
+      octave = lowestOctave;
+    }
+    inputMapping.setOctave(octave);
     Set<Integer> programs = song.getPrograms(device.getChannel());
     if (programs.size() > 0) {
       int program = programs.iterator().next();
@@ -88,13 +98,13 @@ public abstract class Player {
     return song == null || song.getNotes().size() == 0;
   }
 
-  protected void playMidiChord(Action action, int octave, ChordType chordType) {
+  protected void playMidiChord(Action action, int baseMidiNote, ChordType chordType) {
     if (action == Action.PRESS && Trace.isTracePlay()) {
       System.out.println("Player.play: chordType=" + chordType);
     }
     for (int midiNote : chordType.getMidiNotes()) {
       try {
-        synthesizeNote(action, octave + midiNote);
+        synthesizeNote(action, baseMidiNote + midiNote);
         Thread.sleep(0);
       } catch (InterruptedException e) {
         throw new RuntimeException(e);
