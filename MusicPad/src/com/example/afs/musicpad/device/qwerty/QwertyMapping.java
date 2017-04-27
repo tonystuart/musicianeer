@@ -17,6 +17,9 @@ import com.example.afs.musicpad.song.Default;
 
 public abstract class QwertyMapping implements InputMapping {
 
+  protected static final String N = ""; // normal
+  protected static final String S = "\u21E7"; // sharp (shift)
+
   // http://www.fileformat.info/
   protected static final int ENTER = '\u23ce';
   protected static final int BACK_SPACE = '\u2190';

@@ -13,32 +13,16 @@ import com.example.afs.musicpad.analyzer.Names;
 
 public class MappingTool {
 
-  public static void alphaMapping() {
-    int midiNote = 0;
-    String hasSharp = "1101110";
-    String alpha = "ZXCVBNMASDFGHJKLQWERTYUIOP";
-    for (int i = 0; i < alpha.length(); i++) {
-      char thisChar = alpha.charAt(i);
-      if (hasSharp.charAt(i % hasSharp.length()) == '1') {
-        System.out.println("N + " + "\"" + thisChar + "\", // " + Names.getNoteName(midiNote++));
-        System.out.println("S + " + "\"" + thisChar + "\", // " + Names.getNoteName(midiNote++));
-      } else {
-        System.out.println("N + " + "\"" + thisChar + "\", // " + Names.getNoteName(midiNote++));
-      }
-    }
-  }
-
   public static void main(String[] args) {
     numericMapping();
   }
 
+  public static void mapAlpha() {
+    doChromaticScale("ZXCVBNMASDFGHJKLQWERTYUIOP");
+  }
+
   public static void numericMapping() {
-    int midiNote = 0;
-    String numeric = "123E456+789-N/+B";
-    for (int i = 0; i < numeric.length(); i++) {
-      char thisChar = numeric.charAt(i);
-      System.out.println("\"" + thisChar + "\", // " + Names.getNoteName(midiNote++));
-    }
+    doChromaticScale("123E456+789-N/+B");
   }
 
   public static void qwertyMapping() {
@@ -58,6 +42,29 @@ public class MappingTool {
         letter++;
       }
       midiNote++;
+    }
+  }
+
+  private static void doChromaticScale(String legend) {
+    int midiNote = 0;
+    String hasSharp = "1101110";
+    for (int i = 0; i < legend.length(); i++) {
+      char thisChar = legend.charAt(i);
+      if (hasSharp.charAt(i % hasSharp.length()) == '1') {
+        System.out.println("N + " + "\"" + thisChar + "\", // " + Names.getNoteName(midiNote++));
+        System.out.println("S + " + "\"" + thisChar + "\", // " + Names.getNoteName(midiNote++));
+      } else {
+        System.out.println("N + " + "\"" + thisChar + "\", // " + Names.getNoteName(midiNote++));
+      }
+    }
+  }
+
+  @SuppressWarnings("unused")
+  private static void doWholeNoteScale(String legend) {
+    int midiNote = 0;
+    for (int i = 0; i < legend.length(); i++) {
+      char thisChar = legend.charAt(i);
+      System.out.println("\"" + thisChar + "\", // " + Names.getNoteName(midiNote++));
     }
   }
 

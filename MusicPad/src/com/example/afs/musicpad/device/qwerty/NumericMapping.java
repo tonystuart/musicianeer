@@ -12,26 +12,38 @@ package com.example.afs.musicpad.device.qwerty;
 public class NumericMapping extends QwertyMapping {
 
   private static final String[] KEY_SEQUENCE = new String[] {
-      "1", // C
-      "2", // C#
-      "3", // D
-      "E", // D#
-      "4", // E
-      "5", // F
-      "6", // F#
-      "+", // G
-      "7", // G#
-      "8", // A
-      "9", // A#
-      "-", // B
-      "N", // C
-      "/", // C#
-      "+", // D
-      "B", // D#
+      N + "1", // C
+      S + "1", // C#
+      N + "2", // D
+      S + "2", // D#
+      N + "3", // E
+      N + "E", // F
+      S + "E", // F#
+      N + "4", // G
+      S + "4", // G#
+      N + "5", // A
+      S + "5", // A#
+      N + "6", // B
+      N + "+", // C
+      S + "+", // C#
+      N + "7", // D
+      S + "7", // D#
+      N + "8", // E
+      N + "9", // F
+      S + "9", // F#
+      N + "-", // G
+      S + "-", // G#
+      N + "N", // A
+      S + "N", // A#
+      N + "/", // B
+      N + "+", // C
+      S + "+", // C#
+      N + "B", // D
+      S + "B", // D#
   };
 
   @Override
-  public int getBaseOctave() {
+  public int getDefaultOctave() {
     return 4;
   }
 

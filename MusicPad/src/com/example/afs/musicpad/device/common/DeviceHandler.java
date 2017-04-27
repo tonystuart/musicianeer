@@ -36,12 +36,10 @@ public class DeviceHandler extends BrokerTask<Message> implements Controllable {
   private Device device;
   private Player player;
   private PlayerFactory playerFactory;
-  private Synthesizer synthesizer;
   private Song song = Default.SONG;
 
   public DeviceHandler(Broker<Message> messageBroker, Synthesizer synthesizer, Device device) {
     super(messageBroker);
-    this.synthesizer = synthesizer;
     this.device = device;
     this.playerFactory = new PlayerFactory(synthesizer);
     delegate(OnNoteOn.class, message -> doNoteOn(message.getMidiNote()));

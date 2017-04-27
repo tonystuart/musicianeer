@@ -20,6 +20,7 @@ import java.util.TreeSet;
 import com.example.afs.fluidsynth.Synthesizer;
 import com.example.afs.musicpad.analyzer.ChordFinder;
 import com.example.afs.musicpad.device.common.Device;
+import com.example.afs.musicpad.device.common.InputMapping;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.player.PrompterData.BrowserMusic;
 import com.example.afs.musicpad.player.PrompterData.BrowserWords;
@@ -32,7 +33,6 @@ import com.example.afs.musicpad.util.RandomAccessList;
 
 public class ChordPlayer extends Player {
 
-  private int octave;
   private int baseMidiNote;
   private TreeSet<Chord> chords;
   private Map<ChordType, Integer> chordTypeToMidiNoteIndex = new HashMap<>();
@@ -40,22 +40,8 @@ public class ChordPlayer extends Player {
 
   public ChordPlayer(Synthesizer synthesizer, Song song, Device device) {
     super(synthesizer, song, device);
-    octave = device.getInputMapping().getOctave();
-    baseMidiNote = octave * Midi.SEMITONES_PER_OCTAVE;
-    ChordFinder chordFinder = new ChordFinder();
-    chords = chordFinder.getChords(song.getNotes(), device.getChannel());
-    Set<ChordType> uniqueChordTypes = new HashSet<>();
-    for (Chord chord : chords) {
-      uniqueChordTypes.add(chord.getChordType());
-    }
-    RandomAccessList<ChordType> chordMapping = new DirectList<>(uniqueChordTypes);
-    chordMapping.sort((o1, o2) -> o1.compareTo(o2));
-    for (int i = 0; i < chordMapping.size(); i++) {
-      int midiNoteIndex = Keys.CMajorFull.getMidiNotes()[i];
-      chordTypeToMidiNoteIndex.put(chordMapping.get(i), midiNoteIndex);
-      midiNoteIndexToChordType.put(midiNoteIndex, chordMapping.get(i));
-      System.out.println(chordMapping.get(i) + " <=> " + midiNoteIndex);
-    }
+    initializeOctave();
+    initializeChords();
   }
 
   @Override
@@ -89,8 +75,34 @@ public class ChordPlayer extends Player {
     int midiNoteIndex = midiNote - baseMidiNote;
     ChordType chordType = midiNoteIndexToChordType.get(midiNoteIndex);
     if (chordType != null) {
-      playMidiChord(action, baseMidiNote + 24, chordType);
+      playMidiChord(action, baseMidiNote, chordType);
     }
+  }
+
+  private void initializeChords() {
+    ChordFinder chordFinder = new ChordFinder();
+    chords = chordFinder.getChords(song.getNotes(), device.getChannel());
+    Set<ChordType> uniqueChordTypes = new HashSet<>();
+    for (Chord chord : chords) {
+      uniqueChordTypes.add(chord.getChordType());
+    }
+    RandomAccessList<ChordType> chordMapping = new DirectList<>(uniqueChordTypes);
+    chordMapping.sort((o1, o2) -> o1.compareTo(o2));
+    for (int i = 0; i < chordMapping.size(); i++) {
+      int midiNoteIndex = Keys.CMajorFull.getMidiNotes()[i];
+      chordTypeToMidiNoteIndex.put(chordMapping.get(i), midiNoteIndex);
+      midiNoteIndexToChordType.put(midiNoteIndex, chordMapping.get(i));
+      System.out.println(chordMapping.get(i) + " <=> " + midiNoteIndex);
+    }
+  }
+
+  private void initializeOctave() {
+    int channel = device.getChannel();
+    InputMapping inputMapping = device.getInputMapping();
+    int averageMidiNote = song.getAverageMidiNote(channel);
+    int octave = averageMidiNote / Midi.SEMITONES_PER_OCTAVE;
+    baseMidiNote = octave * Midi.SEMITONES_PER_OCTAVE;
+    inputMapping.setOctave(octave);
   }
 
 }

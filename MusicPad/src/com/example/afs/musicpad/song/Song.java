@@ -73,6 +73,10 @@ public class Song {
     return appendTick;
   }
 
+  public int getAverageMidiNote(int channel) {
+    return channelFacets.getFacet(channel).getAverageMidiNote();
+  }
+
   public int getBeatsPerMeasure(long tick) {
     int beatsPerMeasure;
     Note note = getControllingNote(tick);

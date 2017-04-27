@@ -17,7 +17,7 @@ public class MidiMapping implements InputMapping {
   private int octave;
 
   @Override
-  public int getBaseOctave() {
+  public int getDefaultOctave() {
     return 36;
   }
 

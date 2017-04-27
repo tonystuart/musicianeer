@@ -11,7 +11,7 @@ package com.example.afs.musicpad.device.common;
 
 public interface InputMapping {
 
-  int getBaseOctave();
+  int getDefaultOctave();
 
   int getOctave();
 

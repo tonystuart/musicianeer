@@ -9,10 +9,8 @@
 
 package com.example.afs.musicpad.device.qwerty;
 
-public class AlphaMapping extends QwertyMapping {
 
-  private static final String N = ""; // normal
-  private static final String S = "\u21E7"; // sharp (shift)
+public class AlphaMapping extends QwertyMapping {
 
   private static final String[] KEY_SEQUENCE = new String[] {
       N + "Z", // C
@@ -63,7 +61,7 @@ public class AlphaMapping extends QwertyMapping {
   };
 
   @Override
-  public int getBaseOctave() {
+  public int getDefaultOctave() {
     return 3;
   }
 

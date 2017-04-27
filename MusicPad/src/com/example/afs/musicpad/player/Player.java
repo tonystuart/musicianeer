@@ -9,6 +9,7 @@
 
 package com.example.afs.musicpad.player;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Set;
 
@@ -16,7 +17,6 @@ import com.example.afs.fluidsynth.Synthesizer;
 import com.example.afs.musicpad.Trace;
 import com.example.afs.musicpad.analyzer.Names;
 import com.example.afs.musicpad.device.common.Device;
-import com.example.afs.musicpad.device.common.InputMapping;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.player.PrompterData.BrowserWords;
 import com.example.afs.musicpad.song.Song;
@@ -47,21 +47,7 @@ public abstract class Player {
     this.synthesizer = synthesizer;
     this.song = song;
     this.device = device;
-
-    int channel = device.getChannel();
-    InputMapping inputMapping = device.getInputMapping();
-    int octave = inputMapping.getBaseOctave();
-    int lowestMidiNote = song.getLowestMidiNote(channel);
-    int lowestOctave = lowestMidiNote / Midi.SEMITONES_PER_OCTAVE;
-    if (lowestOctave < octave) {
-      octave = lowestOctave;
-    }
-    inputMapping.setOctave(octave);
-    Set<Integer> programs = song.getPrograms(device.getChannel());
-    if (programs.size() > 0) {
-      int program = programs.iterator().next();
-      synthesizer.changeProgram(PLAYER_BASE + device.getChannel(), program);
-    }
+    initializeChannelProgram();
   }
 
   public abstract PrompterData getPrompterData();
@@ -82,6 +68,7 @@ public abstract class Player {
     for (int midiNote = lowest; midiNote <= highest; midiNote++) {
       names[midiNote - lowest] = device.getInputMapping().toLegend(midiNote);
     }
+    System.out.println("names=" + Arrays.toString(names));
     return names;
   }
 
@@ -117,6 +104,14 @@ public abstract class Player {
       System.out.println("Player.play: midiNote=" + Names.formatNote(midiNote));
     }
     synthesizeNote(action, midiNote);
+  }
+
+  private void initializeChannelProgram() {
+    Set<Integer> programs = song.getPrograms(device.getChannel());
+    if (programs.size() > 0) {
+      int program = programs.iterator().next();
+      synthesizer.changeProgram(PLAYER_BASE + device.getChannel(), program);
+    }
   }
 
   private void synthesizeNote(Action action, int midiNote) {
