@@ -54,15 +54,14 @@ musicPad.onPrompterData = function(data) {
 musicPad.onTick = function(tick) {
   console.log("tick="+tick);  
   var index = tick / 512; // resolution
-  var prompters = document.querySelector("#prompters").childNodes;
-  for (var i = 0; i < prompters.length; i++) {
-    var prompter = prompters[i];
+  var prompters = document.querySelector("#prompters");
+  var prompter = prompters.firstChild;
+  if (prompter) {
     var table = prompter.querySelector("table");
     var rows = table.rows;
     var offsetTop = rows[index].offsetTop;
-    var music = prompter.querySelector(".music");
-    music.scrollTop = offsetTop;
-    console.log("offsetTop="+offsetTop+", music.scrollTop="+music.scrollTop);
+    prompters.scrollTop = offsetTop;
+    console.log("offsetTop="+offsetTop+", prompters.scrollTop="+prompters.scrollTop);
   }
 }
 
