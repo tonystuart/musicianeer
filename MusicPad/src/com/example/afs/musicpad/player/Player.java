@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Set;
 
+import com.example.afs.fluidsynth.FluidSynth;
 import com.example.afs.fluidsynth.Synthesizer;
 import com.example.afs.musicpad.Trace;
 import com.example.afs.musicpad.analyzer.Names;
@@ -30,16 +31,16 @@ public abstract class Player {
     PRESS, RELEASE
   }
 
-  public static final int PLAYER_BASE = Midi.CHANNELS;
-  public static final int PLAYER_CHANNELS = Midi.CHANNELS;
-
+  private static final int PLAYER_BASE = Midi.CHANNELS;
+  private static final int PLAYER_CHANNELS = Midi.CHANNELS;
   public static final int TOTAL_CHANNELS = PLAYER_BASE + PLAYER_CHANNELS;
-  public static final int DEFAULT_VELOCITY = 96;
 
-  public static final int DEFAULT_PERCENT_VELOCITY = 100;
+  private static final int DEFAULT_VELOCITY = 96;
+  private static final int DEFAULT_PERCENT_VELOCITY = 100;
 
   protected Song song;
   protected Device device;
+  private int deviceChannel;
   private Synthesizer synthesizer;
   private int percentVelocity = DEFAULT_PERCENT_VELOCITY;
 
@@ -47,6 +48,7 @@ public abstract class Player {
     this.synthesizer = synthesizer;
     this.song = song;
     this.device = device;
+    initializeDeviceChannel();
     initializeChannelProgram();
   }
 
@@ -55,7 +57,7 @@ public abstract class Player {
   public abstract void play(Action action, int midiNote);
 
   public void selectProgram(int program) {
-    synthesizer.changeProgram(PLAYER_BASE + device.getChannel(), program);
+    synthesizer.changeProgram(deviceChannel, program);
   }
 
   public void setPercentVelocity(int percentVelocity) {
@@ -110,17 +112,27 @@ public abstract class Player {
     Set<Integer> programs = song.getPrograms(device.getChannel());
     if (programs.size() > 0) {
       int program = programs.iterator().next();
-      synthesizer.changeProgram(PLAYER_BASE + device.getChannel(), program);
+      synthesizer.changeProgram(deviceChannel, program);
     }
+  }
+
+  private void initializeDeviceChannel() {
+    this.deviceChannel = PLAYER_BASE + device.getIndex();
+    if (device.getChannel() == Midi.DRUM) {
+      synthesizer.setChannelType(deviceChannel, FluidSynth.CHANNEL_TYPE_DRUM);
+    } else {
+      synthesizer.setChannelType(deviceChannel, FluidSynth.CHANNEL_TYPE_MELODIC);
+    }
+    synthesizer.changeProgram(deviceChannel, 0); // initialize fluid_synth.c channel
   }
 
   private void synthesizeNote(Action action, int midiNote) {
     switch (action) {
     case PRESS:
-      synthesizer.pressKey(PLAYER_BASE + device.getChannel(), midiNote, Velocity.scale(DEFAULT_VELOCITY, percentVelocity));
+      synthesizer.pressKey(deviceChannel, midiNote, Velocity.scale(DEFAULT_VELOCITY, percentVelocity));
       break;
     case RELEASE:
-      synthesizer.releaseKey(PLAYER_BASE + device.getChannel(), midiNote);
+      synthesizer.releaseKey(deviceChannel, midiNote);
       break;
     default:
       throw new UnsupportedOperationException();

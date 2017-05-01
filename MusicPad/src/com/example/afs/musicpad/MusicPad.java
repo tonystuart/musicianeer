@@ -16,7 +16,6 @@ import com.example.afs.musicpad.analyzer.AnalyzerTask;
 import com.example.afs.musicpad.device.midi.MidiWatcher;
 import com.example.afs.musicpad.device.qwerty.QwertyWatcher;
 import com.example.afs.musicpad.message.Message;
-import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.player.Player;
 import com.example.afs.musicpad.transport.TransportTask;
 import com.example.afs.musicpad.util.Broker;
@@ -59,9 +58,6 @@ public class MusicPad {
     Settings settings = Synthesizer.createDefaultSettings();
     settings.set("synth.midi-channels", Player.TOTAL_CHANNELS);
     Synthesizer synthesizer = new Synthesizer(settings);
-    synthesizer.setChannelType(Player.PLAYER_BASE + Midi.DRUM, FluidSynth.CHANNEL_TYPE_DRUM);
-    // Force initialization of drum instrument bank and preset, see fluid_synth.c for info
-    synthesizer.changeProgram(Player.PLAYER_BASE + Midi.DRUM, 0);
     return synthesizer;
   }
 
