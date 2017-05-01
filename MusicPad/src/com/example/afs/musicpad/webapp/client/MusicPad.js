@@ -13,10 +13,12 @@ musicPad.onPrompterData = function(data) {
   var title = prompter.querySelector(".title");
   title.innerHTML = data.title + " (" + data.channel + ")";
   var table = prompter.querySelector("table");
+  var colgroup = prompter.querySelector("colgroup");
+  var tbody = table.querySelector("tbody");
   var columnCount = (data.highest - data.lowest) + 1;
   var rowCount = Math.floor(data.duration / data.resolution) + 1;
   for (var i = 0; i < rowCount; i++) {
-    var row = table.insertRow();
+    var row = tbody.insertRow();
     var rowNumber = row.insertCell();
     rowNumber.innerHTML = i + 1;
     words[i] = row.insertCell();
@@ -25,6 +27,16 @@ musicPad.onPrompterData = function(data) {
       var cell = row.insertCell();
       cells[i][j] = cell;
     }
+  }
+  for (var n in data.names) {
+    var col = document.createElement("col");
+    var name = data.names[n];
+    if (name.endsWith("#")) {
+      col.className = "sharp";
+    } else {
+      col.className = "normal";
+    }
+    colgroup.appendChild(col);
   }
   for (var w in data.words) {
     var word = data.words[w];
@@ -35,8 +47,8 @@ musicPad.onPrompterData = function(data) {
     var music = data.music[m];
     var row = Math.floor(music.tick / data.resolution);
     var column = music.note - data.lowest;
-    var noteName = data.names[music.note - data.lowest];
-    cells[row][column].innerHTML = noteName;
+    var name = data.names[music.note - data.lowest];
+    cells[row][column].innerHTML = name;
     var count = Math.floor(music.duration / data.resolution);
     for (var i = 1; i < count; i++) {
       cells[row+i][column].innerHTML = "|";
