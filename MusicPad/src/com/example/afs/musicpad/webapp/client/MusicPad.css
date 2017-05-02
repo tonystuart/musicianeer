@@ -84,16 +84,9 @@ input[type='text'] {
 	display: none;
 }
 
-.prompter-table {
+.prompter-table table {
 	border-left: 1px solid black;
-}
-
-tr:nth-child(even) { /* background: #CCC */
-	
-}
-
-tr:nth-child(odd) { /* background: #FFF */
-	
+	border-spacing: 0;
 }
 
 #templates {
@@ -107,6 +100,6 @@ tr:nth-child(odd) { /* background: #FFF */
 }
 
 .MidiMapping .normal {
-	background-color: beige;
+	background-color: white;
 	width: 20px;
 }
