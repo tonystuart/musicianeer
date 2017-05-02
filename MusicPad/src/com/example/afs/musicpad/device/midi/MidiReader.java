@@ -31,6 +31,7 @@ import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnDeviceMessage;
 import com.example.afs.musicpad.message.OnNoteOff;
 import com.example.afs.musicpad.message.OnNoteOn;
+import com.example.afs.musicpad.message.OnPitchBend;
 import com.example.afs.musicpad.util.Broker;
 
 public class MidiReader implements Controllable, HasSendCommand, HasSendDeviceMessage, HasSendHandlerMessage {
@@ -134,6 +135,10 @@ public class MidiReader implements Controllable, HasSendCommand, HasSendDeviceMe
             queue.add(new OnNoteOn(shortMessage.getData1()));
           } else if (shortMessage.getCommand() == ShortMessage.NOTE_OFF) {
             queue.add(new OnNoteOff(shortMessage.getData1()));
+          } else if (shortMessage.getCommand() == ShortMessage.PITCH_BEND) {
+            int pitchBend = shortMessage.getData1() | shortMessage.getData2();
+            System.out.println("pitchBend=" + pitchBend + ", data1=" + shortMessage.getData1() + ", data2=" + shortMessage.getData2());
+            queue.add(new OnPitchBend(pitchBend));
           }
         }
       }

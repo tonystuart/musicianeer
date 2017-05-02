@@ -49,7 +49,10 @@ public abstract class BrokerTask<M> extends SimpleTask<M> {
     Class<?> classType = message.getClass();
     while ((subscriber = (Subscriber<M>) subscribers.get(classType)) == null && (classType = classType.getSuperclass()) != null) {
     }
-    subscriber.onMessage(message);
+    if (subscriber != null) {
+      // NB: can be null when message placed directly on queue
+      subscriber.onMessage(message);
+    }
   }
 
   protected void publish(M message) {
