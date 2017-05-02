@@ -10,6 +10,7 @@ musicPad.onPrompterData = function(data) {
   var template = document.getElementById("prompter");
   var prompter = template.cloneNode(true);
   prompter.id = "prompter-" + data.index;
+  prompter.className = data.type;
   var title = prompter.querySelector(".title");
   title.innerHTML = data.title + " (" + data.channel + ")";
   var table = prompter.querySelector("table");
@@ -28,9 +29,9 @@ musicPad.onPrompterData = function(data) {
       cells[i][j] = cell;
     }
   }
-  for (var n in data.names) {
+  for (var n in data.legend) {
     var col = document.createElement("col");
-    var name = data.names[n];
+    var name = data.legend[n];
     if (name.endsWith("#")) {
       col.className = "sharp";
     } else {
@@ -47,7 +48,7 @@ musicPad.onPrompterData = function(data) {
     var music = data.music[m];
     var row = Math.floor(music.tick / data.resolution);
     var column = music.note - data.lowest;
-    var name = data.names[music.note - data.lowest];
+    var name = data.legend[music.note - data.lowest];
     cells[row][column].innerHTML = name;
     var count = Math.floor(music.duration / data.resolution);
     for (var i = 1; i < count; i++) {

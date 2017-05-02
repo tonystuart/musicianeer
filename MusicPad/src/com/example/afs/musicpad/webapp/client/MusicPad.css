@@ -100,13 +100,13 @@ tr:nth-child(odd) { /* background: #FFF */
 	display: none;
 }
 
-.sharp {
+.MidiMapping .sharp {
 	background-color: lightgray;
 	width: 20px;
 
 }
 
-.normal {
+.MidiMapping .normal {
 	background-color: beige;
 	width: 20px;
 }

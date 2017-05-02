@@ -9,6 +9,7 @@
 
 package com.example.afs.musicpad.player;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -72,23 +73,23 @@ public class PrompterData {
     }
   }
 
-  private String title;
   private int index;
   private int channel;
   private int lowest;
   private int highest;
   private long duration;
-  private String[] names;
+  private String type;
+  private String[] legend;
   private int resolution = Default.RESOLUTION;
   private List<BrowserWords> words = new LinkedList<>();
   private List<BrowserMusic> music = new LinkedList<>();
 
-  public PrompterData(Song song, Device device, String[] names, int lowest, int highest, List<BrowserWords> words, List<BrowserMusic> music) {
-    this.title = song.getName();
+  public PrompterData(Song song, Device device, String[] legend, int lowest, int highest, List<BrowserWords> words, List<BrowserMusic> music) {
     this.duration = song.getDuration();
     this.index = device.getIndex();
     this.channel = device.getChannel();
-    this.names = names;
+    this.type = device.getInputMapping().getClass().getSimpleName();
+    this.legend = legend;
     this.lowest = lowest;
     this.highest = highest;
     this.words = words;
@@ -111,6 +112,10 @@ public class PrompterData {
     return index;
   }
 
+  public String[] getLegend() {
+    return legend;
+  }
+
   public int getLowest() {
     return lowest;
   }
@@ -119,16 +124,8 @@ public class PrompterData {
     return music;
   }
 
-  public String[] getNames() {
-    return names;
-  }
-
   public int getResolution() {
     return resolution;
-  }
-
-  public String getTitle() {
-    return title;
   }
 
   public List<BrowserWords> getWords() {
@@ -137,7 +134,7 @@ public class PrompterData {
 
   @Override
   public String toString() {
-    return "prompterData [title=" + title + ", deviceIndex=" + index + ", channel=" + channel + ", lowest=" + lowest + ", highest=" + highest + ", duration=" + duration + ", resolution=" + resolution + "]";
+    return "PrompterData [index=" + index + ", channel=" + channel + ", lowest=" + lowest + ", highest=" + highest + ", duration=" + duration + ", type=" + type + ", legend=" + Arrays.toString(legend) + ", resolution=" + resolution + "]";
   }
 
 }
