@@ -89,17 +89,25 @@ input[type='text'] {
 	border-spacing: 0;
 }
 
+.prompter-table td {
+  border-left: 1px solid gray;
+}
+
 #templates {
 	display: none;
 }
 
-.MidiMapping .sharp {
+table {
+	font-size: small;
+}
+.sharp {
 	background-color: lightgray;
 	width: 20px;
 
 }
 
-.MidiMapping .normal {
+.normal {
 	background-color: white;
 	width: 20px;
 }
+
