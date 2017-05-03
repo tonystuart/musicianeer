@@ -92,6 +92,10 @@ public class Synthesizer {
     FluidSynth.fluid_synth_pitch_bend(synth, channel, val);
   }
 
+  public void changeControl(int channel, int control, int value) {
+    FluidSynth.fluid_synth_cc(synth, channel, control, value);
+  }
+
   public void changeProgram(int channel, int program) {
     FluidSynth.fluid_synth_program_change(synth, channel, program);
   }

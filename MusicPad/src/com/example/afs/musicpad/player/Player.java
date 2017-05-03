@@ -52,6 +52,14 @@ public abstract class Player {
     initializeChannelProgram();
   }
 
+  public void bendPitch(int pitchBend) {
+    synthesizer.bendPitch(deviceChannel, pitchBend);
+  }
+
+  public void changeControl(int control, int value) {
+    synthesizer.changeControl(deviceChannel, control, value);
+  }
+
   public abstract PrompterData getPrompterData();
 
   public abstract void play(Action action, int midiNote);

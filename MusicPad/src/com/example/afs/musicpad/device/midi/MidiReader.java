@@ -28,6 +28,7 @@ import com.example.afs.musicpad.device.midi.configuration.Node.ReturnState;
 import com.example.afs.musicpad.device.midi.configuration.On;
 import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnCommand;
+import com.example.afs.musicpad.message.OnControlChange;
 import com.example.afs.musicpad.message.OnDeviceMessage;
 import com.example.afs.musicpad.message.OnNoteOff;
 import com.example.afs.musicpad.message.OnNoteOn;
@@ -135,9 +136,18 @@ public class MidiReader implements Controllable, HasSendCommand, HasSendDeviceMe
             queue.add(new OnNoteOn(shortMessage.getData1()));
           } else if (shortMessage.getCommand() == ShortMessage.NOTE_OFF) {
             queue.add(new OnNoteOff(shortMessage.getData1()));
+          } else if (shortMessage.getCommand() == ShortMessage.CONTROL_CHANGE) {
+            int control = shortMessage.getData1();
+            int value = shortMessage.getData2();
+            queue.add(new OnControlChange(control, value));
           } else if (shortMessage.getCommand() == ShortMessage.PITCH_BEND) {
-            int pitchBend = shortMessage.getData1() | shortMessage.getData2();
-            System.out.println("pitchBend=" + pitchBend + ", data1=" + shortMessage.getData1() + ", data2=" + shortMessage.getData2());
+            // Pitch bend is reported as a signed 14 bit value with MSB in data2 and LSB in data1
+            // Options for converting it into values in the range 0 to 16384 include:
+            // 1. Use LS(32-14) to set the sign and RS(32-14) to extend the size to produce values in range -8192 to 8192, then add 8192 to get values in range 0 to 16384
+            // 2. Recognize that values GT 8192 have their sign bit set, subtract 8192 from them and add 8192 to values LT 8192 to get values in range 0 to 16384
+            // We use the second approach
+            int value = (shortMessage.getData2() << 7) | shortMessage.getData1();
+            int pitchBend = value >= 8192 ? value - 8192 : value + 8192;
             queue.add(new OnPitchBend(pitchBend));
           }
         }

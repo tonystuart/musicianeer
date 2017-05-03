@@ -17,8 +17,10 @@ import com.example.afs.musicpad.device.qwerty.AlphaMapping;
 import com.example.afs.musicpad.device.qwerty.NumericMapping;
 import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnCommand;
+import com.example.afs.musicpad.message.OnControlChange;
 import com.example.afs.musicpad.message.OnNoteOff;
 import com.example.afs.musicpad.message.OnNoteOn;
+import com.example.afs.musicpad.message.OnPitchBend;
 import com.example.afs.musicpad.message.OnPrompterData;
 import com.example.afs.musicpad.message.OnSongSelected;
 import com.example.afs.musicpad.player.Player;
@@ -44,6 +46,8 @@ public class DeviceHandler extends BrokerTask<Message> implements Controllable {
     this.playerFactory = new PlayerFactory(synthesizer);
     delegate(OnNoteOn.class, message -> doNoteOn(message.getMidiNote()));
     delegate(OnNoteOff.class, message -> doNoteOff(message.getMidiNote()));
+    delegate(OnControlChange.class, message -> doControlChange(message.getControl(), message.getValue()));
+    delegate(OnPitchBend.class, message -> doPitchBend(message.getPitchBend()));
     delegate(OnCommand.class, message -> doCommand(message));
     subscribe(OnSongSelected.class, message -> doSongSelected(message.getSong()));
   }
@@ -76,12 +80,20 @@ public class DeviceHandler extends BrokerTask<Message> implements Controllable {
     }
   }
 
+  private void doControlChange(int control, int value) {
+    player.changeControl(control, value);
+  }
+
   private void doNoteOff(int midiNote) {
     player.play(Action.RELEASE, midiNote);
   }
 
   private void doNoteOn(int midiNote) {
     player.play(Action.PRESS, midiNote);
+  }
+
+  private void doPitchBend(int pitchBend) {
+    player.bendPitch(pitchBend);
   }
 
   private void doSongSelected(Song song) {
