@@ -32,7 +32,7 @@ public class MidiMapping implements InputMapping {
   }
 
   @Override
-  public String toLegend(int midiNote) {
+  public String toKeyCap(int midiNote) {
     return Names.getNoteName(midiNote);
   }
 

@@ -36,7 +36,22 @@ public class Names {
     }
   }
 
-  private static final String[] SHARPS = new String[] {
+  private static final boolean[] SHARPS = new boolean[] {
+      false,
+      true,
+      false,
+      true,
+      false,
+      false,
+      true,
+      false,
+      true,
+      false,
+      true,
+      false,
+  };
+
+  private static final String[] ASCENDING = new String[] {
       "C",
       "C#",
       "D",
@@ -51,7 +66,7 @@ public class Names {
       "B"
   };
 
-  private static final String[] FLATS = new String[] {
+  private static final String[] DESCENDING = new String[] {
       "C",
       "Db",
       "D",
@@ -81,6 +96,7 @@ public class Names {
       "min7", // 10
       "maj7", // 11
   };
+
   private final static ChordName chordNames[] = new ChordName[] //
   { //               012345678901
       new ChordName("100100010000", "min"), //
@@ -135,7 +151,7 @@ public class Names {
   }
 
   public static String formatNote(int midiNote) {
-    return SHARPS[midiNote % Midi.SEMITONES_PER_OCTAVE] + (midiNote / Midi.SEMITONES_PER_OCTAVE) + " (" + midiNote + ")";
+    return ASCENDING[midiNote % Midi.SEMITONES_PER_OCTAVE] + (midiNote / Midi.SEMITONES_PER_OCTAVE) + " (" + midiNote + ")";
   }
 
   public static String formatNote(long tick, int midiNote, long duration) {
@@ -143,7 +159,7 @@ public class Names {
   }
 
   public static String formatNoteName(int midiNote) {
-    return SHARPS[midiNote % Midi.SEMITONES_PER_OCTAVE] + (midiNote / Midi.SEMITONES_PER_OCTAVE);
+    return ASCENDING[midiNote % Midi.SEMITONES_PER_OCTAVE] + (midiNote / Midi.SEMITONES_PER_OCTAVE);
   }
 
   public static String getIntervalName(int interval) {
@@ -151,14 +167,14 @@ public class Names {
   }
 
   public static String getKeyName(int tonic, boolean isMajor, int sharpsOrFlats) {
-    String midiNote = (sharpsOrFlats < 0 ? FLATS[tonic] : SHARPS[tonic]);
+    String midiNote = (sharpsOrFlats < 0 ? DESCENDING[tonic] : ASCENDING[tonic]);
     String mode = isMajor ? " Major" : " minor";
     String key = midiNote + mode;
     return key;
   }
 
   public static String getNoteName(int midiNote) {
-    return SHARPS[midiNote % Midi.SEMITONES_PER_OCTAVE];
+    return ASCENDING[midiNote % Midi.SEMITONES_PER_OCTAVE];
   }
 
   public static String getSynopsis(int sharpsOrFlats) {
@@ -171,6 +187,10 @@ public class Names {
       nickName = "";
     }
     return nickName;
+  }
+
+  public static boolean isSharp(int midiNote) {
+    return SHARPS[midiNote % SHARPS.length];
   }
 
   private static String getChordName(char[] intervals) {

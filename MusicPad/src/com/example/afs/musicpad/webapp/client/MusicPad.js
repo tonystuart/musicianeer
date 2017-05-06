@@ -40,8 +40,7 @@ musicPad.onMusic = function(response) {
     for (let j = 0; j < columnCount; j++) {
       let cell = document.createElement("div");
       row.appendChild(cell);
-      let name = response.legend[j];
-      if (name.endsWith("#") || name.startsWith("\u2191")) {
+      if (response.legend[j].isSharp) {
         cell.className = "sharp";
       } else {
         cell.className = "normal";
@@ -55,8 +54,8 @@ musicPad.onMusic = function(response) {
     let sound = response.sounds[m];
     let row = Math.floor(sound.tick / response.resolution);
     let column = sound.sound - response.lowest;
-    let name = response.legend[sound.sound - response.lowest];
-    cells[row][column].innerHTML = name;
+    let keyCap = response.legend[sound.sound - response.lowest].keyCap;
+    cells[row][column].innerHTML = keyCap;
     let count = Math.floor(sound.duration / response.resolution);
     for (let i = 1; i < count; i++) {
       cells[row+i][column].innerHTML = "|";

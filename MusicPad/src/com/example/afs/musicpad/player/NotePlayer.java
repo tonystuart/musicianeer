@@ -16,6 +16,7 @@ import com.example.afs.fluidsynth.Synthesizer;
 import com.example.afs.musicpad.device.common.Device;
 import com.example.afs.musicpad.device.common.InputMapping;
 import com.example.afs.musicpad.message.OnMusic;
+import com.example.afs.musicpad.message.OnMusic.Legend;
 import com.example.afs.musicpad.message.OnMusic.Sound;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.song.Note;
@@ -43,7 +44,7 @@ public class NotePlayer extends Player {
     }
     int lowest = song.getLowestMidiNote(channel);
     int highest = song.getHighestMidiNote(channel);
-    String[] legend = getLegend(lowest, highest);
+    Legend[] legend = getLegend(lowest, highest);
     OnMusic onMusic = new OnMusic(song, device, legend, lowest, highest, songMusicList);
     return onMusic;
   }

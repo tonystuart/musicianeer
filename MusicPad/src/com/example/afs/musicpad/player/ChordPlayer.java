@@ -22,6 +22,7 @@ import com.example.afs.musicpad.analyzer.ChordFinder;
 import com.example.afs.musicpad.device.common.Device;
 import com.example.afs.musicpad.device.common.InputMapping;
 import com.example.afs.musicpad.message.OnMusic;
+import com.example.afs.musicpad.message.OnMusic.Legend;
 import com.example.afs.musicpad.message.OnMusic.Sound;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.song.Chord;
@@ -64,7 +65,7 @@ public class ChordPlayer extends Player {
       Sound sound = new Sound(tick, midiNote, duration);
       songMusicList.add(sound);
     }
-    String[] legend = getLegend(lowest, highest);
+    Legend[] legend = getLegend(lowest, highest);
     OnMusic onMusic = new OnMusic(song, device, legend, lowest, highest, songMusicList);
     return onMusic;
   }

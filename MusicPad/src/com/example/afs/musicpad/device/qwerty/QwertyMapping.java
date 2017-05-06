@@ -43,7 +43,7 @@ public abstract class QwertyMapping implements InputMapping {
   }
 
   @Override
-  public String toLegend(int midiNote) {
+  public String toKeyCap(int midiNote) {
     String keyCap;
     int noteIndex = midiNote - octave * Midi.SEMITONES_PER_OCTAVE;
     if (noteIndex >= 0 && noteIndex < keySequence.length) {

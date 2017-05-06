@@ -9,7 +9,6 @@
 
 package com.example.afs.musicpad.player;
 
-import java.util.Arrays;
 import java.util.Set;
 
 import com.example.afs.fluidsynth.FluidSynth;
@@ -18,6 +17,7 @@ import com.example.afs.musicpad.Trace;
 import com.example.afs.musicpad.analyzer.Names;
 import com.example.afs.musicpad.device.common.Device;
 import com.example.afs.musicpad.message.OnMusic;
+import com.example.afs.musicpad.message.OnMusic.Legend;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.theory.ChordType;
@@ -70,14 +70,15 @@ public abstract class Player {
     this.percentVelocity = percentVelocity;
   }
 
-  protected String[] getLegend(int lowest, int highest) {
+  protected Legend[] getLegend(int lowest, int highest) {
     int count = (highest - lowest) + 1;
-    String[] names = new String[count];
+    Legend[] legend = new Legend[count];
     for (int midiNote = lowest; midiNote <= highest; midiNote++) {
-      names[midiNote - lowest] = device.getInputMapping().toLegend(midiNote);
+      String keyCap = device.getInputMapping().toKeyCap(midiNote);
+      boolean isSharp = Names.isSharp(midiNote);
+      legend[midiNote - lowest] = new Legend(keyCap, isSharp);
     }
-    System.out.println("names=" + Arrays.toString(names));
-    return names;
+    return legend;
   }
 
   protected boolean isEmptySong() {

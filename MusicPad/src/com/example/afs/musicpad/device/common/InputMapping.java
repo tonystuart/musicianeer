@@ -17,7 +17,7 @@ public interface InputMapping {
 
   void setOctave(int octave);
 
-  String toLegend(int midiNote);
+  String toKeyCap(int midiNote);
 
   int toMidiNote(int inputCode);
 }

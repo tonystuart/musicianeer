@@ -19,6 +19,34 @@ import com.example.afs.musicpad.song.Song;
 
 public class OnMusic extends Message {
 
+  public static class Legend {
+
+    private String keyCap;
+    private boolean isSharp;
+
+    public Legend() {
+    }
+
+    public Legend(String keyCap, boolean isSharp) {
+      this.keyCap = keyCap;
+      this.isSharp = isSharp;
+    }
+
+    public String getKeyCap() {
+      return keyCap;
+    }
+
+    public boolean isSharp() {
+      return isSharp;
+    }
+
+    @Override
+    public String toString() {
+      return "Legend [keyCap=" + keyCap + ", isSharp=" + isSharp + "]";
+    }
+
+  }
+
   public static class Sound {
 
     private long tick;
@@ -55,11 +83,11 @@ public class OnMusic extends Message {
   private int highest;
   private long duration;
   private String mappingType;
-  private String[] legend;
+  private Legend[] legend;
   private int resolution = Default.RESOLUTION;
   private List<Sound> sounds = new LinkedList<>();
 
-  public OnMusic(Song song, Device device, String[] legend, int lowest, int highest, List<Sound> sounds) {
+  public OnMusic(Song song, Device device, Legend[] legend, int lowest, int highest, List<Sound> sounds) {
     this.duration = song.getDuration();
     this.index = device.getIndex();
     this.channel = device.getChannel();
@@ -86,7 +114,7 @@ public class OnMusic extends Message {
     return index;
   }
 
-  public String[] getLegend() {
+  public Legend[] getLegend() {
     return legend;
   }
 
@@ -104,7 +132,7 @@ public class OnMusic extends Message {
 
   @Override
   public String toString() {
-    return "OnChannelNotes [index=" + index + ", channel=" + channel + ", lowest=" + lowest + ", highest=" + highest + ", duration=" + duration + ", mappingType=" + mappingType + ", legend=" + Arrays.toString(legend) + ", resolution=" + resolution + "]";
+    return "OnChannelkeyCaps [index=" + index + ", channel=" + channel + ", lowest=" + lowest + ", highest=" + highest + ", duration=" + duration + ", mappingType=" + mappingType + ", legend=" + Arrays.toString(legend) + ", resolution=" + resolution + "]";
   }
 
 }
