@@ -18,7 +18,7 @@ import com.example.afs.fluidsynth.Synthesizer;
 import com.example.afs.musicpad.Command;
 import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnCommand;
-import com.example.afs.musicpad.message.OnSongSelected;
+import com.example.afs.musicpad.message.OnSong;
 import com.example.afs.musicpad.message.OnTick;
 import com.example.afs.musicpad.song.Default;
 import com.example.afs.musicpad.song.Note;
@@ -49,7 +49,7 @@ public class TransportTask extends BrokerTask<Message> {
   public TransportTask(Broker<Message> broker, Synthesizer synthesizer) {
     super(broker);
     this.synthesizer = synthesizer;
-    subscribe(OnSongSelected.class, message -> doSongSelected(message.getSong()));
+    subscribe(OnSong.class, message -> doSongSelected(message.getSong()));
     subscribe(OnCommand.class, message -> doCommand(message.getCommand(), message.getParameter()));
     noteEventScheduler = new NoteEventScheduler();
     sequencerTask = new PausibleSequencerTask<NoteEvent>(noteEventScheduler, new Broker<>());

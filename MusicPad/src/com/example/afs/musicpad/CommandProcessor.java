@@ -10,6 +10,8 @@
 package com.example.afs.musicpad;
 
 import java.io.File;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Random;
 
 import com.example.afs.fluidsynth.Synthesizer;
@@ -17,10 +19,13 @@ import com.example.afs.musicpad.Trace.TraceOption;
 import com.example.afs.musicpad.analyzer.TranspositionFinder;
 import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnCommand;
-import com.example.afs.musicpad.message.OnSongSelected;
+import com.example.afs.musicpad.message.OnSong;
+import com.example.afs.musicpad.message.OnWords;
+import com.example.afs.musicpad.message.OnWords.Lyric;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.parser.SongBuilder;
 import com.example.afs.musicpad.song.Song;
+import com.example.afs.musicpad.song.Word;
 import com.example.afs.musicpad.task.BrokerTask;
 import com.example.afs.musicpad.util.Broker;
 import com.example.afs.musicpad.util.Range;
@@ -74,7 +79,7 @@ public class CommandProcessor extends BrokerTask<Message> {
   private static final int PAGE_SIZE = 10;
   private static final float DEFAULT_GAIN = 5 * Synthesizer.DEFAULT_GAIN;
 
-  private Song currentSong;
+  private Song song;
   private MusicLibrary musicLibrary;
   private Synthesizer synthesizer;
   private Random random = new Random();
@@ -152,11 +157,17 @@ public class CommandProcessor extends BrokerTask<Message> {
     if (songIndex < musicLibrary.size()) {
       File midiFile = musicLibrary.getMidiFile(songIndex);
       SongBuilder songBuilder = new SongBuilder();
-      currentSong = songBuilder.createSong(midiFile);
-      int distanceToWhiteKeys = TranspositionFinder.getDistanceToWhiteKeys(currentSong);
-      System.out.println("Selecting song " + songNumber + " - " + currentSong.getName());
+      song = songBuilder.createSong(midiFile);
+      int distanceToWhiteKeys = TranspositionFinder.getDistanceToWhiteKeys(song);
+      System.out.println("Selecting song " + songNumber + " - " + song.getName());
       System.out.println("Transpose by " + distanceToWhiteKeys + " to minimize sharps and flats");
-      publish(new OnSongSelected(currentSong));
+      List<Lyric> lyrics = new LinkedList<>();
+      for (Word word : song.getWords()) {
+        Lyric lyric = new Lyric(word.getTick(), word.getText());
+        lyrics.add(lyric);
+      }
+      publish(new OnWords(lyrics, song.getDuration()));
+      publish(new OnSong(song));
     } else {
       System.out.println("Song " + songNumber + " is out of range");
     }
@@ -169,7 +180,7 @@ public class CommandProcessor extends BrokerTask<Message> {
 
   private void doTranspose(int midiTransposition) {
     int transposition = Range.scale(-24, 24, Midi.MIN_VALUE, Midi.MAX_VALUE, midiTransposition);
-    currentSong.transpose(transposition);
+    song.transpose(transposition);
     synthesizer.allNotesOff(); // turn off notes that were playing before transpose
   }
 

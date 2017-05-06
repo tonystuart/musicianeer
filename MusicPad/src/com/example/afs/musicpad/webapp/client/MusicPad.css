@@ -65,7 +65,13 @@ input[type='text'] {
 	padding-bottom: 10px;
 }
 
-#prompters {
+#words {
+	overflow-x: hidden;
+	white-space: nowrap;
+	flex-shrink: 0;
+}
+
+#music {
 	border-top: 1px solid black;
 	border-bottom: 1px solid black;
 	display: flex;
@@ -98,16 +104,20 @@ input[type='text'] {
 }
 
 table {
-	font-size: small;
+	font-size: 10px;
 }
+
+td {
+	text-align: center;
+}
+
 .sharp {
 	background-color: lightgray;
-	width: 20px;
-
+	width: 15px;
 }
 
 .normal {
 	background-color: white;
-	width: 20px;
+	width: 25px;
 }
 

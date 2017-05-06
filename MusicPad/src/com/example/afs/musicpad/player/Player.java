@@ -10,7 +10,6 @@
 package com.example.afs.musicpad.player;
 
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.Set;
 
 import com.example.afs.fluidsynth.FluidSynth;
@@ -18,10 +17,9 @@ import com.example.afs.fluidsynth.Synthesizer;
 import com.example.afs.musicpad.Trace;
 import com.example.afs.musicpad.analyzer.Names;
 import com.example.afs.musicpad.device.common.Device;
+import com.example.afs.musicpad.message.OnMusic;
 import com.example.afs.musicpad.midi.Midi;
-import com.example.afs.musicpad.player.PrompterData.BrowserWords;
 import com.example.afs.musicpad.song.Song;
-import com.example.afs.musicpad.song.Word;
 import com.example.afs.musicpad.theory.ChordType;
 import com.example.afs.musicpad.util.Velocity;
 
@@ -60,7 +58,7 @@ public abstract class Player {
     synthesizer.changeControl(deviceChannel, control, value);
   }
 
-  public abstract PrompterData getPrompterData();
+  public abstract OnMusic getOnSongMusic();
 
   public abstract void play(Action action, int midiNote);
 
@@ -80,15 +78,6 @@ public abstract class Player {
     }
     System.out.println("names=" + Arrays.toString(names));
     return names;
-  }
-
-  protected LinkedList<BrowserWords> getWords() {
-    LinkedList<BrowserWords> words = new LinkedList<>();
-    for (Word word : song.getWords()) {
-      BrowserWords browserWords = new BrowserWords(word.getTick(), word.getText());
-      words.add(browserWords);
-    }
-    return words;
   }
 
   protected boolean isEmptySong() {

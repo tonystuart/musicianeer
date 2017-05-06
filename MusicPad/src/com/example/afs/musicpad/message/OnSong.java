@@ -11,11 +11,11 @@ package com.example.afs.musicpad.message;
 
 import com.example.afs.musicpad.song.Song;
 
-public class OnSongSelected extends Message {
+public class OnSong extends Message {
 
   private Song song;
 
-  public OnSongSelected(Song song) {
+  public OnSong(Song song) {
     this.song = song;
   }
 
@@ -25,7 +25,7 @@ public class OnSongSelected extends Message {
 
   @Override
   public String toString() {
-    return "OnSongSelected [song=" + song + "]";
+    return "OnSong [song=" + song + "]";
   }
 
 }

@@ -21,9 +21,9 @@ import com.example.afs.fluidsynth.Synthesizer;
 import com.example.afs.musicpad.analyzer.ChordFinder;
 import com.example.afs.musicpad.device.common.Device;
 import com.example.afs.musicpad.device.common.InputMapping;
+import com.example.afs.musicpad.message.OnMusic;
+import com.example.afs.musicpad.message.OnMusic.Sound;
 import com.example.afs.musicpad.midi.Midi;
-import com.example.afs.musicpad.player.PrompterData.BrowserMusic;
-import com.example.afs.musicpad.player.PrompterData.BrowserWords;
 import com.example.afs.musicpad.song.Chord;
 import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.theory.ChordType;
@@ -45,11 +45,10 @@ public class ChordPlayer extends Player {
   }
 
   @Override
-  public PrompterData getPrompterData() {
+  public OnMusic getOnSongMusic() {
     int highest = 0;
     int lowest = Midi.MAX_VALUE;
-    List<BrowserWords> words = getWords();
-    List<BrowserMusic> music = new LinkedList<>();
+    List<Sound> songMusicList = new LinkedList<>();
     for (Chord chord : chords) {
       ChordType chordType = chord.getChordType();
       long tick = chord.getTick();
@@ -62,12 +61,12 @@ public class ChordPlayer extends Player {
       if (midiNote > highest) {
         highest = midiNote;
       }
-      BrowserMusic browserMusic = new BrowserMusic(tick, midiNote, duration);
-      music.add(browserMusic);
+      Sound sound = new Sound(tick, midiNote, duration);
+      songMusicList.add(sound);
     }
     String[] legend = getLegend(lowest, highest);
-    PrompterData prompterData = new PrompterData(song, device, legend, lowest, highest, words, music);
-    return prompterData;
+    OnMusic onMusic = new OnMusic(song, device, legend, lowest, highest, songMusicList);
+    return onMusic;
   }
 
   @Override

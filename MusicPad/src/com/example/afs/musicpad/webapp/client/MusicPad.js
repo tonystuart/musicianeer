@@ -4,77 +4,91 @@ var musicPad = musicPad || {};
 musicPad.refreshIntervalMillis = 60000;
 musicPad.lastMessageNumber = -1;
 
-musicPad.onPrompterData = function(data) {
-  var cells = [];
-  var words = [];
-  var template = document.getElementById("prompter");
-  var prompter = template.cloneNode(true);
-  prompter.id = "prompter-" + data.index;
-  prompter.className += " " + data.type;
-  var title = prompter.querySelector(".title");
-  title.innerHTML = data.title + " (" + data.channel + ")";
-  var table = prompter.querySelector("table");
-  var colgroup = prompter.querySelector("colgroup");
-  var tbody = table.querySelector("tbody");
-  var columnCount = (data.highest - data.lowest) + 1;
-  var rowCount = Math.floor(data.duration / data.resolution) + 1;
-  for (var i = 0; i < rowCount; i++) {
-    var row = tbody.insertRow();
-    var rowNumber = row.insertCell();
+musicPad.onWords = function(response) {
+  let words = document.getElementById("words");
+  words.innerHTML = "";
+  let spanCount = Math.floor(response.duration / response.resolution) + 1;
+  for (let i = 0; i < spanCount; i++) {
+    let span = document.createElement("span");
+    span.innerHTML = "&nbsp;";
+    words.appendChild(span);
+  }
+  for (let w in response.lyrics) {
+    let lyric = response.lyrics[w];
+    let index = Math.floor(lyric.tick / response.resolution);
+    words.childNodes[index].innerHTML += musicPad.formatText(lyric.lyric);
+  }
+}
+
+musicPad.onMusic = function(response) {
+  let cells = [];
+  let template = document.getElementById("prompter");
+  let prompter = template.cloneNode(true);
+  prompter.id = "prompter-" + response.index;
+  prompter.className += " " + response.mappingType;
+  let table = prompter.querySelector("table");
+  let colgroup = prompter.querySelector("colgroup");
+  let tbody = table.querySelector("tbody");
+  let columnCount = (response.highest - response.lowest) + 1;
+  let rowCount = Math.floor(response.duration / response.resolution) + 1;
+  for (let i = 0; i < rowCount; i++) {
+    let row = tbody.insertRow();
+    let rowNumber = row.insertCell();
     rowNumber.innerHTML = i + 1;
-    words[i] = row.insertCell();
     cells[i] = [];
-    for (var j = 0; j < columnCount; j++) {
-      var cell = row.insertCell();
+    for (let j = 0; j < columnCount; j++) {
+      let cell = row.insertCell();
       cells[i][j] = cell;
     }
   }
-  for (var n in data.legend) {
-    var col = document.createElement("col");
-    var name = data.legend[n];
-    if (name.endsWith("#")) {
+  for (let n in response.legend) {
+    let col = document.createElement("col");
+    let name = response.legend[n];
+    if (name.endsWith("#") || name.startsWith("\u2191")) {
       col.className = "sharp";
     } else {
       col.className = "normal";
     }
     colgroup.appendChild(col);
   }
-  for (var w in data.words) {
-    var word = data.words[w];
-    var row = Math.floor(word.tick / data.resolution);
-    words[row].innerHTML = musicPad.formatText(word.text);
-  }
-  for (var m in data.music) {
-    var music = data.music[m];
-    var row = Math.floor(music.tick / data.resolution);
-    var column = music.note - data.lowest;
-    var name = data.legend[music.note - data.lowest];
+  console.log("Preparing to initialize music");
+  for (let m in response.sounds) {
+    let sound = response.sounds[m];
+    let row = Math.floor(sound.tick / response.resolution);
+    let column = sound.sound - response.lowest;
+    let name = response.legend[sound.sound - response.lowest];
     cells[row][column].innerHTML = name;
-    var count = Math.floor(music.duration / data.resolution);
-    for (var i = 1; i < count; i++) {
+    let count = Math.floor(sound.duration / response.resolution);
+    for (let i = 1; i < count; i++) {
       cells[row+i][column].innerHTML = "|";
     }
   }
-  var prompters = document.getElementById("prompters");
-  var oldPrompter = document.getElementById(prompter.id);
+  let music = document.getElementById("music");
+  let oldPrompter = document.getElementById(prompter.id);
   if (oldPrompter) {
-    prompters.replaceChild(prompter, oldPrompter);
+    music.replaceChild(prompter, oldPrompter);
   } else {
-    prompters.appendChild(prompter);
+    music.appendChild(prompter);
   }
 }
 
 musicPad.onTick = function(tick) {
   console.log("tick="+tick);  
-  var index = tick / 512; // resolution
-  var prompters = document.querySelector("#prompters");
-  var prompter = prompters.firstChild;
+  let index = tick / 512; // resolution
+  let words = document.getElementById("words");
+  let spans = words.children;
+  if (index < spans.length) {
+    let word = spans.item(index);
+    words.scrollLeft = word.offsetLeft;
+  }
+  let music = document.getElementById("music");
+  let prompter = music.firstChild;
   if (prompter) {
-    var table = prompter.querySelector("table");
-    var rows = table.rows;
-    var offsetTop = rows[index].offsetTop;
-    prompters.scrollTop = offsetTop;
-    console.log("offsetTop="+offsetTop+", prompters.scrollTop="+prompters.scrollTop);
+    let table = prompter.querySelector("table");
+    let rows = table.rows;
+    let offsetTop = rows[index].offsetTop;
+    music.scrollTop = offsetTop;
+    console.log("offsetTop="+offsetTop+", music.scrollTop="+music.scrollTop);
   }
 }
 
@@ -96,7 +110,7 @@ musicPad.onLoad = function() {
 }
 
 musicPad.createWebSocketClient = function() {
-  var ws = new WebSocket("ws://localhost:8080/v1/message");
+  let ws = new WebSocket("ws://localhost:8080/v1/message");
   ws.onopen = function() {
     console.log("ws.onopen: entered");
   }
@@ -111,7 +125,7 @@ musicPad.createWebSocketClient = function() {
 }
 
 musicPad.request = function(resource) {
-  var httpRequest = new XMLHttpRequest();
+  let httpRequest = new XMLHttpRequest();
   httpRequest.onreadystatechange = function() {
     if (httpRequest.readyState == 4 && httpRequest.status == 200) {
       musicPad.processResponse(httpRequest.responseText);
@@ -122,10 +136,13 @@ musicPad.request = function(resource) {
 }
 
 musicPad.processResponse = function(json) {
-  var response = JSON.parse(json);
+  let response = JSON.parse(json);
   switch (response.type) {
-  case "OnPrompterData":
-    musicPad.onPrompterData(response.prompterData);
+  case "OnWords":
+    musicPad.onWords(response);
+    break;
+  case "OnMusic":
+    musicPad.onMusic(response);
     break;
   case "OnTick":
     musicPad.onTick(response.tick);

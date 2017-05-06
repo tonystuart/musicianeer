@@ -12,7 +12,7 @@ package com.example.afs.musicpad.transport;
 import com.example.afs.musicpad.Command;
 import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnCommand;
-import com.example.afs.musicpad.message.OnSongSelected;
+import com.example.afs.musicpad.message.OnSong;
 import com.example.afs.musicpad.message.OnTick;
 import com.example.afs.musicpad.song.Default;
 import com.example.afs.musicpad.song.Song;
@@ -27,7 +27,7 @@ public class MetronomeTask extends BrokerTask<Message> {
 
   public MetronomeTask(Broker<Message> broker) {
     super(broker);
-    subscribe(OnSongSelected.class, message -> doSongSelected(message.getSong()));
+    subscribe(OnSong.class, message -> doSongSelected(message.getSong()));
     subscribe(OnCommand.class, message -> doCommand(message.getCommand(), message.getParameter()));
   }
 

@@ -14,7 +14,7 @@ import com.example.afs.musicpad.device.midi.configuration.ChannelState;
 import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnChannelState;
 import com.example.afs.musicpad.message.OnCommand;
-import com.example.afs.musicpad.message.OnSongSelected;
+import com.example.afs.musicpad.message.OnSong;
 import com.example.afs.musicpad.midi.Instruments;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.song.Song;
@@ -29,7 +29,7 @@ public class AnalyzerTask extends BrokerTask<Message> {
   public AnalyzerTask(Broker<Message> broker) {
     super(broker);
     subscribe(OnCommand.class, message -> doCommand(message.getCommand(), message.getParameter()));
-    subscribe(OnSongSelected.class, message -> doSongSelected(message.getSong()));
+    subscribe(OnSong.class, message -> doSongSelected(message.getSong()));
   }
 
   private void doCommand(Command command, int parameter) {

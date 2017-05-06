@@ -7,7 +7,7 @@
 // This program is made available on an "as is" basis, without
 // warranties or conditions of any kind, either express or implied.
 
-package com.example.afs.musicpad.player;
+package com.example.afs.musicpad.message;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -17,17 +17,17 @@ import com.example.afs.musicpad.device.common.Device;
 import com.example.afs.musicpad.song.Default;
 import com.example.afs.musicpad.song.Song;
 
-public class PrompterData {
+public class OnMusic extends Message {
 
-  public static class BrowserMusic {
+  public static class Sound {
 
     private long tick;
-    private int note;
+    private int sound;
     private int duration;
 
-    public BrowserMusic(long tick, int note, int duration) {
+    public Sound(long tick, int sound, int duration) {
       this.tick = tick;
-      this.note = note;
+      this.sound = sound;
       this.duration = duration;
     }
 
@@ -35,8 +35,8 @@ public class PrompterData {
       return duration;
     }
 
-    public int getNote() {
-      return note;
+    public int getSound() {
+      return sound;
     }
 
     public long getTick() {
@@ -45,31 +45,7 @@ public class PrompterData {
 
     @Override
     public String toString() {
-      return "BrowserMusic [tick=" + tick + ", note=" + note + ", duration=" + duration + "]";
-    }
-  }
-
-  public static class BrowserWords {
-
-    private long tick;
-    private String text;
-
-    public BrowserWords(long tick, String words) {
-      this.tick = tick;
-      this.text = words;
-    }
-
-    public String getText() {
-      return text;
-    }
-
-    public long getTick() {
-      return tick;
-    }
-
-    @Override
-    public String toString() {
-      return "BrowserWords [tick=" + tick + ", text=" + text + "]";
+      return "Sound [tick=" + tick + ", sound=" + sound + ", duration=" + duration + "]";
     }
   }
 
@@ -78,22 +54,20 @@ public class PrompterData {
   private int lowest;
   private int highest;
   private long duration;
-  private String type;
+  private String mappingType;
   private String[] legend;
   private int resolution = Default.RESOLUTION;
-  private List<BrowserWords> words = new LinkedList<>();
-  private List<BrowserMusic> music = new LinkedList<>();
+  private List<Sound> sounds = new LinkedList<>();
 
-  public PrompterData(Song song, Device device, String[] legend, int lowest, int highest, List<BrowserWords> words, List<BrowserMusic> music) {
+  public OnMusic(Song song, Device device, String[] legend, int lowest, int highest, List<Sound> sounds) {
     this.duration = song.getDuration();
     this.index = device.getIndex();
     this.channel = device.getChannel();
-    this.type = device.getInputMapping().getClass().getSimpleName();
+    this.mappingType = device.getInputMapping().getClass().getSimpleName();
     this.legend = legend;
     this.lowest = lowest;
     this.highest = highest;
-    this.words = words;
-    this.music = music;
+    this.sounds = sounds;
   }
 
   public int getChannel() {
@@ -120,21 +94,17 @@ public class PrompterData {
     return lowest;
   }
 
-  public List<BrowserMusic> getMusic() {
-    return music;
-  }
-
   public int getResolution() {
     return resolution;
   }
 
-  public List<BrowserWords> getWords() {
-    return words;
+  public List<Sound> getSounds() {
+    return sounds;
   }
 
   @Override
   public String toString() {
-    return "PrompterData [index=" + index + ", channel=" + channel + ", lowest=" + lowest + ", highest=" + highest + ", duration=" + duration + ", type=" + type + ", legend=" + Arrays.toString(legend) + ", resolution=" + resolution + "]";
+    return "OnChannelNotes [index=" + index + ", channel=" + channel + ", lowest=" + lowest + ", highest=" + highest + ", duration=" + duration + ", mappingType=" + mappingType + ", legend=" + Arrays.toString(legend) + ", resolution=" + resolution + "]";
   }
 
 }

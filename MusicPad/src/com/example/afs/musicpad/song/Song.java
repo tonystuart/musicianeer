@@ -60,7 +60,7 @@ public class Song {
   }
 
   public long append(Song newSong) {
-    long lastTick = getLength();
+    long lastTick = getLastTick();
     long appendTick = roundTickToNextMeasure(lastTick);
     if (newSong.notes.size() > 0) {
       long baseTick = newSong.notes.first().getTick();
@@ -132,7 +132,7 @@ public class Song {
     return channelFacets.getFacet(channel).getHighestMidiNote();
   }
 
-  public long getLength() {
+  public long getLastTick() {
     long length;
     if (notes.size() == 0) {
       length = 0;

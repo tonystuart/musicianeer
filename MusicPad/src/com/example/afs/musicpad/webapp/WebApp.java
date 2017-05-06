@@ -24,7 +24,8 @@ import org.eclipse.jetty.util.log.Log;
 import org.eclipse.jetty.util.log.Logger;
 
 import com.example.afs.musicpad.message.Message;
-import com.example.afs.musicpad.message.OnPrompterData;
+import com.example.afs.musicpad.message.OnMusic;
+import com.example.afs.musicpad.message.OnWords;
 import com.example.afs.musicpad.message.OnTick;
 import com.example.afs.musicpad.task.BrokerTask;
 import com.example.afs.musicpad.util.Broker;
@@ -33,16 +34,18 @@ public class WebApp extends BrokerTask<Message> {
 
   private static final Logger LOG = Log.getLogger(WebApp.class);
   private static final int PORT = 8080;
-  private static final int CLIENTS = 10;
 
+  private static final int CLIENTS = 10;
   private Server server;
+
   private BlockingQueue<MessageWebSocket> messageWebSockets = new LinkedBlockingQueue<>(CLIENTS);
 
   public WebApp(Broker<Message> broker) {
     super(broker);
     createServer();
-    subscribe(OnPrompterData.class, message -> onMessage(message));
-    subscribe(OnTick.class, message -> onMessage(message));
+    subscribe(OnWords.class, message -> doMessage(message));
+    subscribe(OnMusic.class, message -> doMessage(message));
+    subscribe(OnTick.class, message -> doMessage(message));
   }
 
   public void addMessageWebSocket(MessageWebSocket messageWebSocket) {
@@ -101,18 +104,18 @@ public class WebApp extends BrokerTask<Message> {
     return webSocketServletHolder;
   }
 
+  private void doMessage(Message message) {
+    for (MessageWebSocket messageWebSocket : messageWebSockets) {
+      messageWebSocket.write(message);
+    }
+  }
+
   private String getResourceBase() {
     String packageName = getClass().getPackage().getName() + ".client";
     String packageFolder = packageName.replace(".", "/");
     URL resource = getClass().getClassLoader().getResource(packageFolder);
     String resourceBase = resource.toExternalForm();
     return resourceBase;
-  }
-
-  private void onMessage(Message message) {
-    for (MessageWebSocket messageWebSocket : messageWebSockets) {
-      messageWebSocket.write(message);
-    }
   }
 
 }

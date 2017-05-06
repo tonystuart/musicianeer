@@ -21,8 +21,7 @@ import com.example.afs.musicpad.message.OnControlChange;
 import com.example.afs.musicpad.message.OnNoteOff;
 import com.example.afs.musicpad.message.OnNoteOn;
 import com.example.afs.musicpad.message.OnPitchBend;
-import com.example.afs.musicpad.message.OnPrompterData;
-import com.example.afs.musicpad.message.OnSongSelected;
+import com.example.afs.musicpad.message.OnSong;
 import com.example.afs.musicpad.player.Player;
 import com.example.afs.musicpad.player.Player.Action;
 import com.example.afs.musicpad.player.PlayerFactory;
@@ -49,7 +48,7 @@ public class DeviceHandler extends BrokerTask<Message> implements Controllable {
     delegate(OnControlChange.class, message -> doControlChange(message.getControl(), message.getValue()));
     delegate(OnPitchBend.class, message -> doPitchBend(message.getPitchBend()));
     delegate(OnCommand.class, message -> doCommand(message));
-    subscribe(OnSongSelected.class, message -> doSongSelected(message.getSong()));
+    subscribe(OnSong.class, message -> doSongSelected(message.getSong()));
   }
 
   private void doCommand(OnCommand message) {
@@ -123,7 +122,7 @@ public class DeviceHandler extends BrokerTask<Message> implements Controllable {
   private void updatePlayer() {
     this.player = playerFactory.createPlayer(song, device);
     getBroker().publish(new OnCommand(Command.SHOW_CHANNEL_INFO, 0));
-    getBroker().publish(new OnPrompterData(player.getPrompterData()));
+    getBroker().publish(player.getOnSongMusic());
   }
 
 }
