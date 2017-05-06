@@ -26,30 +26,29 @@ musicPad.onMusic = function(response) {
   let prompter = template.cloneNode(true);
   prompter.id = "prompter-" + response.index;
   prompter.className += " " + response.mappingType;
-  let table = prompter.querySelector("table");
-  let colgroup = prompter.querySelector("colgroup");
-  let tbody = table.querySelector("tbody");
+  let table = prompter.querySelector(".prompter-table");
   let columnCount = (response.highest - response.lowest) + 1;
   let rowCount = Math.floor(response.duration / response.resolution) + 1;
   for (let i = 0; i < rowCount; i++) {
-    let row = tbody.insertRow();
-    let rowNumber = row.insertCell();
-    rowNumber.innerHTML = i + 1;
+    let row = document.createElement("div");
+    row.className = "prompter-row";
+    let beat = document.createElement("div");
+    beat.className = "beat";
+    row.appendChild(beat);
+    beat.innerHTML = i + 1;
     cells[i] = [];
     for (let j = 0; j < columnCount; j++) {
-      let cell = row.insertCell();
+      let cell = document.createElement("div");
+      row.appendChild(cell);
+      let name = response.legend[j];
+      if (name.endsWith("#") || name.startsWith("\u2191")) {
+        cell.className = "sharp";
+      } else {
+        cell.className = "normal";
+      }
       cells[i][j] = cell;
     }
-  }
-  for (let n in response.legend) {
-    let col = document.createElement("col");
-    let name = response.legend[n];
-    if (name.endsWith("#") || name.startsWith("\u2191")) {
-      col.className = "sharp";
-    } else {
-      col.className = "normal";
-    }
-    colgroup.appendChild(col);
+    table.appendChild(row);
   }
   console.log("Preparing to initialize music");
   for (let m in response.sounds) {

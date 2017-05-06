@@ -90,34 +90,40 @@ input[type='text'] {
 	display: none;
 }
 
-.prompter-table table {
+.prompter-table {
 	border-left: 1px solid black;
 	border-spacing: 0;
 }
 
-.prompter-table td {
+.prompter-row {
+	display: flex;
+	flex-direction: row;
+}
+
+.prompter-row div {
   border-left: 1px solid gray;
+  text-align: center;
 }
 
 #templates {
 	display: none;
 }
 
-table {
-	font-size: 10px;
-}
-
-td {
-	text-align: center;
+.beat {
+  min-width: 3em;
 }
 
 .sharp {
 	background-color: lightgray;
 	width: 15px;
+	flex-grow: 1;
+	flex-shrink: 2;
 }
 
 .normal {
 	background-color: white;
 	width: 25px;
+	flex-grow: 2;
+	flex-shrink: 1;
 }
 
