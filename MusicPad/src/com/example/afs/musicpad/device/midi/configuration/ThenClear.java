@@ -9,7 +9,6 @@
 
 package com.example.afs.musicpad.device.midi.configuration;
 
-
 public class ThenClear extends Then {
 
   public ThenClear(int lineIndex, String[] tokens) {

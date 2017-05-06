@@ -9,7 +9,6 @@
 
 package com.example.afs.musicpad.device.midi.configuration;
 
-
 public class ThenSendDeviceMessage extends Then {
 
   public ThenSendDeviceMessage(int lineIndex, String[] tokens) {

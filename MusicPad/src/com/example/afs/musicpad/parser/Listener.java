@@ -9,7 +9,6 @@
 
 package com.example.afs.musicpad.parser;
 
-
 public interface Listener {
 
   void onBegin(String fileName);

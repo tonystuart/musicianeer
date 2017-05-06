@@ -22,12 +22,12 @@ public class ActiveNote {
     this.velocity = velocity;
   }
 
-  public int getProgram() {
-    return program;
-  }
-
   public int getMidiNote() {
     return midiNote;
+  }
+
+  public int getProgram() {
+    return program;
   }
 
   public long getTick() {

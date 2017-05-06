@@ -9,7 +9,6 @@
 
 package com.example.afs.musicpad.message;
 
-
 public class Message {
 
   private String type = getClass().getSimpleName();

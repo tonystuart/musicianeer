@@ -9,7 +9,6 @@
 
 package com.example.afs.musicpad.util;
 
-
 public class Velocity {
 
   public static int scale(int velocity, int percent) {

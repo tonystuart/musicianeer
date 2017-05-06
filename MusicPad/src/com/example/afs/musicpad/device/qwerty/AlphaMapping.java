@@ -9,7 +9,6 @@
 
 package com.example.afs.musicpad.device.qwerty;
 
-
 public class AlphaMapping extends QwertyMapping {
 
   private static final String[] KEY_SEQUENCE = new String[] {
