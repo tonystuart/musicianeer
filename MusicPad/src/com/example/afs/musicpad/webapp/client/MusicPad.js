@@ -49,7 +49,6 @@ musicPad.onMusic = function(response) {
     }
     table.appendChild(row);
   }
-  console.log("Preparing to initialize music");
   for (let m in response.sounds) {
     let sound = response.sounds[m];
     let row = Math.floor(sound.tick / response.resolution);
@@ -71,7 +70,6 @@ musicPad.onMusic = function(response) {
 }
 
 musicPad.onTick = function(tick) {
-  console.log("tick="+tick);  
   let index = tick / 512; // resolution
   let words = document.getElementById("words");
   let spans = words.children;
@@ -82,11 +80,10 @@ musicPad.onTick = function(tick) {
   let music = document.getElementById("music");
   let prompter = music.firstChild;
   if (prompter) {
-    let table = prompter.querySelector("table");
-    let rows = table.rows;
-    let offsetTop = rows[index].offsetTop;
+    let table = prompter.querySelector(".prompter-table");
+    let rows = table.children;
+    let offsetTop = rows[index].offsetTop - prompter.offsetTop;
     music.scrollTop = offsetTop;
-    console.log("offsetTop="+offsetTop+", music.scrollTop="+music.scrollTop);
   }
 }
 
@@ -113,7 +110,6 @@ musicPad.createWebSocketClient = function() {
     console.log("ws.onopen: entered");
   }
   ws.onmessage = function(message) {
-    console.log("ws.onmessage: entered");
     musicPad.processResponse(message.data);
   }
   ws.onclose = function() {
