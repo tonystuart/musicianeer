@@ -7,19 +7,23 @@
 // This program is made available on an "as is" basis, without
 // warranties or conditions of any kind, either express or implied.
 
-package com.example.afs.musicpad.device.common;
+package com.example.afs.musicpad.message;
 
-public interface InputMapping {
+public class OnDeviceAttached extends Message {
 
-  int getDefaultOctave();
+  private int index;
 
-  int getDefaultRange();
+  public OnDeviceAttached(int index) {
+    this.index = index;
+  }
 
-  int getOctave();
+  public int getIndex() {
+    return index;
+  }
 
-  void setOctave(int octave);
+  @Override
+  public String toString() {
+    return "OnDeviceAttached [index=" + index + "]";
+  }
 
-  String toKeyCap(int midiNote);
-
-  int toMidiNote(int inputCode);
 }

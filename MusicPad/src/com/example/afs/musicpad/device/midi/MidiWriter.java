@@ -16,7 +16,6 @@ import javax.sound.midi.Receiver;
 import javax.sound.midi.ShortMessage;
 
 import com.example.afs.musicpad.Command;
-import com.example.afs.musicpad.device.common.ControllableGroup.Controllable;
 import com.example.afs.musicpad.device.midi.configuration.ChannelState;
 import com.example.afs.musicpad.device.midi.configuration.Context;
 import com.example.afs.musicpad.device.midi.configuration.Context.HasSendDeviceMessage;
@@ -32,7 +31,7 @@ import com.example.afs.musicpad.util.DirectList;
 import com.example.afs.musicpad.util.RandomAccessList;
 import com.example.afs.musicpad.util.Value;
 
-public class MidiWriter extends BrokerTask<Message> implements Controllable, HasSendDeviceMessage {
+public class MidiWriter extends BrokerTask<Message> implements HasSendDeviceMessage {
 
   private Context context;
   private MidiDeviceBundle device;

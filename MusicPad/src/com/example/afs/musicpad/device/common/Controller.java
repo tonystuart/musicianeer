@@ -9,17 +9,12 @@
 
 package com.example.afs.musicpad.device.common;
 
-public interface InputMapping {
+public interface Controller {
 
-  int getDefaultOctave();
+  int getIndex();
 
-  int getDefaultRange();
+  void start();
 
-  int getOctave();
+  void terminate();
 
-  void setOctave(int octave);
-
-  String toKeyCap(int midiNote);
-
-  int toMidiNote(int inputCode);
 }

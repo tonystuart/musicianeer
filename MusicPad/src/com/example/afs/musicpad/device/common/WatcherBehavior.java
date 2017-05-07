@@ -9,17 +9,14 @@
 
 package com.example.afs.musicpad.device.common;
 
-public interface InputMapping {
+import java.util.Map;
 
-  int getDefaultOctave();
+public interface WatcherBehavior {
 
-  int getDefaultRange();
+  Controller attachDevice(DeviceHandler deviceHandler, DeviceBundle deviceBundle);
 
-  int getOctave();
+  void detachDevice(String name, Controller controller);
 
-  void setOctave(int octave);
+  Map<String, DeviceBundle> getDevices();
 
-  String toKeyCap(int midiNote);
-
-  int toMidiNote(int inputCode);
 }

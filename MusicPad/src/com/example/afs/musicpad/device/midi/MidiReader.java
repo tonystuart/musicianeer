@@ -18,7 +18,6 @@ import javax.sound.midi.Receiver;
 import javax.sound.midi.ShortMessage;
 
 import com.example.afs.musicpad.Command;
-import com.example.afs.musicpad.device.common.ControllableGroup.Controllable;
 import com.example.afs.musicpad.device.midi.configuration.Context;
 import com.example.afs.musicpad.device.midi.configuration.Context.HasSendCommand;
 import com.example.afs.musicpad.device.midi.configuration.Context.HasSendDeviceMessage;
@@ -35,7 +34,7 @@ import com.example.afs.musicpad.message.OnNoteOn;
 import com.example.afs.musicpad.message.OnPitchBend;
 import com.example.afs.musicpad.util.Broker;
 
-public class MidiReader implements Controllable, HasSendCommand, HasSendDeviceMessage, HasSendHandlerMessage {
+public class MidiReader implements HasSendCommand, HasSendDeviceMessage, HasSendHandlerMessage {
 
   private class MidiReceiver implements Receiver {
 
@@ -88,11 +87,9 @@ public class MidiReader implements Controllable, HasSendCommand, HasSendDeviceMe
     queue.add(new OnNoteOn(data1));
   }
 
-  @Override
   public void start() {
   }
 
-  @Override
   public void terminate() {
     disconnectDevices();
   }

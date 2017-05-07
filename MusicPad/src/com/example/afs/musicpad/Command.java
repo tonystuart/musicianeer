@@ -37,5 +37,6 @@ public enum Command {
   TRANSPOSE, //
   TRON, //
   TROFF, //
+  DETACH, //
   QUIT, //
 }

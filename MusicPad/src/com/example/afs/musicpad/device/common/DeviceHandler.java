@@ -9,9 +9,11 @@
 
 package com.example.afs.musicpad.device.common;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.example.afs.fluidsynth.Synthesizer;
 import com.example.afs.musicpad.Command;
-import com.example.afs.musicpad.device.common.ControllableGroup.Controllable;
 import com.example.afs.musicpad.device.midi.MidiMapping;
 import com.example.afs.musicpad.device.qwerty.AlphaMapping;
 import com.example.afs.musicpad.device.qwerty.NumericMapping;
@@ -32,23 +34,75 @@ import com.example.afs.musicpad.util.Broker;
 import com.example.afs.musicpad.util.Range;
 import com.example.afs.musicpad.util.Value;
 
-public class DeviceHandler extends BrokerTask<Message> implements Controllable {
+public class DeviceHandler extends BrokerTask<Message> {
 
-  private Device device;
+  private static int nextDeviceIndex;
+  private static Map<String, Integer> devices = new HashMap<>();
+
+  private static synchronized int getDeviceIndex(String name) {
+    Integer deviceIndex = devices.get(name);
+    if (deviceIndex == null) {
+      deviceIndex = nextDeviceIndex++;
+      devices.put(name, deviceIndex);
+    }
+    return deviceIndex;
+  }
+
   private Player player;
   private PlayerFactory playerFactory;
   private Song song = Default.SONG;
+  private final String name;
+  private final int index;
+  private int channel;
+  private InputMapping inputMapping;
+  private Synthesizer synthesizer;
 
-  public DeviceHandler(Broker<Message> messageBroker, Synthesizer synthesizer, Device device) {
+  public DeviceHandler(Broker<Message> messageBroker, Synthesizer synthesizer, String name) {
     super(messageBroker);
-    this.device = device;
-    this.playerFactory = new PlayerFactory(synthesizer);
+    this.synthesizer = synthesizer;
+    this.name = name;
+    this.index = getDeviceIndex(name);
+    this.playerFactory = new PlayerFactory(this);
     delegate(OnNoteOn.class, message -> doNoteOn(message.getMidiNote()));
     delegate(OnNoteOff.class, message -> doNoteOff(message.getMidiNote()));
     delegate(OnControlChange.class, message -> doControlChange(message.getControl(), message.getValue()));
     delegate(OnPitchBend.class, message -> doPitchBend(message.getPitchBend()));
     delegate(OnCommand.class, message -> doCommand(message));
     subscribe(OnSong.class, message -> doSongSelected(message.getSong()));
+  }
+
+  @Override
+  public Broker<Message> getBroker() {
+    return super.getBroker();
+  }
+
+  public int getChannel() {
+    return channel;
+  }
+
+  public int getIndex() {
+    return index;
+  }
+
+  public InputMapping getInputMapping() {
+    return inputMapping;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public Synthesizer getSynthesizer() {
+    return synthesizer;
+  }
+
+  public void setChannel(int channel) {
+    this.channel = channel;
+  }
+
+  public void setInputMapping(InputMapping inputMapping) {
+    this.inputMapping = inputMapping;
+    updatePlayer();
   }
 
   private void doCommand(OnCommand message) {
@@ -65,13 +119,13 @@ public class DeviceHandler extends BrokerTask<Message> implements Controllable {
       setVelocity(parameter);
       break;
     case SET_ALPHA_MAPPING:
-      setMapping(new AlphaMapping());
+      setInputMapping(new AlphaMapping());
       break;
     case SET_NUMERIC_MAPPING:
-      setMapping(new NumericMapping());
+      setInputMapping(new NumericMapping());
       break;
     case SET_MIDI_MAPPING:
-      setMapping(new MidiMapping());
+      setInputMapping(new MidiMapping());
       break;
     default:
       getBroker().publish(message);
@@ -102,7 +156,7 @@ public class DeviceHandler extends BrokerTask<Message> implements Controllable {
   }
 
   private void selectChannel(int channel) {
-    device.setChannel(channel);
+    this.channel = channel;
     updatePlayer();
   }
 
@@ -110,17 +164,12 @@ public class DeviceHandler extends BrokerTask<Message> implements Controllable {
     player.selectProgram(program);
   }
 
-  private void setMapping(InputMapping inputMapping) {
-    device.setInputMapping(inputMapping);
-    updatePlayer();
-  }
-
   private void setVelocity(int velocity) {
     player.setPercentVelocity(Range.scaleMidiToPercent(velocity));
   }
 
   private void updatePlayer() {
-    this.player = playerFactory.createPlayer(song, device);
+    this.player = playerFactory.createPlayer(song);
     getBroker().publish(new OnCommand(Command.SHOW_CHANNEL_INFO, 0));
     getBroker().publish(player.getOnSongMusic());
   }

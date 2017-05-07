@@ -21,7 +21,7 @@ import com.example.afs.musicpad.message.OnNoteOn;
 public class CommandBuilder {
 
   private BlockingQueue<Message> queue;
-  private Device device;
+  private DeviceHandler deviceHandler;
 
   private StringBuilder currentField;
   private StringBuilder left = new StringBuilder();
@@ -30,9 +30,9 @@ public class CommandBuilder {
   private boolean sharp;
   private int[] activeMidiNotes = new int[256]; // NB: KeyEvents VK codes, not midiNotes
 
-  public CommandBuilder(BlockingQueue<Message> queue, Device device) {
+  public CommandBuilder(BlockingQueue<Message> queue, DeviceHandler deviceHandler) {
     this.queue = queue;
-    this.device = device;
+    this.deviceHandler = deviceHandler;
   }
 
   public int processKeyDown(int inputCode) {
@@ -44,6 +44,9 @@ public class CommandBuilder {
       } else if (inputCode == KeyEvent.VK_SHIFT) {
         sharp = true;
         ignoreCount = 0;
+      } else if (inputCode == KeyEvent.VK_ESCAPE) {
+        queue.add(new OnCommand(Command.DETACH, deviceHandler.getIndex()));
+        ignoreCount = 1;
       } else {
         int midiNote = getMidiNote(inputCode);
         activeMidiNotes[inputCode] = midiNote;
@@ -117,7 +120,7 @@ public class CommandBuilder {
   }
 
   private int getMidiNote(int inputCode) {
-    int midiNote = device.getInputMapping().toMidiNote(inputCode);
+    int midiNote = deviceHandler.getInputMapping().toMidiNote(inputCode);
     if (sharp) {
       midiNote++;
     }

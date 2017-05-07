@@ -17,10 +17,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import com.example.afs.fluidsynth.Synthesizer;
 import com.example.afs.musicpad.analyzer.ChordFinder;
-import com.example.afs.musicpad.device.common.Device;
-import com.example.afs.musicpad.device.common.InputMapping;
+import com.example.afs.musicpad.device.common.DeviceHandler;
 import com.example.afs.musicpad.message.OnMusic;
 import com.example.afs.musicpad.message.OnMusic.Legend;
 import com.example.afs.musicpad.message.OnMusic.Sound;
@@ -39,8 +37,8 @@ public class ChordPlayer extends Player {
   private Map<ChordType, Integer> chordTypeToMidiNoteIndex = new HashMap<>();
   private Map<Integer, ChordType> midiNoteIndexToChordType = new HashMap<>();
 
-  public ChordPlayer(Synthesizer synthesizer, Song song, Device device) {
-    super(synthesizer, song, device);
+  public ChordPlayer(DeviceHandler deviceHandler, Song song) {
+    super(deviceHandler, song);
     initializeOctave();
     initializeChords();
   }
@@ -66,7 +64,7 @@ public class ChordPlayer extends Player {
       songMusicList.add(sound);
     }
     Legend[] legend = getLegend(lowest, highest);
-    OnMusic onMusic = new OnMusic(song, device, legend, lowest, highest, songMusicList);
+    OnMusic onMusic = new OnMusic(song, index, songChannel, mappingType, legend, lowest, highest, songMusicList);
     return onMusic;
   }
 
@@ -81,7 +79,7 @@ public class ChordPlayer extends Player {
 
   private void initializeChords() {
     ChordFinder chordFinder = new ChordFinder();
-    chords = chordFinder.getChords(song.getNotes(), device.getChannel());
+    chords = chordFinder.getChords(song.getNotes(), songChannel);
     Set<ChordType> uniqueChordTypes = new HashSet<>();
     for (Chord chord : chords) {
       uniqueChordTypes.add(chord.getChordType());
@@ -97,9 +95,7 @@ public class ChordPlayer extends Player {
   }
 
   private void initializeOctave() {
-    int channel = device.getChannel();
-    InputMapping inputMapping = device.getInputMapping();
-    int averageMidiNote = song.getAverageMidiNote(channel);
+    int averageMidiNote = song.getAverageMidiNote(songChannel);
     int octave = averageMidiNote / Midi.SEMITONES_PER_OCTAVE;
     baseMidiNote = octave * Midi.SEMITONES_PER_OCTAVE;
     inputMapping.setOctave(octave);

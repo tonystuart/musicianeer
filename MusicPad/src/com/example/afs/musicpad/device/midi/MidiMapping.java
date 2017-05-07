@@ -18,7 +18,12 @@ public class MidiMapping implements InputMapping {
 
   @Override
   public int getDefaultOctave() {
-    return 36;
+    return 3;
+  }
+
+  @Override
+  public int getDefaultRange() {
+    return 49;
   }
 
   @Override

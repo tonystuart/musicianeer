@@ -9,7 +9,6 @@
 
 package com.example.afs.musicpad.device.qwerty;
 
-import java.awt.event.KeyEvent;
 import java.io.FileDescriptor;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -19,26 +18,25 @@ import java.util.concurrent.BlockingQueue;
 
 import com.example.afs.fluidsynth.FluidSynth;
 import com.example.afs.musicpad.device.common.CommandBuilder;
-import com.example.afs.musicpad.device.common.ControllableGroup.Controllable;
-import com.example.afs.musicpad.device.common.Device;
+import com.example.afs.musicpad.device.common.DeviceHandler;
 import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.util.ByteArray;
 
 // See /usr/include/linux/input.h
 // See https://www.kernel.org/doc/Documentation/input/input.txt
 
-public class QwertyReader implements Controllable {
+public class QwertyReader {
 
   private static final int EV_KEY = 0x01;
 
-  private Device device;
+  private DeviceHandler deviceHandler;
   private Thread deviceReader;
   private boolean isTerminated;
   private CommandBuilder commandBuilder;
 
-  public QwertyReader(BlockingQueue<Message> queue, Device device) {
-    this.device = device;
-    this.commandBuilder = new CommandBuilder(queue, device);
+  public QwertyReader(BlockingQueue<Message> queue, DeviceHandler deviceHandler) {
+    this.deviceHandler = deviceHandler;
+    this.commandBuilder = new CommandBuilder(queue, deviceHandler);
   }
 
   public void capture(FileInputStream fileInputStream) {
@@ -61,12 +59,7 @@ public class QwertyReader implements Controllable {
     int ignoreKeyUp;
     if (keyCode < QwertyKeyCodes.inputCodes.length) {
       char inputCode = QwertyKeyCodes.inputCodes[keyCode];
-      if (inputCode == KeyEvent.VK_ESCAPE) {
-        terminate();
-        ignoreKeyUp = 1;
-      } else {
-        ignoreKeyUp = commandBuilder.processKeyDown(inputCode);
-      }
+      ignoreKeyUp = commandBuilder.processKeyDown(inputCode);
     } else {
       // e.g. windows meta key (125)
       ignoreKeyUp = 1;
@@ -79,19 +72,17 @@ public class QwertyReader implements Controllable {
     commandBuilder.processKeyUp(inputCode);
   }
 
-  @Override
   public void start() {
-    deviceReader = new Thread(() -> run(), device.getName());
+    deviceReader = new Thread(() -> run(), deviceHandler.getName());
     deviceReader.start();
   }
 
-  @Override
   public void terminate() {
     isTerminated = true;
   }
 
   private void run() {
-    try (FileInputStream fileInputStream = new FileInputStream(device.getName())) {
+    try (FileInputStream fileInputStream = new FileInputStream(deviceHandler.getName())) {
       capture(fileInputStream);
       int ignoreKeyUp = 0;
       byte[] buffer = new byte[16];
@@ -124,7 +115,7 @@ public class QwertyReader implements Controllable {
     } catch (IOException e1) {
       throw new RuntimeException(e1);
     }
-    System.out.println("Terminating QWERTY device " + device);
+    System.out.println("Terminating QWERTY device " + deviceHandler);
   }
 
 }

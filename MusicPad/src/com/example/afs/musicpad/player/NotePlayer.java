@@ -12,9 +12,7 @@ package com.example.afs.musicpad.player;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.example.afs.fluidsynth.Synthesizer;
-import com.example.afs.musicpad.device.common.Device;
-import com.example.afs.musicpad.device.common.InputMapping;
+import com.example.afs.musicpad.device.common.DeviceHandler;
 import com.example.afs.musicpad.message.OnMusic;
 import com.example.afs.musicpad.message.OnMusic.Legend;
 import com.example.afs.musicpad.message.OnMusic.Sound;
@@ -24,17 +22,16 @@ import com.example.afs.musicpad.song.Song;
 
 public class NotePlayer extends Player {
 
-  public NotePlayer(Synthesizer synthesizer, Song song, Device device) {
-    super(synthesizer, song, device);
+  public NotePlayer(DeviceHandler deviceHandler, Song song) {
+    super(deviceHandler, song);
     initializeOctave();
   }
 
   @Override
   public OnMusic getOnSongMusic() {
-    int channel = device.getChannel();
     List<Sound> songMusicList = new LinkedList<>();
     for (Note note : song.getNotes()) {
-      if (note.getChannel() == channel) {
+      if (note.getChannel() == songChannel) {
         int midiNote = note.getMidiNote();
         long tick = note.getTick();
         int duration = (int) note.getDuration();
@@ -42,10 +39,10 @@ public class NotePlayer extends Player {
         songMusicList.add(sound);
       }
     }
-    int lowest = song.getLowestMidiNote(channel);
-    int highest = song.getHighestMidiNote(channel);
+    int lowest = getLowestMidiNote();
+    int highest = getHighestMidiNote();
     Legend[] legend = getLegend(lowest, highest);
-    OnMusic onMusic = new OnMusic(song, device, legend, lowest, highest, songMusicList);
+    OnMusic onMusic = new OnMusic(song, index, songChannel, mappingType, legend, lowest, highest, songMusicList);
     return onMusic;
   }
 
@@ -55,10 +52,8 @@ public class NotePlayer extends Player {
   }
 
   private void initializeOctave() {
-    int channel = device.getChannel();
-    InputMapping inputMapping = device.getInputMapping();
     int octave = inputMapping.getDefaultOctave();
-    int lowestMidiNote = song.getLowestMidiNote(channel);
+    int lowestMidiNote = getLowestMidiNote();
     int lowestOctave = lowestMidiNote / Midi.SEMITONES_PER_OCTAVE;
     if (lowestOctave < octave) {
       octave = lowestOctave;

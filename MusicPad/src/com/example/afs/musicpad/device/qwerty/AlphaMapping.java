@@ -12,7 +12,7 @@ package com.example.afs.musicpad.device.qwerty;
 public class AlphaMapping extends QwertyMapping {
 
   private static final String[] KEY_SEQUENCE = new String[] {
-      N + "Z", // C
+      N + "Z", // C3
       S + "Z", // C#
       N + "X", // D
       S + "X", // D#
@@ -24,7 +24,7 @@ public class AlphaMapping extends QwertyMapping {
       N + "N", // A
       S + "N", // A#
       N + "M", // B
-      N + "A", // C
+      N + "A", // C4
       S + "A", // C#
       N + "S", // D
       S + "S", // D#
@@ -36,7 +36,7 @@ public class AlphaMapping extends QwertyMapping {
       N + "H", // A
       S + "H", // A#
       N + "J", // B
-      N + "K", // C
+      N + "K", // C5
       S + "K", // C#
       N + "L", // D
       S + "L", // D#
@@ -48,7 +48,7 @@ public class AlphaMapping extends QwertyMapping {
       N + "R", // A
       S + "R", // A#
       N + "T", // B
-      N + "Y", // C
+      N + "Y", // C6
       S + "Y", // C#
       N + "U", // D
       S + "U", // D#
@@ -62,6 +62,11 @@ public class AlphaMapping extends QwertyMapping {
   @Override
   public int getDefaultOctave() {
     return 3;
+  }
+
+  @Override
+  public int getDefaultRange() {
+    return 44; // from C3 to G#6
   }
 
   @Override

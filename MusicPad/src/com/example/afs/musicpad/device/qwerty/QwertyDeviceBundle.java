@@ -7,19 +7,10 @@
 // This program is made available on an "as is" basis, without
 // warranties or conditions of any kind, either express or implied.
 
-package com.example.afs.musicpad.device.common;
+package com.example.afs.musicpad.device.qwerty;
 
-public interface InputMapping {
+import com.example.afs.musicpad.device.common.DeviceBundle;
 
-  int getDefaultOctave();
+public class QwertyDeviceBundle implements DeviceBundle {
 
-  int getDefaultRange();
-
-  int getOctave();
-
-  void setOctave(int octave);
-
-  String toKeyCap(int midiNote);
-
-  int toMidiNote(int inputCode);
 }

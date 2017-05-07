@@ -13,7 +13,6 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.example.afs.musicpad.device.common.Device;
 import com.example.afs.musicpad.song.Default;
 import com.example.afs.musicpad.song.Song;
 
@@ -87,11 +86,11 @@ public class OnMusic extends Message {
   private int resolution = Default.RESOLUTION;
   private List<Sound> sounds = new LinkedList<>();
 
-  public OnMusic(Song song, Device device, Legend[] legend, int lowest, int highest, List<Sound> sounds) {
+  public OnMusic(Song song, int index, int channel, String mappingType, Legend[] legend, int lowest, int highest, List<Sound> sounds) {
+    this.index = index;
+    this.channel = channel;
+    this.mappingType = mappingType;
     this.duration = song.getDuration();
-    this.index = device.getIndex();
-    this.channel = device.getChannel();
-    this.mappingType = device.getInputMapping().getClass().getSimpleName();
     this.legend = legend;
     this.lowest = lowest;
     this.highest = highest;

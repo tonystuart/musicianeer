@@ -13,8 +13,9 @@ import com.example.afs.fluidsynth.FluidSynth;
 import com.example.afs.fluidsynth.Synthesizer;
 import com.example.afs.fluidsynth.Synthesizer.Settings;
 import com.example.afs.musicpad.analyzer.AnalyzerTask;
-import com.example.afs.musicpad.device.midi.MidiWatcher;
-import com.example.afs.musicpad.device.qwerty.QwertyWatcher;
+import com.example.afs.musicpad.device.common.DeviceWatcher;
+import com.example.afs.musicpad.device.midi.MidiWatcherBehavior;
+import com.example.afs.musicpad.device.qwerty.QwertyWatcherBehavior;
 import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.player.Player;
 import com.example.afs.musicpad.transport.TransportTask;
@@ -35,8 +36,8 @@ public class MusicPad {
 
   private Broker<Message> broker;
   private MusicLibrary musicLibrary;
-  private MidiWatcher midiWatcher;
-  private QwertyWatcher qwertyWatcher;
+  private DeviceWatcher midiWatcher;
+  private DeviceWatcher qwertyWatcher;
   private TransportTask transportTask;
   private AnalyzerTask analyzerTask;
   private CommandProcessor commandProcessor;
@@ -46,8 +47,8 @@ public class MusicPad {
   public MusicPad(String libraryPath) {
     this.musicLibrary = new MusicLibrary(libraryPath);
     this.broker = new Broker<Message>();
-    this.midiWatcher = new MidiWatcher(broker, synthesizer);
-    this.qwertyWatcher = new QwertyWatcher(broker, synthesizer);
+    this.midiWatcher = new DeviceWatcher(broker, synthesizer, new MidiWatcherBehavior());
+    this.qwertyWatcher = new DeviceWatcher(broker, synthesizer, new QwertyWatcherBehavior());
     this.transportTask = new TransportTask(broker, synthesizer);
     this.analyzerTask = new AnalyzerTask(broker);
     this.webApp = new WebApp(broker);
