@@ -20,6 +20,13 @@ musicPad.onWords = function(response) {
   }
 }
 
+musicPad.onDeviceDetached = function(response) {
+  let prompter = document.getElementById("prompter-" + response.index);
+  if (prompter) {
+    prompter.parentNode.removeChild(prompter);
+  }
+}
+
 musicPad.onMusic = function(response) {
   let cells = [];
   let template = document.getElementById("prompter");
@@ -132,14 +139,17 @@ musicPad.request = function(resource) {
 musicPad.processResponse = function(json) {
   let response = JSON.parse(json);
   switch (response.type) {
-  case "OnWords":
-    musicPad.onWords(response);
+  case "OnDeviceDetached":
+    musicPad.onDeviceDetached(response);
     break;
   case "OnMusic":
     musicPad.onMusic(response);
     break;
   case "OnTick":
     musicPad.onTick(response.tick);
+    break;
+  case "OnWords":
+    musicPad.onWords(response);
     break;
   }
 }
