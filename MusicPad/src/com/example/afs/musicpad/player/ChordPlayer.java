@@ -11,8 +11,6 @@ package com.example.afs.musicpad.player;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -20,8 +18,6 @@ import java.util.TreeSet;
 import com.example.afs.musicpad.analyzer.ChordFinder;
 import com.example.afs.musicpad.device.common.DeviceHandler;
 import com.example.afs.musicpad.message.OnMusic;
-import com.example.afs.musicpad.message.OnMusic.Legend;
-import com.example.afs.musicpad.message.OnMusic.Sound;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.song.Chord;
 import com.example.afs.musicpad.song.Song;
@@ -47,7 +43,6 @@ public class ChordPlayer extends Player {
   public OnMusic getOnSongMusic() {
     int highest = 0;
     int lowest = Midi.MAX_VALUE;
-    List<Sound> songMusicList = new LinkedList<>();
     for (Chord chord : chords) {
       ChordType chordType = chord.getChordType();
       long tick = chord.getTick();
@@ -60,11 +55,8 @@ public class ChordPlayer extends Player {
       if (midiNote > highest) {
         highest = midiNote;
       }
-      Sound sound = new Sound(tick, midiNote, duration);
-      songMusicList.add(sound);
     }
-    Legend[] legend = getLegend(lowest, highest);
-    OnMusic onMusic = new OnMusic(song, index, songChannel, mappingType, legend, lowest, highest, songMusicList);
+    OnMusic onMusic = new OnMusic(songChannel, "Coming Soon!");
     return onMusic;
   }
 

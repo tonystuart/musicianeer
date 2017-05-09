@@ -9,129 +9,27 @@
 
 package com.example.afs.musicpad.message;
 
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-
-import com.example.afs.musicpad.song.Default;
-import com.example.afs.musicpad.song.Song;
-
 public class OnMusic extends Message {
 
-  public static class Legend {
-
-    private String keyCap;
-    private boolean isSharp;
-
-    public Legend() {
-    }
-
-    public Legend(String keyCap, boolean isSharp) {
-      this.keyCap = keyCap;
-      this.isSharp = isSharp;
-    }
-
-    public String getKeyCap() {
-      return keyCap;
-    }
-
-    public boolean isSharp() {
-      return isSharp;
-    }
-
-    @Override
-    public String toString() {
-      return "Legend [keyCap=" + keyCap + ", isSharp=" + isSharp + "]";
-    }
-
-  }
-
-  public static class Sound {
-
-    private long tick;
-    private int sound;
-    private int duration;
-
-    public Sound(long tick, int sound, int duration) {
-      this.tick = tick;
-      this.sound = sound;
-      this.duration = duration;
-    }
-
-    public int getDuration() {
-      return duration;
-    }
-
-    public int getSound() {
-      return sound;
-    }
-
-    public long getTick() {
-      return tick;
-    }
-
-    @Override
-    public String toString() {
-      return "Sound [tick=" + tick + ", sound=" + sound + ", duration=" + duration + "]";
-    }
-  }
-
   private int index;
-  private int channel;
-  private int lowest;
-  private int highest;
-  private long duration;
-  private String mappingType;
-  private Legend[] legend;
-  private int resolution = Default.RESOLUTION;
-  private List<Sound> sounds = new LinkedList<>();
+  private String music;
 
-  public OnMusic(Song song, int index, int channel, String mappingType, Legend[] legend, int lowest, int highest, List<Sound> sounds) {
+  public OnMusic(int index, String music) {
     this.index = index;
-    this.channel = channel;
-    this.mappingType = mappingType;
-    this.duration = song.getDuration();
-    this.legend = legend;
-    this.lowest = lowest;
-    this.highest = highest;
-    this.sounds = sounds;
-  }
-
-  public int getChannel() {
-    return channel;
-  }
-
-  public long getDuration() {
-    return duration;
-  }
-
-  public int getHighest() {
-    return highest;
+    this.music = music;
   }
 
   public int getIndex() {
     return index;
   }
 
-  public Legend[] getLegend() {
-    return legend;
-  }
-
-  public int getLowest() {
-    return lowest;
-  }
-
-  public int getResolution() {
-    return resolution;
-  }
-
-  public List<Sound> getSounds() {
-    return sounds;
+  public String getMusic() {
+    return music;
   }
 
   @Override
   public String toString() {
-    return "OnChannelkeyCaps [index=" + index + ", channel=" + channel + ", lowest=" + lowest + ", highest=" + highest + ", duration=" + duration + ", mappingType=" + mappingType + ", legend=" + Arrays.toString(legend) + ", resolution=" + resolution + "]";
+    return "OnMusic [index=" + index + ", music=" + music + "]";
   }
 
 }

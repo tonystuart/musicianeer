@@ -18,7 +18,6 @@ import com.example.afs.musicpad.analyzer.Names;
 import com.example.afs.musicpad.device.common.DeviceHandler;
 import com.example.afs.musicpad.device.common.InputMapping;
 import com.example.afs.musicpad.message.OnMusic;
-import com.example.afs.musicpad.message.OnMusic.Legend;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.theory.ChordType;
@@ -83,17 +82,6 @@ public abstract class Player {
       highestMidiNote = inputMapping.getDefaultOctave() * Midi.SEMITONES_PER_OCTAVE + inputMapping.getDefaultRange();
     }
     return highestMidiNote;
-  }
-
-  protected Legend[] getLegend(int lowest, int highest) {
-    int count = (highest - lowest) + 1;
-    Legend[] legend = new Legend[count];
-    for (int midiNote = lowest; midiNote <= highest; midiNote++) {
-      String keyCap = inputMapping.toKeyCap(midiNote);
-      boolean isSharp = Names.isSharp(midiNote);
-      legend[midiNote - lowest] = new Legend(keyCap, isSharp);
-    }
-    return legend;
   }
 
   protected int getLowestMidiNote() {
