@@ -36,8 +36,14 @@ musicPad.onTick = function(tick) {
   let scroller = document.getElementById("notator-scroller");
   let width = scroller.offsetWidth;
   let midPoint = width / 2;
-  scroller.scrollLeft = scaledTick + midPoint;
-  console.log("scaledTick="+scaledTick+", width="+width+", midPoint="+midPoint+", scrollLeft="+scroller.scrollLeft);
+  let firstNotatorSvg = scroller.querySelector("svg");
+  if (firstNotatorSvg) {
+    let point = firstNotatorSvg.createSVGPoint();
+    point.x = scaledTick;
+    point.y = 0;
+    let t = point.matrixTransform(firstNotatorSvg.getScreenCTM());
+    scroller.scrollLeft += t.x - midPoint;
+  }
 }
 
 musicPad.formatText = function(text) {
