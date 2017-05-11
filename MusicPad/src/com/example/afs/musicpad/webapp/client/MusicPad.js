@@ -29,7 +29,6 @@ musicPad.onMusic = function(response) {
     let scroller = document.getElementById("notator-scroller");
     scroller.appendChild(notator);
   }
-  musicPad.onTick(0);
 }
 
 musicPad.onTick = function(tick) {

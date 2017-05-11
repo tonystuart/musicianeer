@@ -12,8 +12,8 @@ body {
 }
 
 line {
-  stroke: rgb(255, 0, 0);
-  stroke-width: 10;
+  stroke: black;
+  stroke-width: 1;
 }
 
 #music-pad {
@@ -55,12 +55,14 @@ line {
 }
 
 .notator svg {
-	position: absolute;
+	bottom: 0;
 	height: 100%;
 	left: 0;
-	top: 0;
+	padding-left: calc(50%);
+	padding-right: calc(50%);
+	position: absolute;
 	right: 0;
-	bottom: 0;
+	top: 0;
 }
 
 
