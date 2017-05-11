@@ -1,56 +1,37 @@
 @CHARSET "UTF-8";
 
 html {
-	height: 100%;
-	width: 100%;
+  height: 100%;
+  width: 100%
 }
 
 body {
-	font-family: sans-serif;
+  height: 100%;
+  margin: 0px;
+  width: 100%;
+}
+
+line {
+  stroke: rgb(255, 0, 0);
+  stroke-width: 10;
+}
+
+#music-pad {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+}
+
+#channel-notators {
+	display: flex;
+	flex-direction: column;
+	position: relative;
 	height: 100%;
 	width: 100%;
-	padding: 0px;
-	margin: 0px;
-	display: flex;
-	flex-direction: column;
 }
 
-#header {
-	padding-top: 10px;
-	padding-bottom: 10px;
-}
-
-#footer {
-	padding-top: 10px;
-	padding-bottom: 10px;
-}
-
-#music {
-	border-top: 1px solid black;
-	border-bottom: 1px solid black;
-	display: flex;
-	flex-direction: column;
-	/* height: 100%; */
-	width: 100%;
-	overflow-x: auto;
-	flex-grow: 1;
-	flex-shrink: 1;
-}
-
-.prompter {
-	/* border: 1px solid gray; */
-	/* flex-grow: 1; */
-	/* flex-shrink: 1; */
-	/* background-color: red; */
-	width: 100%;
-	flex-grow: 1;
-	flex-shrink: 1;
-	border-left:  1px solid red;
-	position: relative;
-}
-
-.prompter:before {
-    content: 'This is the before content';
+#notator-cursor {
     position: absolute;
     left: 50%;
     height: 100%;
@@ -58,15 +39,28 @@ body {
     border-left: 1px solid red;
 }
 
-.prompter svg {
-	border-top: 1px solid gray;
-	padding-left: calc(100%);
-	padding-right: calc(100%);
+#notator-scroller {
+	display: flex;
+	flex-direction: column;
 	flex-grow: 1;
-	flex-shrink: 1;
+	height: 100%;
+	overflow-x: auto;
+	width: 100%;
 }
 
-#templates {
-	display: none;
+.notator {
+  flex-grow: 1;
+  flex-shrink: 1;
+  position: relative;	
 }
+
+.notator svg {
+	position: absolute;
+	height: 100%;
+	left: 0;
+	top: 0;
+	right: 0;
+	bottom: 0;
+}
+
 

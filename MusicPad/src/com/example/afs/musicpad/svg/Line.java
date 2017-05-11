@@ -9,26 +9,28 @@
 
 package com.example.afs.musicpad.svg;
 
-public class Circle extends SvgElement {
+public class Line extends SvgElement {
 
-  private int cx;
-  private int cy;
-  private int r;
+  private int x1;
+  private int y1;
+  private int x2;
+  private int y2;
 
-  public Circle(int cx, int cy, int r) {
-    this.cx = cx;
-    this.cy = cy;
-    this.r = r;
+  public Line(int x1, int y1, int x2, int y2) {
+    this.x1 = x1;
+    this.y1 = y1;
+    this.x2 = x2;
+    this.y2 = y2;
   }
 
   @Override
   public void render(StringBuilder s, int indent) {
     super.render(s, indent);
-    s.append(format("<circle cx='%d' cy='%d' r='%d'/>\n", cx, cy, r));
+    s.append(format("<line x1='%d' y1='%d' x2='%d' y2='%d'/>\n", x1, y1, x2, y2));
   }
 
   @Override
   public String toString() {
-    return "Circle [cx=" + cx + ", cy=" + cy + ", r=" + r + "]";
+    return "Line [x1=" + x1 + ", y1=" + y1 + ", x2=" + x2 + ", y2=" + y2 + "]";
   }
 }

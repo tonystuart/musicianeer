@@ -5,33 +5,40 @@ musicPad.refreshIntervalMillis = 60000;
 musicPad.lastMessageNumber = -1;
 
 musicPad.onDeviceDetached = function(response) {
-  let prompter = document.getElementById("prompter-" + response.index);
-  if (prompter) {
-    prompter.parentNode.removeChild(prompter);
+  let notator = document.getElementById("notator-" + response.index);
+  if (notator) {
+    notator.parentNode.removeChild(notator);
   }
 }
 
+musicPad.getElement = function(html) {
+  var template = document.createElement('template');
+  template.innerHTML = html;
+  return template.content.firstChild;
+}
+
 musicPad.onMusic = function(response) {
-  let prompter = document.createElement("div");
-  prompter.id = "prompter-" + response.index;
-  prompter.className = "prompter";
-  prompter.innerHTML = response.music;
-  let music = document.getElementById("music");
-  let oldPrompter = document.getElementById(prompter.id);
-  if (oldPrompter) {
-    music.replaceChild(prompter, oldPrompter);
+  let notator = document.createElement("div");
+  notator.className = "notator";
+  notator.innerHTML = response.music;
+  notator.id = "notator-" + response.index;
+  let oldNotator = document.getElementById(notator.id);
+  if (oldNotator) {
+    oldNotator.parentElement.replaceChild(notator, oldNotator);
   } else {
-    music.appendChild(prompter);
+    let scroller = document.getElementById("notator-scroller");
+    scroller.appendChild(notator);
   }
+  musicPad.onTick(0);
 }
 
 musicPad.onTick = function(tick) {
   let scaledTick = tick / 10;
-  let music = document.getElementById("music");
-  let width = music.offsetWidth;
+  let scroller = document.getElementById("notator-scroller");
+  let width = scroller.offsetWidth;
   let midPoint = width / 2;
-  music.scrollLeft = scaledTick + midPoint;
-  console.log("scaledTick="+scaledTick+", width="+width+", midPoint="+midPoint+", scrollLeft="+music.scrollLeft);
+  scroller.scrollLeft = scaledTick + midPoint;
+  console.log("scaledTick="+scaledTick+", width="+width+", midPoint="+midPoint+", scrollLeft="+scroller.scrollLeft);
 }
 
 musicPad.formatText = function(text) {

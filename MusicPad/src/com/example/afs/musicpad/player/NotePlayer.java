@@ -19,6 +19,7 @@ import com.example.afs.musicpad.song.Note;
 import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.song.Word;
 import com.example.afs.musicpad.svg.Circle;
+import com.example.afs.musicpad.svg.Line;
 import com.example.afs.musicpad.svg.Svg;
 import com.example.afs.musicpad.svg.Text;
 
@@ -27,6 +28,14 @@ public class NotePlayer extends Player {
   private static final int RADIUS = 10;
 
   private static final String NOTE = "note";
+
+  // Treble Mnemonic - Every Good Boy Deserves Fudge
+  // Bass Mnemonic - Good Boys Do Fine Always
+  private static final int TREBLE_TOP = 77; // F6
+
+  private static final int TREBLE_BOTTOM = 64; // E5
+  private static final int BASS_TOP = 57; // A4 
+  private static final int BASS_BOTTOM = 43; // G3
 
   public NotePlayer(DeviceHandler deviceHandler, Song song) {
     super(deviceHandler, song);
@@ -37,11 +46,27 @@ public class NotePlayer extends Player {
   public OnMusic getOnSongMusic() {
     int lastTick = 0;
     int lowest = getLowestMidiNote();
+    if (lowest > BASS_BOTTOM) {
+      lowest = BASS_BOTTOM;
+    }
     int highest = getHighestMidiNote();
+    if (highest < TREBLE_TOP) {
+      highest = TREBLE_TOP;
+    }
     int range = highest - lowest;
-    int width = (int) song.getDuration();
+
+    int width = scale((int) song.getDuration());
     int height = ((highest - lowest) + 2) * RADIUS;
     Svg svg = new Svg(width, height);
+
+    for (int i = 0; i < 5; i++) {
+      int midiNote = TREBLE_BOTTOM + (2 * i);
+      int a = midiNote - lowest;
+      int b = range - a;
+      int y = b * RADIUS;
+      svg.add(new Line(0, y, width, y));
+    }
+
     for (Note note : song.getNotes(songChannel)) {
       int noteTick = (int) note.getTick();
       int scaledNoteTick = scale(noteTick);

@@ -26,4 +26,9 @@ public class Text extends SvgElement {
     super.render(s, indent);
     s.append(format("<text x='%d' y='%d'>%s</text>\n", x, y, text));
   }
+
+  @Override
+  public String toString() {
+    return "Text [x=" + x + ", y=" + y + ", text=" + text + "]";
+  }
 }

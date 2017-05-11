@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <style>
+            html {
+                height: 100%;
+                width: 100%
+            }
+
+            body {
+                height: 100%;
+                width: 100%;
+                margin: 0px;
+            }
+
+            line {
+                stroke: rgb(255, 0, 0);
+                stroke-width: 10;
+            }
+
+            .svg-container {
+                height: 100%;
+                width: 100%;
+                display: flex;
+                flex-direction: column;
+                overflow-x: auto;
+            }
+  
+            .flex-child-div {
+                flex-grow: 1;
+                flex-shrink: 1;
+                background-color: blue;
+            }
+
+            .flex-child-svg {
+                flex-grow: 1;
+                flex-shrink: 1;
+                width: 10000px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class='svg-container'>
+            <div class='flex-child-div'>Before the SVG</div>
+            <svg viewBox="0 0 50000 400" class='flex-child-svg'>
+                <line x1="0" y1="0" x2="50000" y2="400"/>
+            </svg>
+            <div class='flex-child-div'>After the SVG</div>
+            <div class='flex-child-div'>Before the SVG</div>
+            <svg viewBox="0 0 50000 400" class='flex-child-svg'>
+                <line x1="0" y1="0" x2="50000" y2="400"/>
+            </svg>
+            <div class='flex-child-div'>After the SVG</div>
+        </div>
+    </body>
+</html>

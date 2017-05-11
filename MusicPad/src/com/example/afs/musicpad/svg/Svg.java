@@ -29,7 +29,7 @@ public class Svg extends SvgElement {
 
   public String render() {
     StringBuilder s = new StringBuilder();
-    s.append(format("<svg width='%d' height='%d' viewbox='0 0 %d %d'>", width, height, width, height));
+    s.append(format("<svg viewBox='0 0 %d %d' preserveAspectRatio='xMinYMin meet'>", width, height));
     for (SvgElement svgElement : svgElements) {
       svgElement.render(s, 2);
     }
