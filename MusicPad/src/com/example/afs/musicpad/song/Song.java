@@ -128,6 +128,22 @@ public class Song {
     return duration;
   }
 
+  public int getHighestMidiNote() {
+    int highest;
+    if (notes.size() == 0) {
+      highest = -1;
+    } else {
+      highest = 0;
+      for (int channel = 0; channel < Midi.CHANNELS; channel++) {
+        int channelHighest = getHighestMidiNote(channel);
+        if (channelHighest > highest) {
+          highest = channelHighest;
+        }
+      }
+    }
+    return highest;
+  }
+
   public int getHighestMidiNote(int channel) {
     return channelFacets.getFacet(channel).getHighestMidiNote();
   }
@@ -140,6 +156,22 @@ public class Song {
       length = notes.last().getTick();
     }
     return length;
+  }
+
+  public int getLowestMidiNote() {
+    int lowest;
+    if (notes.size() == 0) {
+      lowest = -1;
+    } else {
+      lowest = Midi.MAX_VALUE;
+      for (int channel = 0; channel < Midi.CHANNELS; channel++) {
+        int channelLowest = getLowestMidiNote(channel);
+        if (channelLowest != -1 && channelLowest < lowest) {
+          lowest = channelLowest;
+        }
+      }
+    }
+    return lowest;
   }
 
   public int getLowestMidiNote(int channel) {

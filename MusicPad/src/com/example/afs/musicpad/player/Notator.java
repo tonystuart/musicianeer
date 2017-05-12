@@ -75,11 +75,9 @@ public class Notator {
   private static final int INTER_CLEF = RADIUS * 5;
 
   private static final int TOP = RADIUS * 1;
-  private static final int FIRST = TOP;
   private static final int SPAN = (POSITION[HIGHEST] - POSITION[LOWEST]) + 1;
-  private static final int LAST = FIRST + (SPAN * RADIUS) + INTER_CLEF;
-  private static final int BOTTOM = LAST + RADIUS * 1;
-  private static final int WORDS = LAST / 2;
+  private static final int BOTTOM = TOP + (SPAN * RADIUS) + INTER_CLEF;
+  private static final int WORDS = BOTTOM / 2;
 
   private static boolean[] createLedger() {
     boolean[] ledger = new boolean[Midi.NOTES];
@@ -102,9 +100,7 @@ public class Notator {
   }
 
   private Song song;
-
   private int channel;
-
   private InputMapping inputMapping;
 
   public Notator(InputMapping inputMapping, Song song, int channel) {
@@ -115,24 +111,36 @@ public class Notator {
 
   public String getMusic() {
 
-    for (int i = LOWEST; i <= HIGHEST; i++) {
-      int y = getY(i);
-      System.out.println("midiNote=" + i + ", y=" + y);
+    if (song.getChannelNoteCount(channel) == 0) {
+      return "";
     }
-    System.out.println("WORDS=" + WORDS);
+
+    int top;
+    int highestMidiNote = song.getHighestMidiNote();
+    if (highestMidiNote < MIDDLE) {
+      top = getY(MIDDLE) + RADIUS;
+    } else {
+      top = getY(Math.max(highestMidiNote, TREBLE_MIDI_NOTES[4])) - RADIUS;
+    }
+
+    int bottom;
+    int lowestMidiNote = song.getLowestMidiNote();
+    if (lowestMidiNote < MIDDLE) {
+      bottom = getY(Math.min(lowestMidiNote, BASS_MIDI_NOTES[0])) + RADIUS;
+    } else {
+      bottom = getY(MIDDLE) + INTER_CLEF;
+    }
 
     int width = scale((int) song.getDuration());
-    Svg svg = new Svg(width, BOTTOM);
+    Svg svg = new Svg(0, top, width, bottom);
 
     for (int i = 0; i < TREBLE_MIDI_NOTES.length; i++) {
       int y = getY(TREBLE_MIDI_NOTES[i]);
-      System.out.println("i=" + i + ", midiNote=" + TREBLE_MIDI_NOTES[i] + ", y=" + y);
       svg.add(new Line(0, y, width, y));
     }
 
     for (int i = 0; i < BASS_MIDI_NOTES.length; i++) {
       int y = getY(BASS_MIDI_NOTES[i]);
-      System.out.println("i=" + i + ", midiNote=" + BASS_MIDI_NOTES[i] + ", y=" + y);
       svg.add(new Line(0, y, width, y));
     }
 
@@ -158,7 +166,7 @@ public class Notator {
       if (isSharp) {
 
       }
-      svg.add(new Text(noteX, BOTTOM, keyCap));
+      svg.add(new Text(noteX, WORDS + 2 * RADIUS, keyCap));
       lastTick = noteTick;
     }
     String music = svg.render();
@@ -168,9 +176,9 @@ public class Notator {
   private int getY(int midiNote) {
     int y;
     if (midiNote < MIDDLE) {
-      y = LAST - (POSITION[midiNote] * RADIUS);
+      y = BOTTOM - (POSITION[midiNote] * RADIUS);
     } else {
-      y = FIRST + ((POSITION[HIGHEST] - POSITION[midiNote]) * RADIUS);
+      y = TOP + ((POSITION[HIGHEST] - POSITION[midiNote]) * RADIUS);
     }
     return y;
   }

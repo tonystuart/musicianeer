@@ -14,11 +14,15 @@ import java.util.List;
 
 public class Svg extends SvgElement {
 
+  private int left;
+  private int top;
   private int width;
   private int height;
   private List<SvgElement> svgElements = new LinkedList<>();
 
-  public Svg(int width, int height) {
+  public Svg(int left, int top, int width, int height) {
+    this.left = left;
+    this.top = top;
     this.width = width;
     this.height = height;
   }
@@ -29,7 +33,7 @@ public class Svg extends SvgElement {
 
   public String render() {
     StringBuilder s = new StringBuilder();
-    s.append(format("<svg viewBox='0 0 %d %d' preserveAspectRatio='xMinYMin meet'>", width, height));
+    s.append(format("<svg viewBox='%d %d %d %d' preserveAspectRatio='xMinYMin meet'>", left, top, width, height));
     for (SvgElement svgElement : svgElements) {
       svgElement.render(s, 2);
     }
