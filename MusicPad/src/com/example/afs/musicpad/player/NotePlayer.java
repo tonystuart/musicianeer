@@ -25,17 +25,82 @@ import com.example.afs.musicpad.svg.Text;
 
 public class NotePlayer extends Player {
 
-  private static final int RADIUS = 10;
+  private static final int LOWEST = 24;
+  private static final int HIGHEST = 96;
+  private static final int MIDDLE = 60;
 
-  private static final String NOTE = "note";
+  // http://www.theoreticallycorrect.com/Helmholtz-Pitch-Numbering/
+  private static final int[] TREBLE_MIDI_NOTES = new int[] {
+      64,
+      67,
+      71,
+      74,
+      77
+  };
 
-  // Treble Mnemonic - Every Good Boy Deserves Fudge
-  // Bass Mnemonic - Good Boys Do Fine Always
-  private static final int TREBLE_TOP = 77; // F6
+  private static final int[] BASS_MIDI_NOTES = new int[] {
+      43,
+      47,
+      50,
+      53,
+      57
+  };
 
-  private static final int TREBLE_BOTTOM = 64; // E5
-  private static final int BASS_TOP = 57; // A4 
-  private static final int BASS_BOTTOM = 43; // G3
+  private static final int[] LEDGER_MIDI_NOTES = new int[] {
+      26,
+      27,
+      29,
+      30,
+      33,
+      34,
+      36,
+      37,
+      40,
+      60,
+      61,
+      81,
+      82,
+      84,
+      85,
+      88,
+      91,
+      92,
+      95
+  };
+
+  private static final int[] POSITION = createPosition();
+  private static final boolean[] LEDGER = createLedger();
+
+  private static final int RADIUS = 10; // spacing is r, diameter is 2r
+  private static final int LEDGER_WIDTH = RADIUS * 2;
+  private static final int INTER_CLEF = RADIUS * 5;
+
+  private static final int TOP = RADIUS * 1;
+  private static final int FIRST = TOP;
+  private static final int SPAN = (POSITION[HIGHEST] - POSITION[LOWEST]) + 1;
+  private static final int LAST = FIRST + (SPAN * RADIUS) + INTER_CLEF;
+  private static final int BOTTOM = LAST + RADIUS * 1;
+  private static final int WORDS = LAST / 2;
+
+  private static boolean[] createLedger() {
+    boolean[] ledger = new boolean[Midi.NOTES];
+    for (int ledgerNote = 0; ledgerNote < LEDGER_MIDI_NOTES.length; ledgerNote++) {
+      ledger[LEDGER_MIDI_NOTES[ledgerNote]] = true;
+    }
+    return ledger;
+  }
+
+  private static int[] createPosition() {
+    int position = 0;
+    int[] positions = new int[Midi.NOTES];
+    for (int midiNote = LOWEST; midiNote <= HIGHEST; midiNote++) {
+      positions[midiNote] = position;
+      if (!Names.isSharp(midiNote + 1)) {
+        position++;
+      }
+    }
+    return positions;
+  }
 
   public NotePlayer(DeviceHandler deviceHandler, Song song) {
     super(deviceHandler, song);
@@ -44,47 +109,51 @@ public class NotePlayer extends Player {
 
   @Override
   public OnMusic getOnSongMusic() {
-    int lastTick = 0;
-    int lowest = getLowestMidiNote();
-    if (lowest > BASS_BOTTOM) {
-      lowest = BASS_BOTTOM;
+
+    for (int i = LOWEST; i <= HIGHEST; i++) {
+      int y = getY(i);
+      System.out.println("midiNote=" + i + ", y=" + y);
     }
-    int highest = getHighestMidiNote();
-    if (highest < TREBLE_TOP) {
-      highest = TREBLE_TOP;
-    }
-    int range = highest - lowest;
+    System.out.println("WORDS=" + WORDS);
 
     int width = scale((int) song.getDuration());
-    int height = ((highest - lowest) + 2) * RADIUS;
-    Svg svg = new Svg(width, height);
+    Svg svg = new Svg(width, BOTTOM);
 
-    for (int i = 0; i < 5; i++) {
-      int midiNote = TREBLE_BOTTOM + (2 * i);
-      int a = midiNote - lowest;
-      int b = range - a;
-      int y = b * RADIUS;
+    for (int i = 0; i < TREBLE_MIDI_NOTES.length; i++) {
+      int y = getY(TREBLE_MIDI_NOTES[i]);
+      System.out.println("i=" + i + ", midiNote=" + TREBLE_MIDI_NOTES[i] + ", y=" + y);
       svg.add(new Line(0, y, width, y));
     }
 
+    for (int i = 0; i < BASS_MIDI_NOTES.length; i++) {
+      int y = getY(BASS_MIDI_NOTES[i]);
+      System.out.println("i=" + i + ", midiNote=" + BASS_MIDI_NOTES[i] + ", y=" + y);
+      svg.add(new Line(0, y, width, y));
+    }
+
+    long lastTick = 0;
+
     for (Note note : song.getNotes(songChannel)) {
-      int noteTick = (int) note.getTick();
-      int scaledNoteTick = scale(noteTick);
       int midiNote = note.getMidiNote();
-      int x = scaledNoteTick;
-      int a = midiNote - lowest;
-      int b = range - a;
-      int y = b * RADIUS;
-      svg.add(new Circle(x, y, RADIUS));
-      SortedSet<Word> words = song.getWords().subSet(new Word(lastTick), new Word(noteTick));
+      long noteTick = note.getTick();
+      int noteX = scale(noteTick);
+      int noteY = getY(midiNote);
+      if (LEDGER[midiNote]) {
+        svg.add(new Line(noteX - LEDGER_WIDTH, noteY, noteX + LEDGER_WIDTH, noteY));
+      }
+      svg.add(new Circle(noteX, noteY, RADIUS));
+      SortedSet<Word> words = song.getWords().subSet(new Word(lastTick), new Word((int) noteTick));
       for (Word word : words) {
-        int wordTick = (int) word.getTick();
-        int scaledWordTick = scale(wordTick);
-        svg.add(new Text(scaledWordTick, (range + 1) * RADIUS, word.getText()));
+        long wordTick = word.getTick();
+        int wordX = scale(wordTick);
+        svg.add(new Text(wordX, WORDS, word.getText()));
       }
       String keyCap = inputMapping.toKeyCap(midiNote);
       boolean isSharp = Names.isSharp(midiNote);
-      svg.add(new Text(scaledNoteTick, (range + 2) * RADIUS, keyCap));
+      if (isSharp) {
+
+      }
+      svg.add(new Text(noteX, BOTTOM, keyCap));
       lastTick = noteTick;
     }
     String music = svg.render();
@@ -97,6 +166,16 @@ public class NotePlayer extends Player {
     playMidiNote(action, midiNote);
   }
 
+  private int getY(int midiNote) {
+    int y;
+    if (midiNote < MIDDLE) {
+      y = LAST - (POSITION[midiNote] * RADIUS);
+    } else {
+      y = FIRST + ((POSITION[HIGHEST] - POSITION[midiNote]) * RADIUS);
+    }
+    return y;
+  }
+
   private void initializeOctave() {
     int octave = inputMapping.getDefaultOctave();
     int lowestMidiNote = getLowestMidiNote();
@@ -107,8 +186,8 @@ public class NotePlayer extends Player {
     inputMapping.setOctave(octave);
   }
 
-  private int scale(int wordTick) {
-    return wordTick / 10;
+  private int scale(long wordTick) {
+    return (int) (wordTick / 10);
   }
 
 }
