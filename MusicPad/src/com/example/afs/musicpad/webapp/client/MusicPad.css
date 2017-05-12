@@ -16,6 +16,10 @@ line {
   stroke-width: 1;
 }
 
+text {
+	font-size: 18pt;
+}
+
 #music-pad {
   display: flex;
   flex-direction: column;

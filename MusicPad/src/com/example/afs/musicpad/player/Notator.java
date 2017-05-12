@@ -72,7 +72,7 @@ public class Notator {
 
   private static final int RADIUS = 10; // spacing is r, diameter is 2r
   private static final int LEDGER_WIDTH = RADIUS * 2;
-  private static final int INTER_CLEF = RADIUS * 5;
+  private static final int INTER_CLEF = RADIUS * 6;
 
   private static final int TOP = RADIUS * 1;
   private static final int SPAN = (POSITION[HIGHEST] - POSITION[LOWEST]) + 1;
@@ -177,7 +177,7 @@ public class Notator {
       if (isSharp) {
 
       }
-      svg.add(new Text(noteX, WORDS + 2 * RADIUS, keyCap));
+      svg.add(new Text(noteX, WORDS + 3 * RADIUS, keyCap));
       lastTick = noteTick;
     }
     String music = svg.render();
