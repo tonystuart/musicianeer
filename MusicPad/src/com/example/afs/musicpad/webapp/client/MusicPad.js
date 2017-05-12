@@ -46,16 +46,6 @@ musicPad.onTick = function(tick) {
   }
 }
 
-musicPad.formatText = function(text) {
-  if (text.startsWith("\\") || text.startsWith("/")) {
-    text = text.substring(1);
-  }
-  if (text.length > 10) {
-    text = text.substring(0, 10);
-  }
-  return text;
-}
-
 musicPad.onClick = function() {
 }
 

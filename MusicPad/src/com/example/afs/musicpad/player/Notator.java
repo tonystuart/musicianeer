@@ -170,7 +170,7 @@ public class Notator {
       for (Word word : words) {
         long wordTick = word.getTick();
         int wordX = scale(wordTick);
-        svg.add(new Text(wordX, WORDS, word.getText()));
+        svg.add(new Text(wordX, WORDS, formatText(word.getText())));
       }
       String keyCap = inputMapping.toKeyCap(midiNote);
       boolean isSharp = Names.isSharp(midiNote);
@@ -182,6 +182,16 @@ public class Notator {
     }
     String music = svg.render();
     return music;
+  }
+
+  private String formatText(String text) {
+    if (text.startsWith("\\") || text.startsWith("/")) {
+      text = text.substring(1);
+    }
+    if (text.length() > 10) {
+      text = text.substring(0, 10);
+    }
+    return text;
   }
 
   private int getY(int midiNote) {
