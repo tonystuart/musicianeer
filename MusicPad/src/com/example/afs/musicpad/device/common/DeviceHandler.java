@@ -20,10 +20,12 @@ import com.example.afs.musicpad.device.qwerty.NumericMapping;
 import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnControlChange;
+import com.example.afs.musicpad.message.OnMusic;
 import com.example.afs.musicpad.message.OnNoteOff;
 import com.example.afs.musicpad.message.OnNoteOn;
 import com.example.afs.musicpad.message.OnPitchBend;
 import com.example.afs.musicpad.message.OnSong;
+import com.example.afs.musicpad.player.Notator;
 import com.example.afs.musicpad.player.Player;
 import com.example.afs.musicpad.player.Player.Action;
 import com.example.afs.musicpad.player.PlayerFactory;
@@ -96,10 +98,6 @@ public class DeviceHandler extends BrokerTask<Message> {
     return synthesizer;
   }
 
-  public void setChannel(int channel) {
-    this.channel = channel;
-  }
-
   public void setInputMapping(InputMapping inputMapping) {
     this.inputMapping = inputMapping;
     updatePlayer();
@@ -170,8 +168,10 @@ public class DeviceHandler extends BrokerTask<Message> {
 
   private void updatePlayer() {
     this.player = playerFactory.createPlayer(song);
+    Notator notator = new Notator(inputMapping, song, channel);
+    String music = notator.getMusic();
     getBroker().publish(new OnCommand(Command.SHOW_CHANNEL_INFO, 0));
-    getBroker().publish(player.getOnSongMusic());
+    getBroker().publish(new OnMusic(index, music));
   }
 
 }

@@ -17,7 +17,6 @@ import java.util.TreeSet;
 
 import com.example.afs.musicpad.analyzer.ChordFinder;
 import com.example.afs.musicpad.device.common.DeviceHandler;
-import com.example.afs.musicpad.message.OnMusic;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.song.Chord;
 import com.example.afs.musicpad.song.Song;
@@ -37,27 +36,6 @@ public class ChordPlayer extends Player {
     super(deviceHandler, song);
     initializeOctave();
     initializeChords();
-  }
-
-  @Override
-  public OnMusic getOnSongMusic() {
-    int highest = 0;
-    int lowest = Midi.MAX_VALUE;
-    for (Chord chord : chords) {
-      ChordType chordType = chord.getChordType();
-      long tick = chord.getTick();
-      int duration = (int) chord.getDuration();
-      int midiNoteIndex = chordTypeToMidiNoteIndex.get(chordType);
-      int midiNote = baseMidiNote + midiNoteIndex;
-      if (midiNote < lowest) {
-        lowest = midiNote;
-      }
-      if (midiNote > highest) {
-        highest = midiNote;
-      }
-    }
-    OnMusic onMusic = new OnMusic(songChannel, "Coming Soon!");
-    return onMusic;
   }
 
   @Override

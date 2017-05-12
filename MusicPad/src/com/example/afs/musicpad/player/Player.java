@@ -17,7 +17,6 @@ import com.example.afs.musicpad.Trace;
 import com.example.afs.musicpad.analyzer.Names;
 import com.example.afs.musicpad.device.common.DeviceHandler;
 import com.example.afs.musicpad.device.common.InputMapping;
-import com.example.afs.musicpad.message.OnMusic;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.theory.ChordType;
@@ -63,8 +62,6 @@ public abstract class Player {
   public void changeControl(int control, int value) {
     synthesizer.changeControl(playbackChannel, control, value);
   }
-
-  public abstract OnMusic getOnSongMusic();
 
   public abstract void play(Action action, int midiNote);
 
