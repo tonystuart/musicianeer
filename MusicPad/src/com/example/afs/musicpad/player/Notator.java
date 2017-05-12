@@ -131,7 +131,8 @@ public class Notator {
       bottom = getY(MIDDLE) + INTER_CLEF;
     }
 
-    int width = scale((int) song.getDuration());
+    long duration = song.getDuration();
+    int width = scale(duration);
     Svg svg = new Svg(0, top, width, bottom);
 
     for (int i = 0; i < TREBLE_MIDI_NOTES.length; i++) {
@@ -142,6 +143,16 @@ public class Notator {
     for (int i = 0; i < BASS_MIDI_NOTES.length; i++) {
       int y = getY(BASS_MIDI_NOTES[i]);
       svg.add(new Line(0, y, width, y));
+    }
+
+    long tick = 0;
+    while (tick < duration) {
+      int x = scale(tick);
+      if (tick > 0) {
+        tick -= 2 * RADIUS; // so note doesn't land on it
+      }
+      svg.add(new Line(x, getY(TREBLE_MIDI_NOTES[4]), x, getY(BASS_MIDI_NOTES[0])));
+      tick += song.getTicksPerMeasure(tick);
     }
 
     long lastTick = 0;
