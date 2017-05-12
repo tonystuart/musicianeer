@@ -29,13 +29,13 @@ public class AnalyzerTask extends BrokerTask<Message> {
   public AnalyzerTask(Broker<Message> broker) {
     super(broker);
     subscribe(OnCommand.class, message -> doCommand(message.getCommand(), message.getParameter()));
-    subscribe(OnSong.class, message -> doSongSelected(message.getSong()));
+    subscribe(OnSong.class, message -> doSong(message.getSong()));
   }
 
   private void doCommand(Command command, int parameter) {
     switch (command) {
-    case SHOW_CHANNEL_INFO:
-      doShowChannelInfo();
+    case SHOW_CHANNEL_STATE:
+      doShowChannelState();
       break;
     case SHOW_KEY_INFO:
       doShowKeyInfo();
@@ -48,9 +48,9 @@ public class AnalyzerTask extends BrokerTask<Message> {
     }
   }
 
-  private void doShowChannelInfo() {
+  private void doShowChannelState() {
     if (currentSong != null) {
-      showChannelInfo(currentSong);
+      showChannelState(currentSong);
     }
   }
 
@@ -66,7 +66,7 @@ public class AnalyzerTask extends BrokerTask<Message> {
     }
   }
 
-  private void doSongSelected(Song song) {
+  private void doSong(Song song) {
     currentSong = song;
     showChannelInfo(currentSong);
   }
@@ -79,7 +79,6 @@ public class AnalyzerTask extends BrokerTask<Message> {
     System.out.println();
     for (int channel = 0; channel < Midi.CHANNELS; channel++) {
       int noteCount = song.getChannelNoteCount(channel);
-      publish(new OnChannelState(channel, noteCount == 0 ? ChannelState.INACTIVE : ChannelState.ACTIVE));
       if (noteCount > 0) {
         if (channel != Midi.DRUM) {
           int occupancy = song.getOccupancy(channel);
@@ -92,6 +91,13 @@ public class AnalyzerTask extends BrokerTask<Message> {
           System.out.println(" " + song.getProgramNames(channel));
         }
       }
+    }
+  }
+
+  private void showChannelState(Song song) {
+    for (int channel = 0; channel < Midi.CHANNELS; channel++) {
+      int noteCount = song.getChannelNoteCount(channel);
+      publish(new OnChannelState(channel, noteCount == 0 ? ChannelState.INACTIVE : ChannelState.ACTIVE));
     }
   }
 

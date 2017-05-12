@@ -170,7 +170,7 @@ public class DeviceHandler extends BrokerTask<Message> {
     this.player = playerFactory.createPlayer(song);
     Notator notator = new Notator(inputMapping, song, channel);
     String music = notator.getMusic();
-    getBroker().publish(new OnCommand(Command.SHOW_CHANNEL_INFO, 0));
+    getBroker().publish(new OnCommand(Command.SHOW_CHANNEL_STATE, 0));
     getBroker().publish(new OnMusic(index, music));
   }
 
