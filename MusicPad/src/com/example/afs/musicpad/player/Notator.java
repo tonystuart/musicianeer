@@ -245,6 +245,7 @@ public class Notator {
   private void plotNotes(Svg svg, long firstTick, RandomAccessList<Note> notes, int midPoint) {
     int lowestMidiNote = Midi.MAX_VALUE;
     int highestMidiNote = 0;
+    long totalDuration = 0;
     for (Note note : notes) {
       int midiNote = note.getMidiNote();
       lowestMidiNote = Math.min(midiNote, lowestMidiNote);
@@ -256,16 +257,36 @@ public class Notator {
       }
       boolean isSharp = isSharp(midiNote);
       if (isSharp) {
+        int left = noteX - 4 * RADIUS;
+        int right = noteX - 2 * RADIUS;
+        int top = noteY - RADIUS / 2;
+        int bottom = noteY + RADIUS / 2;
+        svg.add(new Line(left, top, right, top));
+        svg.add(new Line(left, bottom, right, bottom));
+        svg.add(new Line(left + RADIUS / 2, top - RADIUS / 2, left + RADIUS / 2, bottom + RADIUS / 2));
+        svg.add(new Line(left + 3 * RADIUS / 2, top - RADIUS / 2, left + 3 * RADIUS / 2, bottom + RADIUS / 2));
       }
-      svg.add(new Circle(noteX, noteY, RADIUS));
+      long duration = note.getDuration();
+      totalDuration += duration;
+      if (duration < 1200) {
+        svg.add(new Circle(noteX, noteY, RADIUS, true));
+      } else {
+        svg.add(new Circle(noteX, noteY, RADIUS, false));
+      }
     }
     if (notes.size() > 0) {
-      if (lowestMidiNote < midPoint) {
-        int x = scale(firstTick) + RADIUS;
-        svg.add(new Line(x, getY(highestMidiNote) - 5 * RADIUS, x, getY(lowestMidiNote)));
-      } else {
-        int x = scale(firstTick) - RADIUS;
-        svg.add(new Line(x, getY(highestMidiNote), x, getY(lowestMidiNote) + 5 * RADIUS));
+      long averageDuration = totalDuration / notes.size();
+      if (averageDuration < 1900) {
+        if (lowestMidiNote < midPoint) {
+          int x = scale(firstTick) + RADIUS;
+          svg.add(new Line(x, getY(highestMidiNote) - 5 * RADIUS, x, getY(lowestMidiNote)));
+          if (averageDuration < 600) {
+            svg.add(new Line(x, getY(highestMidiNote) - 5 * RADIUS, x + RADIUS, getY(highestMidiNote) - 3 * RADIUS));
+          }
+        } else {
+          int x = scale(firstTick) - RADIUS;
+          svg.add(new Line(x, getY(highestMidiNote), x, getY(lowestMidiNote) + 5 * RADIUS));
+        }
       }
     }
   }

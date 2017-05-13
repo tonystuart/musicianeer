@@ -16,6 +16,11 @@ line {
   stroke-width: 1;
 }
 
+circle {
+  stroke: black;
+  stroke-width: 1;
+}
+
 text {
 	font-size: 18pt;
 }
