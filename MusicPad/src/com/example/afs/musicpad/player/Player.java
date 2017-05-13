@@ -73,6 +73,10 @@ public abstract class Player {
     this.percentVelocity = percentVelocity;
   }
 
+  public abstract String toKeyCap(ChordType chordType);
+
+  public abstract String toKeyCap(int midiNote);
+
   protected int getHighestMidiNote() {
     int highestMidiNote = song.getHighestMidiNote(songChannel);
     if (highestMidiNote == -1) {

@@ -10,32 +10,25 @@
 package com.example.afs.musicpad.player;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
 
-import com.example.afs.musicpad.analyzer.ChordFinder;
+import com.example.afs.musicpad.analyzer.Names;
 import com.example.afs.musicpad.device.common.DeviceHandler;
 import com.example.afs.musicpad.midi.Midi;
-import com.example.afs.musicpad.song.Chord;
 import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.theory.ChordType;
+import com.example.afs.musicpad.theory.Intervals;
 import com.example.afs.musicpad.theory.Keys;
-import com.example.afs.musicpad.util.DirectList;
-import com.example.afs.musicpad.util.RandomAccessList;
 
 public class ChordPlayer extends Player {
 
   private int baseMidiNote;
-  private TreeSet<Chord> chords;
   private Map<ChordType, Integer> chordTypeToMidiNoteIndex = new HashMap<>();
   private Map<Integer, ChordType> midiNoteIndexToChordType = new HashMap<>();
 
   public ChordPlayer(DeviceHandler deviceHandler, Song song) {
     super(deviceHandler, song);
     initializeOctave();
-    initializeChords();
   }
 
   @Override
@@ -47,21 +40,24 @@ public class ChordPlayer extends Player {
     }
   }
 
-  private void initializeChords() {
-    ChordFinder chordFinder = new ChordFinder();
-    chords = chordFinder.getChords(song.getNotes(), songChannel);
-    Set<ChordType> uniqueChordTypes = new HashSet<>();
-    for (Chord chord : chords) {
-      uniqueChordTypes.add(chord.getChordType());
+  @Override
+  public String toKeyCap(ChordType chordType) {
+    Integer midiNoteIndex = chordTypeToMidiNoteIndex.get(chordType);
+    if (midiNoteIndex == null) {
+      midiNoteIndex = Keys.CMajorFull.getMidiNotes()[chordTypeToMidiNoteIndex.size()];
+      chordTypeToMidiNoteIndex.put(chordType, midiNoteIndex);
+      midiNoteIndexToChordType.put(midiNoteIndex, chordType);
+      System.out.println(chordType + " <=> " + midiNoteIndex);
     }
-    RandomAccessList<ChordType> chordMapping = new DirectList<>(uniqueChordTypes);
-    chordMapping.sort((o1, o2) -> o1.compareTo(o2));
-    for (int i = 0; i < chordMapping.size(); i++) {
-      int midiNoteIndex = Keys.CMajorFull.getMidiNotes()[i];
-      chordTypeToMidiNoteIndex.put(chordMapping.get(i), midiNoteIndex);
-      midiNoteIndexToChordType.put(midiNoteIndex, chordMapping.get(i));
-      System.out.println(chordMapping.get(i) + " <=> " + midiNoteIndex);
-    }
+    String keyCap = inputMapping.toKeyCap(baseMidiNote + midiNoteIndex);
+    return keyCap;
+  }
+
+  @Override
+  public String toKeyCap(int midiNote) {
+    ChordType chordType = new ChordType(midiNote % Midi.SEMITONES_PER_OCTAVE, new Intervals(Names.getNoteName(midiNote), 0));
+    String keyCap = toKeyCap(chordType);
+    return keyCap;
   }
 
   private void initializeOctave() {

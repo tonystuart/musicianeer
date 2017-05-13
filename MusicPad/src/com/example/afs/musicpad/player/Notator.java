@@ -12,8 +12,6 @@ package com.example.afs.musicpad.player;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import com.example.afs.musicpad.analyzer.Names;
-import com.example.afs.musicpad.device.common.InputMapping;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.song.Default;
 import com.example.afs.musicpad.song.Note;
@@ -23,6 +21,8 @@ import com.example.afs.musicpad.svg.Circle;
 import com.example.afs.musicpad.svg.Line;
 import com.example.afs.musicpad.svg.Svg;
 import com.example.afs.musicpad.svg.Text;
+import com.example.afs.musicpad.theory.ChordType;
+import com.example.afs.musicpad.theory.IntervalSet;
 import com.example.afs.musicpad.util.DirectList;
 import com.example.afs.musicpad.util.RandomAccessList;
 
@@ -71,6 +71,20 @@ public class Notator {
       95
   };
 
+  private static final boolean[] SHARPS = new boolean[] {
+      false,
+      true,
+      false,
+      true,
+      false,
+      false,
+      true,
+      false,
+      true,
+      false,
+      true,
+      false,
+  };
   private static final int[] POSITION = createPosition();
   private static final boolean[] LEDGER = createLedger();
 
@@ -83,6 +97,10 @@ public class Notator {
   private static final int BOTTOM = TOP + (SPAN * RADIUS) + INTER_CLEF;
   private static final int WORDS = BOTTOM / 2;
   private static final long RESOLUTION = Default.TICKS_PER_BEAT / 2;
+
+  public static boolean isSharp(int midiNote) {
+    return SHARPS[midiNote % SHARPS.length];
+  }
 
   private static boolean[] createLedger() {
     boolean[] ledger = new boolean[Midi.NOTES];
@@ -97,7 +115,7 @@ public class Notator {
     int[] positions = new int[Midi.NOTES];
     for (int midiNote = LOWEST; midiNote <= HIGHEST; midiNote++) {
       positions[midiNote] = position;
-      if (!Names.isSharp(midiNote + 1)) {
+      if (!isSharp(midiNote + 1)) {
         position++;
       }
     }
@@ -106,10 +124,10 @@ public class Notator {
 
   private Song song;
   private int channel;
-  private InputMapping inputMapping;
+  private Player player;
 
-  public Notator(InputMapping inputMapping, Song song, int channel) {
-    this.inputMapping = inputMapping;
+  public Notator(Player player, Song song, int channel) {
+    this.player = player;
     this.song = song;
     this.channel = channel;
   }
@@ -163,30 +181,35 @@ public class Notator {
     tick = 0;
     TreeSet<Note> notes = song.getNotes(channel);
     while (tick < duration) {
-      StringBuilder s = new StringBuilder();
-      SortedSet<Note> subSet = notes.subSet(new Note(tick), new Note(tick + RESOLUTION));
+      int midiNote = 0;
       long firstTick = -1;
-      if (subSet.size() > 0) {
-        firstTick = subSet.first().getTick();
+      IntervalSet intervalSet = new IntervalSet();
+      SortedSet<Note> slice = notes.subSet(new Note(tick), new Note(tick + RESOLUTION));
+      int sliceNoteCount = slice.size();
+      if (sliceNoteCount > 0) {
+        firstTick = slice.first().getTick();
         RandomAccessList<Note> trebleNotes = new DirectList<>();
         RandomAccessList<Note> bassNotes = new DirectList<>();
-        for (Note note : subSet) {
-          int midiNote = note.getMidiNote();
+        for (Note note : slice) {
+          midiNote = note.getMidiNote();
           if (midiNote < MIDDLE) {
             bassNotes.add(note);
           } else {
             trebleNotes.add(note);
           }
-          String keyCap = inputMapping.toKeyCap(midiNote);
-          if (s.length() > 0) {
-            s.append("/");
-          }
-          s.append(keyCap);
+          intervalSet.add(note);
         }
-        plotNotes(svg, firstTick, trebleNotes, true);
-        plotNotes(svg, firstTick, bassNotes, false);
+        plotNotes(svg, firstTick, trebleNotes, TREBLE_MIDI_NOTES[2]);
+        plotNotes(svg, firstTick, bassNotes, BASS_MIDI_NOTES[2]);
       }
-      svg.add(new Text(scale(firstTick), WORDS + 3 * RADIUS, s.toString()));
+      if (sliceNoteCount == 1) {
+        String keyCap = player.toKeyCap(midiNote);
+        svg.add(new Text(scale(firstTick), WORDS + 3 * RADIUS, keyCap));
+      } else if (sliceNoteCount > 1) {
+        ChordType chordType = intervalSet.getChordType();
+        String keyCap = player.toKeyCap(chordType);
+        svg.add(new Text(scale(firstTick), WORDS + 3 * RADIUS, keyCap));
+      }
       tick += RESOLUTION;
     }
     SortedSet<Word> words = song.getWords();
@@ -219,7 +242,7 @@ public class Notator {
     return y;
   }
 
-  private void plotNotes(Svg svg, long firstTick, RandomAccessList<Note> notes, boolean isUp) {
+  private void plotNotes(Svg svg, long firstTick, RandomAccessList<Note> notes, int midPoint) {
     int lowestMidiNote = Midi.MAX_VALUE;
     int highestMidiNote = 0;
     for (Note note : notes) {
@@ -231,13 +254,13 @@ public class Notator {
       if (LEDGER[midiNote]) {
         svg.add(new Line(noteX - LEDGER_WIDTH, noteY, noteX + LEDGER_WIDTH, noteY));
       }
-      boolean isSharp = Names.isSharp(midiNote);
+      boolean isSharp = isSharp(midiNote);
       if (isSharp) {
       }
       svg.add(new Circle(noteX, noteY, RADIUS));
     }
     if (notes.size() > 0) {
-      if (isUp) {
+      if (lowestMidiNote < midPoint) {
         int x = scale(firstTick) + RADIUS;
         svg.add(new Line(x, getY(highestMidiNote) - 5 * RADIUS, x, getY(lowestMidiNote)));
       } else {

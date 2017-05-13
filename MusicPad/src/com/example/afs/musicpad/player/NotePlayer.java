@@ -12,6 +12,7 @@ package com.example.afs.musicpad.player;
 import com.example.afs.musicpad.device.common.DeviceHandler;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.song.Song;
+import com.example.afs.musicpad.theory.ChordType;
 
 public class NotePlayer extends Player {
 
@@ -23,6 +24,16 @@ public class NotePlayer extends Player {
   @Override
   public void play(Action action, int midiNote) {
     playMidiNote(action, midiNote);
+  }
+
+  @Override
+  public String toKeyCap(ChordType chordType) {
+    return chordType.getName();
+  }
+
+  @Override
+  public String toKeyCap(int midiNote) {
+    return inputMapping.toKeyCap(midiNote);
   }
 
   private void initializeOctave() {
