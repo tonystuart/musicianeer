@@ -98,6 +98,9 @@ public class Notator {
   private static final int WORDS = BOTTOM / 2;
   private static final long RESOLUTION = Default.TICKS_PER_BEAT / 2;
 
+  private static final String CLOSED = "closed";
+  private static final String OPEN = "open";
+
   public static boolean isSharp(int midiNote) {
     return SHARPS[midiNote % SHARPS.length];
   }
@@ -268,10 +271,10 @@ public class Notator {
       }
       long duration = note.getDuration();
       totalDuration += duration;
-      if (duration < 1200) {
-        svg.add(new Circle(noteX, noteY, RADIUS, true));
+      if (duration < 1800) {
+        svg.add(new Circle(noteX, noteY, RADIUS, CLOSED));
       } else {
-        svg.add(new Circle(noteX, noteY, RADIUS, false));
+        svg.add(new Circle(noteX, noteY, RADIUS, OPEN));
       }
     }
     if (notes.size() > 0) {

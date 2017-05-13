@@ -10,14 +10,6 @@
 package com.example.afs.musicpad.svg;
 
 public class SvgElement {
-  protected String className;
-
-  public SvgElement() {
-  }
-
-  public SvgElement(String className) {
-    this.className = className;
-  }
 
   public void render(StringBuilder s, int indent) {
     for (int i = 0; i < indent; i++) {

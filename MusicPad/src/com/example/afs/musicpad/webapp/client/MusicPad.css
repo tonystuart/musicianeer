@@ -25,6 +25,14 @@ text {
 	font-size: 18pt;
 }
 
+#header {
+	border-bottom: 1px solid gray;
+}
+
+#footer {
+	border-top: 1px solid gray;
+}
+
 #music-pad {
   display: flex;
   flex-direction: column;
@@ -74,4 +82,9 @@ text {
 	top: 0;
 }
 
+.open {
+	fill: white;
+}
 
+.close {
+}
