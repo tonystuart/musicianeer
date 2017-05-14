@@ -12,7 +12,6 @@ package com.example.afs.musicpad.theory;
 import java.util.Arrays;
 
 import com.example.afs.musicpad.midi.Midi;
-import com.example.afs.musicpad.song.Note;
 
 public class IntervalSet {
 
@@ -43,8 +42,7 @@ public class IntervalSet {
   private int lowestMidiNote = Midi.MAX_VALUE;
   private boolean[] commonNotes = new boolean[Midi.SEMITONES_PER_OCTAVE];
 
-  public void add(Note note) {
-    int midiNote = note.getMidiNote();
+  public void add(int midiNote) {
     if (midiNote < lowestMidiNote) {
       lowestMidiNote = midiNote;
     }

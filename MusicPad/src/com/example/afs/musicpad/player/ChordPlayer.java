@@ -12,19 +12,16 @@ package com.example.afs.musicpad.player;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.example.afs.musicpad.analyzer.Names;
 import com.example.afs.musicpad.device.common.DeviceHandler;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.song.Song;
-import com.example.afs.musicpad.theory.ChordType;
-import com.example.afs.musicpad.theory.Intervals;
 import com.example.afs.musicpad.theory.Keys;
 
 public class ChordPlayer extends Player {
 
-  private int baseMidiNote;
-  private Map<ChordType, Integer> chordTypeToMidiNoteIndex = new HashMap<>();
-  private Map<Integer, ChordType> midiNoteIndexToChordType = new HashMap<>();
+  private Map<Chord, Integer> chordToMidiNote = new HashMap<>();
+  private Map<Integer, Chord> midiNoteToChord = new HashMap<>();
+  private int mappingBase;
 
   public ChordPlayer(DeviceHandler deviceHandler, Song song) {
     super(deviceHandler, song);
@@ -33,37 +30,36 @@ public class ChordPlayer extends Player {
 
   @Override
   public void play(Action action, int midiNote) {
-    int midiNoteIndex = midiNote - baseMidiNote;
-    ChordType chordType = midiNoteIndexToChordType.get(midiNoteIndex);
-    if (chordType != null) {
-      playMidiChord(action, baseMidiNote, chordType);
+    Chord chord = midiNoteToChord.get(midiNote - mappingBase);
+    if (chord != null) {
+      playMidiChord(action, chord);
     }
   }
 
   @Override
-  public String toKeyCap(ChordType chordType) {
-    Integer midiNoteIndex = chordTypeToMidiNoteIndex.get(chordType);
-    if (midiNoteIndex == null) {
-      midiNoteIndex = Keys.CMajorFull.getMidiNotes()[chordTypeToMidiNoteIndex.size()];
-      chordTypeToMidiNoteIndex.put(chordType, midiNoteIndex);
-      midiNoteIndexToChordType.put(midiNoteIndex, chordType);
-      System.out.println(chordType + " <=> " + midiNoteIndex);
+  public String toKeyCap(Chord chord) {
+    Integer midiNote = chordToMidiNote.get(chord);
+    if (midiNote == null) {
+      midiNote = Keys.CMajorFull.getMidiNotes()[chordToMidiNote.size()];
+      chordToMidiNote.put(chord, midiNote);
+      midiNoteToChord.put(midiNote, chord);
+      System.out.println(chord + " <=> " + midiNote);
     }
-    String keyCap = inputMapping.toKeyCap(baseMidiNote + midiNoteIndex);
+    String keyCap = inputMapping.toKeyCap(mappingBase + midiNote);
     return keyCap;
   }
 
   @Override
   public String toKeyCap(int midiNote) {
-    ChordType chordType = new ChordType(midiNote % Midi.SEMITONES_PER_OCTAVE, new Intervals(Names.getNoteName(midiNote), 0));
-    String keyCap = toKeyCap(chordType);
+    Chord chord = new Chord(midiNote);
+    String keyCap = toKeyCap(chord);
     return keyCap;
   }
 
   private void initializeOctave() {
     int averageMidiNote = song.getAverageMidiNote(songChannel);
     int octave = averageMidiNote / Midi.SEMITONES_PER_OCTAVE;
-    baseMidiNote = octave * Midi.SEMITONES_PER_OCTAVE;
+    mappingBase = octave * Midi.SEMITONES_PER_OCTAVE;
     inputMapping.setOctave(octave);
   }
 

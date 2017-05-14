@@ -21,8 +21,6 @@ import com.example.afs.musicpad.svg.Circle;
 import com.example.afs.musicpad.svg.Line;
 import com.example.afs.musicpad.svg.Svg;
 import com.example.afs.musicpad.svg.Text;
-import com.example.afs.musicpad.theory.ChordType;
-import com.example.afs.musicpad.theory.IntervalSet;
 import com.example.afs.musicpad.util.DirectList;
 import com.example.afs.musicpad.util.RandomAccessList;
 
@@ -186,7 +184,6 @@ public class Notator {
     while (tick < duration) {
       int midiNote = 0;
       long firstTick = -1;
-      IntervalSet intervalSet = new IntervalSet();
       SortedSet<Note> slice = notes.subSet(new Note(tick), new Note(tick + RESOLUTION));
       int sliceNoteCount = slice.size();
       if (sliceNoteCount > 0) {
@@ -200,7 +197,6 @@ public class Notator {
           } else {
             trebleNotes.add(note);
           }
-          intervalSet.add(note);
         }
         plotNotes(svg, firstTick, trebleNotes, TREBLE_MIDI_NOTES[2]);
         plotNotes(svg, firstTick, bassNotes, BASS_MIDI_NOTES[2]);
@@ -209,8 +205,8 @@ public class Notator {
         String keyCap = player.toKeyCap(midiNote);
         svg.add(new Text(scale(firstTick), WORDS + 3 * RADIUS, keyCap));
       } else if (sliceNoteCount > 1) {
-        ChordType chordType = intervalSet.getChordType();
-        String keyCap = player.toKeyCap(chordType);
+        Chord chord = new Chord(slice);
+        String keyCap = player.toKeyCap(chord);
         svg.add(new Text(scale(firstTick), WORDS + 3 * RADIUS, keyCap));
       }
       tick += RESOLUTION;

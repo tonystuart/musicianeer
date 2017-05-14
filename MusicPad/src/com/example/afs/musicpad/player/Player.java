@@ -19,7 +19,6 @@ import com.example.afs.musicpad.device.common.DeviceHandler;
 import com.example.afs.musicpad.device.common.InputMapping;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.song.Song;
-import com.example.afs.musicpad.theory.ChordType;
 import com.example.afs.musicpad.util.Velocity;
 
 public abstract class Player {
@@ -73,7 +72,7 @@ public abstract class Player {
     this.percentVelocity = percentVelocity;
   }
 
-  public abstract String toKeyCap(ChordType chordType);
+  public abstract String toKeyCap(Chord chord);
 
   public abstract String toKeyCap(int midiNote);
 
@@ -93,17 +92,13 @@ public abstract class Player {
     return lowestMidiNote;
   }
 
-  protected void playMidiChord(Action action, int baseMidiNote, ChordType chordType) {
+  protected void playMidiChord(Action action, Chord chord) {
     if (action == Action.PRESS && Trace.isTracePlay()) {
-      System.out.println("Player.play: chordType=" + chordType);
+      System.out.println("Player.play: chordType=" + chord);
     }
-    for (int midiNote : chordType.getMidiNotes()) {
-      try {
-        synthesizeNote(action, baseMidiNote + midiNote);
-        Thread.sleep(0);
-      } catch (InterruptedException e) {
-        throw new RuntimeException(e);
-      }
+    for (int midiNote : chord.getMidiNotes()) {
+      // TODO: Consider arpeggiator options
+      synthesizeNote(action, midiNote);
     }
   }
 

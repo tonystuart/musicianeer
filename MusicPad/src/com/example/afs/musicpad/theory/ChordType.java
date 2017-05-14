@@ -16,33 +16,33 @@ import com.example.afs.musicpad.analyzer.Names;
 public class ChordType implements Comparable<ChordType> {
 
   private String name;
-  private int[] midiNotes;
+  private int[] commonNotes;
 
   public ChordType(int root, Intervals intervals) {
     name = Names.getNoteName(root) + intervals.getName();
     int[] intervalArray = intervals.getIntervals();
-    midiNotes = new int[intervalArray.length];
-    for (int i = 0; i < midiNotes.length; i++) {
-      int midiNote = root + intervalArray[i];
-      midiNotes[i] = midiNote;
+    commonNotes = new int[intervalArray.length];
+    for (int i = 0; i < commonNotes.length; i++) {
+      int commonNote = root + intervalArray[i];
+      commonNotes[i] = commonNote;
     }
   }
 
-  public ChordType(String name, int... midiNotes) {
+  public ChordType(String name, int... commonNotes) {
     this.name = name;
-    this.midiNotes = midiNotes;
+    this.commonNotes = commonNotes;
   }
 
   @Override
   public int compareTo(ChordType that) {
-    int limit = Math.min(this.midiNotes.length, that.midiNotes.length);
+    int limit = Math.min(this.commonNotes.length, that.commonNotes.length);
     for (int i = 0; i < limit; i++) {
-      int deltaSemitone = this.midiNotes[i] - that.midiNotes[i];
+      int deltaSemitone = this.commonNotes[i] - that.commonNotes[i];
       if (deltaSemitone != 0) {
         return deltaSemitone;
       }
     }
-    int deltaLength = this.midiNotes.length - that.midiNotes.length;
+    int deltaLength = this.commonNotes.length - that.commonNotes.length;
     if (deltaLength != 0) {
       return deltaLength;
     }
@@ -61,18 +61,18 @@ public class ChordType implements Comparable<ChordType> {
       return false;
     }
     ChordType other = (ChordType) obj;
-    if (!Arrays.equals(midiNotes, other.midiNotes)) {
+    if (!Arrays.equals(commonNotes, other.commonNotes)) {
       return false;
     }
     return true;
   }
 
-  public int getLength() {
-    return midiNotes.length;
+  public int[] getCommonNotes() {
+    return commonNotes;
   }
 
-  public int[] getMidiNotes() {
-    return midiNotes;
+  public int getLength() {
+    return commonNotes.length;
   }
 
   public String getName() {
@@ -83,13 +83,13 @@ public class ChordType implements Comparable<ChordType> {
   public int hashCode() {
     final int prime = 31;
     int result = 1;
-    result = prime * result + Arrays.hashCode(midiNotes);
+    result = prime * result + Arrays.hashCode(commonNotes);
     return result;
   }
 
   @Override
   public String toString() {
-    return "ChordType [name=" + name + ", midiNotes=" + Arrays.toString(midiNotes) + "]";
+    return "ChordType [name=" + name + ", commonNotes=" + Arrays.toString(commonNotes) + "]";
   }
 
 }
