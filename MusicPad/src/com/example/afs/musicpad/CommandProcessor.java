@@ -10,8 +10,6 @@
 package com.example.afs.musicpad;
 
 import java.io.File;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Random;
 
 import com.example.afs.fluidsynth.Synthesizer;
@@ -20,12 +18,9 @@ import com.example.afs.musicpad.analyzer.TranspositionFinder;
 import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnSong;
-import com.example.afs.musicpad.message.OnWords;
-import com.example.afs.musicpad.message.OnWords.Lyric;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.parser.SongBuilder;
 import com.example.afs.musicpad.song.Song;
-import com.example.afs.musicpad.song.Word;
 import com.example.afs.musicpad.task.BrokerTask;
 import com.example.afs.musicpad.util.Broker;
 import com.example.afs.musicpad.util.Range;
@@ -161,12 +156,6 @@ public class CommandProcessor extends BrokerTask<Message> {
       int distanceToWhiteKeys = TranspositionFinder.getDistanceToWhiteKeys(song);
       System.out.println("Selecting song " + songNumber + " - " + song.getName());
       System.out.println("Transpose by " + distanceToWhiteKeys + " to minimize sharps and flats");
-      List<Lyric> lyrics = new LinkedList<>();
-      for (Word word : song.getWords()) {
-        Lyric lyric = new Lyric(word.getTick(), word.getText());
-        lyrics.add(lyric);
-      }
-      publish(new OnWords(lyrics, song.getDuration()));
       publish(new OnSong(song));
     } else {
       System.out.println("Song " + songNumber + " is out of range");

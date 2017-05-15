@@ -7,29 +7,24 @@
 // This program is made available on an "as is" basis, without
 // warranties or conditions of any kind, either express or implied.
 
-package com.example.afs.musicpad.svg;
+package com.example.afs.musicpad.html;
 
-import com.example.afs.musicpad.html.Element;
+public class TextElement extends Element {
 
-public class Text extends Element {
-
-  private int x;
-  private int y;
   private String text;
 
-  public Text(int x, int y, String text) {
-    this.x = x;
-    this.y = y;
+  public TextElement(String text) {
     this.text = text;
   }
 
   @Override
   public void render(StringBuilder s) {
-    s.append(format("<text x='%d' y='%d'>%s</text>\n", x, y, text));
+    s.append(text);
   }
 
   @Override
   public String toString() {
-    return "Text [x=" + x + ", y=" + y + ", text=" + text + "]";
+    return "TextElement [text=" + text + "]";
   }
+
 }

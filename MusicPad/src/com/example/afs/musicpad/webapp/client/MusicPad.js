@@ -17,6 +17,11 @@ musicPad.getElement = function(html) {
   return template.content.firstChild;
 }
 
+musicPad.onDetails = function(response) {
+  let header = document.getElementById("header");
+  header.innerHTML = response.details;
+}
+
 musicPad.onMusic = function(response) {
   let notator = document.createElement("div");
   notator.className = "notator";
@@ -81,14 +86,17 @@ musicPad.request = function(resource) {
 musicPad.processResponse = function(json) {
   let response = JSON.parse(json);
   switch (response.type) {
-  case "OnDeviceDetached":
-    musicPad.onDeviceDetached(response);
+  case "OnDetails":
+    musicPad.onDetails(response);
     break;
   case "OnMusic":
     musicPad.onMusic(response);
     break;
   case "OnTick":
     musicPad.onTick(response.tick);
+    break;
+  case "OnDeviceDetached":
+    musicPad.onDeviceDetached(response);
     break;
   }
 }

@@ -12,13 +12,15 @@ package com.example.afs.musicpad.svg;
 import java.util.LinkedList;
 import java.util.List;
 
-public class Svg extends SvgElement {
+import com.example.afs.musicpad.html.Element;
+
+public class Svg extends Element {
 
   private int left;
   private int top;
   private int width;
   private int height;
-  private List<SvgElement> svgElements = new LinkedList<>();
+  private List<Element> elements = new LinkedList<>();
 
   public Svg(int left, int top, int width, int height) {
     this.left = left;
@@ -27,18 +29,23 @@ public class Svg extends SvgElement {
     this.height = height;
   }
 
-  public void add(SvgElement child) {
-    svgElements.add(child);
+  public void add(Element child) {
+    elements.add(child);
   }
 
   public String render() {
     StringBuilder s = new StringBuilder();
+    render(s);
+    return s.toString();
+  }
+
+  @Override
+  public void render(StringBuilder s) {
     s.append(format("<svg viewBox='%d %d %d %d' preserveAspectRatio='xMinYMin meet'>", left, top, width, height));
-    for (SvgElement svgElement : svgElements) {
-      svgElement.render(s, 2);
+    for (Element element : elements) {
+      element.render(s);
     }
     s.append(format("</svg>"));
-    return s.toString();
   }
 
 }

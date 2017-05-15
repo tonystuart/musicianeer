@@ -11,9 +11,14 @@ package com.example.afs.musicpad.analyzer;
 
 import com.example.afs.musicpad.Command;
 import com.example.afs.musicpad.device.midi.configuration.ChannelState;
+import com.example.afs.musicpad.html.Division;
+import com.example.afs.musicpad.html.Table;
+import com.example.afs.musicpad.html.TableHead;
+import com.example.afs.musicpad.html.TableRow;
 import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnChannelState;
 import com.example.afs.musicpad.message.OnCommand;
+import com.example.afs.musicpad.message.OnDetails;
 import com.example.afs.musicpad.message.OnSong;
 import com.example.afs.musicpad.midi.Instruments;
 import com.example.afs.musicpad.midi.Midi;
@@ -71,27 +76,80 @@ public class AnalyzerTask extends BrokerTask<Message> {
     showChannelInfo(currentSong);
   }
 
+  private String getDuration() {
+    long tickDuration = currentSong.getDuration();
+    int beatsPerMinute = currentSong.getBeatsPerMinute(0);
+    int beatsPerSecond = beatsPerMinute * 60;
+    long secondsDuration = tickDuration / beatsPerSecond;
+    String duration = String.format("%d:%02d", secondsDuration / 60, secondsDuration % 60);
+    return duration;
+  }
+
   private void showChannelInfo(Song song) {
-    System.out.print("CHN   TOT OCC CON");
+    Division detail = new Division();
+    detail.setId("detail");
+
+    Table songTable = new Table();
+    TableHead songHeader = songTable.createHead();
+
+    songHeader.append("Title");
+    songHeader.append("BPM");
+    songHeader.append("Tempo");
+    songHeader.append("Duration");
+
+    TableRow songRow = songTable.createRow();
+    songRow.append(song.getName());
+    songRow.append(song.getBeatsPerMinute(0));
+    songRow.append(song.getBeatsPerMeasure(0) + "/" + song.getBeatUnit(0));
+    songRow.append(getDuration());
+
+    detail.append(songTable);
+
+    Table channelTable = new Table();
+    TableHead channelHeader = channelTable.createHead();
+
+    channelHeader.append("Channel");
+    channelHeader.append("Total Notes");
+    channelHeader.append("Lowest Note");
+    channelHeader.append("Highest Note");
+    channelHeader.append("Occupancy");
+    channelHeader.append("Concurrency");
+
     for (int semitone = 0; semitone < Midi.SEMITONES_PER_OCTAVE; semitone++) {
-      System.out.printf(" %3s", Names.getNoteName(semitone));
+      channelHeader.append(Names.getNoteName(semitone));
     }
-    System.out.println();
+
+    channelHeader.append("Instruments");
+
     for (int channel = 0; channel < Midi.CHANNELS; channel++) {
       int noteCount = song.getChannelNoteCount(channel);
       if (noteCount > 0) {
         if (channel != Midi.DRUM) {
+          TableRow channelRow = new TableRow();
           int occupancy = song.getOccupancy(channel);
           int concurrency = song.getConcurrency(channel);
-          System.out.printf("%3d %5d %3d %3d", Value.toNumber(channel), noteCount, occupancy, concurrency);
+          channelRow.append(Value.toNumber(channel));
+          channelRow.append(noteCount);
+          channelRow.append(song.getLowestMidiNote(channel));
+          channelRow.append(song.getHighestMidiNote(channel));
+          channelRow.append(occupancy);
+          channelRow.append(concurrency);
           for (int semitone = 0; semitone < Midi.SEMITONES_PER_OCTAVE; semitone++) {
             int commonNoteCount = song.getCommonNoteCounts(channel)[semitone];
-            System.out.printf(" %3d", commonNoteCount);
+            channelRow.append(commonNoteCount);
           }
-          System.out.println(" " + song.getProgramNames(channel));
+          channelRow.append(song.getProgramNames(channel));
+
+          channelTable.append(channelRow);
         }
       }
     }
+
+    detail.append(channelTable);
+
+    StringBuilder s = new StringBuilder();
+    detail.render(s);
+    publish(new OnDetails(s.toString()));
   }
 
   private void showChannelState(Song song) {

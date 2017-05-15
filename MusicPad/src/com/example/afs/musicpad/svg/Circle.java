@@ -9,7 +9,9 @@
 
 package com.example.afs.musicpad.svg;
 
-public class Circle extends SvgElement {
+import com.example.afs.musicpad.html.Element;
+
+public class Circle extends Element {
 
   private int cx;
   private int cy;
@@ -30,8 +32,7 @@ public class Circle extends SvgElement {
   }
 
   @Override
-  public void render(StringBuilder s, int indent) {
-    super.render(s, indent);
+  public void render(StringBuilder s) {
     if (className == null) {
       s.append(format("<circle cx='%d' cy='%d' r='%d'/>\n", cx, cy, r));
     } else {

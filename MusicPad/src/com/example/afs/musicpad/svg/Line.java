@@ -9,7 +9,9 @@
 
 package com.example.afs.musicpad.svg;
 
-public class Line extends SvgElement {
+import com.example.afs.musicpad.html.Element;
+
+public class Line extends Element {
 
   private int x1;
   private int y1;
@@ -24,8 +26,7 @@ public class Line extends SvgElement {
   }
 
   @Override
-  public void render(StringBuilder s, int indent) {
-    super.render(s, indent);
+  public void render(StringBuilder s) {
     s.append(format("<line x1='%d' y1='%d' x2='%d' y2='%d'/>\n", x1, y1, x2, y2));
   }
 

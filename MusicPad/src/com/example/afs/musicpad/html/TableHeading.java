@@ -7,17 +7,17 @@
 // This program is made available on an "as is" basis, without
 // warranties or conditions of any kind, either express or implied.
 
-package com.example.afs.musicpad.svg;
+package com.example.afs.musicpad.html;
 
-public class SvgElement {
+public class TableHeading extends Hypertext {
 
-  public void render(StringBuilder s, int indent) {
-    for (int i = 0; i < indent; i++) {
-      s.append(" ");
-    }
+  public TableHeading() {
+    super("th");
   }
 
-  protected String format(String template, Object... parameters) {
-    return String.format(template, parameters);
+  public TableHeading(Object value) {
+    this();
+    append(new TextElement(value.toString()));
   }
+
 }

@@ -99,6 +99,17 @@ public class Song {
     return beatsPerMinute;
   }
 
+  public int getBeatUnit(long tick) {
+    int beatUnit;
+    Note note = getControllingNote(tick);
+    if (note == null) {
+      beatUnit = Default.BEAT_UNIT;
+    } else {
+      beatUnit = note.getBeatUnit();
+    }
+    return beatUnit;
+  }
+
   public int getChannelNoteCount(int channel) {
     return channelFacets.getFacet(channel).getTotalNoteCount();
   }
