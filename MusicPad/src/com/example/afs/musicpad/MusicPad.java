@@ -12,12 +12,12 @@ package com.example.afs.musicpad;
 import com.example.afs.fluidsynth.FluidSynth;
 import com.example.afs.fluidsynth.Synthesizer;
 import com.example.afs.fluidsynth.Synthesizer.Settings;
-import com.example.afs.musicpad.analyzer.AnalyzerTask;
 import com.example.afs.musicpad.device.common.DeviceWatcher;
 import com.example.afs.musicpad.device.midi.MidiWatcherBehavior;
 import com.example.afs.musicpad.device.qwerty.QwertyWatcherBehavior;
 import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.player.Player;
+import com.example.afs.musicpad.renderer.RendererTask;
 import com.example.afs.musicpad.transport.TransportTask;
 import com.example.afs.musicpad.util.Broker;
 import com.example.afs.musicpad.webapp.WebApp;
@@ -39,7 +39,7 @@ public class MusicPad {
   private DeviceWatcher midiWatcher;
   private DeviceWatcher qwertyWatcher;
   private TransportTask transportTask;
-  private AnalyzerTask analyzerTask;
+  private RendererTask rendererTask;
   private CommandProcessor commandProcessor;
   private WebApp webApp;
   private Synthesizer synthesizer = createSynthesizer();
@@ -50,7 +50,7 @@ public class MusicPad {
     this.midiWatcher = new DeviceWatcher(broker, synthesizer, new MidiWatcherBehavior());
     this.qwertyWatcher = new DeviceWatcher(broker, synthesizer, new QwertyWatcherBehavior());
     this.transportTask = new TransportTask(broker, synthesizer);
-    this.analyzerTask = new AnalyzerTask(broker);
+    this.rendererTask = new RendererTask(broker);
     this.webApp = new WebApp(broker);
     this.commandProcessor = new CommandProcessor(broker, synthesizer, musicLibrary);
   }
@@ -66,7 +66,7 @@ public class MusicPad {
     midiWatcher.start();
     qwertyWatcher.start();
     transportTask.start();
-    analyzerTask.start();
+    rendererTask.start();
     commandProcessor.start();
     webApp.start();
   }

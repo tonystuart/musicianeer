@@ -15,15 +15,15 @@ public class Table extends Hypertext {
     super("table");
   }
 
-  public TableHead createHead() {
-    TableHead tableHead = new TableHead();
-    append(tableHead);
-    return tableHead;
+  public TableHeader createHeader() {
+    TableHeader tableHeader = new TableHeader();
+    appendChild(tableHeader);
+    return tableHeader;
   }
 
   public TableRow createRow() {
     TableRow tableRow = new TableRow();
-    append(tableRow);
+    appendChild(tableRow);
     return tableRow;
   }
 

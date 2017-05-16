@@ -12,24 +12,24 @@ package com.example.afs.musicpad.message;
 public class OnMusic extends Message {
 
   private int index;
-  private String music;
+  private String html;
 
-  public OnMusic(int index, String music) {
+  public OnMusic(int index, String html) {
     this.index = index;
-    this.music = music;
+    this.html = html;
+  }
+
+  public String getHtml() {
+    return html;
   }
 
   public int getIndex() {
     return index;
   }
 
-  public String getMusic() {
-    return music;
-  }
-
   @Override
   public String toString() {
-    return "OnMusic [index=" + index + ", music=" + music + "]";
+    return "OnMusic [index=" + index + ", html=" + html + "]";
   }
 
 }

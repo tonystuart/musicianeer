@@ -7,12 +7,14 @@
 // This program is made available on an "as is" basis, without
 // warranties or conditions of any kind, either express or implied.
 
-package com.example.afs.musicpad.player;
+package com.example.afs.musicpad.renderer;
 
 import java.util.SortedSet;
 import java.util.TreeSet;
 
 import com.example.afs.musicpad.midi.Midi;
+import com.example.afs.musicpad.player.Chord;
+import com.example.afs.musicpad.player.Player;
 import com.example.afs.musicpad.song.Default;
 import com.example.afs.musicpad.song.Note;
 import com.example.afs.musicpad.song.Song;

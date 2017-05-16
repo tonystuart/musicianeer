@@ -9,15 +9,16 @@
 
 package com.example.afs.musicpad.html;
 
-public class TableHeading extends Hypertext {
+public class CheckBox extends Hypertext {
 
-  public TableHeading() {
-    super("th");
+  public CheckBox() {
+    super("input");
+    appendProperty("type", "checkbox");
   }
 
-  public TableHeading(Object value) {
+  public CheckBox(String id) {
     this();
-    appendChild(new TextElement(value.toString()));
+    setId(id);
   }
 
 }

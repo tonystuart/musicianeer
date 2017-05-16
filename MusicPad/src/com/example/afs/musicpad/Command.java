@@ -32,7 +32,6 @@ public enum Command {
   SET_TRANSPORT_VELOCITY, //
   SET_MASTER_GAIN, //
   SHOW_CHANNEL_STATE, //
-  SHOW_KEY_INFO, //
   SHOW_DRUM_INFO, //
   TRANSPOSE, //
   TRON, //

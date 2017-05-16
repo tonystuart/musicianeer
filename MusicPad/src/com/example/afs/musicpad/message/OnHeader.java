@@ -7,17 +7,23 @@
 // This program is made available on an "as is" basis, without
 // warranties or conditions of any kind, either express or implied.
 
-package com.example.afs.musicpad.html;
+package com.example.afs.musicpad.message;
 
-public class TableHeading extends Hypertext {
+public class OnHeader extends Message {
 
-  public TableHeading() {
-    super("th");
+  private String html;
+
+  public OnHeader(String html) {
+    this.html = html;
   }
 
-  public TableHeading(Object value) {
-    this();
-    appendChild(new TextElement(value.toString()));
+  public String getHtml() {
+    return html;
+  }
+
+  @Override
+  public String toString() {
+    return "OnHeader [html=" + html + "]";
   }
 
 }

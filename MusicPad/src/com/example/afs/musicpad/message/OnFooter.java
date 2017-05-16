@@ -9,22 +9,21 @@
 
 package com.example.afs.musicpad.message;
 
+public class OnFooter extends Message {
 
-public class OnDetails extends Message {
+  private String html;
 
-  private String details;
-
-  public OnDetails(String details) {
-    this.details = details;
+  public OnFooter(String html) {
+    this.html = html;
   }
 
-  public String getDetails() {
-    return details;
+  public String getHtml() {
+    return html;
   }
 
   @Override
   public String toString() {
-    return "OnDetails [details=" + details + "]";
+    return "OnFooter [html=" + html + "]";
   }
 
 }

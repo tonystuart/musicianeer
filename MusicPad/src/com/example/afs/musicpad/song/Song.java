@@ -243,6 +243,10 @@ public class Song {
     return ticksPerMeasure;
   }
 
+  public int getTransposition() {
+    return transposition;
+  }
+
   public TreeSet<Word> getWords() {
     return words;
   }

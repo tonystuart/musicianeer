@@ -17,7 +17,7 @@ public class TableData extends Hypertext {
 
   public TableData(Object value) {
     this();
-    append(new TextElement(value.toString()));
+    appendChild(new TextElement(value.toString()));
   }
 
 }

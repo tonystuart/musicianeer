@@ -17,15 +17,25 @@ musicPad.getElement = function(html) {
   return template.content.firstChild;
 }
 
-musicPad.onDetails = function(response) {
+musicPad.onHeader = function(response) {
   let header = document.getElementById("header");
-  header.innerHTML = response.details;
+  header.innerHTML = response.html;
+}
+
+musicPad.onFooter = function(response) {
+  let footer = document.getElementById("footer");
+  footer.innerHTML = response.html;
+}
+
+musicPad.onTransport = function(response) {
+  let transport = document.getElementById("transport");
+  transport.innerHTML = response.html;
 }
 
 musicPad.onMusic = function(response) {
   let notator = document.createElement("div");
   notator.className = "notator";
-  notator.innerHTML = response.music;
+  notator.innerHTML = response.html;
   notator.id = "notator-" + response.index;
   let oldNotator = document.getElementById(notator.id);
   if (oldNotator) {
@@ -86,8 +96,14 @@ musicPad.request = function(resource) {
 musicPad.processResponse = function(json) {
   let response = JSON.parse(json);
   switch (response.type) {
-  case "OnDetails":
-    musicPad.onDetails(response);
+  case "OnHeader":
+    musicPad.onHeader(response);
+    break;
+  case "OnFooter":
+    musicPad.onFooter(response);
+    break;
+  case "OnTransport":
+    musicPad.onTransport(response);
     break;
   case "OnMusic":
     musicPad.onMusic(response);

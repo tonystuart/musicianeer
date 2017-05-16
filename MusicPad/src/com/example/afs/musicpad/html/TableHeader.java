@@ -9,15 +9,19 @@
 
 package com.example.afs.musicpad.html;
 
-public class TableHeading extends Hypertext {
+public class TableHeader extends Hypertext {
 
-  public TableHeading() {
-    super("th");
+  private TableRow tableRow;
+
+  public TableHeader() {
+    super("thead");
+    tableRow = new TableRow();
+    appendChild(tableRow);
   }
 
-  public TableHeading(Object value) {
-    this();
-    appendChild(new TextElement(value.toString()));
+  public TableHeading append(Object value) {
+    TableHeading tableHeading = new TableHeading(value);
+    tableRow.appendChild(tableHeading);
+    return tableHeading;
   }
-
 }

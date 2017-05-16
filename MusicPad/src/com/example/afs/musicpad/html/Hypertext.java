@@ -9,6 +9,10 @@
 
 package com.example.afs.musicpad.html;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import com.example.afs.musicpad.util.DirectList;
 import com.example.afs.musicpad.util.RandomAccessList;
 
@@ -16,18 +20,25 @@ public class Hypertext extends Element {
   private String type;
   private String id;
   private String className;
-  private RandomAccessList<Element> childElements = new DirectList<>();
+  private Map<String, String> attributes;
+  private RandomAccessList<Element> childElements;
 
   public Hypertext(String type) {
     this.type = type;
   }
 
-  public void append(Element childElement) {
+  public void appendChild(Element childElement) {
+    if (childElements == null) {
+      childElements = new DirectList<>();
+    }
     childElements.add(childElement);
   }
 
-  public RandomAccessList<Element> getChildElements() {
-    return childElements;
+  public void appendProperty(String name, String value) {
+    if (attributes == null) {
+      attributes = new HashMap<>();
+    }
+    attributes.put(name, value);
   }
 
   public String getClassName() {
@@ -51,9 +62,16 @@ public class Hypertext extends Element {
     if (className != null) {
       s.append(format(" class='%s'", className));
     }
+    if (attributes != null) {
+      for (Entry<String, String> entry : attributes.entrySet()) {
+        s.append(format(" %s='%s'", entry.getKey(), entry.getValue()));
+      }
+    }
     s.append(">\n");
-    for (Element element : childElements) {
-      element.render(s);
+    if (childElements != null) {
+      for (Element element : childElements) {
+        element.render(s);
+      }
     }
     s.append(format("</%s>", type));
   }

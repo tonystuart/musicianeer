@@ -15,9 +15,16 @@ public class TableRow extends Hypertext {
     super("tr");
   }
 
+  public Element append(Element element) {
+    TableData tableData = new TableData();
+    tableData.appendChild(element);
+    appendChild(tableData);
+    return tableData;
+  }
+
   public TableData append(Object value) {
     TableData tableData = new TableData(value);
-    append(tableData);
+    appendChild(tableData);
     return tableData;
   }
 

@@ -14,7 +14,6 @@ import java.util.Random;
 
 import com.example.afs.fluidsynth.Synthesizer;
 import com.example.afs.musicpad.Trace.TraceOption;
-import com.example.afs.musicpad.analyzer.TranspositionFinder;
 import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnSong;
@@ -153,9 +152,7 @@ public class CommandProcessor extends BrokerTask<Message> {
       File midiFile = musicLibrary.getMidiFile(songIndex);
       SongBuilder songBuilder = new SongBuilder();
       song = songBuilder.createSong(midiFile);
-      int distanceToWhiteKeys = TranspositionFinder.getDistanceToWhiteKeys(song);
       System.out.println("Selecting song " + songNumber + " - " + song.getName());
-      System.out.println("Transpose by " + distanceToWhiteKeys + " to minimize sharps and flats");
       publish(new OnSong(song));
     } else {
       System.out.println("Song " + songNumber + " is out of range");
