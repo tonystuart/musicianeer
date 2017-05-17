@@ -55,15 +55,15 @@ public class MidiReader implements HasSendCommand, HasSendDeviceMessage, HasSend
   }
 
   private Broker<Message> broker;
-  private MidiDeviceBundle device;
+  private MidiDeviceBundle deviceBundle;
   private BlockingQueue<Message> queue;
   private MidiConfiguration configuration;
   private Context context;
 
-  public MidiReader(Broker<Message> broker, BlockingQueue<Message> queue, MidiDeviceBundle device, MidiConfiguration configuration) {
+  public MidiReader(Broker<Message> broker, BlockingQueue<Message> queue, MidiDeviceBundle deviceBundle, MidiConfiguration configuration) {
     this.broker = broker;
     this.queue = queue;
-    this.device = device;
+    this.deviceBundle = deviceBundle;
     this.configuration = configuration;
     this.context = configuration.getContext();
     context.setHasSendCommand(this);
@@ -96,12 +96,12 @@ public class MidiReader implements HasSendCommand, HasSendDeviceMessage, HasSend
 
   @Override
   public String toString() {
-    return "MidiReader [type=" + device.getType() + ", card=" + device.getCard() + ", unit=" + device.getUnit() + "]";
+    return "MidiReader [type=" + deviceBundle.getType() + ", card=" + deviceBundle.getCard() + ", unit=" + deviceBundle.getUnit() + "]";
   }
 
   private void connectDevices() {
     try {
-      for (MidiInputDevice midiInputDevice : device.getInputDevices()) {
+      for (MidiInputDevice midiInputDevice : deviceBundle.getInputDevices()) {
         MidiDevice midiDevice = midiInputDevice.getMidiDevice();
         midiDevice.open();
         midiDevice.getTransmitter().setReceiver(new MidiReceiver(midiInputDevice.getPort()));
@@ -112,7 +112,7 @@ public class MidiReader implements HasSendCommand, HasSendDeviceMessage, HasSend
   }
 
   private void disconnectDevices() {
-    for (MidiInputDevice midiInputDevice : device.getInputDevices()) {
+    for (MidiInputDevice midiInputDevice : deviceBundle.getInputDevices()) {
       MidiDevice midiDevice = midiInputDevice.getMidiDevice();
       midiDevice.close();
     }

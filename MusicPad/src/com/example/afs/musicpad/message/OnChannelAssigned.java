@@ -9,22 +9,26 @@
 
 package com.example.afs.musicpad.message;
 
-import java.util.Map;
-
 import com.example.afs.musicpad.song.Song;
 
-public class OnSong extends Message {
+public class OnChannelAssigned extends Message {
 
   private Song song;
-  private Map<Integer, Integer> deviceChannelMap;
+  private int deviceIndex;
+  private int channel;
 
-  public OnSong(Song song, Map<Integer, Integer> deviceChannelMap) {
+  public OnChannelAssigned(Song song, int deviceIndex, int channel) {
     this.song = song;
-    this.deviceChannelMap = deviceChannelMap;
+    this.deviceIndex = deviceIndex;
+    this.channel = channel;
   }
 
-  public Map<Integer, Integer> getDeviceChannelMap() {
-    return deviceChannelMap;
+  public int getChannel() {
+    return channel;
+  }
+
+  public int getDeviceIndex() {
+    return deviceIndex;
   }
 
   public Song getSong() {
@@ -33,7 +37,7 @@ public class OnSong extends Message {
 
   @Override
   public String toString() {
-    return "OnSong [song=" + song + ", deviceChannelMap=" + deviceChannelMap + "]";
+    return "OnChannelAssigned [song=" + song + ", deviceIndex=" + deviceIndex + ", channel=" + channel + "]";
   }
 
 }

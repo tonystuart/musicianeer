@@ -25,8 +25,8 @@ public class QwertyController implements Controller {
   }
 
   @Override
-  public int getIndex() {
-    return deviceHandler.getIndex();
+  public int getDevice() {
+    return deviceHandler.getDeviceIndex();
   }
 
   @Override

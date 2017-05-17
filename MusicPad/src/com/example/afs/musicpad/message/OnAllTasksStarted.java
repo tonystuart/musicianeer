@@ -9,21 +9,11 @@
 
 package com.example.afs.musicpad.message;
 
-public class OnDeviceAttached extends Message {
-
-  private int deviceIndex;
-
-  public OnDeviceAttached(int deviceIndex) {
-    this.deviceIndex = deviceIndex;
-  }
-
-  public int getDeviceIndex() {
-    return deviceIndex;
-  }
+public class OnAllTasksStarted extends Message {
 
   @Override
   public String toString() {
-    return "OnDeviceAttached [deviceIndex=" + deviceIndex + "]";
+    return "OnAllTasksStarted []";
   }
 
 }

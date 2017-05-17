@@ -11,19 +11,19 @@ package com.example.afs.musicpad.message;
 
 public class OnDeviceDetached extends Message {
 
-  private int index;
+  private int deviceIndex;
 
-  public OnDeviceDetached(int index) {
-    this.index = index;
+  public OnDeviceDetached(int deviceIndex) {
+    this.deviceIndex = deviceIndex;
   }
 
-  public int getIndex() {
-    return index;
+  public int getDeviceIndex() {
+    return deviceIndex;
   }
 
   @Override
   public String toString() {
-    return "OnDeviceDetached [index=" + index + "]";
+    return "OnDeviceDetached [deviceIndex=" + deviceIndex + "]";
   }
 
 }

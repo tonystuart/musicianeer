@@ -16,6 +16,7 @@ import com.example.afs.musicpad.device.common.DeviceWatcher;
 import com.example.afs.musicpad.device.midi.MidiWatcherBehavior;
 import com.example.afs.musicpad.device.qwerty.QwertyWatcherBehavior;
 import com.example.afs.musicpad.message.Message;
+import com.example.afs.musicpad.message.OnAllTasksStarted;
 import com.example.afs.musicpad.player.Player;
 import com.example.afs.musicpad.renderer.RendererTask;
 import com.example.afs.musicpad.transport.TransportTask;
@@ -35,7 +36,7 @@ public class MusicPad {
   }
 
   private Broker<Message> broker;
-  private MusicLibrary musicLibrary;
+  private SongManager songManager;
   private DeviceWatcher midiWatcher;
   private DeviceWatcher qwertyWatcher;
   private TransportTask transportTask;
@@ -45,14 +46,14 @@ public class MusicPad {
   private Synthesizer synthesizer = createSynthesizer();
 
   public MusicPad(String libraryPath) {
-    this.musicLibrary = new MusicLibrary(libraryPath);
     this.broker = new Broker<Message>();
+    this.songManager = new SongManager(broker, libraryPath);
+    this.commandProcessor = new CommandProcessor(broker, synthesizer);
     this.midiWatcher = new DeviceWatcher(broker, synthesizer, new MidiWatcherBehavior());
     this.qwertyWatcher = new DeviceWatcher(broker, synthesizer, new QwertyWatcherBehavior());
     this.transportTask = new TransportTask(broker, synthesizer);
     this.rendererTask = new RendererTask(broker);
     this.webApp = new WebApp(broker);
-    this.commandProcessor = new CommandProcessor(broker, synthesizer, musicLibrary);
   }
 
   private Synthesizer createSynthesizer() {
@@ -63,19 +64,14 @@ public class MusicPad {
   }
 
   private void start() {
+    songManager.start();
     midiWatcher.start();
     qwertyWatcher.start();
     transportTask.start();
     rendererTask.start();
     commandProcessor.start();
     webApp.start();
-    try {
-      // Give devices a chance to attach
-      Thread.sleep(5000);
-    } catch (InterruptedException e) {
-      throw new RuntimeException(e);
-    }
-    commandProcessor.selectRandomSong();
+    broker.publish(new OnAllTasksStarted());
   }
 
 }

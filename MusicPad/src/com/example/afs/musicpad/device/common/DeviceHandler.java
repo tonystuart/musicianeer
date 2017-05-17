@@ -18,6 +18,7 @@ import com.example.afs.musicpad.device.midi.MidiMapping;
 import com.example.afs.musicpad.device.qwerty.AlphaMapping;
 import com.example.afs.musicpad.device.qwerty.NumericMapping;
 import com.example.afs.musicpad.message.Message;
+import com.example.afs.musicpad.message.OnChannelAssigned;
 import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnControlChange;
 import com.example.afs.musicpad.message.OnMusic;
@@ -50,7 +51,7 @@ public class DeviceHandler extends BrokerTask<Message> {
   }
 
   private final String name;
-  private final int index;
+  private final int deviceIndex;
 
   private Song song;
   private Player player;
@@ -63,14 +64,15 @@ public class DeviceHandler extends BrokerTask<Message> {
     super(messageBroker);
     this.synthesizer = synthesizer;
     this.name = name;
-    this.index = getDeviceIndex(name);
+    this.deviceIndex = getDeviceIndex(name);
     this.playerFactory = new PlayerFactory(this);
     delegate(OnNoteOn.class, message -> doNoteOn(message.getMidiNote()));
     delegate(OnNoteOff.class, message -> doNoteOff(message.getMidiNote()));
     delegate(OnControlChange.class, message -> doControlChange(message.getControl(), message.getValue()));
     delegate(OnPitchBend.class, message -> doPitchBend(message.getPitchBend()));
     delegate(OnCommand.class, message -> doCommand(message));
-    subscribe(OnSong.class, message -> doSongSelected(message.getSong()));
+    subscribe(OnSong.class, message -> doSongSelected(message.getSong(), message.getDeviceChannelMap()));
+    subscribe(OnChannelAssigned.class, message -> doChannelAssigned(message.getSong(), message.getDeviceIndex(), message.getChannel()));
   }
 
   @Override
@@ -82,8 +84,8 @@ public class DeviceHandler extends BrokerTask<Message> {
     return channel;
   }
 
-  public int getIndex() {
-    return index;
+  public int getDeviceIndex() {
+    return deviceIndex;
   }
 
   public InputMapping getInputMapping() {
@@ -103,11 +105,20 @@ public class DeviceHandler extends BrokerTask<Message> {
     updatePlayer();
   }
 
+  private void doChannelAssigned(Song song, int deviceIndex, int channel) {
+    if (this.deviceIndex == deviceIndex) {
+      this.song = song;
+      this.channel = channel;
+      updatePlayer();
+    }
+  }
+
   private void doCommand(OnCommand message) {
     Command command = message.getCommand();
     int parameter = message.getParameter();
     switch (command) {
     case SELECT_CHANNEL:
+      // TODO: Add device so that they can be generated / consumed outside the device handler
       selectChannel(Value.toIndex(parameter));
       break;
     case SELECT_PROGRAM:
@@ -147,9 +158,9 @@ public class DeviceHandler extends BrokerTask<Message> {
     player.bendPitch(pitchBend);
   }
 
-  private void doSongSelected(Song song) {
+  private void doSongSelected(Song song, Map<Integer, Integer> deviceChannelMap) {
     this.song = song;
-    channel = song.assignChannel(index);
+    this.channel = deviceChannelMap.get(deviceIndex);
     updatePlayer();
   }
 
@@ -172,7 +183,7 @@ public class DeviceHandler extends BrokerTask<Message> {
       Notator notator = new Notator(player, song, channel);
       String music = notator.getMusic();
       getBroker().publish(new OnCommand(Command.SHOW_CHANNEL_STATE, 0));
-      getBroker().publish(new OnMusic(index, music));
+      getBroker().publish(new OnMusic(deviceIndex, music));
     }
   }
 

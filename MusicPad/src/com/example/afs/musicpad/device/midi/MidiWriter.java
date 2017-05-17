@@ -34,13 +34,13 @@ import com.example.afs.musicpad.util.Value;
 public class MidiWriter extends BrokerTask<Message> implements HasSendDeviceMessage {
 
   private Context context;
-  private MidiDeviceBundle device;
+  private MidiDeviceBundle deviceBundle;
   private MidiConfiguration configuration;
   private RandomAccessList<Receiver> receivers = new DirectList<>();
 
-  public MidiWriter(Broker<Message> broker, MidiDeviceBundle device, MidiConfiguration configuration) {
+  public MidiWriter(Broker<Message> broker, MidiDeviceBundle deviceBundle, MidiConfiguration configuration) {
     super(broker);
-    this.device = device;
+    this.deviceBundle = deviceBundle;
     this.configuration = configuration;
     this.context = configuration.getContext();
     context.setHasSendDeviceMessage(this);
@@ -74,12 +74,12 @@ public class MidiWriter extends BrokerTask<Message> implements HasSendDeviceMess
 
   @Override
   public String toString() {
-    return "MidiWriter [type=" + device.getType() + ", card=" + device.getCard() + ", unit=" + device.getUnit() + "]";
+    return "MidiWriter [type=" + deviceBundle.getType() + ", card=" + deviceBundle.getCard() + ", unit=" + deviceBundle.getUnit() + "]";
   }
 
   private void connectDevices() {
     try {
-      for (MidiOutputDevice midiOutputDevice : device.getOutputDevices()) {
+      for (MidiOutputDevice midiOutputDevice : deviceBundle.getOutputDevices()) {
         MidiDevice midiDevice = midiOutputDevice.getMidiDevice();
         midiDevice.open();
         receivers.add(midiDevice.getReceiver());
@@ -90,7 +90,7 @@ public class MidiWriter extends BrokerTask<Message> implements HasSendDeviceMess
   }
 
   private void disconnectDevices() {
-    for (MidiOutputDevice midiOutputDevice : device.getOutputDevices()) {
+    for (MidiOutputDevice midiOutputDevice : deviceBundle.getOutputDevices()) {
       MidiDevice midiDevice = midiOutputDevice.getMidiDevice();
       midiDevice.close();
     }

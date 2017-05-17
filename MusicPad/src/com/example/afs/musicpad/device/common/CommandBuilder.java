@@ -45,7 +45,7 @@ public class CommandBuilder {
         sharp = true;
         ignoreCount = 0;
       } else if (inputCode == KeyEvent.VK_ESCAPE) {
-        queue.add(new OnCommand(Command.DETACH, deviceHandler.getIndex()));
+        queue.add(new OnCommand(Command.DETACH, deviceHandler.getDeviceIndex()));
         ignoreCount = 1;
       } else {
         int midiNote = getMidiNote(inputCode);
@@ -107,15 +107,15 @@ public class CommandBuilder {
   }
 
   private void createCommand() {
-    int index = parseInteger(left.toString());
+    int commandIndex = parseInteger(left.toString());
     int parameter = parseInteger(right.toString());
     Command[] values = Command.values();
-    if (index < values.length) {
-      Command command = values[index];
+    if (commandIndex < values.length) {
+      Command command = values[commandIndex];
       OnCommand onCommand = new OnCommand(command, parameter);
       queue.add(onCommand);
     } else {
-      System.err.println("Command " + index + " is out of range.");
+      System.err.println("Command " + commandIndex + " is out of range.");
     }
   }
 

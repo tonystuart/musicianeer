@@ -11,25 +11,25 @@ package com.example.afs.musicpad.message;
 
 public class OnMusic extends Message {
 
-  private int index;
+  private int deviceIndex;
   private String html;
 
-  public OnMusic(int index, String html) {
-    this.index = index;
+  public OnMusic(int deviceIndex, String html) {
+    this.deviceIndex = deviceIndex;
     this.html = html;
+  }
+
+  public int getDeviceIndex() {
+    return deviceIndex;
   }
 
   public String getHtml() {
     return html;
   }
 
-  public int getIndex() {
-    return index;
-  }
-
   @Override
   public String toString() {
-    return "OnMusic [index=" + index + ", html=" + html + "]";
+    return "OnMusic [deviceIndex=" + deviceIndex + ", html=" + html + "]";
   }
 
 }

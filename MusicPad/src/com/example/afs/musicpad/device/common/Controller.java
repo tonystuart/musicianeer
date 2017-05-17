@@ -11,7 +11,7 @@ package com.example.afs.musicpad.device.common;
 
 public interface Controller {
 
-  int getIndex();
+  int getDevice();
 
   void start();
 

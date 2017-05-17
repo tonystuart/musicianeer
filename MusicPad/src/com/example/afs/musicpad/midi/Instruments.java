@@ -200,24 +200,24 @@ public class Instruments {
     return DRUMS.length;
   }
 
-  public static String getDrumName(int index) {
-    return findElement(DRUMS, index - Midi.DRUM_BASE);
+  public static String getDrumName(int midiNote) {
+    return findElement(DRUMS, midiNote - Midi.DRUM_BASE);
   }
 
   public static int getInstrument(String name) {
     return findIndex(INSTRUMENTS, name);
   }
 
-  public static String getInstrumentName(int index) {
-    return findElement(INSTRUMENTS, index);
+  public static String getProgramName(int program) {
+    return findElement(INSTRUMENTS, program);
   }
 
-  private static String findElement(String[] array, int index) {
+  private static String findElement(String[] array, int arrayIndex) {
     String instrument;
-    if (index < 0 || index >= array.length) {
-      instrument = Integer.toString(index);
+    if (arrayIndex < 0 || arrayIndex >= array.length) {
+      instrument = Integer.toString(arrayIndex);
     } else {
-      instrument = array[index];
+      instrument = array[arrayIndex];
     }
     return instrument;
   }

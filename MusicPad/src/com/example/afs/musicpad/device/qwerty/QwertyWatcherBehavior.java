@@ -40,8 +40,8 @@ public class QwertyWatcherBehavior implements WatcherBehavior {
     File deviceFolder = new File("/dev/input/by-path");
     File[] deviceArray = deviceFolder.listFiles((dir, name) -> isMusicPad(name));
     Map<String, DeviceBundle> devices = new HashMap<>();
-    for (File device : deviceArray) {
-      devices.put(device.getPath(), new DeviceBundle() {
+    for (File deviceFile : deviceArray) {
+      devices.put(deviceFile.getPath(), new DeviceBundle() {
         // QwertyController uses the key, not the value
       });
     }

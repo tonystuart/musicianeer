@@ -5,7 +5,7 @@ musicPad.refreshIntervalMillis = 60000;
 musicPad.lastMessageNumber = -1;
 
 musicPad.onDeviceDetached = function(response) {
-  let notator = document.getElementById("notator-" + response.index);
+  let notator = document.getElementById("notator-" + response.deviceIndex);
   if (notator) {
     notator.parentNode.removeChild(notator);
   }
@@ -36,7 +36,7 @@ musicPad.onMusic = function(response) {
   let notator = document.createElement("div");
   notator.className = "notator";
   notator.innerHTML = response.html;
-  notator.id = "notator-" + response.index;
+  notator.id = "notator-" + response.deviceIndex;
   let oldNotator = document.getElementById(notator.id);
   if (oldNotator) {
     oldNotator.parentElement.replaceChild(notator, oldNotator);

@@ -36,7 +36,7 @@ public abstract class Player {
 
   protected Song song;
   protected int songChannel;
-  protected int index;
+  protected int deviceIndex;
   protected String mappingType;
   protected InputMapping inputMapping;
   private int playbackChannel;
@@ -44,7 +44,7 @@ public abstract class Player {
   private int percentVelocity = DEFAULT_PERCENT_VELOCITY;
 
   public Player(DeviceHandler deviceHandler, Song song) {
-    this.index = deviceHandler.getIndex();
+    this.deviceIndex = deviceHandler.getDeviceIndex();
     this.songChannel = deviceHandler.getChannel();
     this.inputMapping = deviceHandler.getInputMapping();
     this.mappingType = inputMapping.getClass().getSimpleName();
@@ -118,7 +118,7 @@ public abstract class Player {
   }
 
   private void initializeDeviceChannel() {
-    this.playbackChannel = PLAYER_BASE + index;
+    this.playbackChannel = PLAYER_BASE + deviceIndex;
     if (songChannel == Midi.DRUM) {
       synthesizer.setChannelType(playbackChannel, FluidSynth.CHANNEL_TYPE_DRUM);
     } else {

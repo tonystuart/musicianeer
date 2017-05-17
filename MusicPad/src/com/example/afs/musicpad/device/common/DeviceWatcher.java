@@ -59,18 +59,18 @@ public class DeviceWatcher extends BrokerTask<Message> {
     Controller controller = watcherBehavior.attachDevice(deviceHandler, deviceBundle);
     oldDevices.put(name, controller);
     controller.start();
-    publish(new OnDeviceAttached(deviceHandler.getIndex()));
+    publish(new OnDeviceAttached(deviceHandler.getDeviceIndex()));
   }
 
   private void detachDevice(String name, Controller controller) {
     watcherBehavior.detachDevice(name, controller);
     controller.terminate();
-    publish(new OnDeviceDetached(controller.getIndex()));
+    publish(new OnDeviceDetached(controller.getDevice()));
   }
 
-  private void doCommand(Command command, int index) {
+  private void doCommand(Command command, int deviceIndex) {
     if (command == Command.DETACH) {
-      Entry<String, Controller> entry = findByControllerIndex(index);
+      Entry<String, Controller> entry = findByControllerDeviceIndex(deviceIndex);
       if (entry != null) {
         detachDevice(entry.getKey(), entry.getValue());
         // Leave device in list of oldDevices to prevent re-attachment
@@ -78,9 +78,9 @@ public class DeviceWatcher extends BrokerTask<Message> {
     }
   }
 
-  private Entry<String, Controller> findByControllerIndex(int index) {
+  private Entry<String, Controller> findByControllerDeviceIndex(int deviceIndex) {
     for (Entry<String, Controller> entry : oldDevices.entrySet()) {
-      if (entry.getValue().getIndex() == index) {
+      if (entry.getValue().getDevice() == deviceIndex) {
         return entry;
       }
     }

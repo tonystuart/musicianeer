@@ -9,16 +9,11 @@
 
 package com.example.afs.musicpad;
 
-import java.io.File;
-import java.util.Random;
-
 import com.example.afs.fluidsynth.Synthesizer;
 import com.example.afs.musicpad.Trace.TraceOption;
 import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnCommand;
-import com.example.afs.musicpad.message.OnSong;
 import com.example.afs.musicpad.midi.Midi;
-import com.example.afs.musicpad.parser.SongBuilder;
 import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.task.BrokerTask;
 import com.example.afs.musicpad.util.Broker;
@@ -70,38 +65,16 @@ import com.example.afs.musicpad.util.Value;
 
 public class CommandProcessor extends BrokerTask<Message> {
 
-  private static final int PAGE_SIZE = 10;
   private static final float DEFAULT_GAIN = 5 * Synthesizer.DEFAULT_GAIN;
 
   private Song song;
-  private MusicLibrary musicLibrary;
   private Synthesizer synthesizer;
-  private Random random = new Random();
 
-  public CommandProcessor(Broker<Message> broker, Synthesizer synthesizer, MusicLibrary musicLibrary) {
+  public CommandProcessor(Broker<Message> broker, Synthesizer synthesizer) {
     super(broker);
     this.synthesizer = synthesizer;
-    this.musicLibrary = musicLibrary;
     subscribe(OnCommand.class, message -> doCommand(message.getCommand(), message.getParameter()));
     synthesizer.setGain(DEFAULT_GAIN);
-  }
-
-  public void selectRandomSong() {
-    boolean selected = false;
-    while (!selected) {
-      try {
-        int songIndex = random.nextInt(musicLibrary.size());
-        selectSong(songIndex);
-        selected = true;
-      } catch (RuntimeException e) {
-        e.printStackTrace();
-        try {
-          Thread.sleep(100);
-        } catch (InterruptedException e1) {
-          throw new RuntimeException(e1);
-        }
-      }
-    }
   }
 
   private void doCommand(Command command, int parameter) {
@@ -109,16 +82,10 @@ public class CommandProcessor extends BrokerTask<Message> {
     case HELP:
       doHelp();
       break;
-    case SELECT_SONG:
-      doSelectSong(parameter);
-      break;
-    case LIST_SONGS:
-      doListSongs(parameter);
-      break;
     case SET_MASTER_GAIN:
       doSetMasterGain(parameter);
       break;
-    case TRANSPOSE:
+    case TRANSPOSE: // TODO: Consider moving to SongManager. Synthesizer.allNotesOff() is the problem.
       doTranspose(parameter);
       break;
     case TRON:
@@ -138,32 +105,6 @@ public class CommandProcessor extends BrokerTask<Message> {
   private void doHelp() {
     for (Command command : Command.values()) {
       System.out.println(command.ordinal() + " -> " + command);
-    }
-  }
-
-  private void doListSongs(int songNumber) {
-    int base;
-    int limit;
-    if (songNumber == 0) {
-      base = 0;
-      limit = musicLibrary.size();
-    } else {
-      int songIndex = songNumber - 1;
-      base = Math.max(0, songIndex);
-      limit = Math.min(songIndex + PAGE_SIZE, musicLibrary.size());
-    }
-    for (int songIndex = base; songIndex < limit; songIndex++) {
-      File midiFile = musicLibrary.getMidiFile(songIndex);
-      System.out.println("Song #" + (songIndex + 1) + ": " + midiFile.getName());
-    }
-  }
-
-  private void doSelectSong(int songNumber) {
-    int songIndex = Value.toIndex(songNumber);
-    if (songIndex >= 0 && songIndex < musicLibrary.size()) {
-      selectSong(songIndex);
-    } else {
-      System.out.println("Song " + songNumber + " is out of range");
     }
   }
 
@@ -198,14 +139,6 @@ public class CommandProcessor extends BrokerTask<Message> {
       traceOption = traceOptions[trace];
     }
     return traceOption;
-  }
-
-  private void selectSong(int songIndex) {
-    File midiFile = musicLibrary.getMidiFile(songIndex);
-    SongBuilder songBuilder = new SongBuilder();
-    song = songBuilder.createSong(midiFile);
-    System.out.println("Selecting song " + (songIndex + 1) + " - " + song.getName());
-    publish(new OnSong(song));
   }
 
   private void setTrace(int traceIndex, boolean value) {

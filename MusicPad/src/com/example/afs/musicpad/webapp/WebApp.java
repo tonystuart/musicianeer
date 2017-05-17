@@ -148,7 +148,7 @@ public class WebApp extends BrokerTask<Message> {
   }
 
   private void doDeviceDetached(OnDeviceDetached message) {
-    indexMusic.remove(message.getIndex());
+    indexMusic.remove(message.getDeviceIndex());
     doMessage(message);
   }
 
@@ -159,7 +159,7 @@ public class WebApp extends BrokerTask<Message> {
   }
 
   private void doMusic(OnMusic message) {
-    indexMusic.put(message.getIndex(), message);
+    indexMusic.put(message.getDeviceIndex(), message);
     doMessage(message);
   }
 
