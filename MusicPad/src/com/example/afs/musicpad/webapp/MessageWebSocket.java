@@ -23,7 +23,7 @@ public class MessageWebSocket extends WebSocketAdapter {
   @Override
   public void onWebSocketConnect(Session sess) {
     super.onWebSocketConnect(sess);
-    webApp.addMessageWebSocket(this);
+    webApp.onWebSocketConnection(this);
   }
 
   @Override
@@ -35,6 +35,7 @@ public class MessageWebSocket extends WebSocketAdapter {
   @Override
   public void onWebSocketText(String message) {
     super.onWebSocketText(message);
+    webApp.onWebSocketText(this, message);
   }
 
   public void write(Message message) {

@@ -86,6 +86,24 @@ public class CommandProcessor extends BrokerTask<Message> {
     synthesizer.setGain(DEFAULT_GAIN);
   }
 
+  public void selectRandomSong() {
+    boolean selected = false;
+    while (!selected) {
+      try {
+        int songIndex = random.nextInt(musicLibrary.size());
+        selectSong(songIndex);
+        selected = true;
+      } catch (RuntimeException e) {
+        e.printStackTrace();
+        try {
+          Thread.sleep(100);
+        } catch (InterruptedException e1) {
+          throw new RuntimeException(e1);
+        }
+      }
+    }
+  }
+
   private void doCommand(Command command, int parameter) {
     switch (command) {
     case HELP:
@@ -141,19 +159,9 @@ public class CommandProcessor extends BrokerTask<Message> {
   }
 
   private void doSelectSong(int songNumber) {
-    int songIndex;
-    if (songNumber == 0) {
-      songIndex = random.nextInt(musicLibrary.size());
-      songNumber = songIndex + 1;
-    } else {
-      songIndex = songNumber - 1;
-    }
-    if (songIndex < musicLibrary.size()) {
-      File midiFile = musicLibrary.getMidiFile(songIndex);
-      SongBuilder songBuilder = new SongBuilder();
-      song = songBuilder.createSong(midiFile);
-      System.out.println("Selecting song " + songNumber + " - " + song.getName());
-      publish(new OnSong(song));
+    int songIndex = Value.toIndex(songNumber);
+    if (songIndex >= 0 && songIndex < musicLibrary.size()) {
+      selectSong(songIndex);
     } else {
       System.out.println("Song " + songNumber + " is out of range");
     }
@@ -190,6 +198,14 @@ public class CommandProcessor extends BrokerTask<Message> {
       traceOption = traceOptions[trace];
     }
     return traceOption;
+  }
+
+  private void selectSong(int songIndex) {
+    File midiFile = musicLibrary.getMidiFile(songIndex);
+    SongBuilder songBuilder = new SongBuilder();
+    song = songBuilder.createSong(midiFile);
+    System.out.println("Selecting song " + (songIndex + 1) + " - " + song.getName());
+    publish(new OnSong(song));
   }
 
   private void setTrace(int traceIndex, boolean value) {

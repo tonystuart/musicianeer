@@ -9,34 +9,32 @@
 
 package com.example.afs.musicpad.theory;
 
+import com.example.afs.musicpad.midi.Midi;
+
 public class Key {
 
   private String name;
   private int tonic;
   private int octaveCount;
   private Scale scale;
-  private int[] midiNotes;
 
   public Key(String name, int tonic, int octaveCount, Scale scale) {
     this.name = name;
     this.tonic = tonic;
     this.octaveCount = octaveCount;
     this.scale = scale;
-    int noteCount = octaveCount * 7;
-    this.midiNotes = new int[noteCount];
-    for (int i = 0, value = tonic; i < noteCount; i++) {
-      midiNotes[i] = value;
-      int halfStepsToNextNote = scale.getInterval(i);
-      value += halfStepsToNextNote;
-    }
-  }
-
-  public int[] getMidiNotes() {
-    return midiNotes;
   }
 
   public String getName() {
     return name;
+  }
+
+  public int getNoteInKey(int fulltone) {
+    int base = fulltone - tonic;
+    int octave = base / Midi.NOTES_PER_OCTAVE;
+    int offset = octave % Midi.NOTES_PER_OCTAVE;
+    int midiNote = octave * Midi.SEMITONES_PER_OCTAVE + scale.getSemiTone(offset);
+    return midiNote;
   }
 
   public int getOctaveCount() {

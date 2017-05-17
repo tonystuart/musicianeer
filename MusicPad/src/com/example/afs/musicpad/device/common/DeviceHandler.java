@@ -29,7 +29,6 @@ import com.example.afs.musicpad.player.Player;
 import com.example.afs.musicpad.player.Player.Action;
 import com.example.afs.musicpad.player.PlayerFactory;
 import com.example.afs.musicpad.renderer.Notator;
-import com.example.afs.musicpad.song.Default;
 import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.task.BrokerTask;
 import com.example.afs.musicpad.util.Broker;
@@ -50,14 +49,15 @@ public class DeviceHandler extends BrokerTask<Message> {
     return deviceIndex;
   }
 
-  private Player player;
-  private PlayerFactory playerFactory;
-  private Song song = Default.SONG;
   private final String name;
   private final int index;
+
+  private Song song;
+  private Player player;
   private int channel;
   private InputMapping inputMapping;
   private Synthesizer synthesizer;
+  private PlayerFactory playerFactory;
 
   public DeviceHandler(Broker<Message> messageBroker, Synthesizer synthesizer, String name) {
     super(messageBroker);
@@ -149,7 +149,7 @@ public class DeviceHandler extends BrokerTask<Message> {
 
   private void doSongSelected(Song song) {
     this.song = song;
-    // TODO: Select default channel based on device index and capabilities
+    channel = song.assignChannel(index);
     updatePlayer();
   }
 
@@ -167,11 +167,13 @@ public class DeviceHandler extends BrokerTask<Message> {
   }
 
   private void updatePlayer() {
-    this.player = playerFactory.createPlayer(song);
-    Notator notator = new Notator(player, song, channel);
-    String music = notator.getMusic();
-    getBroker().publish(new OnCommand(Command.SHOW_CHANNEL_STATE, 0));
-    getBroker().publish(new OnMusic(index, music));
+    if (song != null) {
+      this.player = playerFactory.createPlayer(song);
+      Notator notator = new Notator(player, song, channel);
+      String music = notator.getMusic();
+      getBroker().publish(new OnCommand(Command.SHOW_CHANNEL_STATE, 0));
+      getBroker().publish(new OnMusic(index, music));
+    }
   }
 
 }

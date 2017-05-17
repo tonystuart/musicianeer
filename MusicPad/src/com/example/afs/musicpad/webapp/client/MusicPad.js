@@ -61,7 +61,9 @@ musicPad.onTick = function(tick) {
   }
 }
 
-musicPad.onClick = function() {
+musicPad.onClick = function(event) {
+  let id = event.target.id;
+  musicPad.ws.send(JSON.stringify({type: "OnClick", id: id}))
 }
 
 musicPad.onLoad = function() {
@@ -69,14 +71,14 @@ musicPad.onLoad = function() {
 }
 
 musicPad.createWebSocketClient = function() {
-  let ws = new WebSocket("ws://localhost:8080/v1/message");
-  ws.onopen = function() {
+  musicPad.ws = new WebSocket("ws://localhost:8080/v1/message");
+  musicPad.ws.onopen = function() {
     console.log("ws.onopen: entered");
   }
-  ws.onmessage = function(message) {
+  musicPad.ws.onmessage = function(message) {
     musicPad.processResponse(message.data);
   }
-  ws.onclose = function() {
+  musicPad.ws.onclose = function() {
     console.log("ws.onclose: entered, connecting again in 1000 ms.");
     setTimeout(musicPad.createWebSocketClient, 1000);
   }

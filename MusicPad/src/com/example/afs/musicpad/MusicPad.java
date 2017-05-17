@@ -69,6 +69,13 @@ public class MusicPad {
     rendererTask.start();
     commandProcessor.start();
     webApp.start();
+    try {
+      // Give devices a chance to attach
+      Thread.sleep(5000);
+    } catch (InterruptedException e) {
+      throw new RuntimeException(e);
+    }
+    commandProcessor.selectRandomSong();
   }
 
 }

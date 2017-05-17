@@ -9,7 +9,12 @@
 
 package com.example.afs.musicpad.webapp;
 
+import java.io.IOException;
 import java.net.URL;
+import java.nio.ByteBuffer;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -39,23 +44,40 @@ public class WebApp extends BrokerTask<Message> {
   private static final int PORT = 8080;
 
   private static final int CLIENTS = 10;
-  private Server server;
+  private static final long PING_INTERVAL_MS = 5000;
+  private static final ByteBuffer PING = ByteBuffer.wrap("PING".getBytes());
 
+  private Server server;
+  private Map<Integer, Message> indexMusic = new HashMap<>();
+  private Map<Class<? extends Message>, Message> state = new HashMap<>();
   private BlockingQueue<MessageWebSocket> messageWebSockets = new LinkedBlockingQueue<>(CLIENTS);
 
   public WebApp(Broker<Message> broker) {
-    super(broker);
+    super(broker, PING_INTERVAL_MS);
     createServer();
-    subscribe(OnHeader.class, message -> doMessage(message));
-    subscribe(OnFooter.class, message -> doMessage(message));
-    subscribe(OnTransport.class, message -> doMessage(message));
-    subscribe(OnMusic.class, message -> doMessage(message));
+    subscribe(OnHeader.class, message -> doStatefulMessage(message));
+    subscribe(OnFooter.class, message -> doStatefulMessage(message));
+    subscribe(OnTransport.class, message -> doStatefulMessage(message));
+    subscribe(OnMusic.class, message -> doMusic(message));
     subscribe(OnTick.class, message -> doMessage(message));
-    subscribe(OnDeviceDetached.class, message -> doMessage(message));
+    subscribe(OnDeviceDetached.class, message -> doDeviceDetached(message));
   }
 
-  public void addMessageWebSocket(MessageWebSocket messageWebSocket) {
+  public void onWebSocketConnection(MessageWebSocket messageWebSocket) {
     messageWebSockets.add(messageWebSocket);
+    for (Message stateMessage : state.values()) {
+      messageWebSocket.write(stateMessage);
+    }
+    for (Message musicMessage : indexMusic.values()) {
+      messageWebSocket.write(musicMessage);
+    }
+  }
+
+  public void onWebSocketText(MessageWebSocket messageWebSocket, String json) {
+    System.out.println("Received " + json);
+    //    Message message = JsonUtilities.fromJson(json, Message.class);
+    //    if ("OnInitialize".equals(message.getType())) {
+    //    }
   }
 
   public void removeMessageWebSocket(MessageWebSocket messageWebSocket) {
@@ -67,10 +89,25 @@ public class WebApp extends BrokerTask<Message> {
     super.start();
     try {
       server.start();
-      server.join();
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
+  }
+
+  @Override
+  protected void onTimeout() throws InterruptedException {
+    Iterator<MessageWebSocket> iterator = messageWebSockets.iterator();
+    while (iterator.hasNext()) {
+      MessageWebSocket messageWebSocket = iterator.next();
+      try {
+        messageWebSocket.getRemote().sendPing(PING);
+      } catch (IOException e) {
+        System.err.println("Client PING failed, closing WebSocket");
+        messageWebSocket.getSession().close();
+        iterator.remove();
+      }
+    }
+
   }
 
   private ServletHolder createDefaultServlet() {
@@ -110,10 +147,25 @@ public class WebApp extends BrokerTask<Message> {
     return webSocketServletHolder;
   }
 
+  private void doDeviceDetached(OnDeviceDetached message) {
+    indexMusic.remove(message.getIndex());
+    doMessage(message);
+  }
+
   private void doMessage(Message message) {
     for (MessageWebSocket messageWebSocket : messageWebSockets) {
       messageWebSocket.write(message);
     }
+  }
+
+  private void doMusic(OnMusic message) {
+    indexMusic.put(message.getIndex(), message);
+    doMessage(message);
+  }
+
+  private void doStatefulMessage(Message message) {
+    state.put(message.getClass(), message);
+    doMessage(message);
   }
 
   private String getResourceBase() {

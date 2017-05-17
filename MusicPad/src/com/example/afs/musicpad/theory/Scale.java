@@ -11,14 +11,22 @@ package com.example.afs.musicpad.theory;
 
 import java.util.Arrays;
 
+import com.example.afs.musicpad.midi.Midi;
+
 public class Scale {
 
   private String name;
   private int[] intervals;
+  private int[] fullToneToSemiTone = new int[Midi.NOTES_PER_OCTAVE];
 
   public Scale(String name, int... intervals) {
     this.name = name;
     this.intervals = intervals;
+    for (int i = 0, value = 0; i < fullToneToSemiTone.length; i++) {
+      fullToneToSemiTone[i] = value;
+      int halfStepsToNextNote = intervals[i];
+      value += halfStepsToNextNote;
+    }
   }
 
   public int getInterval(int degree) {
@@ -31,6 +39,10 @@ public class Scale {
 
   public String getName() {
     return name;
+  }
+
+  public int getSemiTone(int fullTone) {
+    return fullToneToSemiTone[fullTone];
   }
 
   @Override

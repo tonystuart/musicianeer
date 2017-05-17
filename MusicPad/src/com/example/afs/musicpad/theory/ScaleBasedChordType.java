@@ -12,6 +12,6 @@ package com.example.afs.musicpad.theory;
 public class ScaleBasedChordType extends ChordType {
 
   public ScaleBasedChordType(Key key, String name, int degree) {
-    super(name, key.getMidiNotes()[degree - 1 + 0], key.getMidiNotes()[degree - 1 + 2], key.getMidiNotes()[degree - 1 + 4]);
+    super(name, key.getNoteInKey(degree - 1 + 0), key.getNoteInKey(degree - 1 + 2), key.getNoteInKey(degree - 1 + 4));
   }
 }

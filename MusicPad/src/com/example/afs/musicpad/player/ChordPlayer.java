@@ -40,7 +40,7 @@ public class ChordPlayer extends Player {
   public String toKeyCap(Chord chord) {
     Integer midiNote = chordToMidiNote.get(chord);
     if (midiNote == null) {
-      midiNote = Keys.CMajorFull.getMidiNotes()[chordToMidiNote.size()];
+      midiNote = Keys.CMajorFull.getNoteInKey(chordToMidiNote.size());
       chordToMidiNote.put(chord, midiNote);
       midiNoteToChord.put(midiNote, chord);
       System.out.println(chord + " <=> " + midiNote);

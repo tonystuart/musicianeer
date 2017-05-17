@@ -327,17 +327,6 @@ public class Notator {
     return text;
   }
 
-  private int getBottom() {
-    int bottom;
-    int lowestMidiNote = song.getLowestMidiNote();
-    if (lowestMidiNote < MIDDLE) {
-      bottom = getY(Math.min(lowestMidiNote, BASS_MIDI_NOTES[0])) + RADIUS;
-    } else {
-      bottom = getY(MIDDLE) + INTER_CLEF;
-    }
-    return bottom;
-  }
-
   private Context getContext(RandomAccessList<Note> notes, int midPoint) {
     NoteType noteType;
     int lowestMidiNote = Midi.MAX_VALUE;
@@ -370,10 +359,9 @@ public class Notator {
   }
 
   private Svg getStaff(long duration) {
-    int top = getTop();
-    int bottom = getBottom();
+    int bottom = getY(POSITION[LOWEST]);
     int width = scale(duration);
-    Svg staff = new Svg(0, top, width, bottom);
+    Svg staff = new Svg(0, 0, width, bottom);
     for (int i = 0; i < TREBLE_MIDI_NOTES.length; i++) {
       int y = getY(TREBLE_MIDI_NOTES[i]);
       staff.add(new Line(0, y, width, y));
@@ -383,17 +371,6 @@ public class Notator {
       staff.add(new Line(0, y, width, y));
     }
     return staff;
-  }
-
-  private int getTop() {
-    int top;
-    int highestMidiNote = song.getHighestMidiNote();
-    if (highestMidiNote < MIDDLE) {
-      top = getY(MIDDLE) + RADIUS;
-    } else {
-      top = getY(Math.max(highestMidiNote, TREBLE_MIDI_NOTES[4])) - RADIUS;
-    }
-    return top;
   }
 
   private int getY(int midiNote) {

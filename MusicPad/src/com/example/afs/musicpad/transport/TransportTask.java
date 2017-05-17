@@ -38,11 +38,11 @@ public class TransportTask extends BrokerTask<Message> {
   private static final long FIRST_NOTE = -1;
   private static final long LAST_NOTE = -1;
 
+  private Song song;
   private Synthesizer synthesizer;
-  private PausibleSequencerTask<NoteEvent> sequencerTask;
   private NoteEventScheduler noteEventScheduler;
+  private PausibleSequencerTask<NoteEvent> sequencerTask;
   private int percentVelocity = DEFAULT_PERCENT_VELOCITY;
-  private Song song = Song.DEFAULT;
 
   private int currentChannel;
 

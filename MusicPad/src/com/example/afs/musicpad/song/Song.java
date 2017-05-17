@@ -10,8 +10,10 @@
 package com.example.afs.musicpad.song;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.NavigableSet;
 import java.util.Set;
 import java.util.TreeSet;
@@ -23,16 +25,13 @@ import com.example.afs.musicpad.util.Value;
 
 public class Song {
 
-  public static final Song DEFAULT = new Song();
-
   private String name;
+  private long duration;
+  private int transposition;
   private TreeSet<Note> notes = new TreeSet<>();
   private TreeSet<Word> words = new TreeSet<>();
   private ChannelFacets channelFacets = new ChannelFacets();
-
-  private int transposition;
-
-  private long duration;
+  private Map<Integer, Integer> deviceChannelMap = new HashMap<>();
 
   public Song() {
   }
@@ -71,6 +70,31 @@ public class Song {
       }
     }
     return appendTick;
+  }
+
+  public synchronized int assignChannel(int device) {
+    unassignChannel(device);
+    int assignedChannel = -1;
+    int firstActiveChannel = -1;
+    for (int channel = 0; channel < Midi.CHANNELS && assignedChannel == -1; channel++) {
+      if (getChannelNoteCount(channel) != 0) {
+        if (firstActiveChannel == -1) {
+          firstActiveChannel = channel;
+        }
+        if (!channelAssigned(channel)) {
+          assignedChannel = channel;
+        }
+      }
+    }
+    if (assignedChannel == -1) {
+      if (firstActiveChannel != -1) {
+        assignedChannel = firstActiveChannel;
+      } else {
+        assignedChannel = 0;
+      }
+    }
+    deviceChannelMap.put(device, assignedChannel);
+    return assignedChannel;
   }
 
   public int getAverageMidiNote(int channel) {
@@ -296,4 +320,16 @@ public class Song {
     }
   }
 
+  public synchronized void unassignChannel(int device) {
+    deviceChannelMap.remove(device);
+  }
+
+  private synchronized boolean channelAssigned(int channel) {
+    for (int assignedChannel : deviceChannelMap.values()) {
+      if (assignedChannel == channel) {
+        return true;
+      }
+    }
+    return false;
+  }
 }
