@@ -22,6 +22,7 @@ import com.example.afs.musicpad.device.midi.configuration.Context.HasSendDeviceM
 import com.example.afs.musicpad.device.midi.configuration.MidiConfiguration;
 import com.example.afs.musicpad.device.midi.configuration.On;
 import com.example.afs.musicpad.message.Message;
+import com.example.afs.musicpad.message.OnChannelAssigned;
 import com.example.afs.musicpad.message.OnChannelState;
 import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnDeviceMessage;
@@ -46,6 +47,7 @@ public class MidiWriter extends BrokerTask<Message> implements HasSendDeviceMess
     context.setHasSendDeviceMessage(this);
     subscribe(OnCommand.class, message -> doCommand(message.getCommand(), message.getParameter()));
     subscribe(OnChannelState.class, message -> doChannelState(message.getChannel(), message.getChannelState()));
+    subscribe(OnChannelAssigned.class, message -> doChannelAssigned(message.getDeviceIndex(), message.getChannel()));
     subscribe(OnDeviceMessage.class, message -> sendDeviceMessage(message.getPort(), message.getCommand(), message.getChannel(), message.getData1(), message.getData2()));
     connectDevices();
   }
@@ -94,6 +96,9 @@ public class MidiWriter extends BrokerTask<Message> implements HasSendDeviceMess
       MidiDevice midiDevice = midiOutputDevice.getMidiDevice();
       midiDevice.close();
     }
+  }
+
+  private void doChannelAssigned(int deviceIndex, int channel) {
   }
 
   private void doChannelState(int channel, ChannelState channelState) {
