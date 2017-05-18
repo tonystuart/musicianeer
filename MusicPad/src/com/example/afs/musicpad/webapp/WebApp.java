@@ -29,14 +29,17 @@ import org.eclipse.jetty.util.log.Log;
 import org.eclipse.jetty.util.log.Logger;
 
 import com.example.afs.musicpad.message.Message;
+import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnDeviceDetached;
 import com.example.afs.musicpad.message.OnFooter;
 import com.example.afs.musicpad.message.OnHeader;
 import com.example.afs.musicpad.message.OnMusic;
+import com.example.afs.musicpad.message.OnSongList;
 import com.example.afs.musicpad.message.OnTick;
 import com.example.afs.musicpad.message.OnTransport;
 import com.example.afs.musicpad.task.BrokerTask;
 import com.example.afs.musicpad.util.Broker;
+import com.example.afs.musicpad.util.JsonUtilities;
 
 public class WebApp extends BrokerTask<Message> {
 
@@ -55,6 +58,7 @@ public class WebApp extends BrokerTask<Message> {
   public WebApp(Broker<Message> broker) {
     super(broker, PING_INTERVAL_MS);
     createServer();
+    subscribe(OnSongList.class, message -> doStatefulMessage(message));
     subscribe(OnHeader.class, message -> doStatefulMessage(message));
     subscribe(OnFooter.class, message -> doStatefulMessage(message));
     subscribe(OnTransport.class, message -> doStatefulMessage(message));
@@ -75,9 +79,11 @@ public class WebApp extends BrokerTask<Message> {
 
   public void onWebSocketText(MessageWebSocket messageWebSocket, String json) {
     System.out.println("Received " + json);
-    //    Message message = JsonUtilities.fromJson(json, Message.class);
-    //    if ("OnInitialize".equals(message.getType())) {
-    //    }
+    Message message = JsonUtilities.fromJson(json, Message.class);
+    if ("OnCommand".equals(message.getType())) {
+      OnCommand onCommand = JsonUtilities.fromJson(json, OnCommand.class);
+      getBroker().publish(onCommand);
+    }
   }
 
   public void removeMessageWebSocket(MessageWebSocket messageWebSocket) {

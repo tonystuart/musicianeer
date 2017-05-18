@@ -23,6 +23,7 @@ import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnDeviceAttached;
 import com.example.afs.musicpad.message.OnDeviceDetached;
 import com.example.afs.musicpad.message.OnSong;
+import com.example.afs.musicpad.message.OnSongList;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.parser.SongBuilder;
 import com.example.afs.musicpad.song.Song;
@@ -87,6 +88,7 @@ public class SongManager extends BrokerTask<Message> {
   }
 
   private void doAllTasksStarted() {
+    publishSongList();
     selectRandomSong();
   }
 
@@ -171,6 +173,14 @@ public class SongManager extends BrokerTask<Message> {
     }
   }
 
+  private void publishSongList() {
+    String[] songList = new String[midiFiles.size()];
+    for (int i = 0; i < songList.length; i++) {
+      songList[i] = midiFiles.get(i).getName();
+    }
+    getBroker().publish(new OnSongList(songList));
+  }
+
   private void selectRandomSong() {
     boolean selected = false;
     while (!selected) {
@@ -193,7 +203,7 @@ public class SongManager extends BrokerTask<Message> {
     File midiFile = midiFiles.get(songIndex);
     SongBuilder songBuilder = new SongBuilder();
     song = songBuilder.createSong(midiFile);
-    System.out.println("Selecting song " + (songIndex + 1) + " - " + song.getName());
+    System.out.println("Selecting song " + Value.toNumber(songIndex) + " - " + song.getName());
     assignChannels();
     publish(new OnSong(song, deviceChannelMap));
   }

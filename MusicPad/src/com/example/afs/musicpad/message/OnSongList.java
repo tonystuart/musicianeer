@@ -9,27 +9,23 @@
 
 package com.example.afs.musicpad.message;
 
-public class OnHeader extends Message {
+import java.util.Arrays;
 
-  private String title;
-  private String html;
+public class OnSongList extends Message {
 
-  public OnHeader(String title, String html) {
-    this.title = title;
-    this.html = html;
+  private String[] songList;
+
+  public OnSongList(String[] songList) {
+    this.songList = songList;
   }
 
-  public String getHtml() {
-    return html;
-  }
-
-  public String getTitle() {
-    return title;
+  public String[] getSongList() {
+    return songList;
   }
 
   @Override
   public String toString() {
-    return "OnHeader [title=" + title + ", html=" + html + "]";
+    return "OnSongList [songList=" + Arrays.toString(songList) + "]";
   }
 
 }

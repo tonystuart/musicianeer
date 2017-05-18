@@ -33,6 +33,14 @@ public class OnCommand extends Message {
     return parameter;
   }
 
+  public void setCommand(Command command) {
+    this.command = command;
+  }
+
+  public void setParameter(int parameter) {
+    this.parameter = parameter;
+  }
+
   @Override
   public String toString() {
     return "OnCommand [command=" + command + ", parameter=" + parameter + "]";

@@ -61,7 +61,7 @@ public class RendererTask extends BrokerTask<Message> {
 
   private void doSong(Song song) {
     currentSong = song;
-    publish(new OnHeader(new HeaderRenderer(song).render()));
+    publish(new OnHeader(song.getName(), new HeaderRenderer(song).render()));
     publish(new OnFooter(new FooterRenderer(song).render()));
     publish(new OnTransport(new TransportRenderer(song).render()));
   }

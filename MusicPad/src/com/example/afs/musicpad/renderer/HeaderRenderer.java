@@ -14,6 +14,7 @@ import com.example.afs.musicpad.analyzer.KeySignatures;
 import com.example.afs.musicpad.analyzer.TranspositionFinder;
 import com.example.afs.musicpad.html.CheckBox;
 import com.example.afs.musicpad.html.Division;
+import com.example.afs.musicpad.html.Select;
 import com.example.afs.musicpad.html.Table;
 import com.example.afs.musicpad.html.TableHeader;
 import com.example.afs.musicpad.html.TableRow;
@@ -45,7 +46,7 @@ public class HeaderRenderer {
     header.append("Duration");
 
     TableRow row = table.createRow();
-    row.append(song.getName());
+    row.append(new Select("title"));
     row.append(new CheckBox("master-override"));
     row.append(getKeyInfo(song));
     row.append(TranspositionFinder.getDistanceToWhiteKeys(song));

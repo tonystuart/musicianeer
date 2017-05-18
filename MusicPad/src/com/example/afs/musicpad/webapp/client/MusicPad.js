@@ -1,8 +1,37 @@
 "use strict";
 var musicPad = musicPad || {};
 
-musicPad.refreshIntervalMillis = 60000;
-musicPad.lastMessageNumber = -1;
+musicPad.songList = null;
+musicPad.title = null;
+
+musicPad.createWebSocketClient = function() {
+  musicPad.ws = new WebSocket("ws://localhost:8080/v1/message");
+  musicPad.ws.onopen = function() {
+    console.log("ws.onopen: entered");
+  }
+  musicPad.ws.onmessage = function(message) {
+    musicPad.processResponse(message.data);
+  }
+  musicPad.ws.onclose = function() {
+    console.log("ws.onclose: entered, connecting again in 1000 ms.");
+    setTimeout(musicPad.createWebSocketClient, 1000);
+  }
+}
+
+musicPad.onClick = function(event) {
+  let id = event.target.id;
+  switch (id) {
+  case "play":
+    musicPad.ws.send(JSON.stringify({type: "OnCommand", command: "PLAY_PAUSE", parameter: 0}));
+    break;
+  case "stop":
+    musicPad.ws.send(JSON.stringify({type: "OnCommand", command: "STOP_PAUSE", parameter: 0}));
+    break;
+  default:
+    musicPad.ws.send(JSON.stringify({type: "OnClick", id: id}))
+    break;
+  }
+}
 
 musicPad.onDeviceDetached = function(response) {
   let notator = document.getElementById("notator-" + response.deviceIndex);
@@ -19,7 +48,9 @@ musicPad.getElement = function(html) {
 
 musicPad.onHeader = function(response) {
   let header = document.getElementById("header");
+  musicPad.title = response.title;
   header.innerHTML = response.html;
+  musicPad.setTitleSongList();
 }
 
 musicPad.onFooter = function(response) {
@@ -27,9 +58,8 @@ musicPad.onFooter = function(response) {
   footer.innerHTML = response.html;
 }
 
-musicPad.onTransport = function(response) {
-  let transport = document.getElementById("transport");
-  transport.innerHTML = response.html;
+musicPad.onLoad = function() {
+  musicPad.createWebSocketClient();
 }
 
 musicPad.onMusic = function(response) {
@@ -44,6 +74,11 @@ musicPad.onMusic = function(response) {
     let scroller = document.getElementById("notator-scroller");
     scroller.appendChild(notator);
   }
+}
+
+musicPad.onSongList = function(songList) {
+  musicPad.songList = songList;
+  musicPad.setTitleSongList();
 }
 
 musicPad.onTick = function(tick) {
@@ -61,38 +96,16 @@ musicPad.onTick = function(tick) {
   }
 }
 
-musicPad.onClick = function(event) {
-  let id = event.target.id;
-  musicPad.ws.send(JSON.stringify({type: "OnClick", id: id}))
+musicPad.onTitleChange = function() {
+  let title = document.getElementById("title");
+  let titleIndex = title.options[title.selectedIndex].value;
+  console.log("titleIndex="+titleIndex);
+  musicPad.ws.send(JSON.stringify({type: "OnCommand", command: "SELECT_SONG", parameter: parseInt(titleIndex) + 1}));
 }
 
-musicPad.onLoad = function() {
-  musicPad.createWebSocketClient();
-}
-
-musicPad.createWebSocketClient = function() {
-  musicPad.ws = new WebSocket("ws://localhost:8080/v1/message");
-  musicPad.ws.onopen = function() {
-    console.log("ws.onopen: entered");
-  }
-  musicPad.ws.onmessage = function(message) {
-    musicPad.processResponse(message.data);
-  }
-  musicPad.ws.onclose = function() {
-    console.log("ws.onclose: entered, connecting again in 1000 ms.");
-    setTimeout(musicPad.createWebSocketClient, 1000);
-  }
-}
-
-musicPad.request = function(resource) {
-  let httpRequest = new XMLHttpRequest();
-  httpRequest.onreadystatechange = function() {
-    if (httpRequest.readyState == 4 && httpRequest.status == 200) {
-      musicPad.processResponse(httpRequest.responseText);
-    }
-  };
-  httpRequest.open("GET", "v1/rest/" + resource, true);
-  httpRequest.send();
+musicPad.onTransport = function(response) {
+  let transport = document.getElementById("transport");
+  transport.innerHTML = response.html;
 }
 
 musicPad.processResponse = function(json) {
@@ -110,11 +123,42 @@ musicPad.processResponse = function(json) {
   case "OnMusic":
     musicPad.onMusic(response);
     break;
+  case "OnSongList":
+    musicPad.onSongList(response.songList);
+    break;
   case "OnTick":
     musicPad.onTick(response.tick);
     break;
   case "OnDeviceDetached":
     musicPad.onDeviceDetached(response);
     break;
+  }
+}
+
+musicPad.request = function(resource) {
+  let httpRequest = new XMLHttpRequest();
+  httpRequest.onreadystatechange = function() {
+    if (httpRequest.readyState == 4 && httpRequest.status == 200) {
+      musicPad.processResponse(httpRequest.responseText);
+    }
+  };
+  httpRequest.open("GET", "v1/rest/" + resource, true);
+  httpRequest.send();
+}
+
+musicPad.setTitleSongList = function() {
+  let title = document.getElementById("title");
+  if (title && musicPad.songList) {
+    title.innerHTML = "";
+    for (let i = 0; i < musicPad.songList.length; i++) {
+      let option = document.createElement("option");
+      option.value = i;
+      option.innerHTML = musicPad.songList[i];
+      if (musicPad.songList[i] == musicPad.title) {
+        option.selected = true;
+      }
+      title.appendChild(option);
+    }
+    title.onchange = function(){musicPad.onTitleChange();}
   }
 }
