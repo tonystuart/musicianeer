@@ -32,7 +32,7 @@ public class Key {
   public int getNoteInKey(int fulltone) {
     int base = fulltone - tonic;
     int octave = base / Midi.NOTES_PER_OCTAVE;
-    int offset = octave % Midi.NOTES_PER_OCTAVE;
+    int offset = base % Midi.NOTES_PER_OCTAVE;
     int midiNote = octave * Midi.SEMITONES_PER_OCTAVE + scale.getSemiTone(offset);
     return midiNote;
   }
