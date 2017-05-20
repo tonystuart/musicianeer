@@ -9,16 +9,31 @@
 
 package com.example.afs.musicpad.html;
 
-public class Button extends Input {
+public class Option extends Hypertext {
 
-  public Button() {
-    appendProperty("type", "button");
+  public Option() {
+    super("option");
   }
 
-  public Button(String id, String value) {
+  public Option(String text, Object value, boolean isSelected) {
     this();
-    setId(id);
+    setValue(value);
+    setText(text);
+    if (isSelected) {
+      setSelected();
+    }
+  }
+
+  public void setValue(Object value) {
     appendProperty("value", value);
+  }
+
+  private void setSelected() {
+    appendProperty("selected");
+  }
+
+  private void setText(String text) {
+    appendChild(new TextElement(text));
   }
 
 }

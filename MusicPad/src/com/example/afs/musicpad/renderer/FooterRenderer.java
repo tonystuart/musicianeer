@@ -75,9 +75,8 @@ public class FooterRenderer {
 
     detail.appendChild(table);
 
-    StringBuilder s = new StringBuilder();
-    detail.render(s);
-    return s.toString();
+    String html = detail.render();
+    return html;
   }
 
 }

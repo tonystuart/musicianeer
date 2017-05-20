@@ -70,6 +70,11 @@ public class AlphaMapping extends QwertyMapping {
   }
 
   @Override
+  public MappingType getType() {
+    return MappingType.ALPHA;
+  }
+
+  @Override
   protected String[] getKeySequence() {
     return KEY_SEQUENCE;
   }

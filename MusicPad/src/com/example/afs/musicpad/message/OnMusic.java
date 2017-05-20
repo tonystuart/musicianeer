@@ -9,13 +9,16 @@
 
 package com.example.afs.musicpad.message;
 
+
 public class OnMusic extends Message {
 
   private int deviceIndex;
+  private String channelControls;
   private String html;
 
-  public OnMusic(int deviceIndex, String html) {
+  public OnMusic(int deviceIndex, String channelControls, String html) {
     this.deviceIndex = deviceIndex;
+    this.channelControls = channelControls;
     this.html = html;
   }
 
@@ -29,7 +32,7 @@ public class OnMusic extends Message {
 
   @Override
   public String toString() {
-    return "OnMusic [deviceIndex=" + deviceIndex + ", html=" + html + "]";
+    return "OnMusic [deviceIndex=" + deviceIndex + ", channelControls=" + channelControls + ", html=" + html + "]";
   }
 
 }

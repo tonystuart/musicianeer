@@ -7,19 +7,14 @@
 // This program is made available on an "as is" basis, without
 // warranties or conditions of any kind, either express or implied.
 
-package com.example.afs.musicpad.html;
+package com.example.afs.musicpad.message;
 
-public abstract class Element {
+import com.example.afs.musicpad.Command;
 
-  public String render() {
-    StringBuilder s = new StringBuilder();
-    render(s);
-    return s.toString();
+public class OnDeviceCommand extends OnCommand {
+
+  public OnDeviceCommand(Command command, int parameter) {
+    super(command, parameter);
   }
 
-  public abstract void render(StringBuilder s);
-
-  protected String format(String template, Object... parameters) {
-    return String.format(template, parameters);
-  }
 }

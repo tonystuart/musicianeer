@@ -9,19 +9,27 @@
 
 package com.example.afs.musicpad.message;
 
+import java.util.Arrays;
+
 import com.example.afs.musicpad.Command;
 import com.example.afs.musicpad.Trace;
 
 public class OnCommand extends Message {
 
   private Command command;
-  private int parameter;
+  private int[] parameters;
 
   public OnCommand(Command command, int parameter) {
+    this(command, new int[] {
+      parameter
+    });
+  }
+
+  public OnCommand(Command command, int... parameters) {
     this.command = command;
-    this.parameter = parameter;
+    this.parameters = parameters;
     if (Trace.isTraceCommand()) {
-      System.out.println(command + "(" + parameter + ")");
+      System.out.println(command + "(" + Arrays.toString(parameters) + ")");
     }
   }
 
@@ -30,7 +38,12 @@ public class OnCommand extends Message {
   }
 
   public int getParameter() {
-    return parameter;
+    // TODO: Track down all the users of this and modify to support variable parameter lists
+    return parameters == null ? 0 : parameters[0];
+  }
+
+  public int[] getParameters() {
+    return parameters;
   }
 
   public void setCommand(Command command) {
@@ -38,12 +51,18 @@ public class OnCommand extends Message {
   }
 
   public void setParameter(int parameter) {
-    this.parameter = parameter;
+    this.parameters = new int[] {
+      parameter
+    };
+  }
+
+  public void setParameters(int[] parameters) {
+    this.parameters = parameters;
   }
 
   @Override
   public String toString() {
-    return "OnCommand [command=" + command + ", parameter=" + parameter + "]";
+    return "OnCommand [command=" + command + ", parameters=" + Arrays.toString(parameters) + "]";
   }
 
 }

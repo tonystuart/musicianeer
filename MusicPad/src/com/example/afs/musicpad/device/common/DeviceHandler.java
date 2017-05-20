@@ -14,6 +14,7 @@ import java.util.Map;
 
 import com.example.afs.fluidsynth.Synthesizer;
 import com.example.afs.musicpad.Command;
+import com.example.afs.musicpad.device.common.InputMapping.MappingType;
 import com.example.afs.musicpad.device.midi.MidiMapping;
 import com.example.afs.musicpad.device.qwerty.AlphaMapping;
 import com.example.afs.musicpad.device.qwerty.NumericMapping;
@@ -29,6 +30,7 @@ import com.example.afs.musicpad.message.OnSong;
 import com.example.afs.musicpad.player.Player;
 import com.example.afs.musicpad.player.Player.Action;
 import com.example.afs.musicpad.player.PlayerFactory;
+import com.example.afs.musicpad.renderer.ChannelControlsRenderer;
 import com.example.afs.musicpad.renderer.Notator;
 import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.task.BrokerTask;
@@ -70,7 +72,7 @@ public class DeviceHandler extends BrokerTask<Message> {
     delegate(OnNoteOff.class, message -> doNoteOff(message.getMidiNote()));
     delegate(OnControlChange.class, message -> doControlChange(message.getControl(), message.getValue()));
     delegate(OnPitchBend.class, message -> doPitchBend(message.getPitchBend()));
-    delegate(OnCommand.class, message -> doCommand(message));
+    subscribe(OnCommand.class, message -> doCommand(message));
     subscribe(OnSong.class, message -> doSongSelected(message.getSong(), message.getDeviceChannelMap()));
     subscribe(OnChannelAssigned.class, message -> doChannelAssigned(message.getSong(), message.getDeviceIndex(), message.getChannel()));
   }
@@ -115,35 +117,61 @@ public class DeviceHandler extends BrokerTask<Message> {
 
   private void doCommand(OnCommand message) {
     Command command = message.getCommand();
-    int parameter = message.getParameter();
-    switch (command) {
-    case SELECT_CHANNEL:
-      // TODO: Add device so that they can be generated / consumed outside the device handler
-      selectChannel(Value.toIndex(parameter));
-      break;
-    case SELECT_PROGRAM:
-      selectProgram(Value.toIndex(parameter));
-      break;
-    case SET_PLAYER_VELOCITY:
-      setVelocity(parameter);
-      break;
-    case SET_ALPHA_MAPPING:
-      setInputMapping(new AlphaMapping());
-      break;
-    case SET_NUMERIC_MAPPING:
-      setInputMapping(new NumericMapping());
-      break;
-    case SET_MIDI_MAPPING:
-      setInputMapping(new MidiMapping());
-      break;
-    default:
-      getBroker().publish(message);
-      break;
+    // TODO: Handle empty (null) parameter list
+    int[] parameters = message.getParameters();
+    if (parameters.length == 2) {
+      // TODO: Move remaining commands to two parameter form, including midi/qwerty input handlers
+      int deviceIndex = parameters[0];
+      if (deviceIndex == this.deviceIndex) {
+        switch (command) {
+        case CHANNEL:
+          selectChannel(Value.toIndex(parameters[1]));
+          break;
+        case INPUT:
+          doInput(parameters[1]);
+        default:
+          break;
+        }
+      }
+    } else {
+      switch (command) {
+      case PROGRAM:
+        selectProgram(parameters[0]);
+        break;
+      case SET_PLAYER_VELOCITY:
+        setVelocity(parameters[0]);
+        break;
+      default:
+        // Now that we subscribe to command instead of delegate, this is a great way to create an infinite loop
+        //getBroker().publish(message);
+        System.out.println("Not forwarding " + command);
+        break;
+      }
     }
   }
 
   private void doControlChange(int control, int value) {
     player.changeControl(control, value);
+  }
+
+  private void doInput(int typeIndex) {
+    MappingType mappingType = MappingType.values()[typeIndex];
+    switch (mappingType) {
+    case ALPHA:
+      setInputMapping(new AlphaMapping());
+      break;
+    case MIDI:
+      setInputMapping(new MidiMapping());
+      break;
+    case NONE:
+      getBroker().publish(new OnCommand(Command.DETACH));
+      break;
+    case NUMERIC:
+      setInputMapping(new NumericMapping());
+      break;
+    default:
+      throw new UnsupportedOperationException();
+    }
   }
 
   private void doNoteOff(int midiNote) {
@@ -164,6 +192,18 @@ public class DeviceHandler extends BrokerTask<Message> {
     updatePlayer();
   }
 
+  private String getChannelControls() {
+    ChannelControlsRenderer channelControlsRenderer = new ChannelControlsRenderer(song, channel, inputMapping, deviceIndex);
+    String channelControls = channelControlsRenderer.render();
+    return channelControls;
+  }
+
+  private String getMusic() {
+    Notator notator = new Notator(player, song, channel);
+    String music = notator.getMusic();
+    return music;
+  }
+
   private void selectChannel(int channel) {
     this.channel = channel;
     updatePlayer();
@@ -180,10 +220,9 @@ public class DeviceHandler extends BrokerTask<Message> {
   private void updatePlayer() {
     if (song != null) {
       this.player = playerFactory.createPlayer(song);
-      Notator notator = new Notator(player, song, channel);
-      String music = notator.getMusic();
+      // TODO: Figure out if this needs to be sent once per device?
       getBroker().publish(new OnCommand(Command.SHOW_CHANNEL_STATE, 0));
-      getBroker().publish(new OnMusic(deviceIndex, music));
+      getBroker().publish(new OnMusic(deviceIndex, getChannelControls(), getMusic()));
     }
   }
 

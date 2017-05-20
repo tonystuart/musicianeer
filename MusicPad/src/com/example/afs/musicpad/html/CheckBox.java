@@ -9,10 +9,9 @@
 
 package com.example.afs.musicpad.html;
 
-public class CheckBox extends Hypertext {
+public class CheckBox extends Input {
 
   public CheckBox() {
-    super("input");
     appendProperty("type", "checkbox");
   }
 

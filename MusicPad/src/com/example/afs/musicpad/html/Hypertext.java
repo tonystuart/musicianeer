@@ -20,7 +20,7 @@ public class Hypertext extends Element {
   private String type;
   private String id;
   private String className;
-  private Map<String, String> attributes;
+  private Map<String, Object> attributes;
   private RandomAccessList<Element> childElements;
 
   public Hypertext(String type) {
@@ -34,7 +34,11 @@ public class Hypertext extends Element {
     childElements.add(childElement);
   }
 
-  public void appendProperty(String name, String value) {
+  public void appendProperty(String name) {
+    appendProperty(name, null);
+  }
+
+  public void appendProperty(String name, Object value) {
     if (attributes == null) {
       attributes = new HashMap<>();
     }
@@ -63,8 +67,18 @@ public class Hypertext extends Element {
       s.append(format(" class='%s'", className));
     }
     if (attributes != null) {
-      for (Entry<String, String> entry : attributes.entrySet()) {
-        s.append(format(" %s='%s'", entry.getKey(), entry.getValue()));
+      for (Entry<String, Object> entry : attributes.entrySet()) {
+        String name = entry.getKey();
+        Object value = entry.getValue();
+        if (value == null) {
+          s.append(format(" %s", name));
+        } else {
+          if (value instanceof Number) {
+            s.append(format(" %s=%s", name, value.toString())); // integer or floating point
+          } else {
+            s.append(format(" %s='%s'", name, value.toString())); // value must not contain single quote
+          }
+        }
       }
     }
     s.append(">\n");

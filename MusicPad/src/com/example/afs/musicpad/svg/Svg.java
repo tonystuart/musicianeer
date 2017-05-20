@@ -33,12 +33,6 @@ public class Svg extends Element {
     elements.add(child);
   }
 
-  public String render() {
-    StringBuilder s = new StringBuilder();
-    render(s);
-    return s.toString();
-  }
-
   @Override
   public void render(StringBuilder s) {
     s.append(format("<svg viewBox='%d %d %d %d' preserveAspectRatio='xMinYMin meet'>", left, top, width, height));

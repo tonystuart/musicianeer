@@ -7,25 +7,17 @@
 // This program is made available on an "as is" basis, without
 // warranties or conditions of any kind, either express or implied.
 
-package com.example.afs.musicpad.message;
+package com.example.afs.musicpad.html;
 
-import java.util.Arrays;
+public class Template extends Hypertext {
 
-public class OnSongList extends Message {
-
-  private String[] songList;
-
-  public OnSongList(String[] songList) {
-    this.songList = songList;
+  public Template() {
+    super("template");
   }
 
-  public String[] getSongList() {
-    return songList;
-  }
-
-  @Override
-  public String toString() {
-    return "OnSongList [songList=" + Arrays.toString(songList) + "]";
+  public Template(String id) {
+    this();
+    setId(id);
   }
 
 }

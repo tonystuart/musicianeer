@@ -15,4 +15,9 @@ public class Division extends Hypertext {
     super("div");
   }
 
+  public Division(String id) {
+    this();
+    setId(id);
+  }
+
 }

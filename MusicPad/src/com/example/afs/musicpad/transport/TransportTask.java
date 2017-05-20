@@ -28,7 +28,6 @@ import com.example.afs.musicpad.task.PausibleSequencerTask;
 import com.example.afs.musicpad.transport.NoteEvent.Type;
 import com.example.afs.musicpad.util.Broker;
 import com.example.afs.musicpad.util.Range;
-import com.example.afs.musicpad.util.Value;
 import com.example.afs.musicpad.util.Velocity;
 
 public class TransportTask extends BrokerTask<Message> {
@@ -111,22 +110,19 @@ public class TransportTask extends BrokerTask<Message> {
     pause();
   }
 
-  private void doPlay(int channelNumber) {
-    int channel = Value.toIndex(channelNumber);
+  private void doPlay(int channel) {
     play(channel, FIRST_NOTE);
   }
 
-  private void doPlayPause(int channelNumber) {
+  private void doPlayPause(int channel) {
     if (sequencerTask.isPaused()) {
       resume();
     } else {
-      int channel = Value.toIndex(channelNumber);
       play(channel, FIRST_NOTE);
     }
   }
 
-  private void doPlaySample(int channelNumber) {
-    int channel = Value.toIndex(channelNumber);
+  private void doPlaySample(int channel) {
     play(channel, FIRST_NOTE, song.getBeatsPerMeasure(0) * Default.TICKS_PER_BEAT * 2);
   }
 

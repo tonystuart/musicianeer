@@ -9,6 +9,7 @@
 
 package com.example.afs.musicpad.renderer;
 
+import com.example.afs.musicpad.Command;
 import com.example.afs.musicpad.analyzer.KeyScore;
 import com.example.afs.musicpad.analyzer.KeySignatures;
 import com.example.afs.musicpad.analyzer.TranspositionFinder;
@@ -30,12 +31,10 @@ public class HeaderRenderer {
   }
 
   public String render() {
-    Division detail = new Division();
-    detail.setId("header-detail");
 
     Table table = new Table();
-    TableHeader header = table.createHeader();
 
+    TableHeader header = table.createHeader();
     header.append("Title");
     header.append("Master Override");
     header.append("Key (chromatics / triads / thirds)");
@@ -46,7 +45,7 @@ public class HeaderRenderer {
     header.append("Duration");
 
     TableRow row = table.createRow();
-    row.append(new Select("title"));
+    row.append(getTitleSelect());
     row.append(new CheckBox("master-override"));
     row.append(getKeyInfo(song));
     row.append(TranspositionFinder.getDistanceToWhiteKeys(song));
@@ -55,11 +54,11 @@ public class HeaderRenderer {
     row.append(song.getBeatsPerMeasure(0) + "/" + song.getBeatUnit(0));
     row.append(getDuration());
 
+    Division detail = new Division("header-detail");
     detail.appendChild(table);
 
-    StringBuilder s = new StringBuilder();
-    detail.render(s);
-    return s.toString();
+    String html = detail.render();
+    return html;
   }
 
   private String getDuration() {
@@ -98,6 +97,18 @@ public class HeaderRenderer {
       }
     }
     return s.toString();
+  }
+
+  private Select getTitleSelect() {
+    Select select = new Select("title");
+    select.appendProperty("value", mapTitleToIndex(song.getName()));
+    select.appendProperty("onchange", SendCommandRenderer.render(Command.SONG));
+    return select;
+  }
+
+  private int mapTitleToIndex(String title) {
+    System.out.println("HeaderRenderer.mapTitleToIndex: mapping " + title + " to 2");
+    return 2;
   }
 
 }

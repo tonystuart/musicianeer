@@ -32,9 +32,8 @@ public class TransportRenderer {
     detail.appendChild(new Button("stop", "Stop"));
     detail.appendChild(new Button("play", "Play"));
 
-    StringBuilder s = new StringBuilder();
-    detail.render(s);
-    return s.toString();
+    String html = detail.render();
+    return html;
   }
 
 }

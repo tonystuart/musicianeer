@@ -1,9 +1,6 @@
 "use strict";
 var musicPad = musicPad || {};
 
-musicPad.songList = null;
-musicPad.title = null;
-
 musicPad.createWebSocketClient = function() {
   musicPad.ws = new WebSocket("ws://localhost:8080/v1/message");
   musicPad.ws.onopen = function() {
@@ -16,6 +13,22 @@ musicPad.createWebSocketClient = function() {
     console.log("ws.onclose: entered, connecting again in 1000 ms.");
     setTimeout(musicPad.createWebSocketClient, 1000);
   }
+}
+
+musicPad.appendTemplate = function(containerId, templateId) {
+  let container = document.getElementById(containerId);
+  let template = document.getElementById(templateId); 
+  container.appendChild(template.content.cloneNode(true));
+  let value = container.getAttribute("value");
+  if (value) {
+    container.value = value;
+  }
+}
+
+musicPad.fragmentToElement = function(fragment) {
+  let container = document.createElement("div");
+  container.innerHTML = fragment;
+  return container.firstElementChild;
 }
 
 musicPad.onClick = function(event) {
@@ -40,17 +53,11 @@ musicPad.onDeviceDetached = function(response) {
   }
 }
 
-musicPad.getElement = function(html) {
-  var template = document.createElement('template');
-  template.innerHTML = html;
-  return template.content.firstChild;
-}
-
 musicPad.onHeader = function(response) {
   let header = document.getElementById("header");
   musicPad.title = response.title;
   header.innerHTML = response.html;
-  musicPad.setTitleSongList();
+  musicPad.appendTemplate("title", "song-options");
 }
 
 musicPad.onFooter = function(response) {
@@ -66,7 +73,9 @@ musicPad.onMusic = function(response) {
   let notator = document.createElement("div");
   notator.className = "notator";
   notator.innerHTML = response.html;
+  let channelControls = musicPad.fragmentToElement(response.channelControls)
   notator.id = "notator-" + response.deviceIndex;
+  notator.appendChild(channelControls);
   let oldNotator = document.getElementById(notator.id);
   if (oldNotator) {
     oldNotator.parentElement.replaceChild(notator, oldNotator);
@@ -74,11 +83,20 @@ musicPad.onMusic = function(response) {
     let scroller = document.getElementById("notator-scroller");
     scroller.appendChild(notator);
   }
+  let programId = "program-select-" + response.deviceIndex;
+  let inputId = "input-select-" + response.deviceIndex;
+  musicPad.appendTemplate(programId, "program-options");
+  musicPad.appendTemplate(inputId, "input-options");
 }
 
-musicPad.onSongList = function(songList) {
-  musicPad.songList = songList;
-  musicPad.setTitleSongList();
+musicPad.onTemplates = function(response) {
+  var templates = document.getElementById('templates');
+  let songOptions = musicPad.fragmentToElement(response.songOptions);
+  let programOptions = musicPad.fragmentToElement(response.programOptions);
+  let inputOptions = musicPad.fragmentToElement(response.inputOptions);
+  templates.appendChild(songOptions);
+  templates.appendChild(programOptions);
+  templates.appendChild(inputOptions);
 }
 
 musicPad.onTick = function(tick) {
@@ -96,11 +114,10 @@ musicPad.onTick = function(tick) {
   }
 }
 
-musicPad.onTitleChange = function() {
-  let title = document.getElementById("title");
-  let titleIndex = title.options[title.selectedIndex].value;
-  console.log("titleIndex="+titleIndex);
-  musicPad.ws.send(JSON.stringify({type: "OnCommand", command: "SELECT_SONG", parameter: parseInt(titleIndex) + 1}));
+musicPad.sendCommand = function(command, parameters) {
+  // NB: invoked by on-property in html sent by server
+  console.log("command="+command+", parameters="+parameters);
+  musicPad.ws.send(JSON.stringify({type: "OnCommand", command: command, parameters: parameters}));
 }
 
 musicPad.onTransport = function(response) {
@@ -123,8 +140,8 @@ musicPad.processResponse = function(json) {
   case "OnMusic":
     musicPad.onMusic(response);
     break;
-  case "OnSongList":
-    musicPad.onSongList(response.songList);
+  case "OnTemplates":
+    musicPad.onTemplates(response);
     break;
   case "OnTick":
     musicPad.onTick(response.tick);
@@ -144,21 +161,4 @@ musicPad.request = function(resource) {
   };
   httpRequest.open("GET", "v1/rest/" + resource, true);
   httpRequest.send();
-}
-
-musicPad.setTitleSongList = function() {
-  let title = document.getElementById("title");
-  if (title && musicPad.songList) {
-    title.innerHTML = "";
-    for (let i = 0; i < musicPad.songList.length; i++) {
-      let option = document.createElement("option");
-      option.value = i;
-      option.innerHTML = musicPad.songList[i];
-      if (musicPad.songList[i] == musicPad.title) {
-        option.selected = true;
-      }
-      title.appendChild(option);
-    }
-    title.onchange = function(){musicPad.onTitleChange();}
-  }
 }

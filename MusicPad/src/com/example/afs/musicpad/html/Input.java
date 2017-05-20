@@ -9,17 +9,10 @@
 
 package com.example.afs.musicpad.html;
 
-public abstract class Element {
+public class Input extends Hypertext {
 
-  public String render() {
-    StringBuilder s = new StringBuilder();
-    render(s);
-    return s.toString();
+  public Input() {
+    super("input");
   }
 
-  public abstract void render(StringBuilder s);
-
-  protected String format(String template, Object... parameters) {
-    return String.format(template, parameters);
-  }
 }

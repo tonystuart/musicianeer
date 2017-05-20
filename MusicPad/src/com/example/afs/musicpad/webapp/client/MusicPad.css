@@ -98,7 +98,8 @@ text {
 .notator {
   flex-grow: 1;
   flex-shrink: 1;
-  position: relative;	
+  position: relative;
+  display: flex;
 }
 
 .notator svg {
@@ -110,6 +111,19 @@ text {
 	position: absolute;
 	right: 0;
 	top: 0;
+}
+
+.channel-controls {
+	z-index: 1;
+	margin-top: auto;
+	margin-bottom: auto;
+}
+
+.notator select {
+}
+
+.notator input {
+	margin-left: 20px;
 }
 
 .open {

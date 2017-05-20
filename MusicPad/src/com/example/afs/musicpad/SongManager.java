@@ -16,6 +16,9 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
+import com.example.afs.musicpad.device.common.InputMapping.MappingType;
+import com.example.afs.musicpad.html.Option;
+import com.example.afs.musicpad.html.Template;
 import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnAllTasksStarted;
 import com.example.afs.musicpad.message.OnChannelAssigned;
@@ -23,7 +26,8 @@ import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnDeviceAttached;
 import com.example.afs.musicpad.message.OnDeviceDetached;
 import com.example.afs.musicpad.message.OnSong;
-import com.example.afs.musicpad.message.OnSongList;
+import com.example.afs.musicpad.message.OnTemplates;
+import com.example.afs.musicpad.midi.Instruments;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.parser.SongBuilder;
 import com.example.afs.musicpad.song.Song;
@@ -31,11 +35,8 @@ import com.example.afs.musicpad.task.BrokerTask;
 import com.example.afs.musicpad.util.Broker;
 import com.example.afs.musicpad.util.DirectList;
 import com.example.afs.musicpad.util.RandomAccessList;
-import com.example.afs.musicpad.util.Value;
 
 public class SongManager extends BrokerTask<Message> {
-
-  private static final int PAGE_SIZE = 10;
 
   private Song song;
   private File directory;
@@ -88,19 +89,19 @@ public class SongManager extends BrokerTask<Message> {
   }
 
   private void doAllTasksStarted() {
-    publishSongList();
+    String songOptions = getSongOptions();
+    String programOptions = getProgramOptions();
+    String inputOptions = getInputOptions();
+    getBroker().publish(new OnTemplates(songOptions, programOptions, inputOptions));
     selectRandomSong();
   }
 
   private void doCommand(Command command, int parameter) {
     switch (command) {
-    case SELECT_SONG:
+    case SONG:
       doSelectSong(parameter);
       break;
-    case LIST_SONGS:
-      doListSongs(parameter);
-      break;
-    case SELECT_CHANNEL:
+    case CHANNEL:
       // TODO: Add support after device index is added to device handler messages
       break;
     default:
@@ -120,28 +121,44 @@ public class SongManager extends BrokerTask<Message> {
     deviceIndexes.remove(deviceIndex);
   }
 
-  private void doListSongs(int songNumber) {
-    int base;
-    int limit;
-    if (songNumber == 0) {
-      base = 0;
-      limit = midiFiles.size();
-    } else {
-      int songIndex = songNumber - 1;
-      base = Math.max(0, songIndex);
-      limit = Math.min(songIndex + PAGE_SIZE, midiFiles.size());
-    }
-    for (int songIndex = base; songIndex < limit; songIndex++) {
-      File midiFile = midiFiles.get(songIndex);
-      System.out.println("Song #" + (songIndex + 1) + ": " + midiFile.getName());
-    }
-  }
-
-  private void doSelectSong(int songNumber) {
-    int songIndex = Value.toIndex(songNumber);
+  private void doSelectSong(int songIndex) {
     if (songIndex >= 0 && songIndex < midiFiles.size()) {
       selectSong(songIndex);
     }
+  }
+
+  private String getInputOptions() {
+    Template template = new Template("input-options");
+    MappingType[] mappingTypes = MappingType.values();
+    for (int i = 0; i < mappingTypes.length; i++) {
+      MappingType mappingType = mappingTypes[i];
+      Option option = new Option(mappingType.name(), i, false);
+      template.appendChild(option);
+    }
+    String inputOptions = template.render();
+    return inputOptions;
+  }
+
+  private String getProgramOptions() {
+    Template template = new Template("program-options");
+    for (int i = 0; i < Midi.PROGRAMS; i++) {
+      Option option = new Option(Instruments.getProgramName(i), i, false);
+      template.appendChild(option);
+    }
+    String programOptions = template.render();
+    return programOptions;
+  }
+
+  private String getSongOptions() {
+    Template template = new Template("song-options");
+    int midiFileCount = midiFiles.size();
+    for (int i = 0; i < midiFileCount; i++) {
+      String name = midiFiles.get(i).getName();
+      Option option = new Option(name, i, false);
+      template.appendChild(option);
+    }
+    String songOptions = template.render();
+    return songOptions;
   }
 
   private boolean isChannelAssigned(int channel) {
@@ -173,14 +190,6 @@ public class SongManager extends BrokerTask<Message> {
     }
   }
 
-  private void publishSongList() {
-    String[] songList = new String[midiFiles.size()];
-    for (int i = 0; i < songList.length; i++) {
-      songList[i] = midiFiles.get(i).getName();
-    }
-    getBroker().publish(new OnSongList(songList));
-  }
-
   private void selectRandomSong() {
     boolean selected = false;
     while (!selected) {
@@ -203,7 +212,7 @@ public class SongManager extends BrokerTask<Message> {
     File midiFile = midiFiles.get(songIndex);
     SongBuilder songBuilder = new SongBuilder();
     song = songBuilder.createSong(midiFile);
-    System.out.println("Selecting song " + Value.toNumber(songIndex) + " - " + song.getName());
+    System.out.println("Selecting song " + songIndex + " - " + song.getName());
     assignChannels();
     publish(new OnSong(song, deviceChannelMap));
   }

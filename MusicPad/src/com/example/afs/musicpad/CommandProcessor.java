@@ -18,7 +18,6 @@ import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.task.BrokerTask;
 import com.example.afs.musicpad.util.Broker;
 import com.example.afs.musicpad.util.Range;
-import com.example.afs.musicpad.util.Value;
 
 // new things
 // zero/enter when not in command mode are modulation down/up1550000550
@@ -119,12 +118,12 @@ public class CommandProcessor extends BrokerTask<Message> {
     synthesizer.allNotesOff(); // turn off notes that were playing before transpose
   }
 
-  private void doTroff(int traceNumber) {
-    setTrace(Value.toIndex(traceNumber), false);
+  private void doTroff(int trace) {
+    setTrace(trace, false);
   }
 
-  private void doTron(int traceNumber) {
-    setTrace(Value.toIndex(traceNumber), true);
+  private void doTron(int trace) {
+    setTrace(trace, true);
   }
 
   private TraceOption getTraceOption(int trace) {

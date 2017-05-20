@@ -11,10 +11,10 @@ package com.example.afs.musicpad;
 
 public enum Command {
   HELP, //
-  LIST_SONGS, //
-  SELECT_SONG, //
-  SELECT_CHANNEL, //
-  SELECT_PROGRAM, //
+  SONG, //
+  CHANNEL, //
+  PROGRAM, //
+  INPUT, //
   PLAY, //
   PLAY_PAUSE, //
   PLAY_SAMPLE, //
@@ -24,9 +24,6 @@ public enum Command {
   STOP_PAUSE, //
   PREVIOUS_MEASURE, //
   NEXT_MEASURE, //
-  SET_ALPHA_MAPPING, //
-  SET_NUMERIC_MAPPING, //
-  SET_MIDI_MAPPING, //
   SET_PLAYER_VELOCITY, //
   SET_TRANSPORT_TEMPO, //
   SET_TRANSPORT_VELOCITY, //
