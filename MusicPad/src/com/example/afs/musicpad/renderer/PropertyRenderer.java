@@ -9,6 +9,7 @@
 
 package com.example.afs.musicpad.renderer;
 
+import com.example.afs.musicpad.ChannelCommand;
 import com.example.afs.musicpad.Command;
 import com.example.afs.musicpad.DeviceCommand;
 
@@ -24,6 +25,11 @@ public class PropertyRenderer {
 
   public static String render(DeviceCommand deviceCommand, int deviceIndex) {
     String javaScript = String.format("musicPad.sendDeviceCommand(\"%s\", %d, this.value)", deviceCommand.name(), deviceIndex);
+    return javaScript;
+  }
+
+  public static String renderChannelChecked(ChannelCommand channelCommand, int channel) {
+    String javaScript = String.format("musicPad.sendChannelCommand(\"%s\", %d, this.checked ? 1 : 0)", channelCommand.name(), channel);
     return javaScript;
   }
 

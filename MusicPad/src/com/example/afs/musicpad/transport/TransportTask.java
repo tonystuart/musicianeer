@@ -15,8 +15,10 @@ import java.util.TreeSet;
 import java.util.concurrent.BlockingQueue;
 
 import com.example.afs.fluidsynth.Synthesizer;
+import com.example.afs.musicpad.ChannelCommand;
 import com.example.afs.musicpad.Command;
 import com.example.afs.musicpad.message.Message;
+import com.example.afs.musicpad.message.OnChannelCommand;
 import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnSong;
 import com.example.afs.musicpad.message.OnTick;
@@ -52,10 +54,15 @@ public class TransportTask extends BrokerTask<Message> {
     synthesizer.setGain(DEFAULT_GAIN);
     subscribe(OnSong.class, message -> doSongSelected(message.getSong()));
     subscribe(OnCommand.class, message -> doCommand(message.getCommand(), message.getParameter()));
+    subscribe(OnChannelCommand.class, message -> doChannelCommand(message.getChannelCommand(), message.getChannel(), message.getParameter()));
     noteEventScheduler = new NoteEventScheduler();
     sequencerTask = new PausibleSequencerTask<NoteEvent>(noteEventScheduler, new Broker<>());
     sequencerTask.subscribe(NoteEvent.class, noteEvent -> processNoteEvent(noteEvent));
     sequencerTask.start();
+  }
+
+  private void doChannelCommand(ChannelCommand command, int channel, int parameter) {
+    System.out.println("TransportTask.doChannelCommand: command=" + command + ", channel=" + channel + ", parameter=" + parameter);
   }
 
   private void doCommand(Command command, int parameter) {

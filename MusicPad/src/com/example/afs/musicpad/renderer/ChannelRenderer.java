@@ -20,22 +20,25 @@ import com.example.afs.musicpad.html.Select;
 import com.example.afs.musicpad.html.Table;
 import com.example.afs.musicpad.html.TableHeader;
 import com.example.afs.musicpad.html.TableRow;
+import com.example.afs.musicpad.html.TextElement;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.util.Value;
 
-public class ChannelControlsRenderer {
+public class ChannelRenderer {
 
+  private String deviceName;
+  private int deviceIndex;
   private Song song;
   private int channel;
   private InputMapping inputMapping;
-  private int deviceIndex;
 
-  public ChannelControlsRenderer(Song song, int channel, InputMapping inputMapping, int deviceIndex) {
+  public ChannelRenderer(String deviceName, int deviceIndex, Song song, int channel, InputMapping inputMapping) {
+    this.deviceName = deviceName;
+    this.deviceIndex = deviceIndex;
     this.song = song;
     this.channel = channel;
     this.inputMapping = inputMapping;
-    this.deviceIndex = deviceIndex;
   }
 
   public String render() {
@@ -53,9 +56,13 @@ public class ChannelControlsRenderer {
     row.append(getInputSelect());
     row.append(getVolumeRange());
 
+    Division nameDivision = new Division();
+    nameDivision.appendChild(new TextElement(deviceName));
+
     Division channelControls = new Division();
     channelControls.setClassName("channel-controls");
     channelControls.appendChild(table);
+    channelControls.appendChild(nameDivision);
 
     String html = channelControls.render();
     return html;

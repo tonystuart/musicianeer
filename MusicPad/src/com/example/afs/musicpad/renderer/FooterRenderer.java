@@ -9,6 +9,7 @@
 
 package com.example.afs.musicpad.renderer;
 
+import com.example.afs.musicpad.ChannelCommand;
 import com.example.afs.musicpad.analyzer.Names;
 import com.example.afs.musicpad.html.CheckBox;
 import com.example.afs.musicpad.html.Division;
@@ -56,8 +57,8 @@ public class FooterRenderer {
           int occupancy = song.getOccupancy(channel);
           int concurrency = song.getConcurrency(channel);
           row.append(Value.toNumber(channel));
-          row.append(new CheckBox("mute-" + channel));
-          row.append(new CheckBox("solo-" + channel));
+          row.append(getMute(channel));
+          row.append(getSolo(channel));
           row.append(song.getProgramNames(channel));
           row.append(noteCount);
           row.append(Names.formatNote(song.getLowestMidiNote(channel)));
@@ -77,6 +78,18 @@ public class FooterRenderer {
 
     String html = detail.render();
     return html;
+  }
+
+  private CheckBox getMute(int channel) {
+    CheckBox checkBox = new CheckBox("mute-" + channel);
+    checkBox.appendProperty("onclick", PropertyRenderer.renderChannelChecked(ChannelCommand.MUTE, channel));
+    return checkBox;
+  }
+
+  private CheckBox getSolo(int channel) {
+    CheckBox checkBox = new CheckBox("solo-" + channel);
+    checkBox.appendProperty("onclick", PropertyRenderer.renderChannelChecked(ChannelCommand.SOLO, channel));
+    return checkBox;
   }
 
 }

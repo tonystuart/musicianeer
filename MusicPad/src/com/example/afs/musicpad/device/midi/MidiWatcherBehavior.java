@@ -30,7 +30,7 @@ public class MidiWatcherBehavior implements WatcherBehavior {
 
   @Override
   public Controller attachDevice(DeviceHandler deviceHandler, DeviceBundle deviceBundle) {
-    System.out.println("Attaching MIDI device " + deviceHandler.getName());
+    System.out.println("Attaching MIDI device " + deviceHandler.getDeviceName());
     Controller controller = new MidiController(deviceHandler, deviceBundle);
     return controller;
   }

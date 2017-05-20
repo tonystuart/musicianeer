@@ -30,6 +30,7 @@ import org.eclipse.jetty.util.log.Log;
 import org.eclipse.jetty.util.log.Logger;
 
 import com.example.afs.musicpad.message.Message;
+import com.example.afs.musicpad.message.OnChannelCommand;
 import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnDeviceCommand;
 import com.example.afs.musicpad.message.OnDeviceDetached;
@@ -85,6 +86,9 @@ public class WebApp extends BrokerTask<Message> {
     if ("OnCommand".equals(message.getType())) {
       OnCommand onCommand = JsonUtilities.fromJson(json, OnCommand.class);
       getBroker().publish(onCommand);
+    } else if ("OnChannelCommand".equals(message.getType())) {
+      OnChannelCommand onChannelCommand = JsonUtilities.fromJson(json, OnChannelCommand.class);
+      getBroker().publish(onChannelCommand);
     } else if ("OnDeviceCommand".equals(message.getType())) {
       OnDeviceCommand onDeviceCommand = JsonUtilities.fromJson(json, OnDeviceCommand.class);
       getBroker().publish(onDeviceCommand);

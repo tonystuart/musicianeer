@@ -44,7 +44,7 @@ public class QwertyReader {
   }
 
   public void start() {
-    deviceReader = new Thread(() -> run(), deviceHandler.getName());
+    deviceReader = new Thread(() -> run(), deviceHandler.getDeviceName());
     deviceReader.start();
   }
 
@@ -121,7 +121,7 @@ public class QwertyReader {
   }
 
   private void run() {
-    try (FileInputStream fileInputStream = new FileInputStream(deviceHandler.getName())) {
+    try (FileInputStream fileInputStream = new FileInputStream(deviceHandler.getDeviceName())) {
       capture(fileInputStream);
       int ignoreKeyUp = 0;
       byte[] buffer = new byte[16];

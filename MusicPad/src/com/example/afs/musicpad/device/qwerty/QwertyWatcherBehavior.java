@@ -22,7 +22,7 @@ public class QwertyWatcherBehavior implements WatcherBehavior {
 
   @Override
   public Controller attachDevice(DeviceHandler deviceHandler, DeviceBundle deviceBundle) {
-    System.out.println("Attaching QWERTY device " + deviceHandler.getName());
+    System.out.println("Attaching QWERTY device " + deviceHandler.getDeviceName());
     Controller controller = new QwertyController(deviceHandler, deviceBundle);
     return controller;
   }

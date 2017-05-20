@@ -40,9 +40,6 @@ musicPad.onClick = function(event) {
   case "stop":
     musicPad.ws.send(JSON.stringify({type: "OnCommand", command: "STOP_PAUSE", parameter: 0}));
     break;
-  default:
-    musicPad.ws.send(JSON.stringify({type: "OnClick", id: id}))
-    break;
   }
 }
 
@@ -158,14 +155,18 @@ musicPad.request = function(resource) {
 }
 
 musicPad.sendCommand = function(command, parameter) {
-  // NB: invoked by on-property in html sent by server
   console.log("command="+command+", parameter="+parameter);
-  musicPad.ws.send(JSON.stringify({type: "OnCommand", command: command, parameter: parameter}));
+  musicPad.ws.send(JSON.stringify({type : "OnCommand", command : command, parameter : parameter}));
+}
+
+musicPad.sendChannelCommand = function(command, channel, parameter) {
+  console.log("command="+command+", channel="+channel+", parameter="+parameter);
+  musicPad.ws.send(JSON.stringify({type : "OnChannelCommand", channelCommand : command, channel : channel, parameter: parameter}));
 }
 
 musicPad.sendDeviceCommand = function(command, deviceIndex, parameter) {
-  // NB: invoked by on-property in html sent by server
   console.log("command="+command+", deviceIndex="+deviceIndex+", parameter="+parameter);
-  musicPad.ws.send(JSON.stringify({type: "OnDeviceCommand", deviceCommand: command, deviceIndex: deviceIndex, parameter: parameter}));
+  musicPad.ws.send(JSON.stringify({type : "OnDeviceCommand", deviceCommand : command, deviceIndex : deviceIndex, parameter: parameter}));
 }
+
 

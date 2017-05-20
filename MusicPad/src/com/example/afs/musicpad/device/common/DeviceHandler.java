@@ -32,7 +32,7 @@ import com.example.afs.musicpad.message.OnSong;
 import com.example.afs.musicpad.player.Player;
 import com.example.afs.musicpad.player.Player.Action;
 import com.example.afs.musicpad.player.PlayerFactory;
-import com.example.afs.musicpad.renderer.ChannelControlsRenderer;
+import com.example.afs.musicpad.renderer.ChannelRenderer;
 import com.example.afs.musicpad.renderer.Notator;
 import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.task.BrokerTask;
@@ -54,7 +54,7 @@ public class DeviceHandler extends BrokerTask<Message> {
     return deviceIndex;
   }
 
-  private final String name;
+  private final String deviceName;
   private final int deviceIndex;
 
   private Song song;
@@ -67,7 +67,7 @@ public class DeviceHandler extends BrokerTask<Message> {
   public DeviceHandler(Broker<Message> messageBroker, Synthesizer synthesizer, String name) {
     super(messageBroker);
     this.synthesizer = synthesizer;
-    this.name = name;
+    this.deviceName = name;
     this.deviceIndex = getDeviceIndex(name);
     this.playerFactory = new PlayerFactory(this);
     delegate(OnNoteOn.class, message -> doNoteOn(message.getMidiNote()));
@@ -92,12 +92,12 @@ public class DeviceHandler extends BrokerTask<Message> {
     return deviceIndex;
   }
 
-  public InputMapping getInputMapping() {
-    return inputMapping;
+  public String getDeviceName() {
+    return deviceName;
   }
 
-  public String getName() {
-    return name;
+  public InputMapping getInputMapping() {
+    return inputMapping;
   }
 
   public Synthesizer getSynthesizer() {
@@ -181,8 +181,8 @@ public class DeviceHandler extends BrokerTask<Message> {
   }
 
   private String getChannelControls() {
-    ChannelControlsRenderer channelControlsRenderer = new ChannelControlsRenderer(song, channel, inputMapping, deviceIndex);
-    String channelControls = channelControlsRenderer.render();
+    ChannelRenderer channelRenderer = new ChannelRenderer(deviceName, deviceIndex, song, channel, inputMapping);
+    String channelControls = channelRenderer.render();
     return channelControls;
   }
 
