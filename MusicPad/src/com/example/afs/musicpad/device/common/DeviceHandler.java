@@ -176,8 +176,13 @@ public class DeviceHandler extends BrokerTask<Message> {
 
   private void doSongSelected(Song song, Map<Integer, Integer> deviceChannelMap) {
     this.song = song;
-    this.channel = deviceChannelMap.get(deviceIndex);
-    updatePlayer();
+    // TODO: Resolve race condition between publishing initial song and connecting device
+    if (deviceChannelMap.containsKey(deviceIndex)) {
+      this.channel = deviceChannelMap.get(deviceIndex);
+      updatePlayer();
+    } else {
+      System.err.println("DeviceHandler.doSongSelected: deviceChannelMap does not contain channel for device " + deviceIndex);
+    }
   }
 
   private String getChannelControls() {

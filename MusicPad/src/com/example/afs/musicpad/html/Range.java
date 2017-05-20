@@ -28,19 +28,19 @@ public class Range extends Input {
     setValue(value);
   }
 
-  private void setValue(int value) {
-    appendProperty("value", value);
-  }
-
-  private void setStep(int step) {
-    appendProperty("step", step);
-  }
-
   private void setMaximum(int maximum) {
     appendProperty("max", maximum);
   }
 
   private void setMinimum(int minimum) {
     appendProperty("min", minimum);
+  }
+
+  private void setStep(int step) {
+    appendProperty("step", step);
+  }
+
+  private void setValue(int value) {
+    appendProperty("value", value);
   }
 }

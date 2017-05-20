@@ -9,7 +9,6 @@
 
 package com.example.afs.musicpad.transport;
 
-import java.util.Iterator;
 import java.util.NavigableSet;
 import java.util.TreeSet;
 import java.util.concurrent.BlockingQueue;
@@ -42,7 +41,6 @@ public class TransportTask extends BrokerTask<Message> {
   private static final long LAST_NOTE = -1;
 
   private Song song;
-  private int currentChannel;
   private Synthesizer synthesizer;
   private NoteEventScheduler noteEventScheduler;
   private PausibleSequencerTask<NoteEvent> sequencerTask;
@@ -94,14 +92,14 @@ public class TransportTask extends BrokerTask<Message> {
     case NEXT_MEASURE:
       doNextMeasure();
       break;
-    case SET_TRANSPORT_TEMPO:
-      doSetTempo(parameter);
+    case TEMPO:
+      doTempo(parameter);
       break;
     case SET_TRANSPORT_VELOCITY:
       doSetVelocity(parameter);
       break;
-    case SET_MASTER_GAIN:
-      doSetMasterGain(parameter);
+    case GAIN:
+      doGain(parameter);
       break;
     case TRANSPOSE:
       doTranspose(parameter);
@@ -111,6 +109,11 @@ public class TransportTask extends BrokerTask<Message> {
     }
   }
 
+  private void doGain(int masterGain) {
+    float gain = Range.scale(0f, 2f, Midi.MIN_VALUE, Midi.MAX_VALUE, masterGain);
+    synthesizer.setGain(gain);
+  }
+
   private void doNextMeasure() {
     long tick = noteEventScheduler.getTick();
     int ticksPerMeasure = song.getTicksPerMeasure(tick);
@@ -118,7 +121,7 @@ public class TransportTask extends BrokerTask<Message> {
     int nextMeasure = measure + 1;
     long baseTick = nextMeasure * ticksPerMeasure;
     System.out.println("Moving from measure " + measure + " to measure " + nextMeasure);
-    play(currentChannel, baseTick);
+    play(baseTick);
   }
 
   private void doPause() {
@@ -126,14 +129,14 @@ public class TransportTask extends BrokerTask<Message> {
   }
 
   private void doPlay(int channel) {
-    play(channel, FIRST_NOTE);
+    play(FIRST_NOTE);
   }
 
   private void doPlayPause(int channel) {
     if (sequencerTask.isPaused()) {
       resume();
     } else {
-      play(channel, FIRST_NOTE);
+      play(FIRST_NOTE);
     }
   }
 
@@ -149,35 +152,14 @@ public class TransportTask extends BrokerTask<Message> {
     long baseTick = previousMeasure * ticksPerMeasure;
     Note toElement = song.getNotes().floor(new Note(baseTick));
     if (toElement != null) {
-      if (currentChannel == -1) {
-        System.out.println("Moving from measure " + measure + " to measure " + previousMeasure);
-        play(currentChannel, toElement.getTick());
-        return;
-      } else {
-        Iterator<Note> iterator = song.getNotes().headSet(toElement, true).descendingIterator();
-        while (iterator.hasNext()) {
-          Note note = iterator.next();
-          if (currentChannel == note.getChannel()) {
-            System.out.println("Moving from measure " + measure + " to measure " + previousMeasure);
-            play(currentChannel, toElement.getTick());
-            return;
-          }
-        }
-      }
+      System.out.println("Moving from measure " + measure + " to measure " + previousMeasure);
+      play(toElement.getTick());
+      return;
     }
   }
 
   private void doResume() {
     resume();
-  }
-
-  private void doSetMasterGain(int masterGain) {
-    float gain = Range.scale(Synthesizer.MINIMUM_GAIN, Synthesizer.MAXIMUM_GAIN, Midi.MIN_VALUE, Midi.MAX_VALUE, masterGain);
-    synthesizer.setGain(gain);
-  }
-
-  private void doSetTempo(int tempo) {
-    noteEventScheduler.setPercentTempo(Range.scaleMidiToPercent(tempo));
   }
 
   private void doSetVelocity(int velocity) {
@@ -199,6 +181,10 @@ public class TransportTask extends BrokerTask<Message> {
     } else {
       pause();
     }
+  }
+
+  private void doTempo(int tempo) {
+    noteEventScheduler.setPercentTempo(Range.scaleMidiToPercent(tempo));
   }
 
   private void doTranspose(int midiTransposition) {
@@ -234,13 +220,8 @@ public class TransportTask extends BrokerTask<Message> {
     synthesizer.allNotesOff();
   }
 
-  private void play(int channel, long baseTick) {
-    play(channel, baseTick, LAST_NOTE);
-  }
-
   private void play(int channel, long baseTick, long baseDuration) {
     stop();
-    currentChannel = channel;
     Note firstNote = findFirstNote(channel, baseTick);
     if (firstNote != null) {
       long firstTick = firstNote.getTick();
@@ -273,6 +254,10 @@ public class TransportTask extends BrokerTask<Message> {
         inputQueue.add(new NoteEvent(Type.TICK, tick, beatsPerMinute));
       }
     }
+  }
+
+  private void play(long baseTick) {
+    play(-1, baseTick, LAST_NOTE);
   }
 
   private void processNoteEvent(NoteEvent noteEvent) {
