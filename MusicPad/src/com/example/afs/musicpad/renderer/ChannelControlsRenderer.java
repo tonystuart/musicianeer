@@ -11,7 +11,7 @@ package com.example.afs.musicpad.renderer;
 
 import java.util.Set;
 
-import com.example.afs.musicpad.Command;
+import com.example.afs.musicpad.DeviceCommand;
 import com.example.afs.musicpad.device.common.InputMapping;
 import com.example.afs.musicpad.html.Division;
 import com.example.afs.musicpad.html.Option;
@@ -70,14 +70,14 @@ public class ChannelControlsRenderer {
         select.appendChild(option);
       }
     }
-    select.appendProperty("onchange", SendCommandRenderer.render(Command.CHANNEL, deviceIndex));
+    select.appendProperty("onchange", PropertyRenderer.render(DeviceCommand.CHANNEL, deviceIndex));
     return select;
   }
 
   private Select getInputSelect() {
     Select select = new Select("input-select-" + deviceIndex);
     select.appendProperty("value", inputMapping.getType().ordinal());
-    select.appendProperty("onchange", SendCommandRenderer.render(Command.INPUT, deviceIndex));
+    select.appendProperty("onchange", PropertyRenderer.render(DeviceCommand.INPUT, deviceIndex));
     return select;
   }
 
@@ -89,7 +89,7 @@ public class ChannelControlsRenderer {
     }
     Select select = new Select("program-select-" + deviceIndex);
     select.appendProperty("value", channelProgram);
-    select.appendProperty("onchange", SendCommandRenderer.render(Command.PROGRAM, deviceIndex));
+    select.appendProperty("onchange", PropertyRenderer.render(DeviceCommand.PROGRAM, deviceIndex));
     return select;
   }
 

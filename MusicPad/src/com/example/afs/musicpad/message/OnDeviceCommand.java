@@ -9,12 +9,50 @@
 
 package com.example.afs.musicpad.message;
 
-import com.example.afs.musicpad.Command;
+import com.example.afs.musicpad.DeviceCommand;
 
-public class OnDeviceCommand extends OnCommand {
+public class OnDeviceCommand extends Message {
 
-  public OnDeviceCommand(Command command, int parameter) {
-    super(command, parameter);
+  private DeviceCommand deviceCommand;
+  private int deviceIndex;
+  private int parameter;
+
+  public OnDeviceCommand() {
+  }
+
+  public OnDeviceCommand(DeviceCommand deviceCommand, int deviceIndex, int parameter) {
+    this.deviceCommand = deviceCommand;
+    this.deviceIndex = deviceIndex;
+    this.parameter = parameter;
+  }
+
+  public DeviceCommand getDeviceCommand() {
+    return deviceCommand;
+  }
+
+  public int getDeviceIndex() {
+    return deviceIndex;
+  }
+
+  public int getParameter() {
+    return parameter;
+  }
+
+  public void setDeviceCommand(DeviceCommand deviceCommand) {
+    this.deviceCommand = deviceCommand;
+  }
+
+  public void setDeviceIndex(int deviceIndex) {
+    this.deviceIndex = deviceIndex;
+  }
+
+  public void setParameter(int parameter) {
+    this.parameter = parameter;
+  }
+
+  @Override
+  public String toString() {
+    return "OnDeviceCommand [deviceCommand=" + deviceCommand + ", deviceIndex=" + deviceIndex + ", parameter=" + parameter + "]";
   }
 
 }

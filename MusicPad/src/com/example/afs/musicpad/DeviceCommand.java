@@ -9,26 +9,9 @@
 
 package com.example.afs.musicpad;
 
-public enum Command {
-  HELP, //
-  SONG, //
-  PLAY, //
-  PLAY_PAUSE, //
-  PLAY_SAMPLE, //
-  PAUSE, //
-  RESUME, //
-  STOP, //
-  STOP_PAUSE, //
-  PREVIOUS_MEASURE, //
-  NEXT_MEASURE, //
-  SET_TRANSPORT_TEMPO, //
-  SET_TRANSPORT_VELOCITY, //
-  SET_MASTER_GAIN, //
-  SHOW_CHANNEL_STATE, //
-  SHOW_DRUM_INFO, //
-  TRANSPOSE, //
-  TRON, //
-  TROFF, //
-  DETACH, //
-  QUIT, //
+public enum DeviceCommand {
+  CHANNEL, //
+  PROGRAM, //
+  INPUT, //
+  VELOCITY, //
 }

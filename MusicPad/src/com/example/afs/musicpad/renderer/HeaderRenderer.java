@@ -9,6 +9,8 @@
 
 package com.example.afs.musicpad.renderer;
 
+import java.io.File;
+
 import com.example.afs.musicpad.Command;
 import com.example.afs.musicpad.analyzer.KeyScore;
 import com.example.afs.musicpad.analyzer.KeySignatures;
@@ -21,12 +23,15 @@ import com.example.afs.musicpad.html.TableHeader;
 import com.example.afs.musicpad.html.TableRow;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.song.Song;
+import com.example.afs.musicpad.util.RandomAccessList;
 
 public class HeaderRenderer {
 
+  private RandomAccessList<File> midiFiles;
   private Song song;
 
-  public HeaderRenderer(Song song) {
+  public HeaderRenderer(RandomAccessList<File> midiFiles, Song song) {
+    this.midiFiles = midiFiles;
     this.song = song;
   }
 
@@ -101,14 +106,20 @@ public class HeaderRenderer {
 
   private Select getTitleSelect() {
     Select select = new Select("title");
-    select.appendProperty("value", mapTitleToIndex(song.getName()));
-    select.appendProperty("onchange", SendCommandRenderer.render(Command.SONG));
+    select.appendProperty("value", mapTitleToIndex(song.getTitle()));
+    select.appendProperty("onchange", PropertyRenderer.render(Command.SONG));
     return select;
   }
 
   private int mapTitleToIndex(String title) {
-    System.out.println("HeaderRenderer.mapTitleToIndex: mapping " + title + " to 2");
-    return 2;
+    int midiFileCount = midiFiles.size();
+    for (int i = 0; i < midiFileCount; i++) {
+      File midiFile = midiFiles.get(i);
+      if (midiFile.getName().equals(title)) {
+        return i;
+      }
+    }
+    return 0;
   }
 
 }

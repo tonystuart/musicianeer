@@ -20,6 +20,7 @@ import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnSong;
 import com.example.afs.musicpad.message.OnTick;
+import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.song.Default;
 import com.example.afs.musicpad.song.Note;
 import com.example.afs.musicpad.song.Song;
@@ -33,21 +34,22 @@ import com.example.afs.musicpad.util.Velocity;
 public class TransportTask extends BrokerTask<Message> {
 
   public static final int DEFAULT_PERCENT_VELOCITY = 25;
+  private static final float DEFAULT_GAIN = 5 * Synthesizer.DEFAULT_GAIN;
 
   private static final long FIRST_NOTE = -1;
   private static final long LAST_NOTE = -1;
 
   private Song song;
+  private int currentChannel;
   private Synthesizer synthesizer;
   private NoteEventScheduler noteEventScheduler;
   private PausibleSequencerTask<NoteEvent> sequencerTask;
   private int percentVelocity = DEFAULT_PERCENT_VELOCITY;
 
-  private int currentChannel;
-
   public TransportTask(Broker<Message> broker, Synthesizer synthesizer) {
     super(broker);
     this.synthesizer = synthesizer;
+    synthesizer.setGain(DEFAULT_GAIN);
     subscribe(OnSong.class, message -> doSongSelected(message.getSong()));
     subscribe(OnCommand.class, message -> doCommand(message.getCommand(), message.getParameter()));
     noteEventScheduler = new NoteEventScheduler();
@@ -90,6 +92,12 @@ public class TransportTask extends BrokerTask<Message> {
       break;
     case SET_TRANSPORT_VELOCITY:
       doSetVelocity(parameter);
+      break;
+    case SET_MASTER_GAIN:
+      doSetMasterGain(parameter);
+      break;
+    case TRANSPOSE:
+      doTranspose(parameter);
       break;
     default:
       break;
@@ -156,6 +164,11 @@ public class TransportTask extends BrokerTask<Message> {
     resume();
   }
 
+  private void doSetMasterGain(int masterGain) {
+    float gain = Range.scale(Synthesizer.MINIMUM_GAIN, Synthesizer.MAXIMUM_GAIN, Midi.MIN_VALUE, Midi.MAX_VALUE, masterGain);
+    synthesizer.setGain(gain);
+  }
+
   private void doSetTempo(int tempo) {
     noteEventScheduler.setPercentTempo(Range.scaleMidiToPercent(tempo));
   }
@@ -179,6 +192,12 @@ public class TransportTask extends BrokerTask<Message> {
     } else {
       pause();
     }
+  }
+
+  private void doTranspose(int midiTransposition) {
+    int transposition = Range.scale(-24, 24, Midi.MIN_VALUE, Midi.MAX_VALUE, midiTransposition);
+    song.transpose(transposition);
+    synthesizer.allNotesOff(); // turn off notes that were playing before transpose
   }
 
   private Note findFirstNote(int channel, long baseTick) {

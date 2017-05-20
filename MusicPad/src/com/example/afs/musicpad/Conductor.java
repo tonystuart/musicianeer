@@ -16,18 +16,15 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
-import com.example.afs.musicpad.device.common.InputMapping.MappingType;
-import com.example.afs.musicpad.html.Option;
-import com.example.afs.musicpad.html.Template;
 import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnAllTasksStarted;
 import com.example.afs.musicpad.message.OnChannelAssigned;
 import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnDeviceAttached;
+import com.example.afs.musicpad.message.OnDeviceCommand;
 import com.example.afs.musicpad.message.OnDeviceDetached;
+import com.example.afs.musicpad.message.OnMidiFiles;
 import com.example.afs.musicpad.message.OnSong;
-import com.example.afs.musicpad.message.OnTemplates;
-import com.example.afs.musicpad.midi.Instruments;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.parser.SongBuilder;
 import com.example.afs.musicpad.song.Song;
@@ -35,8 +32,9 @@ import com.example.afs.musicpad.task.BrokerTask;
 import com.example.afs.musicpad.util.Broker;
 import com.example.afs.musicpad.util.DirectList;
 import com.example.afs.musicpad.util.RandomAccessList;
+import com.example.afs.musicpad.util.Value;
 
-public class SongManager extends BrokerTask<Message> {
+public class Conductor extends BrokerTask<Message> {
 
   private Song song;
   private File directory;
@@ -45,13 +43,14 @@ public class SongManager extends BrokerTask<Message> {
   private Map<Integer, Integer> deviceChannelMap = new HashMap<>();
   private Set<Integer> deviceIndexes = new HashSet<>();
 
-  public SongManager(Broker<Message> broker, String path) {
+  public Conductor(Broker<Message> broker, String path) {
     super(broker);
     this.directory = new File(path);
     this.midiFiles = new DirectList<>();
     listMidiFiles(midiFiles, directory);
     midiFiles.sort((o1, o2) -> o1.getPath().compareTo(o2.getPath()));
     subscribe(OnCommand.class, message -> doCommand(message.getCommand(), message.getParameter()));
+    subscribe(OnDeviceCommand.class, message -> doCommand(message.getDeviceCommand(), message.getDeviceIndex(), message.getParameter()));
     subscribe(OnAllTasksStarted.class, message -> doAllTasksStarted());
     subscribe(OnDeviceAttached.class, message -> doDeviceAttached(message.getDeviceIndex()));
     subscribe(OnDeviceDetached.class, message -> doDeviceDetached(message.getDeviceIndex()));
@@ -78,8 +77,12 @@ public class SongManager extends BrokerTask<Message> {
         assignedChannel = 0;
       }
     }
-    deviceChannelMap.put(deviceIndex, assignedChannel);
+    assignChannel(deviceIndex, assignedChannel);
     return assignedChannel;
+  }
+
+  private void assignChannel(int deviceIndex, int assignedChannel) {
+    deviceChannelMap.put(deviceIndex, assignedChannel);
   }
 
   private void assignChannels() {
@@ -89,11 +92,13 @@ public class SongManager extends BrokerTask<Message> {
   }
 
   private void doAllTasksStarted() {
-    String songOptions = getSongOptions();
-    String programOptions = getProgramOptions();
-    String inputOptions = getInputOptions();
-    getBroker().publish(new OnTemplates(songOptions, programOptions, inputOptions));
+    getBroker().publish(new OnMidiFiles(midiFiles));
     selectRandomSong();
+  }
+
+  private void doChannel(int deviceIndex, int channel) {
+    unassignChannel(deviceIndex);
+    assignChannel(deviceIndex, channel);
   }
 
   private void doCommand(Command command, int parameter) {
@@ -101,11 +106,19 @@ public class SongManager extends BrokerTask<Message> {
     case SONG:
       doSelectSong(parameter);
       break;
+    default:
+      break;
+    }
+  }
+
+  private void doCommand(DeviceCommand deviceCommand, int deviceIndex, int parameter) {
+    switch (deviceCommand) {
     case CHANNEL:
-      // TODO: Add support after device index is added to device handler messages
+      doChannel(deviceIndex, Value.toIndex(parameter));
       break;
     default:
       break;
+
     }
   }
 
@@ -125,40 +138,6 @@ public class SongManager extends BrokerTask<Message> {
     if (songIndex >= 0 && songIndex < midiFiles.size()) {
       selectSong(songIndex);
     }
-  }
-
-  private String getInputOptions() {
-    Template template = new Template("input-options");
-    MappingType[] mappingTypes = MappingType.values();
-    for (int i = 0; i < mappingTypes.length; i++) {
-      MappingType mappingType = mappingTypes[i];
-      Option option = new Option(mappingType.name(), i, false);
-      template.appendChild(option);
-    }
-    String inputOptions = template.render();
-    return inputOptions;
-  }
-
-  private String getProgramOptions() {
-    Template template = new Template("program-options");
-    for (int i = 0; i < Midi.PROGRAMS; i++) {
-      Option option = new Option(Instruments.getProgramName(i), i, false);
-      template.appendChild(option);
-    }
-    String programOptions = template.render();
-    return programOptions;
-  }
-
-  private String getSongOptions() {
-    Template template = new Template("song-options");
-    int midiFileCount = midiFiles.size();
-    for (int i = 0; i < midiFileCount; i++) {
-      String name = midiFiles.get(i).getName();
-      Option option = new Option(name, i, false);
-      template.appendChild(option);
-    }
-    String songOptions = template.render();
-    return songOptions;
   }
 
   private boolean isChannelAssigned(int channel) {
@@ -212,7 +191,7 @@ public class SongManager extends BrokerTask<Message> {
     File midiFile = midiFiles.get(songIndex);
     SongBuilder songBuilder = new SongBuilder();
     song = songBuilder.createSong(midiFile);
-    System.out.println("Selecting song " + songIndex + " - " + song.getName());
+    System.out.println("Selecting song " + songIndex + " - " + song.getTitle());
     assignChannels();
     publish(new OnSong(song, deviceChannelMap));
   }

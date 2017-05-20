@@ -68,9 +68,9 @@ public class DeviceWatcher extends BrokerTask<Message> {
     publish(new OnDeviceDetached(controller.getDevice()));
   }
 
-  private void doCommand(Command command, int deviceIndex) {
+  private void doCommand(Command command, int parameter) {
     if (command == Command.DETACH) {
-      Entry<String, Controller> entry = findByControllerDeviceIndex(deviceIndex);
+      Entry<String, Controller> entry = findByControllerDeviceIndex(parameter);
       if (entry != null) {
         detachDevice(entry.getKey(), entry.getValue());
         // Leave device in list of oldDevices to prevent re-attachment

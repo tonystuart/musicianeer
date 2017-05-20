@@ -9,15 +9,11 @@
 
 package com.example.afs.musicpad;
 
-import com.example.afs.fluidsynth.Synthesizer;
 import com.example.afs.musicpad.Trace.TraceOption;
 import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnCommand;
-import com.example.afs.musicpad.midi.Midi;
-import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.task.BrokerTask;
 import com.example.afs.musicpad.util.Broker;
-import com.example.afs.musicpad.util.Range;
 
 // new things
 // zero/enter when not in command mode are modulation down/up1550000550
@@ -64,28 +60,15 @@ import com.example.afs.musicpad.util.Range;
 
 public class CommandProcessor extends BrokerTask<Message> {
 
-  private static final float DEFAULT_GAIN = 5 * Synthesizer.DEFAULT_GAIN;
-
-  private Song song;
-  private Synthesizer synthesizer;
-
-  public CommandProcessor(Broker<Message> broker, Synthesizer synthesizer) {
+  public CommandProcessor(Broker<Message> broker) {
     super(broker);
-    this.synthesizer = synthesizer;
     subscribe(OnCommand.class, message -> doCommand(message.getCommand(), message.getParameter()));
-    synthesizer.setGain(DEFAULT_GAIN);
   }
 
   private void doCommand(Command command, int parameter) {
     switch (command) {
     case HELP:
       doHelp();
-      break;
-    case SET_MASTER_GAIN:
-      doSetMasterGain(parameter);
-      break;
-    case TRANSPOSE: // TODO: Consider moving to SongManager. Synthesizer.allNotesOff() is the problem.
-      doTranspose(parameter);
       break;
     case TRON:
       doTron(parameter);
@@ -105,17 +88,6 @@ public class CommandProcessor extends BrokerTask<Message> {
     for (Command command : Command.values()) {
       System.out.println(command.ordinal() + " -> " + command);
     }
-  }
-
-  private void doSetMasterGain(int masterGain) {
-    float gain = Range.scale(Synthesizer.MINIMUM_GAIN, Synthesizer.MAXIMUM_GAIN, Midi.MIN_VALUE, Midi.MAX_VALUE, masterGain);
-    synthesizer.setGain(gain);
-  }
-
-  private void doTranspose(int midiTransposition) {
-    int transposition = Range.scale(-24, 24, Midi.MIN_VALUE, Midi.MAX_VALUE, midiTransposition);
-    song.transpose(transposition);
-    synthesizer.allNotesOff(); // turn off notes that were playing before transpose
   }
 
   private void doTroff(int trace) {

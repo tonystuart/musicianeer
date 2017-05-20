@@ -9,29 +9,25 @@
 
 package com.example.afs.musicpad.message;
 
-import com.example.afs.musicpad.Command;
+import java.io.File;
 
-public class OnCommand extends Message {
+import com.example.afs.musicpad.util.RandomAccessList;
 
-  private Command command;
-  private int parameter;
+public class OnMidiFiles extends Message {
 
-  public OnCommand(Command command, int parameter) {
-    this.command = command;
-    this.parameter = parameter;
+  private RandomAccessList<File> midiFiles;
+
+  public OnMidiFiles(RandomAccessList<File> midiFiles) {
+    this.midiFiles = midiFiles;
   }
 
-  public Command getCommand() {
-    return command;
-  }
-
-  public int getParameter() {
-    return parameter;
+  public RandomAccessList<File> getMidiFiles() {
+    return midiFiles;
   }
 
   @Override
   public String toString() {
-    return "OnCommand [command=" + command + ", parameter=" + parameter + "]";
+    return "OnMidiFiles [midiFiles=" + midiFiles + "]";
   }
 
 }

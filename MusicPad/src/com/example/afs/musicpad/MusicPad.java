@@ -36,7 +36,7 @@ public class MusicPad {
   }
 
   private Broker<Message> broker;
-  private SongManager songManager;
+  private Conductor conductor;
   private DeviceWatcher midiWatcher;
   private DeviceWatcher qwertyWatcher;
   private TransportTask transportTask;
@@ -47,8 +47,8 @@ public class MusicPad {
 
   public MusicPad(String libraryPath) {
     this.broker = new Broker<Message>();
-    this.songManager = new SongManager(broker, libraryPath);
-    this.commandProcessor = new CommandProcessor(broker, synthesizer);
+    this.conductor = new Conductor(broker, libraryPath);
+    this.commandProcessor = new CommandProcessor(broker);
     this.midiWatcher = new DeviceWatcher(broker, synthesizer, new MidiWatcherBehavior());
     this.qwertyWatcher = new DeviceWatcher(broker, synthesizer, new QwertyWatcherBehavior());
     this.transportTask = new TransportTask(broker, synthesizer);
@@ -64,7 +64,7 @@ public class MusicPad {
   }
 
   private void start() {
-    songManager.start();
+    conductor.start();
     midiWatcher.start();
     qwertyWatcher.start();
     transportTask.start();

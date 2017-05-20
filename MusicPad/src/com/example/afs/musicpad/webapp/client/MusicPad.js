@@ -114,12 +114,6 @@ musicPad.onTick = function(tick) {
   }
 }
 
-musicPad.sendCommand = function(command, parameters) {
-  // NB: invoked by on-property in html sent by server
-  console.log("command="+command+", parameters="+parameters);
-  musicPad.ws.send(JSON.stringify({type: "OnCommand", command: command, parameters: parameters}));
-}
-
 musicPad.onTransport = function(response) {
   let transport = document.getElementById("transport");
   transport.innerHTML = response.html;
@@ -162,3 +156,16 @@ musicPad.request = function(resource) {
   httpRequest.open("GET", "v1/rest/" + resource, true);
   httpRequest.send();
 }
+
+musicPad.sendCommand = function(command, parameter) {
+  // NB: invoked by on-property in html sent by server
+  console.log("command="+command+", parameter="+parameter);
+  musicPad.ws.send(JSON.stringify({type: "OnCommand", command: command, parameter: parameter}));
+}
+
+musicPad.sendDeviceCommand = function(command, deviceIndex, parameter) {
+  // NB: invoked by on-property in html sent by server
+  console.log("command="+command+", deviceIndex="+deviceIndex+", parameter="+parameter);
+  musicPad.ws.send(JSON.stringify({type: "OnDeviceCommand", deviceCommand: command, deviceIndex: deviceIndex, parameter: parameter}));
+}
+

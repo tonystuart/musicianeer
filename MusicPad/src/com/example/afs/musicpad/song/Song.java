@@ -23,7 +23,7 @@ import com.example.afs.musicpad.util.Value;
 
 public class Song {
 
-  private String name;
+  private String title;
   private long duration;
   private int transposition;
   private TreeSet<Note> notes = new TreeSet<>();
@@ -34,11 +34,11 @@ public class Song {
   }
 
   public Song(String name) {
-    this.name = name;
+    this.title = name;
   }
 
   public Song(String name, int transposition) {
-    this.name = name;
+    this.title = name;
     this.transposition = transposition;
   }
 
@@ -185,8 +185,8 @@ public class Song {
     return channelFacets.getFacet(channel).getLowestMidiNote();
   }
 
-  public String getName() {
-    return transposition == 0 ? name : (name + " (" + transposition + ")");
+  public String getTitle() {
+    return title;
   }
 
   public TreeSet<Note> getNotes() {
@@ -267,7 +267,7 @@ public class Song {
 
   @Override
   public String toString() {
-    return "Song [name=" + name + ", transposition=" + transposition + "]";
+    return "Song [name=" + title + ", transposition=" + transposition + "]";
   }
 
   public void transpose(int desiredDistance) {
