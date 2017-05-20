@@ -185,10 +185,6 @@ public class Song {
     return channelFacets.getFacet(channel).getLowestMidiNote();
   }
 
-  public String getTitle() {
-    return title;
-  }
-
   public TreeSet<Note> getNotes() {
     return notes;
   }
@@ -239,6 +235,10 @@ public class Song {
     return ticksPerMeasure;
   }
 
+  public String getTitle() {
+    return title;
+  }
+
   public int getTransposition() {
     return transposition;
   }
@@ -270,10 +270,9 @@ public class Song {
     return "Song [name=" + title + ", transposition=" + transposition + "]";
   }
 
-  public void transpose(int desiredDistance) {
-    int distance = desiredDistance - this.transposition;
+  public void transposeBy(int distance) {
     if (distance != 0) {
-      this.transposition = desiredDistance;
+      this.transposition += distance;
       ChannelFacets newChannelFacets = new ChannelFacets();
       for (int channel = 0; channel < Midi.CHANNELS; channel++) {
         Facet channelFacet = channelFacets.getFacet(channel);
@@ -290,6 +289,11 @@ public class Song {
       }
       channelFacets = newChannelFacets;
     }
+  }
+
+  public void transposeTo(int desiredDistance) {
+    int distance = desiredDistance - this.transposition;
+    transposeBy(distance);
   }
 
 }

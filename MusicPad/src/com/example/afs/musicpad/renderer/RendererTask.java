@@ -10,6 +10,8 @@
 package com.example.afs.musicpad.renderer;
 
 import java.io.File;
+import java.util.LinkedList;
+import java.util.List;
 
 import com.example.afs.musicpad.Command;
 import com.example.afs.musicpad.device.common.InputMapping.MappingType;
@@ -40,7 +42,7 @@ public class RendererTask extends BrokerTask<Message> {
   public RendererTask(Broker<Message> broker) {
     super(broker);
     subscribe(OnCommand.class, message -> doCommand(message.getCommand(), message.getParameter()));
-    subscribe(OnMidiFiles.class, message -> doMidiFiles(message.getMidiFiles()));
+    subscribe(OnMidiFiles.class, message -> publishTemplates(message.getMidiFiles()));
     subscribe(OnSong.class, message -> doSong(message.getSong()));
   }
 
@@ -57,12 +59,14 @@ public class RendererTask extends BrokerTask<Message> {
     }
   }
 
-  private void doMidiFiles(RandomAccessList<File> midiFiles) {
+  private void publishTemplates(RandomAccessList<File> midiFiles) {
     this.midiFiles = midiFiles;
-    String songOptions = getSongOptions(midiFiles);
-    String programOptions = getProgramOptions();
-    String inputOptions = getInputOptions();
-    getBroker().publish(new OnTemplates(songOptions, programOptions, inputOptions));
+    List<String> templates = new LinkedList<>();
+    templates.add(getSongOptions(midiFiles));
+    templates.add(getProgramOptions());
+    templates.add(getInputOptions());
+    templates.add(getTransposeOptions());
+    getBroker().publish(new OnTemplates(templates));
   }
 
   private void doShowChannelState() {
@@ -89,7 +93,7 @@ public class RendererTask extends BrokerTask<Message> {
     MappingType[] mappingTypes = MappingType.values();
     for (int i = 0; i < mappingTypes.length; i++) {
       MappingType mappingType = mappingTypes[i];
-      Option option = new Option(mappingType.name(), i, false);
+      Option option = new Option(mappingType.name(), i);
       template.appendChild(option);
     }
     String inputOptions = template.render();
@@ -99,7 +103,7 @@ public class RendererTask extends BrokerTask<Message> {
   private String getProgramOptions() {
     Template template = new Template("program-options");
     for (int i = 0; i < Midi.PROGRAMS; i++) {
-      Option option = new Option(Instruments.getProgramName(i), i, false);
+      Option option = new Option(Instruments.getProgramName(i), i);
       template.appendChild(option);
     }
     String programOptions = template.render();
@@ -111,11 +115,20 @@ public class RendererTask extends BrokerTask<Message> {
     int midiFileCount = midiFiles.size();
     for (int i = 0; i < midiFileCount; i++) {
       String name = midiFiles.get(i).getName();
-      Option option = new Option(name, i, false);
+      Option option = new Option(name, i);
       template.appendChild(option);
     }
     String songOptions = template.render();
     return songOptions;
+  }
+
+  private String getTransposeOptions() {
+    Template template = new Template("transpose-options");
+    for (int i = -Midi.SEMITONES_PER_OCTAVE; i <= Midi.SEMITONES_PER_OCTAVE; i++) {
+      template.appendChild(new Option(Integer.toString(i), i));
+    }
+    String transposeOptions = template.render();
+    return transposeOptions;
   }
 
   private void showChannelState(Song song) {

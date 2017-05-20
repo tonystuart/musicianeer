@@ -27,6 +27,7 @@ public enum Command {
   SHOW_CHANNEL_STATE, //
   SHOW_DRUM_INFO, //
   TRANSPOSE, //
+  TRANSPOSE_TO, //
   TRON, //
   TROFF, //
   DETACH, //

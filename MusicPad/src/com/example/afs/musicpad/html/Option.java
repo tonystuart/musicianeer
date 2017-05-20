@@ -15,6 +15,10 @@ public class Option extends Hypertext {
     super("option");
   }
 
+  public Option(String text, Object value) {
+    this(text, value, false);
+  }
+
   public Option(String text, Object value, boolean isSelected) {
     this();
     setValue(value);

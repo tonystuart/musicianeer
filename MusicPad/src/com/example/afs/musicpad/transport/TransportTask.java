@@ -101,8 +101,8 @@ public class TransportTask extends BrokerTask<Message> {
     case GAIN:
       doGain(parameter);
       break;
-    case TRANSPOSE:
-      doTranspose(parameter);
+    case TRANSPOSE_TO:
+      doTransposeTo(parameter);
       break;
     default:
       break;
@@ -187,9 +187,10 @@ public class TransportTask extends BrokerTask<Message> {
     noteEventScheduler.setPercentTempo(Range.scaleMidiToPercent(tempo));
   }
 
-  private void doTranspose(int midiTransposition) {
+  private void doTransposeTo(int midiTransposition) {
+    // Dynamic transposition for use with rotary control... does not update display
     int transposition = Range.scale(-24, 24, Midi.MIN_VALUE, Midi.MAX_VALUE, midiTransposition);
-    song.transpose(transposition);
+    song.transposeTo(transposition);
     synthesizer.allNotesOff(); // turn off notes that were playing before transpose
   }
 

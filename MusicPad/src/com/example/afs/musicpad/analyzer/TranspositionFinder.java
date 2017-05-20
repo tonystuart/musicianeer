@@ -40,9 +40,8 @@ public class TranspositionFinder {
           for (int semitone = 0; semitone < Midi.SEMITONES_PER_OCTAVE; semitone++) {
             int semitoneCount = song.getCommonNoteCounts(channel)[semitone];
             if (semitoneCount > 0) {
-              int transposedSemitone = semitone + transposeDistance;
-              int x = (Midi.SEMITONES_PER_OCTAVE + transposedSemitone) % Midi.SEMITONES_PER_OCTAVE;
-              if (isWhite[x]) {
+              int transposedSemitone = normalize(semitone + transposeDistance);
+              if (isWhite[transposedSemitone]) {
                 naturals += semitoneCount;
               } else {
                 accidentals += semitoneCount;
@@ -60,4 +59,7 @@ public class TranspositionFinder {
     return bestTransposition;
   }
 
+  private static int normalize(int deltaSemitone) {
+    return (Midi.SEMITONES_PER_OCTAVE + deltaSemitone) % Midi.SEMITONES_PER_OCTAVE;
+  }
 }

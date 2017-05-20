@@ -55,6 +55,7 @@ musicPad.onHeader = function(response) {
   musicPad.title = response.title;
   header.innerHTML = response.html;
   musicPad.appendTemplate("title", "song-options");
+  musicPad.appendTemplate("transpose", "transpose-options");
 }
 
 musicPad.onFooter = function(response) {
@@ -88,12 +89,11 @@ musicPad.onMusic = function(response) {
 
 musicPad.onTemplates = function(response) {
   var templates = document.getElementById('templates');
-  let songOptions = musicPad.fragmentToElement(response.songOptions);
-  let programOptions = musicPad.fragmentToElement(response.programOptions);
-  let inputOptions = musicPad.fragmentToElement(response.inputOptions);
-  templates.appendChild(songOptions);
-  templates.appendChild(programOptions);
-  templates.appendChild(inputOptions);
+  for (let i in response.templates) {
+    let templateHtml = response.templates[i];
+    let templateElement = musicPad.fragmentToElement(templateHtml);
+    templates.appendChild(templateElement);
+  }
 }
 
 musicPad.onTick = function(tick) {

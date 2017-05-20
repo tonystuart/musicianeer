@@ -9,33 +9,23 @@
 
 package com.example.afs.musicpad.message;
 
+import java.util.List;
+
 public class OnTemplates extends Message {
 
-  private String songOptions;
-  private String programOptions;
-  private String inputOptions;
+  private List<String> templates;
 
-  public OnTemplates(String songOptions, String programOptions, String inputOptions) {
-    this.songOptions = songOptions;
-    this.programOptions = programOptions;
-    this.inputOptions = inputOptions;
+  public OnTemplates(List<String> templates) {
+    this.templates = templates;
   }
 
-  public String getInputOptions() {
-    return inputOptions;
-  }
-
-  public String getProgramOptions() {
-    return programOptions;
-  }
-
-  public String getSongOptions() {
-    return songOptions;
+  public List<String> getTemplates() {
+    return templates;
   }
 
   @Override
   public String toString() {
-    return "OnTemplates [songOptions=" + songOptions + ", programOptions=" + programOptions + ", inputOptions=" + inputOptions + "]";
+    return "OnTemplates [templates=" + templates + "]";
   }
 
 }

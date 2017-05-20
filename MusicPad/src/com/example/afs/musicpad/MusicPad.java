@@ -47,7 +47,7 @@ public class MusicPad {
 
   public MusicPad(String libraryPath) {
     this.broker = new Broker<Message>();
-    this.conductor = new Conductor(broker, libraryPath);
+    this.conductor = new Conductor(broker, libraryPath, synthesizer);
     this.commandProcessor = new CommandProcessor(broker);
     this.midiWatcher = new DeviceWatcher(broker, synthesizer, new MidiWatcherBehavior());
     this.qwertyWatcher = new DeviceWatcher(broker, synthesizer, new QwertyWatcherBehavior());

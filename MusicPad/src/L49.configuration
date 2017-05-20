@@ -117,7 +117,7 @@ on input
     return
    if data1 27
     # Rotary 7
-    sendCommand TRANSPOSE data2
+    sendCommand TRANSPOSE_TO data2
     return
    if data1 28
     # Rotary 8

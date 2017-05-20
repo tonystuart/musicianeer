@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
+import com.example.afs.fluidsynth.Synthesizer;
 import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnAllTasksStarted;
 import com.example.afs.musicpad.message.OnChannelAssigned;
@@ -42,9 +43,11 @@ public class Conductor extends BrokerTask<Message> {
   private RandomAccessList<File> midiFiles;
   private Map<Integer, Integer> deviceChannelMap = new HashMap<>();
   private Set<Integer> deviceIndexes = new HashSet<>();
+  private Synthesizer synthesizer;
 
-  public Conductor(Broker<Message> broker, String path) {
+  public Conductor(Broker<Message> broker, String path, Synthesizer synthesizer) {
     super(broker);
+    this.synthesizer = synthesizer;
     this.directory = new File(path);
     this.midiFiles = new DirectList<>();
     listMidiFiles(midiFiles, directory);
@@ -106,6 +109,9 @@ public class Conductor extends BrokerTask<Message> {
     case SONG:
       doSelectSong(parameter);
       break;
+    case TRANSPOSE:
+      doTranspose(parameter);
+      break;
     default:
       break;
     }
@@ -138,6 +144,11 @@ public class Conductor extends BrokerTask<Message> {
     if (songIndex >= 0 && songIndex < midiFiles.size()) {
       selectSong(songIndex);
     }
+  }
+
+  private void doTranspose(int distance) {
+    song.transposeTo(distance);
+    publish(new OnSong(song, deviceChannelMap));
   }
 
   private boolean isChannelAssigned(int channel) {

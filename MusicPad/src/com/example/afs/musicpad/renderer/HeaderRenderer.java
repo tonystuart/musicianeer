@@ -54,7 +54,7 @@ public class HeaderRenderer {
     row.append(new CheckBox("master-override"));
     row.append(getKeyInfo(song));
     row.append(TranspositionFinder.getDistanceToWhiteKeys(song));
-    row.append(song.getTransposition());
+    row.append(getTransposition());
     row.append(song.getBeatsPerMinute(0));
     row.append(song.getBeatsPerMeasure(0) + "/" + song.getBeatUnit(0));
     row.append(getDuration());
@@ -108,6 +108,13 @@ public class HeaderRenderer {
     Select select = new Select("title");
     select.appendProperty("value", mapTitleToIndex(song.getTitle()));
     select.appendProperty("onchange", PropertyRenderer.render(Command.SONG));
+    return select;
+  }
+
+  private Select getTransposition() {
+    Select select = new Select("transpose");
+    select.appendProperty("value", song.getTransposition());
+    select.appendProperty("onchange", PropertyRenderer.render(Command.TRANSPOSE));
     return select;
   }
 
