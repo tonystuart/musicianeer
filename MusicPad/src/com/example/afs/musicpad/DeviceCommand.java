@@ -13,5 +13,6 @@ public enum DeviceCommand {
   CHANNEL, //
   PROGRAM, //
   INPUT, //
+  OUTPUT, //
   VELOCITY, //
 }

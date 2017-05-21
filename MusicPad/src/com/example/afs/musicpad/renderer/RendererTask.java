@@ -14,6 +14,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.example.afs.musicpad.Command;
+import com.example.afs.musicpad.device.common.DeviceHandler;
+import com.example.afs.musicpad.device.common.DeviceHandler.InputType;
 import com.example.afs.musicpad.device.midi.configuration.ChannelState;
 import com.example.afs.musicpad.html.Option;
 import com.example.afs.musicpad.html.Template;
@@ -28,7 +30,6 @@ import com.example.afs.musicpad.message.OnTemplates;
 import com.example.afs.musicpad.message.OnTransport;
 import com.example.afs.musicpad.midi.Instruments;
 import com.example.afs.musicpad.midi.Midi;
-import com.example.afs.musicpad.renderer.ChannelRenderer.InputType;
 import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.task.BrokerTask;
 import com.example.afs.musicpad.util.Broker;
@@ -90,6 +91,18 @@ public class RendererTask extends BrokerTask<Message> {
     return inputOptions;
   }
 
+  private String getOutputOptions() {
+    Template template = new Template("output-options");
+    DeviceHandler.OutputType[] mappingTypes = DeviceHandler.OutputType.values();
+    for (int i = 0; i < mappingTypes.length; i++) {
+      DeviceHandler.OutputType outputType = mappingTypes[i];
+      Option option = new Option(outputType.name(), i);
+      template.appendChild(option);
+    }
+    String outputOptions = template.render();
+    return outputOptions;
+  }
+
   private String getProgramOptions() {
     Template template = new Template("program-options");
     for (int i = 0; i < Midi.PROGRAMS; i++) {
@@ -127,6 +140,7 @@ public class RendererTask extends BrokerTask<Message> {
     templates.add(getSongOptions(midiFiles));
     templates.add(getProgramOptions());
     templates.add(getInputOptions());
+    templates.add(getOutputOptions());
     templates.add(getTransposeOptions());
     getBroker().publish(new OnTemplates(templates));
   }

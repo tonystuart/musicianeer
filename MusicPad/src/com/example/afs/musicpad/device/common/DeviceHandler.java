@@ -28,11 +28,11 @@ import com.example.afs.musicpad.message.OnNoteOff;
 import com.example.afs.musicpad.message.OnNoteOn;
 import com.example.afs.musicpad.message.OnPitchBend;
 import com.example.afs.musicpad.message.OnSong;
+import com.example.afs.musicpad.player.ChordPlayer;
+import com.example.afs.musicpad.player.NotePlayer;
 import com.example.afs.musicpad.player.Player;
 import com.example.afs.musicpad.player.Player.Action;
-import com.example.afs.musicpad.player.PlayerFactory;
 import com.example.afs.musicpad.renderer.ChannelRenderer;
-import com.example.afs.musicpad.renderer.ChannelRenderer.InputType;
 import com.example.afs.musicpad.renderer.Notator;
 import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.task.BrokerTask;
@@ -41,6 +41,14 @@ import com.example.afs.musicpad.util.Range;
 import com.example.afs.musicpad.util.Value;
 
 public class DeviceHandler extends BrokerTask<Message> {
+
+  public static enum InputType {
+    MIDI, ALPHA, NUMERIC, DETACH
+  }
+
+  public static enum OutputType {
+    NOTE, CHORD, AUTO
+  }
 
   private static int nextDeviceIndex;
   private static Map<String, Integer> devices = new HashMap<>();
@@ -62,15 +70,14 @@ public class DeviceHandler extends BrokerTask<Message> {
   private int channel;
   private InputMapping inputMapping;
   private Synthesizer synthesizer;
-  private PlayerFactory playerFactory;
   private int ticksPerPixel;
+  private OutputType desiredOutputType;
 
   public DeviceHandler(Broker<Message> messageBroker, Synthesizer synthesizer, String name) {
     super(messageBroker);
     this.synthesizer = synthesizer;
     this.deviceName = name;
     this.deviceIndex = getDeviceIndex(name);
-    this.playerFactory = new PlayerFactory(this);
     delegate(OnNoteOn.class, message -> doNoteOn(message.getMidiNote()));
     delegate(OnNoteOff.class, message -> doNoteOff(message.getMidiNote()));
     delegate(OnControlChange.class, message -> doControlChange(message.getControl(), message.getValue()));
@@ -110,6 +117,43 @@ public class DeviceHandler extends BrokerTask<Message> {
     updatePlayer();
   }
 
+  private Player createPlayer(Song song) {
+    OutputType outputType;
+    if (desiredOutputType != null) {
+      outputType = desiredOutputType;
+    } else {
+      int concurrency = song.getConcurrency(channel);
+      switch (getInputType()) {
+      case MIDI:
+        outputType = OutputType.NOTE;
+        break;
+      case ALPHA:
+        if (concurrency < 110) {
+          outputType = OutputType.NOTE;
+        } else {
+          outputType = OutputType.CHORD;
+        }
+        break;
+      case NUMERIC:
+        outputType = OutputType.CHORD;
+        break;
+      default:
+        throw new UnsupportedOperationException();
+      }
+    }
+    switch (outputType) {
+    case CHORD:
+      player = new ChordPlayer(this, song);
+      break;
+    case NOTE:
+      player = new NotePlayer(this, song);
+      break;
+    default:
+      break;
+    }
+    return player;
+  }
+
   private void doChannelAssigned(OnChannelAssigned message) {
     if (this.deviceIndex == message.getDeviceIndex()) {
       this.song = message.getSong();
@@ -134,6 +178,9 @@ public class DeviceHandler extends BrokerTask<Message> {
         break;
       case INPUT:
         doInput(parameter);
+        break;
+      case OUTPUT:
+        doOutput(parameter);
         break;
       case VELOCITY:
         setVelocity(parameter);
@@ -172,6 +219,16 @@ public class DeviceHandler extends BrokerTask<Message> {
     player.play(Action.PRESS, midiNote);
   }
 
+  private void doOutput(int typeIndex) {
+    OutputType outputType = OutputType.values()[typeIndex];
+    if (outputType == OutputType.AUTO) {
+      desiredOutputType = null;
+    } else {
+      desiredOutputType = outputType;
+    }
+    updatePlayer();
+  }
+
   private void doPitchBend(int pitchBend) {
     player.bendPitch(pitchBend);
   }
@@ -189,15 +246,41 @@ public class DeviceHandler extends BrokerTask<Message> {
   }
 
   private String getChannelControls() {
-    ChannelRenderer channelRenderer = new ChannelRenderer(deviceName, deviceIndex, song, channel, inputMapping);
+    ChannelRenderer channelRenderer = new ChannelRenderer(deviceName, deviceIndex, song, channel, getInputType(), getOutputType());
     String channelControls = channelRenderer.render();
     return channelControls;
+  }
+
+  private InputType getInputType() {
+    InputType inputType;
+    if (inputMapping instanceof AlphaMapping) {
+      inputType = InputType.ALPHA;
+    } else if (inputMapping instanceof NumericMapping) {
+      inputType = InputType.NUMERIC;
+    } else if (inputMapping instanceof MidiMapping) {
+      inputType = InputType.MIDI;
+    } else {
+      throw new UnsupportedOperationException();
+    }
+    return inputType;
   }
 
   private String getMusic() {
     Notator notator = new Notator(player, song, channel, ticksPerPixel);
     String music = notator.getMusic();
     return music;
+  }
+
+  private OutputType getOutputType() {
+    OutputType outputType;
+    if (player instanceof NotePlayer) {
+      outputType = OutputType.NOTE;
+    } else if (player instanceof ChordPlayer) {
+      outputType = OutputType.CHORD;
+    } else {
+      throw new UnsupportedOperationException();
+    }
+    return outputType;
   }
 
   private void selectChannel(int channel) {
@@ -215,11 +298,10 @@ public class DeviceHandler extends BrokerTask<Message> {
 
   private void updatePlayer() {
     if (song != null) {
-      this.player = playerFactory.createPlayer(song);
+      this.player = createPlayer(song);
       // TODO: Figure out if this needs to be sent once per device?
       getBroker().publish(new OnCommand(Command.SHOW_CHANNEL_STATE, 0));
       getBroker().publish(new OnMusic(deviceIndex, getChannelControls(), getMusic()));
     }
   }
-
 }

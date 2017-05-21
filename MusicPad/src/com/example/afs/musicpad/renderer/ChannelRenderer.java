@@ -12,10 +12,8 @@ package com.example.afs.musicpad.renderer;
 import java.util.Set;
 
 import com.example.afs.musicpad.DeviceCommand;
-import com.example.afs.musicpad.device.common.InputMapping;
-import com.example.afs.musicpad.device.midi.MidiMapping;
-import com.example.afs.musicpad.device.qwerty.AlphaMapping;
-import com.example.afs.musicpad.device.qwerty.NumericMapping;
+import com.example.afs.musicpad.device.common.DeviceHandler.InputType;
+import com.example.afs.musicpad.device.common.DeviceHandler.OutputType;
 import com.example.afs.musicpad.html.Division;
 import com.example.afs.musicpad.html.Option;
 import com.example.afs.musicpad.html.Range;
@@ -30,22 +28,20 @@ import com.example.afs.musicpad.util.Value;
 
 public class ChannelRenderer {
 
-  public static enum InputType {
-    MIDI, ALPHA, NUMERIC, DETACH
-  }
-
   private String deviceName;
   private int deviceIndex;
   private Song song;
   private int channel;
-  private InputMapping inputMapping;
+  private InputType inputType;
+  private OutputType outputType;
 
-  public ChannelRenderer(String deviceName, int deviceIndex, Song song, int channel, InputMapping inputMapping) {
+  public ChannelRenderer(String deviceName, int deviceIndex, Song song, int channel, InputType inputType, OutputType outputType) {
     this.deviceName = deviceName;
     this.deviceIndex = deviceIndex;
     this.song = song;
     this.channel = channel;
-    this.inputMapping = inputMapping;
+    this.inputType = inputType;
+    this.outputType = outputType;
   }
 
   public String render() {
@@ -55,12 +51,14 @@ public class ChannelRenderer {
     header.append("Channel");
     header.append("Instrument");
     header.append("Input");
+    header.append("Output");
     header.append("Volume");
 
     TableRow row = table.createRow();
     row.append(getChannelSelect());
     row.append(getProgramSelect());
     row.append(getInputSelect());
+    row.append(getOutputSelect());
     row.append(getVolumeRange());
 
     Division channelControls = new Division();
@@ -94,23 +92,16 @@ public class ChannelRenderer {
 
   private Select getInputSelect() {
     Select select = new Select("input-select-" + deviceIndex);
-    select.appendProperty("value", getInputType().ordinal());
+    select.appendProperty("value", inputType.ordinal());
     select.appendProperty("onchange", PropertyRenderer.render(DeviceCommand.INPUT, deviceIndex));
     return select;
   }
 
-  private InputType getInputType() {
-    InputType inputType;
-    if (inputMapping instanceof AlphaMapping) {
-      inputType = InputType.ALPHA;
-    } else if (inputMapping instanceof NumericMapping) {
-      inputType = InputType.NUMERIC;
-    } else if (inputMapping instanceof MidiMapping) {
-      inputType = InputType.MIDI;
-    } else {
-      throw new UnsupportedOperationException();
-    }
-    return inputType;
+  private Select getOutputSelect() {
+    Select select = new Select("output-select-" + deviceIndex);
+    select.appendProperty("value", outputType.ordinal());
+    select.appendProperty("onchange", PropertyRenderer.render(DeviceCommand.OUTPUT, deviceIndex));
+    return select;
   }
 
   private Select getProgramSelect() {

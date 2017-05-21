@@ -83,8 +83,10 @@ musicPad.onMusic = function(response) {
   }
   let programId = "program-select-" + response.deviceIndex;
   let inputId = "input-select-" + response.deviceIndex;
+  let outputId = "output-select-" + response.deviceIndex;
   musicPad.appendTemplate(programId, "program-options");
   musicPad.appendTemplate(inputId, "input-options");
+  musicPad.appendTemplate(outputId, "output-options");
 }
 
 musicPad.onNotatorScroll = function(event) {
