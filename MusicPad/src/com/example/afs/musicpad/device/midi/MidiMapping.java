@@ -32,11 +32,6 @@ public class MidiMapping implements InputMapping {
   }
 
   @Override
-  public InputType getType() {
-    return InputType.MIDI;
-  }
-
-  @Override
   public void setOctave(int octave) {
     this.octave = octave;
   }

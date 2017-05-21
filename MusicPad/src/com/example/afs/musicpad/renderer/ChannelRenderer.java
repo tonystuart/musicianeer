@@ -13,6 +13,9 @@ import java.util.Set;
 
 import com.example.afs.musicpad.DeviceCommand;
 import com.example.afs.musicpad.device.common.InputMapping;
+import com.example.afs.musicpad.device.midi.MidiMapping;
+import com.example.afs.musicpad.device.qwerty.AlphaMapping;
+import com.example.afs.musicpad.device.qwerty.NumericMapping;
 import com.example.afs.musicpad.html.Division;
 import com.example.afs.musicpad.html.Option;
 import com.example.afs.musicpad.html.Range;
@@ -26,6 +29,10 @@ import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.util.Value;
 
 public class ChannelRenderer {
+
+  public static enum InputType {
+    MIDI, ALPHA, NUMERIC, DETACH
+  }
 
   private String deviceName;
   private int deviceIndex;
@@ -87,9 +94,23 @@ public class ChannelRenderer {
 
   private Select getInputSelect() {
     Select select = new Select("input-select-" + deviceIndex);
-    select.appendProperty("value", inputMapping.getType().ordinal());
+    select.appendProperty("value", getInputType().ordinal());
     select.appendProperty("onchange", PropertyRenderer.render(DeviceCommand.INPUT, deviceIndex));
     return select;
+  }
+
+  private InputType getInputType() {
+    InputType inputType;
+    if (inputMapping instanceof AlphaMapping) {
+      inputType = InputType.ALPHA;
+    } else if (inputMapping instanceof NumericMapping) {
+      inputType = InputType.NUMERIC;
+    } else if (inputMapping instanceof MidiMapping) {
+      inputType = InputType.MIDI;
+    } else {
+      throw new UnsupportedOperationException();
+    }
+    return inputType;
   }
 
   private Select getProgramSelect() {

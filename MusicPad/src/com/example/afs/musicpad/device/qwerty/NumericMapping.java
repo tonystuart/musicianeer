@@ -53,11 +53,6 @@ public class NumericMapping extends QwertyMapping {
   }
 
   @Override
-  public InputType getType() {
-    return InputType.NUMERIC;
-  }
-
-  @Override
   protected String[] getKeySequence() {
     return KEY_SEQUENCE;
   }

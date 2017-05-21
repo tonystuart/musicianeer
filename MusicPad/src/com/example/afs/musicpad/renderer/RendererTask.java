@@ -14,7 +14,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.example.afs.musicpad.Command;
-import com.example.afs.musicpad.device.common.InputMapping.InputType;
 import com.example.afs.musicpad.device.midi.configuration.ChannelState;
 import com.example.afs.musicpad.html.Option;
 import com.example.afs.musicpad.html.Template;
@@ -29,6 +28,7 @@ import com.example.afs.musicpad.message.OnTemplates;
 import com.example.afs.musicpad.message.OnTransport;
 import com.example.afs.musicpad.midi.Instruments;
 import com.example.afs.musicpad.midi.Midi;
+import com.example.afs.musicpad.renderer.ChannelRenderer.InputType;
 import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.task.BrokerTask;
 import com.example.afs.musicpad.util.Broker;
