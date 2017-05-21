@@ -76,34 +76,17 @@ public class QwertyReader {
     return midiNote;
   }
 
-  private int processKeyDown(int inputCode) {
-    int ignoreCount;
+  private void processInputCodeDown(int inputCode) {
     if (inputCode == KeyEvent.VK_SHIFT) {
       sharp = true;
-      ignoreCount = 0;
     } else {
       int midiNote = getMidiNote(inputCode);
       activeMidiNotes[inputCode] = midiNote;
       queue.add(new OnNoteOn(midiNote));
-      ignoreCount = 0;
     }
-
-    return ignoreCount;
   }
 
-  private int processKeyDown(short keyCode) {
-    int ignoreKeyUp;
-    if (keyCode < QwertyKeyCodes.inputCodes.length) {
-      char inputCode = QwertyKeyCodes.inputCodes[keyCode];
-      ignoreKeyUp = processKeyDown(inputCode);
-    } else {
-      // e.g. windows meta key (125)
-      ignoreKeyUp = 1;
-    }
-    return ignoreKeyUp;
-  }
-
-  private void processKeyUp(int inputCode) {
+  private void processInputCodeUp(int inputCode) {
     if (inputCode == KeyEvent.VK_SHIFT) {
       sharp = false;
     } else {
@@ -115,15 +98,27 @@ public class QwertyReader {
     }
   }
 
+  private void processKeyDown(short keyCode) {
+    if (keyCode < QwertyKeyCodes.inputCodes.length) {
+      char inputCode = QwertyKeyCodes.inputCodes[keyCode];
+      processInputCodeDown(inputCode);
+    } else {
+      // e.g. windows meta key (125)
+    }
+  }
+
   private void processKeyUp(short keyCode) {
-    char inputCode = QwertyKeyCodes.inputCodes[keyCode];
-    processKeyUp(inputCode);
+    if (keyCode < QwertyKeyCodes.inputCodes.length) {
+      char inputCode = QwertyKeyCodes.inputCodes[keyCode];
+      processInputCodeUp(inputCode);
+    } else {
+      // e.g. windows meta key (125)
+    }
   }
 
   private void run() {
     try (FileInputStream fileInputStream = new FileInputStream(deviceHandler.getDeviceName())) {
       capture(fileInputStream);
-      int ignoreKeyUp = 0;
       byte[] buffer = new byte[16];
       while (!isTerminated) {
         try {
@@ -134,14 +129,10 @@ public class QwertyReader {
             int value = ByteArray.toNativeInteger(buffer, 12);
             if (value == 0) {
               short code = ByteArray.toNativeShort(buffer, 10);
-              if (ignoreKeyUp > 0) {
-                ignoreKeyUp--;
-              } else {
-                processKeyUp(code);
-              }
+              processKeyUp(code);
             } else if (value == 1) {
               short code = ByteArray.toNativeShort(buffer, 10);
-              ignoreKeyUp += processKeyDown(code);
+              processKeyDown(code);
             }
           }
         } catch (RuntimeException e) {
