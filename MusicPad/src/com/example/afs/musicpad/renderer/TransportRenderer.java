@@ -25,22 +25,21 @@ public class TransportRenderer {
     Division detail = new Division();
     detail.setId("transport-detail");
 
-    detail.appendChild(new TextElement("Master Volume: "));
-    detail.appendChild(getGain());
-    detail.appendChild(new TextElement("Backing Volume: "));
-    detail.appendChild(getBacking());
-    detail.appendChild(new TextElement("Tempo: "));
-    detail.appendChild(getTempo());
-    detail.appendChild(getBackward());
-    detail.appendChild(getForward());
-    detail.appendChild(getStop());
-    detail.appendChild(getPlay());
+    detail.appendChild(getLeft());
+    detail.appendChild(getRight());
 
     String html = detail.render();
     return html;
   }
 
-  private Range getBacking() {
+  private Division getBackingDivision() {
+    Division division = new Division();
+    division.appendChild(new TextElement("Backing Volume: "));
+    division.appendChild(getBackingRange());
+    return division;
+  }
+
+  private Range getBackingRange() {
     Range range = new Range("backing", 0, 127, 1, 64);
     range.appendProperty("oninput", PropertyRenderer.render(Command.BACKING));
     return range;
@@ -58,10 +57,25 @@ public class TransportRenderer {
     return button;
   }
 
-  private Range getGain() {
+  private Division getGainDivision() {
+    Division division = new Division();
+    division.appendChild(new TextElement("Master Volume: "));
+    division.appendChild(getGainRange());
+    return division;
+  }
+
+  private Range getGainRange() {
     Range range = new Range("gain", 0, 127, 1, 64);
     range.appendProperty("oninput", PropertyRenderer.render(Command.GAIN));
     return range;
+  }
+
+  private Division getLeft() {
+    Division division = new Division("transport-left");
+    division.appendChild(getGainDivision());
+    division.appendChild(getBackingDivision());
+    division.appendChild(getTempoDivision());
+    return division;
   }
 
   private Button getPlay() {
@@ -70,13 +84,36 @@ public class TransportRenderer {
     return button;
   }
 
+  private Button getReattach() {
+    Button button = new Button("reattach", "Reattach");
+    button.appendProperty("onclick", PropertyRenderer.render(Command.REATTACH, 0));
+    return button;
+  }
+
+  private Division getRight() {
+    Division division = new Division("transport-right");
+    division.appendChild(getReattach());
+    division.appendChild(getBackward());
+    division.appendChild(getForward());
+    division.appendChild(getStop());
+    division.appendChild(getPlay());
+    return division;
+  }
+
   private Button getStop() {
     Button button = new Button("stop", "Stop");
     button.appendProperty("onclick", PropertyRenderer.render(Command.STOP_PAUSE, 0));
     return button;
   }
 
-  private Range getTempo() {
+  private Division getTempoDivision() {
+    Division division = new Division();
+    division.appendChild(new TextElement("Tempo: "));
+    division.appendChild(getTempoRange());
+    return division;
+  }
+
+  private Range getTempoRange() {
     Range range = new Range("tempo", 0, 127, 1, 64);
     range.appendProperty("oninput", PropertyRenderer.render(Command.TEMPO));
     return range;

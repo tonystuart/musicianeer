@@ -63,6 +63,17 @@ text {
 	width: 100%;
 }
 
+#transport-detail {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+}
+
+#transport-left {
+	display: flex;
+	flex-direction: row;
+}
+
 #music-pad {
   display: flex;
   flex-direction: column;

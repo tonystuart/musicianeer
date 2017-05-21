@@ -12,7 +12,7 @@ package com.example.afs.musicpad.device.common;
 public interface InputMapping {
 
   public static enum InputType {
-    MIDI, ALPHA, NUMERIC, NONE
+    MIDI, ALPHA, NUMERIC, DETACH
   }
 
   int getDefaultOctave();

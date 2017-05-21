@@ -32,5 +32,6 @@ public enum Command {
   TRON, //
   TROFF, //
   DETACH, //
+  REATTACH, //
   QUIT, //
 }

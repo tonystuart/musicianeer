@@ -10,9 +10,11 @@
 package com.example.afs.musicpad.device.common;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import com.example.afs.fluidsynth.Synthesizer;
 import com.example.afs.musicpad.Command;
@@ -28,6 +30,7 @@ public class DeviceWatcher extends BrokerTask<Message> {
   private Synthesizer synthesizer;
   private WatcherBehavior watcherBehavior;
   private Map<String, Controller> oldDevices = new HashMap<>();
+  private Set<String> detachedDevices = new HashSet<>();
 
   public DeviceWatcher(Broker<Message> broker, Synthesizer synthesizer, WatcherBehavior watcherBehavior) {
     super(broker, 1000);
@@ -48,7 +51,7 @@ public class DeviceWatcher extends BrokerTask<Message> {
       }
     }
     for (Entry<String, DeviceBundle> newEntry : newDevices.entrySet()) {
-      if (!oldDevices.containsKey(newEntry.getKey())) {
+      if (!oldDevices.containsKey(newEntry.getKey()) && !detachedDevices.contains(newEntry.getKey())) {
         attachDevice(newEntry.getKey(), newEntry.getValue());
       }
     }
@@ -69,13 +72,31 @@ public class DeviceWatcher extends BrokerTask<Message> {
   }
 
   private void doCommand(Command command, int parameter) {
-    if (command == Command.DETACH) {
-      Entry<String, Controller> entry = findByControllerDeviceIndex(parameter);
-      if (entry != null) {
-        detachDevice(entry.getKey(), entry.getValue());
-        // Leave device in list of oldDevices to prevent re-attachment
-      }
+    switch (command) {
+    case DETACH:
+      doDetach(parameter);
+      break;
+    case REATTACH:
+      doReattach();
+      break;
+    default:
+      break;
     }
+  }
+
+  private void doDetach(int parameter) {
+    Entry<String, Controller> entry = findByControllerDeviceIndex(parameter);
+    if (entry != null) {
+      String deviceName = entry.getKey();
+      Controller controller = entry.getValue();
+      detachDevice(deviceName, controller);
+      detachedDevices.add(deviceName);
+      oldDevices.remove(deviceName);
+    }
+  }
+
+  private void doReattach() {
+    detachedDevices.clear();
   }
 
   private Entry<String, Controller> findByControllerDeviceIndex(int deviceIndex) {

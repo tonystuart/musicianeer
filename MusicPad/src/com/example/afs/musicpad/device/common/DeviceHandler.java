@@ -153,7 +153,7 @@ public class DeviceHandler extends BrokerTask<Message> {
     case MIDI:
       setInputMapping(new MidiMapping());
       break;
-    case NONE:
+    case DETACH:
       getBroker().publish(new OnCommand(Command.DETACH, deviceIndex));
       break;
     case NUMERIC:

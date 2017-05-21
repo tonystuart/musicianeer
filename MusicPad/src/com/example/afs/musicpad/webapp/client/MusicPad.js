@@ -116,6 +116,7 @@ musicPad.toScreen = function(svg, x) {
 
 musicPad.onTemplates = function(response) {
   let templates = document.getElementById('templates');
+  templates.innerHTML = "";
   for (let i in response.templates) {
     let templateHtml = response.templates[i];
     let templateElement = musicPad.fragmentToElement(templateHtml);
