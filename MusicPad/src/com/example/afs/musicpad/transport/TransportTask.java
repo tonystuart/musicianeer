@@ -92,6 +92,9 @@ public class TransportTask extends BrokerTask<Message> {
     case NEXT_MEASURE:
       doNextMeasure();
       break;
+    case SEEK:
+      doSeek(parameter);
+      break;
     case TEMPO:
       doTempo(parameter);
       break;
@@ -160,6 +163,10 @@ public class TransportTask extends BrokerTask<Message> {
 
   private void doResume() {
     resume();
+  }
+
+  private void doSeek(long tick) {
+    //play(tick);
   }
 
   private void doSetVelocity(int velocity) {

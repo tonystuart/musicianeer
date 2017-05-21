@@ -17,6 +17,7 @@ public enum Command {
   PLAY_SAMPLE, //
   PAUSE, //
   RESUME, //
+  SEEK, //
   STOP, //
   STOP_PAUSE, //
   PREVIOUS_MEASURE, //

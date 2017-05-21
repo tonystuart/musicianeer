@@ -82,6 +82,25 @@ musicPad.onMusic = function(response) {
   musicPad.appendTemplate(inputId, "input-options");
 }
 
+musicPad.onNotatorScroll = function() {
+  let scroller = document.getElementById("notator-scroller");
+  let firstNotatorSvg = scroller.querySelector("svg");
+  if (firstNotatorSvg) {
+    let point = firstNotatorSvg.createSVGPoint();
+    let currentScroll = scroller.scrollLeft;
+    let width = scroller.offsetWidth;
+    let midPoint = width / 2;
+    point.x = currentScroll + midPoint;
+    point.y = 0;
+    var ctm = firstNotatorSvg.getScreenCTM();
+    var inverse = ctm.inverse();
+    var p = point.matrixTransform(inverse);
+    let scaledTick = p.x;
+    let tick = scaledTick * musicPad.ticksPerPixel;
+    musicPad.sendCommand("SEEK", Math.floor(tick));
+  }
+}
+
 musicPad.onTemplates = function(response) {
   var templates = document.getElementById('templates');
   for (let i in response.templates) {
