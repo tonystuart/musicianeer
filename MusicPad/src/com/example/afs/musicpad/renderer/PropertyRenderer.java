@@ -23,6 +23,11 @@ public class PropertyRenderer {
     return javaScript;
   }
 
+  public static String render(Command command, int value) {
+    String javaScript = String.format("musicPad.sendCommand(\"%s\", %d)", command.name(), value);
+    return javaScript;
+  }
+
   public static String render(DeviceCommand deviceCommand, int deviceIndex) {
     String javaScript = String.format("musicPad.sendDeviceCommand(\"%s\", %d, this.value)", deviceCommand.name(), deviceIndex);
     return javaScript;

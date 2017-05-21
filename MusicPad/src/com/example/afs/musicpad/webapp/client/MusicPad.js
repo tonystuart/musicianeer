@@ -35,14 +35,6 @@ musicPad.fragmentToElement = function(fragment) {
 
 musicPad.onClick = function(event) {
   let id = event.target.id;
-  switch (id) {
-  case "play":
-    musicPad.ws.send(JSON.stringify({type: "OnCommand", command: "PLAY_PAUSE", parameter: 0}));
-    break;
-  case "stop":
-    musicPad.ws.send(JSON.stringify({type: "OnCommand", command: "STOP_PAUSE", parameter: 0}));
-    break;
-  }
 }
 
 musicPad.onDeviceDetached = function(response) {

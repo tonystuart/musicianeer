@@ -32,8 +32,8 @@ public class TransportRenderer {
     detail.appendChild(getGain());
     detail.appendChild(new TextElement("Tempo: "));
     detail.appendChild(getTempo());
-    detail.appendChild(new Button("stop", "Stop"));
-    detail.appendChild(new Button("play", "Play"));
+    detail.appendChild(getStop());
+    detail.appendChild(getPlay());
 
     String html = detail.render();
     return html;
@@ -43,6 +43,18 @@ public class TransportRenderer {
     Range range = new Range("gain", 0, 127, 1, 64);
     range.appendProperty("oninput", PropertyRenderer.render(Command.GAIN));
     return range;
+  }
+
+  private Button getPlay() {
+    Button button = new Button("play", "Play");
+    button.appendProperty("onclick", PropertyRenderer.render(Command.PLAY_PAUSE, 0));
+    return button;
+  }
+
+  private Button getStop() {
+    Button button = new Button("stop", "Stop");
+    button.appendProperty("onclick", PropertyRenderer.render(Command.STOP_PAUSE, 0));
+    return button;
   }
 
   private Range getTempo() {
