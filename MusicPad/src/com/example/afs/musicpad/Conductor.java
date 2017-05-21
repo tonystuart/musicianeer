@@ -16,7 +16,6 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
-import com.example.afs.fluidsynth.Synthesizer;
 import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnAllTasksStarted;
 import com.example.afs.musicpad.message.OnChannelAssigned;
@@ -43,11 +42,9 @@ public class Conductor extends BrokerTask<Message> {
   private RandomAccessList<File> midiFiles;
   private Map<Integer, Integer> deviceChannelMap = new HashMap<>();
   private Set<Integer> deviceIndexes = new HashSet<>();
-  private Synthesizer synthesizer;
 
-  public Conductor(Broker<Message> broker, String path, Synthesizer synthesizer) {
+  public Conductor(Broker<Message> broker, String path) {
     super(broker);
-    this.synthesizer = synthesizer;
     this.directory = new File(path);
     this.midiFiles = new DirectList<>();
     listMidiFiles(midiFiles, directory);

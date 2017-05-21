@@ -102,7 +102,7 @@ public class ChannelRenderer {
 
   private Range getVolumeRange() {
     Range range = new Range("channel-volume-" + deviceIndex, 0, 127, 1, 64);
-    range.appendProperty("onchange", PropertyRenderer.render(DeviceCommand.VELOCITY, deviceIndex));
+    range.appendProperty("oninput", PropertyRenderer.render(DeviceCommand.VELOCITY, deviceIndex));
     return range;
   }
 

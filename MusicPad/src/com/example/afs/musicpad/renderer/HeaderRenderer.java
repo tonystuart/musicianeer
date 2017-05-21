@@ -14,7 +14,6 @@ import java.io.File;
 import com.example.afs.musicpad.Command;
 import com.example.afs.musicpad.analyzer.KeyScore;
 import com.example.afs.musicpad.analyzer.KeySignatures;
-import com.example.afs.musicpad.analyzer.TranspositionFinder;
 import com.example.afs.musicpad.html.CheckBox;
 import com.example.afs.musicpad.html.Division;
 import com.example.afs.musicpad.html.Select;
@@ -53,7 +52,7 @@ public class HeaderRenderer {
     row.append(getTitleSelect());
     row.append(new CheckBox("master-override"));
     row.append(getKeyInfo(song));
-    row.append(TranspositionFinder.getDistanceToWhiteKeys(song));
+    row.append(song.getDistanceToWhiteKeys());
     row.append(getTransposition());
     row.append(song.getBeatsPerMinute(0));
     row.append(song.getBeatsPerMeasure(0) + "/" + song.getBeatUnit(0));

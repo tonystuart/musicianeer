@@ -16,6 +16,7 @@ import java.util.NavigableSet;
 import java.util.Set;
 import java.util.TreeSet;
 
+import com.example.afs.musicpad.analyzer.TranspositionFinder;
 import com.example.afs.musicpad.midi.Instruments;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.song.Note.NoteBuilder;
@@ -29,6 +30,7 @@ public class Song {
   private TreeSet<Note> notes = new TreeSet<>();
   private TreeSet<Word> words = new TreeSet<>();
   private ChannelFacets channelFacets = new ChannelFacets();
+  private Integer distanceToWhiteKeys;
 
   public Song() {
   }
@@ -125,6 +127,13 @@ public class Song {
       controllingNote = notes.ceiling(tickNote);
     }
     return controllingNote;
+  }
+
+  public Integer getDistanceToWhiteKeys() {
+    if (distanceToWhiteKeys == null) {
+      distanceToWhiteKeys = TranspositionFinder.getDistanceToWhiteKeys(this);
+    }
+    return distanceToWhiteKeys;
   }
 
   public int[] getDistinctNoteCount(int channel) {
