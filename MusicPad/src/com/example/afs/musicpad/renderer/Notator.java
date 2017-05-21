@@ -12,6 +12,7 @@ package com.example.afs.musicpad.renderer;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import com.example.afs.musicpad.analyzer.Names;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.player.Chord;
 import com.example.afs.musicpad.player.Player;
@@ -226,6 +227,25 @@ public class Notator {
     }
   }
 
+  private void drawNoteNames(Svg staff, SortedSet<Note> slice) {
+    String keyCap;
+    String noteDescription;
+    Note firstNote = slice.first();
+    long wordTick = firstNote.getTick() - RADIUS; // align with left edge of note head
+    int wordX = getX(wordTick);
+    if (slice.size() == 1) {
+      int midiNote = firstNote.getMidiNote();
+      keyCap = player.toKeyCap(midiNote);
+      noteDescription = Names.getNoteName(midiNote);
+    } else {
+      Chord chord = new Chord(slice);
+      keyCap = player.toKeyCap(chord);
+      noteDescription = chord.getChordType().getName();
+    }
+    staff.add(new Text(wordX, WORDS + 3 * RADIUS, keyCap));
+    staff.add(new Text(wordX, 3 * RADIUS, noteDescription));
+  }
+
   private void drawNotes(Svg staff, long firstTick, RandomAccessList<Note> notes, int midPoint) {
     if (notes.size() > 0) {
       Context context = getContext(notes, midPoint);
@@ -275,14 +295,7 @@ public class Notator {
       }
       drawNotes(staff, firstTick, trebleNotes, TREBLE_MIDI_NOTES[2]);
       drawNotes(staff, firstTick, bassNotes, BASS_MIDI_NOTES[2]);
-      if (sliceNoteCount == 1) {
-        String keyCap = player.toKeyCap(midiNote);
-        staff.add(new Text(getX(firstTick), WORDS + 3 * RADIUS, keyCap));
-      } else {
-        Chord chord = new Chord(slice);
-        String keyCap = player.toKeyCap(chord);
-        staff.add(new Text(getX(firstTick), WORDS + 3 * RADIUS, keyCap));
-      }
+      drawNoteNames(staff, slice);
     }
   }
 
@@ -313,7 +326,8 @@ public class Notator {
   private void drawWords(Svg staff) {
     SortedSet<Word> words = song.getWords();
     for (Word word : words) {
-      long wordTick = word.getTick();
+      long tick = word.getTick();
+      long wordTick = tick - RADIUS; // align with left edge of note head
       int wordX = getX(wordTick);
       staff.add(new Text(wordX, WORDS, formatText(word.getText())));
     }

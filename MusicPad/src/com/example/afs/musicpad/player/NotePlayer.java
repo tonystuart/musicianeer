@@ -9,6 +9,7 @@
 
 package com.example.afs.musicpad.player;
 
+import com.example.afs.musicpad.analyzer.Names;
 import com.example.afs.musicpad.device.common.DeviceHandler;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.song.Song;
@@ -27,7 +28,14 @@ public class NotePlayer extends Player {
 
   @Override
   public String toKeyCap(Chord chord) {
-    return chord.getChordType().getName();
+    StringBuilder s = new StringBuilder();
+    for (int midiNote : chord.getMidiNotes()) {
+      if (s.length() > 0) {
+        s.append("/");
+      }
+      s.append(Names.getNoteName(midiNote));
+    }
+    return s.toString();
   }
 
   @Override

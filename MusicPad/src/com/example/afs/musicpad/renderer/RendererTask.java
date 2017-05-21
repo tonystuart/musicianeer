@@ -127,7 +127,7 @@ public class RendererTask extends BrokerTask<Message> {
 
   private String getTransposeOptions() {
     Template template = new Template("transpose-options");
-    for (int i = -Midi.SEMITONES_PER_OCTAVE; i <= Midi.SEMITONES_PER_OCTAVE; i++) {
+    for (int i = -2 * Midi.SEMITONES_PER_OCTAVE; i <= 2 * Midi.SEMITONES_PER_OCTAVE; i++) {
       template.appendChild(new Option(Integer.toString(i), i));
     }
     String transposeOptions = template.render();

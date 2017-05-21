@@ -66,6 +66,7 @@ public class TransportTask extends BrokerTask<Message> {
 
   private void clear() {
     sequencer.getInputQueue().clear();
+    sequencer.setPaused(false);
     synthesizer.allNotesOff();
     scheduler.resetAll();
   }
