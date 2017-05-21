@@ -16,11 +16,13 @@ public class OnChannelAssigned extends Message {
   private Song song;
   private int deviceIndex;
   private int channel;
+  private int ticksPerPixel;
 
-  public OnChannelAssigned(Song song, int deviceIndex, int channel) {
+  public OnChannelAssigned(Song song, int deviceIndex, int channel, int ticksPerPixel) {
     this.song = song;
     this.deviceIndex = deviceIndex;
     this.channel = channel;
+    this.ticksPerPixel = ticksPerPixel;
   }
 
   public int getChannel() {
@@ -31,13 +33,17 @@ public class OnChannelAssigned extends Message {
     return deviceIndex;
   }
 
+  public int getTicksPerPixel() {
+    return ticksPerPixel;
+  }
+
   public Song getSong() {
     return song;
   }
 
   @Override
   public String toString() {
-    return "OnChannelAssigned [song=" + song + ", deviceIndex=" + deviceIndex + ", channel=" + channel + "]";
+    return "OnChannelAssigned [song=" + song + ", deviceIndex=" + deviceIndex + ", channel=" + channel + ", ticksPerPixel=" + ticksPerPixel + "]";
   }
 
 }

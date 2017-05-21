@@ -63,6 +63,7 @@ public class DeviceHandler extends BrokerTask<Message> {
   private InputMapping inputMapping;
   private Synthesizer synthesizer;
   private PlayerFactory playerFactory;
+  private int ticksPerPixel;
 
   public DeviceHandler(Broker<Message> messageBroker, Synthesizer synthesizer, String name) {
     super(messageBroker);
@@ -75,8 +76,8 @@ public class DeviceHandler extends BrokerTask<Message> {
     delegate(OnControlChange.class, message -> doControlChange(message.getControl(), message.getValue()));
     delegate(OnPitchBend.class, message -> doPitchBend(message.getPitchBend()));
     subscribe(OnDeviceCommand.class, message -> doDeviceCommand(message.getDeviceCommand(), message.getDeviceIndex(), message.getParameter()));
-    subscribe(OnSong.class, message -> doSongSelected(message.getSong(), message.getDeviceChannelMap()));
-    subscribe(OnChannelAssigned.class, message -> doChannelAssigned(message.getSong(), message.getDeviceIndex(), message.getChannel()));
+    subscribe(OnSong.class, message -> doSong(message.getSong(), message.getDeviceChannelMap(), message.getTicksPerPixel()));
+    subscribe(OnChannelAssigned.class, message -> doChannelAssigned(message));
   }
 
   @Override
@@ -109,10 +110,11 @@ public class DeviceHandler extends BrokerTask<Message> {
     updatePlayer();
   }
 
-  private void doChannelAssigned(Song song, int deviceIndex, int channel) {
-    if (this.deviceIndex == deviceIndex) {
-      this.song = song;
-      this.channel = channel;
+  private void doChannelAssigned(OnChannelAssigned message) {
+    if (this.deviceIndex == message.getDeviceIndex()) {
+      this.song = message.getSong();
+      this.channel = message.getChannel();
+      this.ticksPerPixel = message.getTicksPerPixel();
       updatePlayer();
     }
   }
@@ -174,8 +176,9 @@ public class DeviceHandler extends BrokerTask<Message> {
     player.bendPitch(pitchBend);
   }
 
-  private void doSongSelected(Song song, Map<Integer, Integer> deviceChannelMap) {
+  private void doSong(Song song, Map<Integer, Integer> deviceChannelMap, int ticksPerPixel) {
     this.song = song;
+    this.ticksPerPixel = ticksPerPixel;
     // TODO: Resolve race condition between publishing initial song and connecting device
     if (deviceChannelMap.containsKey(deviceIndex)) {
       this.channel = deviceChannelMap.get(deviceIndex);
@@ -192,7 +195,7 @@ public class DeviceHandler extends BrokerTask<Message> {
   }
 
   private String getMusic() {
-    Notator notator = new Notator(player, song, channel);
+    Notator notator = new Notator(player, song, channel, ticksPerPixel);
     String music = notator.getMusic();
     return music;
   }

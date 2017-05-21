@@ -36,6 +36,8 @@ import com.example.afs.musicpad.util.Value;
 
 public class Conductor extends BrokerTask<Message> {
 
+  private static final int TICKS_PER_PIXEL = 5;
+
   private Song song;
   private File directory;
   private Random random = new Random();
@@ -129,7 +131,7 @@ public class Conductor extends BrokerTask<Message> {
     deviceIndexes.add(deviceIndex);
     if (song != null) {
       int channel = assignChannel(deviceIndex);
-      getBroker().publish(new OnChannelAssigned(song, deviceIndex, channel));
+      getBroker().publish(new OnChannelAssigned(song, deviceIndex, channel, TICKS_PER_PIXEL));
     }
   }
 
@@ -145,7 +147,7 @@ public class Conductor extends BrokerTask<Message> {
 
   private void doTranspose(int distance) {
     song.transposeTo(distance);
-    publish(new OnSong(song, deviceChannelMap));
+    publish(new OnSong(song, deviceChannelMap, TICKS_PER_PIXEL));
   }
 
   private boolean isChannelAssigned(int channel) {
@@ -201,7 +203,7 @@ public class Conductor extends BrokerTask<Message> {
     song = songBuilder.createSong(midiFile);
     System.out.println("Selecting song " + songIndex + " - " + song.getTitle());
     assignChannels();
-    publish(new OnSong(song, deviceChannelMap));
+    publish(new OnSong(song, deviceChannelMap, TICKS_PER_PIXEL));
   }
 
   private void unassignChannel(int deviceIndex) {

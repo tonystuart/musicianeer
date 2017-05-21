@@ -288,5 +288,6 @@ public class TransportTask extends BrokerTask<Message> {
     sequencerTask.setPaused(false);
     synthesizer.allNotesOff();
     noteEventScheduler.resetAll();
+    getBroker().publish(new OnTick(0));
   }
 }

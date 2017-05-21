@@ -17,14 +17,20 @@ public class OnSong extends Message {
 
   private Song song;
   private Map<Integer, Integer> deviceChannelMap;
+  private int ticksPerPixel;
 
-  public OnSong(Song song, Map<Integer, Integer> deviceChannelMap) {
+  public OnSong(Song song, Map<Integer, Integer> deviceChannelMap, int ticksPerPixel) {
     this.song = song;
     this.deviceChannelMap = deviceChannelMap;
+    this.ticksPerPixel = ticksPerPixel;
   }
 
   public Map<Integer, Integer> getDeviceChannelMap() {
     return deviceChannelMap;
+  }
+
+  public int getTicksPerPixel() {
+    return ticksPerPixel;
   }
 
   public Song getSong() {
@@ -33,7 +39,7 @@ public class OnSong extends Message {
 
   @Override
   public String toString() {
-    return "OnSong [song=" + song + ", deviceChannelMap=" + deviceChannelMap + "]";
+    return "OnSong [song=" + song + ", deviceChannelMap=" + deviceChannelMap + ", ticksPerPixel=" + ticksPerPixel + "]";
   }
 
 }

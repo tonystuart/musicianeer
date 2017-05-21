@@ -43,7 +43,7 @@ public class RendererTask extends BrokerTask<Message> {
     super(broker);
     subscribe(OnCommand.class, message -> doCommand(message.getCommand(), message.getParameter()));
     subscribe(OnMidiFiles.class, message -> publishTemplates(message.getMidiFiles()));
-    subscribe(OnSong.class, message -> doSong(message.getSong()));
+    subscribe(OnSong.class, message -> doSong(message.getSong(), message.getTicksPerPixel()));
   }
 
   private void doCommand(Command command, int parameter) {
@@ -59,16 +59,6 @@ public class RendererTask extends BrokerTask<Message> {
     }
   }
 
-  private void publishTemplates(RandomAccessList<File> midiFiles) {
-    this.midiFiles = midiFiles;
-    List<String> templates = new LinkedList<>();
-    templates.add(getSongOptions(midiFiles));
-    templates.add(getProgramOptions());
-    templates.add(getInputOptions());
-    templates.add(getTransposeOptions());
-    getBroker().publish(new OnTemplates(templates));
-  }
-
   private void doShowChannelState() {
     if (currentSong != null) {
       showChannelState(currentSong);
@@ -81,9 +71,9 @@ public class RendererTask extends BrokerTask<Message> {
     }
   }
 
-  private void doSong(Song song) {
+  private void doSong(Song song, int ticksPerPixel) {
     currentSong = song;
-    publish(new OnHeader(song.getTitle(), new HeaderRenderer(midiFiles, song).render()));
+    publish(new OnHeader(song.getTitle(), ticksPerPixel, new HeaderRenderer(midiFiles, song).render()));
     publish(new OnFooter(new FooterRenderer(song).render()));
     publish(new OnTransport(new TransportRenderer(song).render()));
   }
@@ -129,6 +119,16 @@ public class RendererTask extends BrokerTask<Message> {
     }
     String transposeOptions = template.render();
     return transposeOptions;
+  }
+
+  private void publishTemplates(RandomAccessList<File> midiFiles) {
+    this.midiFiles = midiFiles;
+    List<String> templates = new LinkedList<>();
+    templates.add(getSongOptions(midiFiles));
+    templates.add(getProgramOptions());
+    templates.add(getInputOptions());
+    templates.add(getTransposeOptions());
+    getBroker().publish(new OnTemplates(templates));
   }
 
   private void showChannelState(Song song) {

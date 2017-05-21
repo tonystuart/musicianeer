@@ -172,11 +172,13 @@ public class Notator {
   private Song song;
   private int channel;
   private Player player;
+  private int ticksPerPixel;
 
-  public Notator(Player player, Song song, int channel) {
+  public Notator(Player player, Song song, int channel, int ticksPerPixel) {
     this.player = player;
     this.song = song;
     this.channel = channel;
+    this.ticksPerPixel = ticksPerPixel;
   }
 
   public String getMusic() {
@@ -215,7 +217,7 @@ public class Notator {
   private void drawMeasures(Svg staff, long duration) {
     long tick = 0;
     while (tick < duration) {
-      int x = scale(tick);
+      int x = getX(tick);
       if (tick > 0) {
         tick -= 2 * RADIUS; // so note doesn't land on it
       }
@@ -229,7 +231,7 @@ public class Notator {
       Context context = getContext(notes, midPoint);
       for (Note note : notes) {
         int midiNote = note.getMidiNote();
-        int noteX = scale(firstTick);
+        int noteX = getX(firstTick);
         int noteY = getY(midiNote);
         if (LEDGER[midiNote]) {
           staff.add(new Line(noteX - LEDGER_WIDTH, noteY, noteX + LEDGER_WIDTH, noteY));
@@ -275,11 +277,11 @@ public class Notator {
       drawNotes(staff, firstTick, bassNotes, BASS_MIDI_NOTES[2]);
       if (sliceNoteCount == 1) {
         String keyCap = player.toKeyCap(midiNote);
-        staff.add(new Text(scale(firstTick), WORDS + 3 * RADIUS, keyCap));
+        staff.add(new Text(getX(firstTick), WORDS + 3 * RADIUS, keyCap));
       } else {
         Chord chord = new Chord(slice);
         String keyCap = player.toKeyCap(chord);
-        staff.add(new Text(scale(firstTick), WORDS + 3 * RADIUS, keyCap));
+        staff.add(new Text(getX(firstTick), WORDS + 3 * RADIUS, keyCap));
       }
     }
   }
@@ -291,14 +293,14 @@ public class Notator {
       int stemLength = 5 * RADIUS;
       int flagLength = 2 * RADIUS;
       if (context.getStem() == Stem.UP) {
-        int x = scale(firstTick) + RADIUS;
+        int x = getX(firstTick) + RADIUS;
         int stemTop = noteTop - stemLength;
         staff.add(new Line(x, stemTop, x, noteBottom));
         if (context.getNoteType() == NoteType.EIGHTH) {
           staff.add(new Line(x, stemTop, x + RADIUS, stemTop + flagLength));
         }
       } else {
-        int x = scale(firstTick) - RADIUS;
+        int x = getX(firstTick) - RADIUS;
         int stemBottom = noteBottom + stemLength;
         staff.add(new Line(x, noteTop, x, stemBottom));
         if (context.getNoteType() == NoteType.EIGHTH) {
@@ -312,7 +314,7 @@ public class Notator {
     SortedSet<Word> words = song.getWords();
     for (Word word : words) {
       long wordTick = word.getTick();
-      int wordX = scale(wordTick);
+      int wordX = getX(wordTick);
       staff.add(new Text(wordX, WORDS, formatText(word.getText())));
     }
   }
@@ -360,7 +362,7 @@ public class Notator {
 
   private Svg getStaff(long duration) {
     int bottom = getY(POSITION[LOWEST]);
-    int width = scale(duration);
+    int width = getX(duration);
     Svg staff = new Svg(0, 0, width, bottom);
     for (int i = 0; i < TREBLE_MIDI_NOTES.length; i++) {
       int y = getY(TREBLE_MIDI_NOTES[i]);
@@ -373,6 +375,10 @@ public class Notator {
     return staff;
   }
 
+  private int getX(long tick) {
+    return (int) (tick / ticksPerPixel);
+  }
+
   private int getY(int midiNote) {
     int y;
     if (midiNote < MIDDLE) {
@@ -381,10 +387,6 @@ public class Notator {
       y = TOP + ((POSITION[HIGHEST] - POSITION[midiNote]) * RADIUS);
     }
     return y;
-  }
-
-  private int scale(long wordTick) {
-    return (int) (wordTick / 10);
   }
 
 }

@@ -1,6 +1,8 @@
 "use strict";
 var musicPad = musicPad || {};
 
+musicPad.ticksPerPixel = 1;
+
 musicPad.createWebSocketClient = function() {
   musicPad.ws = new WebSocket("ws://localhost:8080/v1/message");
   musicPad.ws.onopen = function() {
@@ -56,6 +58,7 @@ musicPad.onHeader = function(response) {
   header.innerHTML = response.html;
   musicPad.appendTemplate("title", "song-options");
   musicPad.appendTemplate("transpose", "transpose-options");
+  musicPad.ticksPerPixel = response.ticksPerPixel;
 }
 
 musicPad.onFooter = function(response) {
@@ -97,7 +100,7 @@ musicPad.onTemplates = function(response) {
 }
 
 musicPad.onTick = function(tick) {
-  let scaledTick = tick / 10;
+  let scaledTick = tick / musicPad.ticksPerPixel;
   let scroller = document.getElementById("notator-scroller");
   let width = scroller.offsetWidth;
   let midPoint = width / 2;
