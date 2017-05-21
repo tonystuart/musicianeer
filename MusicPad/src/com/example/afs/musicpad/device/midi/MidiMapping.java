@@ -32,8 +32,8 @@ public class MidiMapping implements InputMapping {
   }
 
   @Override
-  public MappingType getType() {
-    return MappingType.MIDI;
+  public InputType getType() {
+    return InputType.MIDI;
   }
 
   @Override

@@ -9,7 +9,6 @@
 
 package com.example.afs.musicpad.html;
 
-
 public class Select extends Hypertext {
 
   public Select() {

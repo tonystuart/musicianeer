@@ -14,7 +14,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.example.afs.musicpad.Command;
-import com.example.afs.musicpad.device.common.InputMapping.MappingType;
+import com.example.afs.musicpad.device.common.InputMapping.InputType;
 import com.example.afs.musicpad.device.midi.configuration.ChannelState;
 import com.example.afs.musicpad.html.Option;
 import com.example.afs.musicpad.html.Template;
@@ -80,10 +80,10 @@ public class RendererTask extends BrokerTask<Message> {
 
   private String getInputOptions() {
     Template template = new Template("input-options");
-    MappingType[] mappingTypes = MappingType.values();
+    InputType[] mappingTypes = InputType.values();
     for (int i = 0; i < mappingTypes.length; i++) {
-      MappingType mappingType = mappingTypes[i];
-      Option option = new Option(mappingType.name(), i);
+      InputType inputType = mappingTypes[i];
+      Option option = new Option(inputType.name(), i);
       template.appendChild(option);
     }
     String inputOptions = template.render();

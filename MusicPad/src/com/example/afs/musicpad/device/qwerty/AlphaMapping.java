@@ -70,8 +70,8 @@ public class AlphaMapping extends QwertyMapping {
   }
 
   @Override
-  public MappingType getType() {
-    return MappingType.ALPHA;
+  public InputType getType() {
+    return InputType.ALPHA;
   }
 
   @Override

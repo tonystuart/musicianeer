@@ -12,9 +12,9 @@ package com.example.afs.musicpad.device.midi;
 import java.io.File;
 import java.io.InputStream;
 
+import com.example.afs.musicpad.device.common.Controller;
 import com.example.afs.musicpad.device.common.DeviceBundle;
 import com.example.afs.musicpad.device.common.DeviceHandler;
-import com.example.afs.musicpad.device.common.Controller;
 import com.example.afs.musicpad.device.midi.configuration.MidiConfiguration;
 import com.example.afs.musicpad.device.midi.configuration.Parser;
 import com.example.afs.musicpad.message.Message;

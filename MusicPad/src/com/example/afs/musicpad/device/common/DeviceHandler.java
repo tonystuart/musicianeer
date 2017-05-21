@@ -15,7 +15,7 @@ import java.util.Map;
 import com.example.afs.fluidsynth.Synthesizer;
 import com.example.afs.musicpad.Command;
 import com.example.afs.musicpad.DeviceCommand;
-import com.example.afs.musicpad.device.common.InputMapping.MappingType;
+import com.example.afs.musicpad.device.common.InputMapping.InputType;
 import com.example.afs.musicpad.device.midi.MidiMapping;
 import com.example.afs.musicpad.device.qwerty.AlphaMapping;
 import com.example.afs.musicpad.device.qwerty.NumericMapping;
@@ -145,8 +145,8 @@ public class DeviceHandler extends BrokerTask<Message> {
   }
 
   private void doInput(int typeIndex) {
-    MappingType mappingType = MappingType.values()[typeIndex];
-    switch (mappingType) {
+    InputType inputType = InputType.values()[typeIndex];
+    switch (inputType) {
     case ALPHA:
       setInputMapping(new AlphaMapping());
       break;

@@ -9,7 +9,6 @@
 
 package com.example.afs.musicpad.device.qwerty;
 
-
 public class NumericMapping extends QwertyMapping {
 
   private static final String[] KEY_SEQUENCE = new String[] {
@@ -54,8 +53,8 @@ public class NumericMapping extends QwertyMapping {
   }
 
   @Override
-  public MappingType getType() {
-    return MappingType.NUMERIC;
+  public InputType getType() {
+    return InputType.NUMERIC;
   }
 
   @Override

@@ -19,9 +19,9 @@ import javax.sound.midi.MidiDevice.Info;
 import javax.sound.midi.MidiSystem;
 import javax.sound.midi.MidiUnavailableException;
 
+import com.example.afs.musicpad.device.common.Controller;
 import com.example.afs.musicpad.device.common.DeviceBundle;
 import com.example.afs.musicpad.device.common.DeviceHandler;
-import com.example.afs.musicpad.device.common.Controller;
 import com.example.afs.musicpad.device.common.WatcherBehavior;
 
 public class MidiWatcherBehavior implements WatcherBehavior {

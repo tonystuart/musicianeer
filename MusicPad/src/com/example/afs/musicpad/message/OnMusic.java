@@ -9,7 +9,6 @@
 
 package com.example.afs.musicpad.message;
 
-
 public class OnMusic extends Message {
 
   private int deviceIndex;
