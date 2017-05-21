@@ -31,11 +31,12 @@ public class QwertyReader {
 
   private static final int EV_KEY = 0x01;
 
+  private int delta;
+  private int sharp;
+  private boolean isTerminated;
+  private Thread deviceReader;
   private BlockingQueue<Message> queue;
   private DeviceHandler deviceHandler;
-  private Thread deviceReader;
-  private boolean isTerminated;
-  private boolean sharp;
   private int[] activeMidiNotes = new int[256]; // NB: KeyEvents VK codes, not midiNotes
 
   public QwertyReader(BlockingQueue<Message> queue, DeviceHandler deviceHandler) {
@@ -70,30 +71,37 @@ public class QwertyReader {
 
   private int getMidiNote(int inputCode) {
     int midiNote = deviceHandler.getInputMapping().toMidiNote(inputCode);
-    if (sharp) {
-      midiNote++;
-    }
-    return midiNote;
+    return delta + midiNote + sharp;
   }
 
   private void processInputCodeDown(int inputCode) {
     if (inputCode == KeyEvent.VK_SHIFT) {
-      sharp = true;
+      sharp = 1;
     } else {
-      int midiNote = getMidiNote(inputCode);
-      activeMidiNotes[inputCode] = midiNote;
-      queue.add(new OnNoteOn(midiNote));
+      int delta = deviceHandler.getInputMapping().getDelta(inputCode);
+      if (delta != 0) {
+        this.delta += delta;
+      } else {
+        int midiNote = getMidiNote(inputCode);
+        activeMidiNotes[inputCode] = midiNote;
+        queue.add(new OnNoteOn(midiNote));
+      }
     }
   }
 
   private void processInputCodeUp(int inputCode) {
     if (inputCode == KeyEvent.VK_SHIFT) {
-      sharp = false;
+      sharp = 0;
     } else {
-      int midiNote = activeMidiNotes[inputCode];
-      if (midiNote != 0) {
-        queue.add(new OnNoteOff(midiNote));
-        activeMidiNotes[inputCode] = 0;
+      int delta = deviceHandler.getInputMapping().getDelta(inputCode);
+      if (delta != 0) {
+        this.delta -= delta;
+      } else {
+        int midiNote = activeMidiNotes[inputCode];
+        if (midiNote != 0) {
+          queue.add(new OnNoteOff(midiNote));
+          activeMidiNotes[inputCode] = 0;
+        }
       }
     }
   }

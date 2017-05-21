@@ -15,6 +15,8 @@ public interface InputMapping {
 
   int getDefaultRange();
 
+  int getDelta(int inputCode);
+
   int getOctave();
 
   void setOctave(int octave);

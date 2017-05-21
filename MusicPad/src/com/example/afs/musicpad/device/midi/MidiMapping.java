@@ -27,6 +27,11 @@ public class MidiMapping implements InputMapping {
   }
 
   @Override
+  public int getDelta(int inputCode) {
+    return 0;
+  }
+
+  @Override
   public int getOctave() {
     return octave;
   }
