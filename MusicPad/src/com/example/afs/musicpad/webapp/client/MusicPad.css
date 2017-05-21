@@ -10,6 +10,7 @@ body {
   height: 100%;
   margin: 0px;
   width: 100%;
+  font-size: 2vh;
 }
 
 input {
@@ -31,6 +32,11 @@ text {
 	font-size: 18pt;
 }
 
+table {
+  text-align: left;
+  width: 100%;
+}
+
 #header {
 	border-bottom: 1px solid gray;
 	font-size: 2vh;
@@ -40,21 +46,11 @@ text {
 	overflow-y: auto;
 }
 
-#header-detail table {
- 	text-align: left;
-	width: 100%;
-}
-
 #footer {
 	border-top: 1px solid gray;
   font-size: 2vh;
 	max-height: 20%;
 	overflow-y: auto;
-}
-
-#footer-detail table {
-  text-align: left;
-  width: 100%;
 }
 
 #transport {
@@ -125,9 +121,22 @@ text {
 }
 
 .channel-controls {
-	z-index: 1;
+	border: 1px solid gray;
 	margin-top: auto;
 	margin-bottom: auto;
+	margin-left: 10px;
+	width: calc(50% - 20px);
+	z-index: 1;
+}
+
+.channel-controls input {
+	margin-left: 0px;
+}
+
+.device-name {
+	padding: 2px;
+	background: linear-gradient(white, lightgray);
+	text-align: center;
 }
 
 .notator select {

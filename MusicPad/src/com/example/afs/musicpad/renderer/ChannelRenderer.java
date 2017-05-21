@@ -56,13 +56,10 @@ public class ChannelRenderer {
     row.append(getInputSelect());
     row.append(getVolumeRange());
 
-    Division nameDivision = new Division();
-    nameDivision.appendChild(new TextElement(deviceName));
-
     Division channelControls = new Division();
     channelControls.setClassName("channel-controls");
+    channelControls.appendChild(getDeviceName());
     channelControls.appendChild(table);
-    channelControls.appendChild(nameDivision);
 
     String html = channelControls.render();
     return html;
@@ -79,6 +76,13 @@ public class ChannelRenderer {
     }
     select.appendProperty("onchange", PropertyRenderer.render(DeviceCommand.CHANNEL, deviceIndex));
     return select;
+  }
+
+  private Division getDeviceName() {
+    Division nameDivision = new Division();
+    nameDivision.setClassName("device-name");
+    nameDivision.appendChild(new TextElement(deviceName));
+    return nameDivision;
   }
 
   private Select getInputSelect() {
