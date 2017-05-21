@@ -18,25 +18,44 @@ import com.example.afs.musicpad.song.Song;
 
 public class TransportRenderer {
 
-  private Song song;
-
   public TransportRenderer(Song song) {
-    this.song = song;
   }
 
   public String render() {
     Division detail = new Division();
     detail.setId("transport-detail");
 
-    detail.appendChild(new TextElement("Volume: "));
+    detail.appendChild(new TextElement("Master Volume: "));
     detail.appendChild(getGain());
+    detail.appendChild(new TextElement("Backing Volume: "));
+    detail.appendChild(getBacking());
     detail.appendChild(new TextElement("Tempo: "));
     detail.appendChild(getTempo());
+    detail.appendChild(getBackward());
+    detail.appendChild(getForward());
     detail.appendChild(getStop());
     detail.appendChild(getPlay());
 
     String html = detail.render();
     return html;
+  }
+
+  private Range getBacking() {
+    Range range = new Range("backing", 0, 127, 1, 64);
+    range.appendProperty("oninput", PropertyRenderer.render(Command.BACKING));
+    return range;
+  }
+
+  private Button getBackward() {
+    Button button = new Button("backward", "Backward");
+    button.appendProperty("onclick", PropertyRenderer.render(Command.BACKWARD, 0));
+    return button;
+  }
+
+  private Button getForward() {
+    Button button = new Button("forward", "Forward");
+    button.appendProperty("onclick", PropertyRenderer.render(Command.FORWARD, 0));
+    return button;
   }
 
   private Range getGain() {

@@ -20,10 +20,10 @@ public enum Command {
   SEEK, //
   STOP, //
   STOP_PAUSE, //
-  PREVIOUS_MEASURE, //
-  NEXT_MEASURE, //
+  BACKWARD, //
+  FORWARD, //
   TEMPO, //
-  SET_TRANSPORT_VELOCITY, //
+  BACKING, //
   GAIN, //
   SHOW_CHANNEL_STATE, //
   SHOW_DRUM_INFO, //

@@ -2,17 +2,22 @@
 var musicPad = musicPad || {};
 
 musicPad.ticksPerPixel = 1;
+musicPad.connected = false;
 
 musicPad.createWebSocketClient = function() {
   musicPad.ws = new WebSocket("ws://localhost:8080/v1/message");
   musicPad.ws.onopen = function() {
     console.log("ws.onopen: entered");
+    musicPad.connected = true;
   }
   musicPad.ws.onmessage = function(message) {
     musicPad.processResponse(message.data);
   }
   musicPad.ws.onclose = function() {
     console.log("ws.onclose: entered, connecting again in 1000 ms.");
+    musicPad.connected = false;
+    let scroller = document.getElementById("notator-scroller");
+    scroller.scrollLeft = 0;
     setTimeout(musicPad.createWebSocketClient, 1000);
   }
 }
@@ -82,27 +87,35 @@ musicPad.onMusic = function(response) {
   musicPad.appendTemplate(inputId, "input-options");
 }
 
-musicPad.onNotatorScroll = function() {
+musicPad.onNotatorScroll = function(event) {
   let scroller = document.getElementById("notator-scroller");
-  let firstNotatorSvg = scroller.querySelector("svg");
-  if (firstNotatorSvg) {
-    let point = firstNotatorSvg.createSVGPoint();
-    let currentScroll = scroller.scrollLeft;
-    let width = scroller.offsetWidth;
-    let midPoint = width / 2;
-    point.x = currentScroll + midPoint;
-    point.y = 0;
-    var ctm = firstNotatorSvg.getScreenCTM();
-    var inverse = ctm.inverse();
-    var p = point.matrixTransform(inverse);
-    let scaledTick = p.x;
-    let tick = scaledTick * musicPad.ticksPerPixel;
-    musicPad.sendCommand("SEEK", Math.floor(tick));
-  }
+  let svg = scroller.querySelector("svg");
+  let mid = scroller.offsetWidth / 2; // start of svg
+  let x1 = scroller.scrollLeft + mid;
+  let x2 = musicPad.toSvg(svg, x1);
+  let x3 = musicPad.toScreen(svg, x2);
+  console.log("x1="+x1+", x2="+x2 + ", x3="+x3);
+}
+
+musicPad.toSvg = function(svg, x) {
+  let screenPoint = svg.createSVGPoint();
+  screenPoint.x = x;
+  let ctm = svg.getScreenCTM();
+  let inverse = ctm.inverse();
+  let svgPoint = screenPoint.matrixTransform(inverse);
+  return svgPoint.x;
+}
+
+musicPad.toScreen = function(svg, x) {
+  let svgPoint = svg.createSVGPoint();
+  svgPoint.x = x;
+  let ctm = svg.getScreenCTM();
+  let screenPoint = svgPoint.matrixTransform(ctm);
+  return screenPoint.x;
 }
 
 musicPad.onTemplates = function(response) {
-  var templates = document.getElementById('templates');
+  let templates = document.getElementById('templates');
   for (let i in response.templates) {
     let templateHtml = response.templates[i];
     let templateElement = musicPad.fragmentToElement(templateHtml);
@@ -111,17 +124,15 @@ musicPad.onTemplates = function(response) {
 }
 
 musicPad.onTick = function(tick) {
-  let scaledTick = tick / musicPad.ticksPerPixel;
   let scroller = document.getElementById("notator-scroller");
-  let width = scroller.offsetWidth;
-  let midPoint = width / 2;
-  let firstNotatorSvg = scroller.querySelector("svg");
-  if (firstNotatorSvg) {
-    let point = firstNotatorSvg.createSVGPoint();
-    point.x = scaledTick;
-    point.y = 0;
-    let t = point.matrixTransform(firstNotatorSvg.getScreenCTM());
-    scroller.scrollLeft += t.x - midPoint;
+  let svg = scroller.querySelector("svg");
+  if (svg) {
+    let scaledTick = tick / musicPad.ticksPerPixel;
+    let screenX = musicPad.toScreen(svg, scaledTick);
+    let width = scroller.offsetWidth;
+    let midPoint = width / 2;
+    scroller.scrollLeft += screenX - midPoint;
+    console.log("x1="+scaledTick+", x2="+screenX);
   }
 }
 
@@ -168,19 +179,25 @@ musicPad.request = function(resource) {
   httpRequest.send();
 }
 
+musicPad.send = function(json) {
+  if (musicPad.connected) {
+    musicPad.ws.send(json);
+  }
+}
+
 musicPad.sendCommand = function(command, parameter) {
   console.log("command="+command+", parameter="+parameter);
-  musicPad.ws.send(JSON.stringify({type : "OnCommand", command : command, parameter : parameter}));
+  musicPad.send(JSON.stringify({type : "OnCommand", command : command, parameter : parameter}));
 }
 
 musicPad.sendChannelCommand = function(command, channel, parameter) {
   console.log("command="+command+", channel="+channel+", parameter="+parameter);
-  musicPad.ws.send(JSON.stringify({type : "OnChannelCommand", channelCommand : command, channel : channel, parameter: parameter}));
+  musicPad.send(JSON.stringify({type : "OnChannelCommand", channelCommand : command, channel : channel, parameter: parameter}));
 }
 
 musicPad.sendDeviceCommand = function(command, deviceIndex, parameter) {
   console.log("command="+command+", deviceIndex="+deviceIndex+", parameter="+parameter);
-  musicPad.ws.send(JSON.stringify({type : "OnDeviceCommand", deviceCommand : command, deviceIndex : deviceIndex, parameter: parameter}));
+  musicPad.send(JSON.stringify({type : "OnDeviceCommand", deviceCommand : command, deviceIndex : deviceIndex, parameter: parameter}));
 }
 
 
