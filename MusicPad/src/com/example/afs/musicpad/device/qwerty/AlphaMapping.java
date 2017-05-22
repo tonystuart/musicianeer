@@ -65,6 +65,17 @@ public class AlphaMapping extends QwertyMapping {
   };
 
   @Override
+  public String deltaToInputCode(int distance) {
+    if (-KEY_SEQUENCE.length < distance && distance < 0) {
+      return "5";
+    } else if (0 < distance && distance < KEY_SEQUENCE.length) {
+      return "6";
+    } else {
+      return "";
+    }
+  }
+
+  @Override
   public int getDefaultOctave() {
     return 3;
   }
@@ -75,8 +86,20 @@ public class AlphaMapping extends QwertyMapping {
   }
 
   @Override
-  public int getDelta(int inputCode) {
-    return 0;
+  public int inputCodeToDelta(int inputCode) {
+    int delta;
+    switch (inputCode) {
+    case '5':
+      delta = -KEY_SEQUENCE.length;
+      break;
+    case '6':
+      delta = KEY_SEQUENCE.length;
+      break;
+    default:
+      delta = 0;
+      break;
+    }
+    return delta;
   }
 
   @Override

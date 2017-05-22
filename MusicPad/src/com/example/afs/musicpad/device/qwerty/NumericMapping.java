@@ -47,6 +47,11 @@ public class NumericMapping extends QwertyMapping {
   };
 
   @Override
+  public String deltaToInputCode(int distance) {
+    return "=?";
+  }
+
+  @Override
   public int getDefaultOctave() {
     return 4;
   }
@@ -57,7 +62,7 @@ public class NumericMapping extends QwertyMapping {
   }
 
   @Override
-  public int getDelta(int inputCode) {
+  public int inputCodeToDelta(int inputCode) {
     return 0;
   }
 

@@ -11,17 +11,20 @@ package com.example.afs.musicpad.device.common;
 
 public interface InputMapping {
 
+  String deltaToInputCode(int distance);
+
   int getDefaultOctave();
 
   int getDefaultRange();
 
-  int getDelta(int inputCode);
-
   int getOctave();
+
+  int inputCodeToDelta(int inputCode);
 
   void setOctave(int octave);
 
   String toKeyCap(int midiNote);
 
   int toMidiNote(int inputCode);
+
 }

@@ -73,7 +73,7 @@ public class QwertyReader {
     if (inputCode == KeyEvent.VK_SHIFT) {
       sharp = 1;
     } else {
-      int delta = deviceHandler.getInputMapping().getDelta(inputCode);
+      int delta = deviceHandler.getInputMapping().inputCodeToDelta(inputCode);
       if (delta != 0) {
         this.delta += delta;
       } else {
@@ -91,7 +91,7 @@ public class QwertyReader {
     if (inputCode == KeyEvent.VK_SHIFT) {
       sharp = 0;
     } else {
-      int delta = deviceHandler.getInputMapping().getDelta(inputCode);
+      int delta = deviceHandler.getInputMapping().inputCodeToDelta(inputCode);
       if (delta != 0) {
         this.delta -= delta;
       } else {

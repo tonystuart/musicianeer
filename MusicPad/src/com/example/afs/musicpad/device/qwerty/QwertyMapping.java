@@ -44,10 +44,16 @@ public abstract class QwertyMapping implements InputMapping {
   public String toKeyCap(int midiNote) {
     String keyCap;
     int noteIndex = midiNote - octave * Midi.SEMITONES_PER_OCTAVE;
-    if (noteIndex >= 0 && noteIndex < keySequence.length) {
+    if (noteIndex < 0) {
+      // add support for notes in shift down registers
+      keyCap = "<?";
+    } else if (noteIndex < keySequence.length) {
       keyCap = keySequence[noteIndex];
     } else {
       keyCap = "?";
+      int deltaSemitone = noteIndex - keySequence.length;
+      String modifier = deltaToInputCode(deltaSemitone);
+      keyCap = modifier + "+" + keySequence[deltaSemitone];
     }
     return keyCap;
   }

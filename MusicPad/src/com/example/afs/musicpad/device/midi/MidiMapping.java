@@ -17,6 +17,11 @@ public class MidiMapping implements InputMapping {
   private int octave;
 
   @Override
+  public String deltaToInputCode(int distance) {
+    return "=?";
+  }
+
+  @Override
   public int getDefaultOctave() {
     return 3;
   }
@@ -27,13 +32,13 @@ public class MidiMapping implements InputMapping {
   }
 
   @Override
-  public int getDelta(int inputCode) {
-    return 0;
+  public int getOctave() {
+    return octave;
   }
 
   @Override
-  public int getOctave() {
-    return octave;
+  public int inputCodeToDelta(int inputCode) {
+    return 0;
   }
 
   @Override
