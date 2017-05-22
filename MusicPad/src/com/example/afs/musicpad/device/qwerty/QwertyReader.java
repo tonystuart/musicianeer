@@ -9,7 +9,6 @@
 
 package com.example.afs.musicpad.device.qwerty;
 
-import java.awt.event.KeyEvent;
 import java.io.FileDescriptor;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -70,16 +69,16 @@ public class QwertyReader {
   }
 
   private void processInputCodeDown(int inputCode) {
-    if (inputCode == KeyEvent.VK_SHIFT) {
+    if (inputCode == deviceHandler.getInputMapping().getSharp()) {
       sharp = 1;
     } else {
       int delta = deviceHandler.getInputMapping().inputCodeToDelta(inputCode);
       if (delta != 0) {
-        this.delta += delta;
+        this.delta = delta;
       } else {
         int midiNote = deviceHandler.getInputMapping().toMidiNote(inputCode);
         if (midiNote != -1) {
-          midiNote += delta + sharp;
+          midiNote += this.delta + sharp;
           activeMidiNotes[inputCode] = midiNote;
           queue.add(new OnNoteOn(midiNote));
         }
@@ -88,12 +87,12 @@ public class QwertyReader {
   }
 
   private void processInputCodeUp(int inputCode) {
-    if (inputCode == KeyEvent.VK_SHIFT) {
+    if (inputCode == deviceHandler.getInputMapping().getSharp()) {
       sharp = 0;
     } else {
       int delta = deviceHandler.getInputMapping().inputCodeToDelta(inputCode);
       if (delta != 0) {
-        this.delta -= delta;
+        this.delta = 0;
       } else {
         int midiNote = activeMidiNotes[inputCode];
         if (midiNote != 0) {

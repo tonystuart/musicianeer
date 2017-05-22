@@ -24,15 +24,34 @@ public abstract class QwertyMapping implements InputMapping {
   protected static final int NUM_LOCK = '#';
 
   protected int octave = Default.OCTAVE;
-  protected final String[] keySequence;
+  private String[] keySequence;
+  private char[] lowerRegisters;
+  private char[] higherRegisters;
 
-  protected QwertyMapping() {
-    keySequence = getKeySequence();
+  public QwertyMapping(String[] keySequence, char[] lowerRegisters, char[] higherRegisters) {
+    this.keySequence = keySequence;
+    this.lowerRegisters = lowerRegisters;
+    this.higherRegisters = higherRegisters;
   }
 
   @Override
   public int getOctave() {
     return octave;
+  }
+
+  @Override
+  public int inputCodeToDelta(int inputCode) {
+    for (int i = 0; i < lowerRegisters.length; i++) {
+      if (inputCode == lowerRegisters[i]) {
+        return -((i + 1) * keySequence.length);
+      }
+    }
+    for (int i = 0; i < higherRegisters.length; i++) {
+      if (inputCode == higherRegisters[i]) {
+        return +((i + 1) * keySequence.length);
+      }
+    }
+    return 0;
   }
 
   @Override
@@ -45,19 +64,31 @@ public abstract class QwertyMapping implements InputMapping {
     String keyCap;
     int noteIndex = midiNote - octave * Midi.SEMITONES_PER_OCTAVE;
     if (noteIndex < 0) {
-      // add support for notes in shift down registers
-      keyCap = "<?";
+      keyCap = null;
+      for (int i = 0; i < lowerRegisters.length && keyCap == null; i++) {
+        noteIndex += keySequence.length;
+        if (noteIndex > 0 && noteIndex < keySequence.length) {
+          keyCap = lowerRegisters[i] + "+" + keySequence[noteIndex];
+        }
+      }
+      if (keyCap == null) {
+        keyCap = "<?";
+      }
     } else if (noteIndex < keySequence.length) {
       keyCap = keySequence[noteIndex];
     } else {
-      keyCap = "?";
-      int deltaSemitone = noteIndex - keySequence.length;
-      String modifier = deltaToInputCode(deltaSemitone);
-      keyCap = modifier + "+" + keySequence[deltaSemitone];
+      keyCap = null;
+      for (int i = 0; i < higherRegisters.length && keyCap == null; i++) {
+        noteIndex -= keySequence.length;
+        if (noteIndex < keySequence.length) {
+          keyCap = higherRegisters[i] + "+" + keySequence[noteIndex];
+        }
+      }
+      if (keyCap == null) {
+        keyCap = ">?";
+      }
     }
     return keyCap;
   }
-
-  protected abstract String[] getKeySequence();
 
 }

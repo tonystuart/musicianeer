@@ -15,11 +15,19 @@ public class MappingTool {
 
   public static void main(String[] args) {
     mapAlpha();
+    mapNumeric();
   }
 
   public static void mapAlpha() {
     String cMajor = "101011010101";
-    String sequence = "ZXCVBNM,.ASDFGHJKLQWERTYUIOP"; // 28 notes - 4 full octaves
+    String sequence = "ZXCVBNM,.ASDFGHJKLQWERTYUIOP";
+    doChromaticScale(sequence);
+    toMidiNote(cMajor, sequence);
+  }
+
+  public static void mapNumeric() {
+    String cMajor = "101011010101";
+    String sequence = "123456789";
     doChromaticScale(sequence);
     toMidiNote(cMajor, sequence);
   }
@@ -30,7 +38,7 @@ public class MappingTool {
 
   public static void qwertyMapping() {
     String cMajor = "101011010101";
-    String alpha = "ZXCVBNMASDFGHJKLQWERTYUIOP";
+    String alpha = "ZXCVBNM,.ASDFGHJKLQWERTYUIOP"; // must be integral multiple of 7 or math on its length won't work
     toMidiNote(cMajor, alpha);
     String numeric = "123E456+789-N/*B";
     toMidiNote(cMajor, numeric);

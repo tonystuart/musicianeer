@@ -11,13 +11,13 @@ package com.example.afs.musicpad.device.common;
 
 public interface InputMapping {
 
-  String deltaToInputCode(int distance);
-
   int getDefaultOctave();
 
   int getDefaultRange();
 
   int getOctave();
+
+  char getSharp();
 
   int inputCodeToDelta(int inputCode);
 

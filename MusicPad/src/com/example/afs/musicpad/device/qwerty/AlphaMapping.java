@@ -9,11 +9,13 @@
 
 package com.example.afs.musicpad.device.qwerty;
 
+import java.awt.event.KeyEvent;
+
 import com.example.afs.musicpad.midi.Midi;
 
 public class AlphaMapping extends QwertyMapping {
 
-  private static final String[] KEY_SEQUENCE = new String[] {
+  private static final String[] keySequence = new String[] {
       N + "Z", // C
       S + "Z", // C#
       N + "X", // D
@@ -64,15 +66,24 @@ public class AlphaMapping extends QwertyMapping {
       N + "P", // B
   };
 
-  @Override
-  public String deltaToInputCode(int distance) {
-    if (-KEY_SEQUENCE.length < distance && distance < 0) {
-      return "5";
-    } else if (0 < distance && distance < KEY_SEQUENCE.length) {
-      return "6";
-    } else {
-      return "";
-    }
+  private static final char[] lowerRegisters = new char[] {
+      '5',
+      '4',
+      '3',
+      '2',
+      '1'
+  };
+
+  private static final char[] higherRegisters = new char[] {
+      '6',
+      '7',
+      '8',
+      '9',
+      '0'
+  };
+
+  public AlphaMapping() {
+    super(keySequence, lowerRegisters, higherRegisters);
   }
 
   @Override
@@ -86,20 +97,8 @@ public class AlphaMapping extends QwertyMapping {
   }
 
   @Override
-  public int inputCodeToDelta(int inputCode) {
-    int delta;
-    switch (inputCode) {
-    case '5':
-      delta = -KEY_SEQUENCE.length;
-      break;
-    case '6':
-      delta = KEY_SEQUENCE.length;
-      break;
-    default:
-      delta = 0;
-      break;
-    }
-    return delta;
+  public char getSharp() {
+    return KeyEvent.VK_SHIFT;
   }
 
   @Override
@@ -195,11 +194,6 @@ public class AlphaMapping extends QwertyMapping {
       break;
     }
     return semitone == -1 ? -1 : (octave * Midi.SEMITONES_PER_OCTAVE) + semitone;
-  }
-
-  @Override
-  protected String[] getKeySequence() {
-    return KEY_SEQUENCE;
   }
 
 }
