@@ -62,11 +62,6 @@ public class NumericMapping extends QwertyMapping {
   }
 
   @Override
-  public int inputCodeToDelta(int inputCode) {
-    return 0;
-  }
-
-  @Override
   public int toMidiNote(int inputCode) {
     int semitone;
     switch (inputCode) {
