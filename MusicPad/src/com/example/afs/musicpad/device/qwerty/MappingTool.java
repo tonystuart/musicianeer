@@ -14,11 +14,14 @@ import com.example.afs.musicpad.analyzer.Names;
 public class MappingTool {
 
   public static void main(String[] args) {
-    numericMapping();
+    mapAlpha();
   }
 
   public static void mapAlpha() {
-    doChromaticScale("ZXCVBNMASDFGHJKLQWERTYUIOP");
+    String cMajor = "101011010101";
+    String sequence = "ZXCVBNM,.ASDFGHJKLQWERTYUIOP"; // 28 notes - 4 full octaves
+    doChromaticScale(sequence);
+    toMidiNote(cMajor, sequence);
   }
 
   public static void numericMapping() {

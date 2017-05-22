@@ -9,6 +9,10 @@
 
 package com.example.afs.musicpad.device.qwerty;
 
+import java.awt.event.KeyEvent;
+
+import com.example.afs.musicpad.midi.Midi;
+
 public class NumericMapping extends QwertyMapping {
 
   private static final String[] KEY_SEQUENCE = new String[] {
@@ -55,6 +59,65 @@ public class NumericMapping extends QwertyMapping {
   @Override
   public int getDelta(int inputCode) {
     return 0;
+  }
+
+  @Override
+  public int toMidiNote(int inputCode) {
+    int semitone;
+    switch (inputCode) {
+    case '1':
+      semitone = 0; // C
+      break;
+    case '2':
+      semitone = 2; // D
+      break;
+    case '3':
+      semitone = 4; // E
+      break;
+    case KeyEvent.VK_ENTER:
+      semitone = 5; // F
+      break;
+    case '4':
+      semitone = 7; // G
+      break;
+    case '5':
+      semitone = 9; // A
+      break;
+    case '6':
+      semitone = 11; // B
+      break;
+    case '+':
+      semitone = 12; // C
+      break;
+    case '7':
+      semitone = 14; // D
+      break;
+    case '8':
+      semitone = 16; // E
+      break;
+    case '9':
+      semitone = 17; // F
+      break;
+    case '-':
+      semitone = 19; // G
+      break;
+    case KeyEvent.VK_NUM_LOCK:
+      semitone = 21; // A
+      break;
+    case '/':
+      semitone = 23; // B
+      break;
+    case '*':
+      semitone = 24; // C
+      break;
+    case KeyEvent.VK_BACK_SPACE:
+      semitone = 26; // D
+      break;
+    default:
+      semitone = -1; // could use these (e.g. F1) for shortcuts
+      break;
+    }
+    return semitone == -1 ? -1 : (octave * Midi.SEMITONES_PER_OCTAVE) + semitone;
   }
 
   @Override

@@ -69,11 +69,6 @@ public class QwertyReader {
     }
   }
 
-  private int getMidiNote(int inputCode) {
-    int midiNote = deviceHandler.getInputMapping().toMidiNote(inputCode);
-    return delta + midiNote + sharp;
-  }
-
   private void processInputCodeDown(int inputCode) {
     if (inputCode == KeyEvent.VK_SHIFT) {
       sharp = 1;
@@ -82,9 +77,12 @@ public class QwertyReader {
       if (delta != 0) {
         this.delta += delta;
       } else {
-        int midiNote = getMidiNote(inputCode);
-        activeMidiNotes[inputCode] = midiNote;
-        queue.add(new OnNoteOn(midiNote));
+        int midiNote = deviceHandler.getInputMapping().toMidiNote(inputCode);
+        if (midiNote != -1) {
+          midiNote += delta + sharp;
+          activeMidiNotes[inputCode] = midiNote;
+          queue.add(new OnNoteOn(midiNote));
+        }
       }
     }
   }
