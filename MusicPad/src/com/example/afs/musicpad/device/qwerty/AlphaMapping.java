@@ -28,42 +28,42 @@ public class AlphaMapping extends QwertyMapping {
       N + "N", // A
       S + "N", // A#
       N + "M", // B
-      N + ",", // C
-      S + ",", // C#
-      N + ".", // D
-      S + ".", // D#
-      N + "A", // E
-      N + "S", // F
-      S + "S", // F#
-      N + "D", // G
-      S + "D", // G#
-      N + "F", // A
-      S + "F", // A#
-      N + "G", // B
-      N + "H", // C
-      S + "H", // C#
-      N + "J", // D
-      S + "J", // D#
-      N + "K", // E
-      N + "L", // F
-      S + "L", // F#
-      N + "Q", // G
-      S + "Q", // G#
-      N + "W", // A
-      S + "W", // A#
-      N + "E", // B
-      N + "R", // C
-      S + "R", // C#
-      N + "T", // D
-      S + "T", // D#
-      N + "Y", // E
-      N + "U", // F
-      S + "U", // F#
-      N + "I", // G
-      S + "I", // G#
-      N + "O", // A
-      S + "O", // A#
-      N + "P", // B
+      N + "A", // C
+      S + "A", // C#
+      N + "S", // D
+      S + "S", // D#
+      N + "D", // E
+      N + "F", // F
+      S + "F", // F#
+      N + "G", // G
+      S + "G", // G#
+      N + "H", // A
+      S + "H", // A#
+      N + "J", // B
+      N + "K", // C
+      S + "K", // C#
+      N + "L", // D
+      S + "L", // D#
+      N + "Q", // E
+      N + "W", // F
+      S + "W", // F#
+      N + "E", // G
+      S + "E", // G#
+      N + "R", // A
+      S + "R", // A#
+      N + "T", // B
+      N + "Y", // C
+      S + "Y", // C#
+      N + "U", // D
+      S + "U", // D#
+      N + "I", // E
+      N + "O", // F
+      S + "O", // F#
+      N + "P", // G
+      S + "P", // G#
+      N + "[", // A
+      S + "[", // A#
+      N + "]", // B
   };
 
   private static final char[] lowerRegisters = new char[] {
@@ -126,67 +126,67 @@ public class AlphaMapping extends QwertyMapping {
     case 'M':
       semitone = 11; // B
       break;
-    case ',':
+    case 'A':
       semitone = 12; // C
       break;
-    case '.':
+    case 'S':
       semitone = 14; // D
       break;
-    case 'A':
+    case 'D':
       semitone = 16; // E
       break;
-    case 'S':
+    case 'F':
       semitone = 17; // F
       break;
-    case 'D':
+    case 'G':
       semitone = 19; // G
       break;
-    case 'F':
+    case 'H':
       semitone = 21; // A
       break;
-    case 'G':
+    case 'J':
       semitone = 23; // B
       break;
-    case 'H':
+    case 'K':
       semitone = 24; // C
       break;
-    case 'J':
+    case 'L':
       semitone = 26; // D
       break;
-    case 'K':
+    case 'Q':
       semitone = 28; // E
       break;
-    case 'L':
+    case 'W':
       semitone = 29; // F
       break;
-    case 'Q':
+    case 'E':
       semitone = 31; // G
       break;
-    case 'W':
+    case 'R':
       semitone = 33; // A
       break;
-    case 'E':
+    case 'T':
       semitone = 35; // B
       break;
-    case 'R':
+    case 'Y':
       semitone = 36; // C
       break;
-    case 'T':
+    case 'U':
       semitone = 38; // D
       break;
-    case 'Y':
+    case 'I':
       semitone = 40; // E
       break;
-    case 'U':
+    case 'O':
       semitone = 41; // F
       break;
-    case 'I':
+    case 'P':
       semitone = 43; // G
       break;
-    case 'O':
+    case '[':
       semitone = 45; // A
       break;
-    case 'P':
+    case ']':
       semitone = 47; // B
       break;
     default:

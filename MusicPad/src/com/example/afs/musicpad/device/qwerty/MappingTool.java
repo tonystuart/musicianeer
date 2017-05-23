@@ -20,7 +20,7 @@ public class MappingTool {
 
   public static void mapAlpha() {
     String cMajor = "101011010101";
-    String sequence = "ZXCVBNM,.ASDFGHJKLQWERTYUIOP";
+    String sequence = "ZXCVBNMASDFGHJKLQWERTYUIOP[]"; // must be integral multiple of 7 or math on its length won't work
     doChromaticScale(sequence);
     toMidiNote(cMajor, sequence);
   }
@@ -38,7 +38,7 @@ public class MappingTool {
 
   public static void qwertyMapping() {
     String cMajor = "101011010101";
-    String alpha = "ZXCVBNM,.ASDFGHJKLQWERTYUIOP"; // must be integral multiple of 7 or math on its length won't work
+    String alpha = "ZXCVBNMASDFGHJKLQWERTYUIOP";
     toMidiNote(cMajor, alpha);
     String numeric = "123E456+789-N/*B";
     toMidiNote(cMajor, numeric);
