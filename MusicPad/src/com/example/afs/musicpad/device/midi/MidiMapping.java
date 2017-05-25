@@ -11,39 +11,20 @@ package com.example.afs.musicpad.device.midi;
 
 import com.example.afs.musicpad.analyzer.Names;
 import com.example.afs.musicpad.device.common.InputMapping;
+import com.example.afs.musicpad.renderer.Notator.KeyCap;
+import com.example.afs.musicpad.renderer.Notator.Slice;
+import com.example.afs.musicpad.util.DirectList;
+import com.example.afs.musicpad.util.RandomAccessList;
 
 public class MidiMapping implements InputMapping {
 
-  private int octave;
-
   @Override
-  public int getDefaultOctave() {
-    return 3;
+  public int onDown(int noteIndex) {
+    return noteIndex;
   }
 
   @Override
-  public int getDefaultRange() {
-    return 49;
-  }
-
-  @Override
-  public int getOctave() {
-    return octave;
-  }
-
-  @Override
-  public char getSharp() {
-    return 0;
-  }
-
-  @Override
-  public int inputCodeToDelta(int inputCode) {
-    return 0;
-  }
-
-  @Override
-  public void setOctave(int octave) {
-    this.octave = octave;
+  public void onUp(int inputCode) {
   }
 
   @Override
@@ -52,8 +33,8 @@ public class MidiMapping implements InputMapping {
   }
 
   @Override
-  public int toMidiNote(int noteIndex) {
-    return noteIndex;
+  public RandomAccessList<KeyCap> toKeyCaps(RandomAccessList<Slice> slices) {
+    return new DirectList<>();
   }
 
 }

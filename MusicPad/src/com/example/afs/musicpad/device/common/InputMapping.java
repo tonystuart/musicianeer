@@ -9,22 +9,18 @@
 
 package com.example.afs.musicpad.device.common;
 
+import com.example.afs.musicpad.renderer.Notator.KeyCap;
+import com.example.afs.musicpad.renderer.Notator.Slice;
+import com.example.afs.musicpad.util.RandomAccessList;
+
 public interface InputMapping {
 
-  int getDefaultOctave();
+  int onDown(int inputCode);
 
-  int getDefaultRange();
-
-  int getOctave();
-
-  char getSharp();
-
-  int inputCodeToDelta(int inputCode);
-
-  void setOctave(int octave);
+  void onUp(int inputCode);
 
   String toKeyCap(int midiNote);
 
-  int toMidiNote(int inputCode);
+  RandomAccessList<KeyCap> toKeyCaps(RandomAccessList<Slice> slices);
 
 }

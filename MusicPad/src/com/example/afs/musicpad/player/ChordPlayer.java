@@ -13,7 +13,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.example.afs.musicpad.device.common.DeviceHandler;
-import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.theory.Keys;
 
@@ -25,7 +24,6 @@ public class ChordPlayer extends Player {
 
   public ChordPlayer(DeviceHandler deviceHandler, Song song) {
     super(deviceHandler, song);
-    initializeOctave();
   }
 
   @Override
@@ -54,13 +52,6 @@ public class ChordPlayer extends Player {
     Chord chord = new Chord(midiNote);
     String keyCap = toKeyCap(chord);
     return keyCap;
-  }
-
-  private void initializeOctave() {
-    int averageMidiNote = song.getAverageMidiNote(songChannel);
-    int octave = averageMidiNote / Midi.SEMITONES_PER_OCTAVE;
-    mappingBase = octave * Midi.SEMITONES_PER_OCTAVE;
-    inputMapping.setOctave(octave);
   }
 
 }

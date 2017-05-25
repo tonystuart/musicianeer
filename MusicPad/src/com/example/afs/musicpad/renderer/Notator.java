@@ -9,6 +9,7 @@
 
 package com.example.afs.musicpad.renderer;
 
+import java.util.Iterator;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -29,6 +30,57 @@ import com.example.afs.musicpad.util.RandomAccessList;
 import com.example.afs.musicpad.util.Value;
 
 public class Notator {
+
+  public static class KeyCap {
+    private String keyCap;
+    private Slice slice;
+
+    public KeyCap(Slice slice, String keyCap) {
+      this.slice = slice;
+      this.keyCap = keyCap;
+    }
+
+    public String getKeyCap() {
+      return keyCap;
+    }
+
+    public Slice getSlice() {
+      return slice;
+    }
+
+    public long getTick() {
+      return slice.getTick();
+    }
+  }
+
+  public static class Slice implements Iterable<Note> {
+    private SortedSet<Note> notes;
+    private long tick;
+    private Note first;
+
+    public Slice(SortedSet<Note> notes) {
+      this.notes = notes;
+      first = notes.first();
+      this.tick = first.getTick();
+    }
+
+    public Note first() {
+      return first;
+    }
+
+    public long getTick() {
+      return tick;
+    }
+
+    @Override
+    public Iterator<Note> iterator() {
+      return notes.iterator();
+    }
+
+    public int size() {
+      return notes.size();
+    }
+  }
 
   private static class Context {
     private NoteType noteType;
@@ -75,9 +127,9 @@ public class Notator {
   }
 
   private static final int LOWEST = 24;
+
   private static final int HIGHEST = 96;
   private static final int MIDDLE = 60;
-
   // http://www.theoreticallycorrect.com/Helmholtz-Pitch-Numbering/
   private static final int[] TREBLE_MIDI_NOTES = new int[] {
       64,
@@ -86,6 +138,7 @@ public class Notator {
       74,
       77
   };
+
   private static final int[] BASS_MIDI_NOTES = new int[] {
       43,
       47,
@@ -114,7 +167,6 @@ public class Notator {
       92,
       95
   };
-
   private static final boolean[] SHARPS = new boolean[] {
       false,
       true,
@@ -129,21 +181,23 @@ public class Notator {
       true,
       false,
   };
+
   private static final int[] POSITION = createPosition();
   private static final boolean[] LEDGER = createLedger();
-
   private static final int RADIUS = 10; // spacing is r, diameter is 2r
   private static final int LEDGER_WIDTH = RADIUS * 2;
   private static final int INTER_CLEF = RADIUS * 6;
+
   private static final int TOP = RADIUS * 1;
   private static final int SPAN = (POSITION[HIGHEST] - POSITION[LOWEST]) + 1;
 
   private static final int BOTTOM = TOP + (SPAN * RADIUS) + INTER_CLEF;
-  private static final int WORDS = BOTTOM / 2;
 
+  private static final int WORDS = BOTTOM / 2;
   private static final long RESOLUTION = Default.TICKS_PER_BEAT / 2;
 
   private static final String CLOSED = "closed";
+
   private static final String OPEN = "open";
 
   public static boolean isSharp(int midiNote) {
@@ -172,7 +226,9 @@ public class Notator {
 
   private Song song;
   private int channel;
+
   private Player player;
+
   private int ticksPerPixel;
 
   public Notator(Player player, Song song, int channel, int ticksPerPixel) {
@@ -189,11 +245,18 @@ public class Notator {
       Svg staff = getStaff(duration);
       drawMeasures(staff, duration);
       long tick = 0;
+      RandomAccessList<Slice> slices = new DirectList<>();
       TreeSet<Note> notes = song.getNotes(channel);
       while (tick < duration) {
-        drawSlice(staff, notes, tick);
+        SortedSet<Note> subSet = notes.subSet(new Note(tick), new Note(tick + RESOLUTION));
+        if (subSet.size() > 0) {
+          Slice slice = new Slice(subSet);
+          slices.add(slice);
+          drawSlice(staff, slice);
+        }
         tick += RESOLUTION;
       }
+      drawNoteNames(staff, slices);
       drawWords(staff);
       music = staff.render();
     }
@@ -227,23 +290,21 @@ public class Notator {
     }
   }
 
-  private void drawNoteNames(Svg staff, SortedSet<Note> slice) {
-    String keyCap;
-    String noteDescription;
-    Note firstNote = slice.first();
-    long wordTick = firstNote.getTick() - RADIUS; // align with left edge of note head
-    int wordX = getX(wordTick);
-    if (slice.size() == 1) {
-      int midiNote = firstNote.getMidiNote();
-      keyCap = player.toKeyCap(midiNote);
-      noteDescription = Names.getNoteName(midiNote);
-    } else {
-      Chord chord = new Chord(slice);
-      keyCap = player.toKeyCap(chord);
-      noteDescription = chord.getChordType().getName();
+  private void drawNoteNames(Svg staff, RandomAccessList<Slice> slices) {
+    RandomAccessList<KeyCap> keyCaps = player.toKeyCaps(slices);
+    for (KeyCap keyCap : keyCaps) {
+      int wordX = getX(keyCap.getTick() - RADIUS); // align with left edge of note head
+      Slice slice = keyCap.getSlice();
+      String noteDescription;
+      if (slice.size() == 1) {
+        noteDescription = Names.getNoteName(slice.first().getMidiNote());
+      } else {
+        Chord chord = new Chord(slice);
+        noteDescription = chord.getChordType().getName();
+      }
+      staff.add(new Text(wordX, WORDS + 3 * RADIUS, keyCap.getKeyCap()));
+      staff.add(new Text(wordX, 3 * RADIUS, noteDescription));
     }
-    staff.add(new Text(wordX, WORDS + 3 * RADIUS, keyCap));
-    staff.add(new Text(wordX, 3 * RADIUS, noteDescription));
   }
 
   private void drawNotes(Svg staff, long firstTick, RandomAccessList<Note> notes, int midPoint) {
@@ -276,27 +337,20 @@ public class Notator {
     staff.add(new Line(x + half, y - full, x + half, y + full));
   }
 
-  private void drawSlice(Svg staff, TreeSet<Note> notes, long tick) {
+  private void drawSlice(Svg staff, Slice slice) {
     int midiNote = 0;
-    long firstTick = -1;
-    SortedSet<Note> slice = notes.subSet(new Note(tick), new Note(tick + RESOLUTION));
-    int sliceNoteCount = slice.size();
-    if (sliceNoteCount > 0) {
-      firstTick = slice.first().getTick();
-      RandomAccessList<Note> trebleNotes = new DirectList<>();
-      RandomAccessList<Note> bassNotes = new DirectList<>();
-      for (Note note : slice) {
-        midiNote = note.getMidiNote();
-        if (midiNote < MIDDLE) {
-          bassNotes.add(note);
-        } else {
-          trebleNotes.add(note);
-        }
+    RandomAccessList<Note> trebleNotes = new DirectList<>();
+    RandomAccessList<Note> bassNotes = new DirectList<>();
+    for (Note note : slice) {
+      midiNote = note.getMidiNote();
+      if (midiNote < MIDDLE) {
+        bassNotes.add(note);
+      } else {
+        trebleNotes.add(note);
       }
-      drawNotes(staff, firstTick, trebleNotes, TREBLE_MIDI_NOTES[2]);
-      drawNotes(staff, firstTick, bassNotes, BASS_MIDI_NOTES[2]);
-      drawNoteNames(staff, slice);
     }
+    drawNotes(staff, slice.getTick(), trebleNotes, TREBLE_MIDI_NOTES[2]);
+    drawNotes(staff, slice.getTick(), bassNotes, BASS_MIDI_NOTES[2]);
   }
 
   private void drawStem(Svg staff, long firstTick, Context context) {

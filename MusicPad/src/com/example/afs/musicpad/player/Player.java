@@ -18,7 +18,10 @@ import com.example.afs.musicpad.analyzer.Names;
 import com.example.afs.musicpad.device.common.DeviceHandler;
 import com.example.afs.musicpad.device.common.InputMapping;
 import com.example.afs.musicpad.midi.Midi;
+import com.example.afs.musicpad.renderer.Notator.KeyCap;
+import com.example.afs.musicpad.renderer.Notator.Slice;
 import com.example.afs.musicpad.song.Song;
+import com.example.afs.musicpad.util.RandomAccessList;
 import com.example.afs.musicpad.util.Velocity;
 
 public abstract class Player {
@@ -76,10 +79,14 @@ public abstract class Player {
 
   public abstract String toKeyCap(int midiNote);
 
+  public RandomAccessList<KeyCap> toKeyCaps(RandomAccessList<Slice> slices) {
+    return inputMapping.toKeyCaps(slices);
+  }
+
   protected int getHighestMidiNote() {
     int highestMidiNote = song.getHighestMidiNote(songChannel);
     if (highestMidiNote == -1) {
-      highestMidiNote = inputMapping.getDefaultOctave() * Midi.SEMITONES_PER_OCTAVE + inputMapping.getDefaultRange();
+      highestMidiNote = 24;
     }
     return highestMidiNote;
   }
@@ -87,7 +94,7 @@ public abstract class Player {
   protected int getLowestMidiNote() {
     int lowestMidiNote = song.getLowestMidiNote(songChannel);
     if (lowestMidiNote == -1) {
-      lowestMidiNote = inputMapping.getDefaultOctave() * Midi.SEMITONES_PER_OCTAVE;
+      lowestMidiNote = 84;
     }
     return lowestMidiNote;
   }

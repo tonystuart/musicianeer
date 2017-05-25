@@ -12,6 +12,7 @@ package com.example.afs.musicpad.player;
 import java.util.Arrays;
 import java.util.Collection;
 
+import com.example.afs.musicpad.renderer.Notator.Slice;
 import com.example.afs.musicpad.song.Note;
 import com.example.afs.musicpad.theory.ChordType;
 import com.example.afs.musicpad.theory.IntervalSet;
@@ -30,6 +31,14 @@ public class Chord {
 
   public Chord(int... notes) {
     this.midiNotes = notes;
+  }
+
+  public Chord(Slice slice) {
+    int index = 0;
+    midiNotes = new int[slice.size()];
+    for (Note note : slice) {
+      midiNotes[index++] = note.getMidiNote();
+    }
   }
 
   @Override

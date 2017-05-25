@@ -9,94 +9,169 @@
 
 package com.example.afs.musicpad.device.qwerty;
 
+import java.awt.event.KeyEvent;
+
+import com.example.afs.musicpad.device.common.InputMapping;
 import com.example.afs.musicpad.midi.Midi;
+import com.example.afs.musicpad.renderer.Notator;
+import com.example.afs.musicpad.renderer.Notator.KeyCap;
+import com.example.afs.musicpad.renderer.Notator.Slice;
+import com.example.afs.musicpad.song.Note;
+import com.example.afs.musicpad.util.DirectList;
+import com.example.afs.musicpad.util.RandomAccessList;
 
-public class NumericMapping extends QwertyMapping {
+public class NumericMapping implements InputMapping {
 
-  private static final String[] keySequence = new String[] {
-      N + "1", // C
-      S + "1", // C#
-      N + "2", // D
-      S + "2", // D#
-      N + "3", // E
-      N + "4", // F
-      S + "4", // F#
-      N + "5", // G
-      S + "5", // G#
-      N + "6", // A
-      S + "6", // A#
-      N + "7", // B
-      N + "8", // C
-      S + "8", // C#
-      N + "9", // D
-      S + "9", // D#
-  };
+  private int octave;
+  private int register;
 
-  private static final char[] lowerRegisters = new char[] {
-      '/',
-      '*',
-  };
-
-  private static final char[] higherRegisters = new char[] {
-      '-',
-      '+',
-  };
-
-  public NumericMapping() {
-    super(keySequence, lowerRegisters, higherRegisters);
-  }
+  private boolean sharp;
 
   @Override
-  public int getDefaultOctave() {
-    return 4;
-  }
-
-  @Override
-  public int getDefaultRange() {
-    return 27; // From C4 to D#4
-  }
-
-  @Override
-  public char getSharp() {
-    return '0';
-  }
-
-  @Override
-  public int toMidiNote(int inputCode) {
-    int semitone;
+  public int onDown(int inputCode) {
+    int midiNote = -1;
     switch (inputCode) {
+    case '/':
+      register--;
+      break;
+    case '*':
+      register++;
+      break;
+    case '-':
+      octave--;
+      break;
+    case '+':
+      octave++;
+      break;
+    case KeyEvent.VK_NUM_LOCK:
+      octave = 0;
+      register = 0;
+      break;
+    case '0':
+      sharp = true;
+      break;
     case '1':
-      semitone = 0; // C
+      midiNote = 53;
       break;
     case '2':
-      semitone = 2; // D
+      midiNote = 55;
       break;
     case '3':
-      semitone = 4; // E
+      midiNote = 57;
       break;
     case '4':
-      semitone = 5; // F
+      midiNote = 59;
       break;
     case '5':
-      semitone = 7; // G
+      midiNote = 60;
       break;
     case '6':
-      semitone = 9; // A
+      midiNote = 62;
       break;
     case '7':
-      semitone = 11; // B
+      midiNote = 64;
       break;
     case '8':
-      semitone = 12; // C
+      midiNote = 65;
       break;
     case '9':
-      semitone = 14; // D
-      break;
-    default:
-      semitone = -1; // could use these (e.g. F1) for shortcuts
+      midiNote = 67;
       break;
     }
-    return semitone == -1 ? -1 : (octave * Midi.SEMITONES_PER_OCTAVE) + semitone;
+    if (midiNote != -1) {
+      midiNote += octave * Midi.SEMITONES_PER_OCTAVE;
+      if (register != 0) {
+        midiNote += register * Midi.SEMITONES_PER_OCTAVE;
+        register = 0;
+      }
+      if (sharp) {
+        midiNote++;
+        sharp = false;
+      }
+    }
+    return midiNote;
+  }
+
+  @Override
+  public void onUp(int inputCode) {
+  }
+
+  @Override
+  public String toKeyCap(int midiNote) {
+    StringBuilder s = new StringBuilder();
+    int scaleNote = midiNote % Midi.SEMITONES_PER_OCTAVE;
+    if (Notator.isSharp(scaleNote)) {
+      scaleNote--;
+      s.append("0 ");
+    }
+    String noteName = "";
+    switch (scaleNote) {
+    case 0:
+      noteName = "5";
+      break;
+    case 2:
+      noteName = "6";
+      break;
+    case 4:
+      noteName = "7";
+      break;
+    case 5:
+      noteName = "8";
+      break;
+    case 7:
+      noteName = "2";
+      break;
+    case 9:
+      noteName = "3";
+      break;
+    case 11:
+      noteName = "4";
+    }
+    s.append(noteName);
+    return s.toString();
+  }
+
+  @Override
+  public RandomAccessList<KeyCap> toKeyCaps(RandomAccessList<Slice> slices) {
+    RandomAccessList<KeyCap> keyCaps = new DirectList<>();
+    int currentOctave = -1;
+    for (Slice slice : slices) {
+      StringBuilder s = new StringBuilder();
+      for (Note note : slice) {
+        if (s.length() > 0) {
+          s.append(" / ");
+        }
+        if (currentOctave == -1) {
+          s.append("N ");
+          currentOctave = 5;
+        }
+        int midiNote = note.getMidiNote();
+        int noteOctave = (midiNote + 5) / Midi.SEMITONES_PER_OCTAVE; // (60 + 5) / 12 -> 5   five because C is on 5 key
+        int distance = noteOctave - currentOctave;
+        if (distance < 0) {
+          if (noteOctave == 5) {
+            s.append("N ");
+          } else {
+            for (int i = 0; i < distance; i++) {
+              s.append("- ");
+            }
+          }
+        } else if (distance > 0) {
+          if (noteOctave == 5) {
+            s.append("N ");
+          } else {
+            for (int i = 0; i < distance; i++) {
+              s.append("+ ");
+            }
+          }
+        }
+        s.append(toKeyCap(midiNote));
+        currentOctave = noteOctave;
+      }
+      KeyCap keyCap = new KeyCap(slice, s.toString());
+      keyCaps.add(keyCap);
+    }
+    return keyCaps;
   }
 
 }

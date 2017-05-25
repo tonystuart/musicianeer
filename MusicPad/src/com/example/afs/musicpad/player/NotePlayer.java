@@ -10,14 +10,12 @@
 package com.example.afs.musicpad.player;
 
 import com.example.afs.musicpad.device.common.DeviceHandler;
-import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.song.Song;
 
 public class NotePlayer extends Player {
 
   public NotePlayer(DeviceHandler deviceHandler, Song song) {
     super(deviceHandler, song);
-    initializeOctave();
   }
 
   @Override
@@ -40,16 +38,6 @@ public class NotePlayer extends Player {
   @Override
   public String toKeyCap(int midiNote) {
     return inputMapping.toKeyCap(midiNote);
-  }
-
-  private void initializeOctave() {
-    int octave = inputMapping.getDefaultOctave();
-    int lowestMidiNote = getLowestMidiNote();
-    int lowestOctave = lowestMidiNote / Midi.SEMITONES_PER_OCTAVE;
-    if (lowestOctave < octave) {
-      octave = lowestOctave;
-    }
-    inputMapping.setOctave(octave);
   }
 
 }

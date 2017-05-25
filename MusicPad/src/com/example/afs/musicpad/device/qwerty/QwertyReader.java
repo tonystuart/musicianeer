@@ -14,6 +14,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.concurrent.BlockingQueue;
 
 import com.example.afs.fluidsynth.FluidSynth;
@@ -30,17 +31,17 @@ public class QwertyReader {
 
   private static final int EV_KEY = 0x01;
 
-  private int delta;
-  private int sharp;
-  private boolean isTerminated;
   private Thread deviceReader;
   private BlockingQueue<Message> queue;
   private DeviceHandler deviceHandler;
+
+  private boolean isTerminated;
   private int[] activeMidiNotes = new int[256]; // NB: KeyEvents VK codes, not midiNotes
 
   public QwertyReader(BlockingQueue<Message> queue, DeviceHandler deviceHandler) {
     this.queue = queue;
     this.deviceHandler = deviceHandler;
+    Arrays.fill(activeMidiNotes, -1);
   }
 
   public void start() {
@@ -69,37 +70,19 @@ public class QwertyReader {
   }
 
   private void processInputCodeDown(int inputCode) {
-    if (inputCode == deviceHandler.getInputMapping().getSharp()) {
-      sharp = 1;
-    } else {
-      int delta = deviceHandler.getInputMapping().inputCodeToDelta(inputCode);
-      if (delta != 0) {
-        this.delta = delta;
-      } else {
-        int midiNote = deviceHandler.getInputMapping().toMidiNote(inputCode);
-        if (midiNote != -1) {
-          midiNote += this.delta + sharp;
-          activeMidiNotes[inputCode] = midiNote;
-          queue.add(new OnNoteOn(midiNote));
-        }
-      }
+    int midiNote = deviceHandler.getInputMapping().onDown(inputCode);
+    if (midiNote != -1) {
+      activeMidiNotes[inputCode] = midiNote;
+      queue.add(new OnNoteOn(midiNote));
     }
   }
 
   private void processInputCodeUp(int inputCode) {
-    if (inputCode == deviceHandler.getInputMapping().getSharp()) {
-      sharp = 0;
-    } else {
-      int delta = deviceHandler.getInputMapping().inputCodeToDelta(inputCode);
-      if (delta != 0) {
-        this.delta = 0;
-      } else {
-        int midiNote = activeMidiNotes[inputCode];
-        if (midiNote != 0) {
-          queue.add(new OnNoteOff(midiNote));
-          activeMidiNotes[inputCode] = 0;
-        }
-      }
+    deviceHandler.getInputMapping().onUp(inputCode);
+    int midiNote = activeMidiNotes[inputCode];
+    if (midiNote != -1) {
+      queue.add(new OnNoteOff(midiNote));
+      activeMidiNotes[inputCode] = -1;
     }
   }
 
