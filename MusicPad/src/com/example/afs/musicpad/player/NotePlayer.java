@@ -37,7 +37,7 @@ public class NotePlayer extends Player {
 
   @Override
   public String toKeyCap(int midiNote) {
-    return inputMapping.toKeyCap(midiNote);
+    return numericMapping.toKeyCap(midiNote);
   }
 
 }

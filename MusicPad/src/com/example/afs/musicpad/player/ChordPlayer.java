@@ -43,7 +43,7 @@ public class ChordPlayer extends Player {
       midiNoteToChord.put(midiNote, chord);
       System.out.println(chord + " <=> " + midiNote);
     }
-    String keyCap = inputMapping.toKeyCap(mappingBase + midiNote);
+    String keyCap = numericMapping.toKeyCap(mappingBase + midiNote);
     return keyCap;
   }
 

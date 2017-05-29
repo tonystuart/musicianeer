@@ -11,7 +11,6 @@ package com.example.afs.musicpad.device.qwerty;
 
 import java.awt.event.KeyEvent;
 
-import com.example.afs.musicpad.device.common.InputMapping;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.renderer.Notator;
 import com.example.afs.musicpad.renderer.Notator.KeyCap;
@@ -20,14 +19,13 @@ import com.example.afs.musicpad.song.Note;
 import com.example.afs.musicpad.util.DirectList;
 import com.example.afs.musicpad.util.RandomAccessList;
 
-public class NumericMapping implements InputMapping {
+public class NumericMapping {
 
   private int octave;
   private int register;
 
   private boolean sharp;
 
-  @Override
   public int onDown(int inputCode) {
     int midiNote = -1;
     switch (inputCode) {
@@ -92,11 +90,9 @@ public class NumericMapping implements InputMapping {
     return midiNote;
   }
 
-  @Override
   public void onUp(int inputCode) {
   }
 
-  @Override
   public String toKeyCap(int midiNote) {
     StringBuilder s = new StringBuilder();
     int scaleNote = midiNote % Midi.SEMITONES_PER_OCTAVE;
@@ -131,7 +127,6 @@ public class NumericMapping implements InputMapping {
     return s.toString();
   }
 
-  @Override
   public RandomAccessList<KeyCap> toKeyCaps(RandomAccessList<Slice> slices) {
     RandomAccessList<KeyCap> keyCaps = new DirectList<>();
     int currentOctave = -1;

@@ -66,7 +66,7 @@ public class DeviceHandler extends BrokerTask<Message> {
   private Song song;
   private Player player;
   private int channel;
-  private InputMapping inputMapping;
+  private NumericMapping numericMapping;
   private Synthesizer synthesizer;
   private int ticksPerPixel;
   private OutputType desiredOutputType;
@@ -76,7 +76,7 @@ public class DeviceHandler extends BrokerTask<Message> {
     this.synthesizer = synthesizer;
     this.deviceName = name;
     this.deviceIndex = getDeviceIndex(name);
-    this.inputMapping = new NumericMapping();
+    this.numericMapping = new NumericMapping();
     delegate(OnNoteOn.class, message -> doNoteOn(message.getMidiNote()));
     delegate(OnNoteOff.class, message -> doNoteOff(message.getMidiNote()));
     delegate(OnControlChange.class, message -> doControlChange(message.getControl(), message.getValue()));
@@ -103,8 +103,8 @@ public class DeviceHandler extends BrokerTask<Message> {
     return deviceName;
   }
 
-  public InputMapping getInputMapping() {
-    return inputMapping;
+  public NumericMapping getNumericMapping() {
+    return numericMapping;
   }
 
   public Synthesizer getSynthesizer() {

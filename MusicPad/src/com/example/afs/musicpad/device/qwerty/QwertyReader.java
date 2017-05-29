@@ -70,7 +70,7 @@ public class QwertyReader {
   }
 
   private void processInputCodeDown(int inputCode) {
-    int midiNote = deviceHandler.getInputMapping().onDown(inputCode);
+    int midiNote = deviceHandler.getNumericMapping().onDown(inputCode);
     if (midiNote != -1) {
       activeMidiNotes[inputCode] = midiNote;
       queue.add(new OnNoteOn(midiNote));
@@ -78,7 +78,7 @@ public class QwertyReader {
   }
 
   private void processInputCodeUp(int inputCode) {
-    deviceHandler.getInputMapping().onUp(inputCode);
+    deviceHandler.getNumericMapping().onUp(inputCode);
     int midiNote = activeMidiNotes[inputCode];
     if (midiNote != -1) {
       queue.add(new OnNoteOff(midiNote));

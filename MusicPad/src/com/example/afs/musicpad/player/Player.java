@@ -16,7 +16,7 @@ import com.example.afs.fluidsynth.Synthesizer;
 import com.example.afs.musicpad.Trace;
 import com.example.afs.musicpad.analyzer.Names;
 import com.example.afs.musicpad.device.common.DeviceHandler;
-import com.example.afs.musicpad.device.common.InputMapping;
+import com.example.afs.musicpad.device.qwerty.NumericMapping;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.renderer.Notator.KeyCap;
 import com.example.afs.musicpad.renderer.Notator.Slice;
@@ -41,7 +41,7 @@ public abstract class Player {
   protected int songChannel;
   protected int deviceIndex;
   protected String mappingType;
-  protected InputMapping inputMapping;
+  protected NumericMapping numericMapping;
   private int playbackChannel;
   private Synthesizer synthesizer;
   private int percentVelocity = DEFAULT_PERCENT_VELOCITY;
@@ -49,8 +49,8 @@ public abstract class Player {
   public Player(DeviceHandler deviceHandler, Song song) {
     this.deviceIndex = deviceHandler.getDeviceIndex();
     this.songChannel = deviceHandler.getChannel();
-    this.inputMapping = deviceHandler.getInputMapping();
-    this.mappingType = inputMapping.getClass().getSimpleName();
+    this.numericMapping = deviceHandler.getNumericMapping();
+    this.mappingType = numericMapping.getClass().getSimpleName();
     this.synthesizer = deviceHandler.getSynthesizer();
     this.song = song;
     initializeDeviceChannel();
@@ -80,7 +80,7 @@ public abstract class Player {
   public abstract String toKeyCap(int midiNote);
 
   public RandomAccessList<KeyCap> toKeyCaps(RandomAccessList<Slice> slices) {
-    return inputMapping.toKeyCaps(slices);
+    return numericMapping.toKeyCaps(slices);
   }
 
   protected int getHighestMidiNote() {
