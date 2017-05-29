@@ -15,8 +15,6 @@ import java.util.Map;
 import com.example.afs.fluidsynth.Synthesizer;
 import com.example.afs.musicpad.Command;
 import com.example.afs.musicpad.DeviceCommand;
-import com.example.afs.musicpad.device.midi.MidiMapping;
-import com.example.afs.musicpad.device.qwerty.AlphaMapping;
 import com.example.afs.musicpad.device.qwerty.NumericMapping;
 import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnChannelAssigned;
@@ -43,7 +41,7 @@ import com.example.afs.musicpad.util.Value;
 public class DeviceHandler extends BrokerTask<Message> {
 
   public static enum InputType {
-    MIDI, ALPHA, NUMERIC, DETACH
+    NUMERIC, DETACH
   }
 
   public static enum OutputType {
@@ -78,6 +76,7 @@ public class DeviceHandler extends BrokerTask<Message> {
     this.synthesizer = synthesizer;
     this.deviceName = name;
     this.deviceIndex = getDeviceIndex(name);
+    this.inputMapping = new NumericMapping();
     delegate(OnNoteOn.class, message -> doNoteOn(message.getMidiNote()));
     delegate(OnNoteOff.class, message -> doNoteOff(message.getMidiNote()));
     delegate(OnControlChange.class, message -> doControlChange(message.getControl(), message.getValue()));
@@ -112,34 +111,12 @@ public class DeviceHandler extends BrokerTask<Message> {
     return synthesizer;
   }
 
-  public void setInputMapping(InputMapping inputMapping) {
-    this.inputMapping = inputMapping;
-    updatePlayer();
-  }
-
   private Player createPlayer(Song song) {
     OutputType outputType;
     if (desiredOutputType != null) {
       outputType = desiredOutputType;
     } else {
-      int concurrency = song.getConcurrency(channel);
-      switch (getInputType()) {
-      case MIDI:
-        outputType = OutputType.NOTE;
-        break;
-      case ALPHA:
-        if (concurrency < 110) {
-          outputType = OutputType.NOTE;
-        } else {
-          outputType = OutputType.CHORD;
-        }
-        break;
-      case NUMERIC:
-        outputType = OutputType.CHORD;
-        break;
-      default:
-        throw new UnsupportedOperationException();
-      }
+      outputType = OutputType.NOTE;
     }
     switch (outputType) {
     case CHORD:
@@ -194,17 +171,8 @@ public class DeviceHandler extends BrokerTask<Message> {
   private void doInput(int typeIndex) {
     InputType inputType = InputType.values()[typeIndex];
     switch (inputType) {
-    case ALPHA:
-      setInputMapping(new AlphaMapping());
-      break;
-    case MIDI:
-      setInputMapping(new MidiMapping());
-      break;
     case DETACH:
       getBroker().publish(new OnCommand(Command.DETACH, deviceIndex));
-      break;
-    case NUMERIC:
-      setInputMapping(new NumericMapping());
       break;
     default:
       throw new UnsupportedOperationException();
@@ -246,23 +214,9 @@ public class DeviceHandler extends BrokerTask<Message> {
   }
 
   private String getChannelControls() {
-    ChannelRenderer channelRenderer = new ChannelRenderer(deviceName, deviceIndex, song, channel, getInputType(), getOutputType());
+    ChannelRenderer channelRenderer = new ChannelRenderer(deviceName, deviceIndex, song, channel, getOutputType());
     String channelControls = channelRenderer.render();
     return channelControls;
-  }
-
-  private InputType getInputType() {
-    InputType inputType;
-    if (inputMapping instanceof AlphaMapping) {
-      inputType = InputType.ALPHA;
-    } else if (inputMapping instanceof NumericMapping) {
-      inputType = InputType.NUMERIC;
-    } else if (inputMapping instanceof MidiMapping) {
-      inputType = InputType.MIDI;
-    } else {
-      throw new UnsupportedOperationException();
-    }
-    return inputType;
   }
 
   private String getMusic() {
@@ -299,8 +253,6 @@ public class DeviceHandler extends BrokerTask<Message> {
   private void updatePlayer() {
     if (song != null) {
       this.player = createPlayer(song);
-      // TODO: Figure out if this needs to be sent once per device?
-      getBroker().publish(new OnCommand(Command.SHOW_CHANNEL_STATE, 0));
       getBroker().publish(new OnMusic(deviceIndex, getChannelControls(), getMusic()));
     }
   }

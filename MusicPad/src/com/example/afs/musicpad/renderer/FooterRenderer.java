@@ -40,6 +40,7 @@ public class FooterRenderer {
     header.append("Solo");
     header.append("Instruments");
     header.append("Total Notes");
+    header.append("Distinct Notes");
     header.append("Lowest Note");
     header.append("Highest Note");
     header.append("Occupancy");
@@ -61,6 +62,7 @@ public class FooterRenderer {
           row.append(getSolo(channel));
           row.append(song.getProgramNames(channel));
           row.append(noteCount);
+          row.append(getDistinctNotes(channel));
           row.append(Names.formatNote(song.getLowestMidiNote(channel)));
           row.append(Names.formatNote(song.getHighestMidiNote(channel)));
           row.append(occupancy);
@@ -78,6 +80,17 @@ public class FooterRenderer {
 
     String html = detail.render();
     return html;
+  }
+
+  private int getDistinctNotes(int channel) {
+    int distinctNotes = 0;
+    int[] noteCounts = song.getDistinctNoteCount(channel);
+    for (int i = 0; i < Midi.NOTES; i++) {
+      if (noteCounts[i] > 0) {
+        distinctNotes++;
+      }
+    }
+    return distinctNotes;
   }
 
   private CheckBox getMute(int channel) {

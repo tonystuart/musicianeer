@@ -13,15 +13,11 @@ import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.example.afs.musicpad.Command;
 import com.example.afs.musicpad.device.common.DeviceHandler;
 import com.example.afs.musicpad.device.common.DeviceHandler.InputType;
-import com.example.afs.musicpad.device.midi.configuration.ChannelState;
 import com.example.afs.musicpad.html.Option;
 import com.example.afs.musicpad.html.Template;
 import com.example.afs.musicpad.message.Message;
-import com.example.afs.musicpad.message.OnChannelState;
-import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnFooter;
 import com.example.afs.musicpad.message.OnHeader;
 import com.example.afs.musicpad.message.OnMidiFiles;
@@ -37,43 +33,15 @@ import com.example.afs.musicpad.util.RandomAccessList;
 
 public class RendererTask extends BrokerTask<Message> {
 
-  private Song currentSong;
   private RandomAccessList<File> midiFiles;
 
   public RendererTask(Broker<Message> broker) {
     super(broker);
-    subscribe(OnCommand.class, message -> doCommand(message.getCommand(), message.getParameter()));
     subscribe(OnMidiFiles.class, message -> publishTemplates(message.getMidiFiles()));
     subscribe(OnSong.class, message -> doSong(message.getSong(), message.getTicksPerPixel()));
   }
 
-  private void doCommand(Command command, int parameter) {
-    switch (command) {
-    case SHOW_CHANNEL_STATE:
-      doShowChannelState();
-      break;
-    case SHOW_DRUM_INFO:
-      doShowDrumInfo();
-      break;
-    default:
-      break;
-    }
-  }
-
-  private void doShowChannelState() {
-    if (currentSong != null) {
-      showChannelState(currentSong);
-    }
-  }
-
-  private void doShowDrumInfo() {
-    if (currentSong != null) {
-      showDrumInfo(currentSong);
-    }
-  }
-
   private void doSong(Song song, int ticksPerPixel) {
-    currentSong = song;
     publish(new OnHeader(song.getTitle(), ticksPerPixel, new HeaderRenderer(midiFiles, song).render()));
     publish(new OnFooter(new FooterRenderer(song).render()));
     publish(new OnTransport(new TransportRenderer(song).render()));
@@ -145,24 +113,4 @@ public class RendererTask extends BrokerTask<Message> {
     getBroker().publish(new OnTemplates(templates));
   }
 
-  private void showChannelState(Song song) {
-    for (int channel = 0; channel < Midi.CHANNELS; channel++) {
-      int noteCount = song.getChannelNoteCount(channel);
-      publish(new OnChannelState(channel, noteCount == 0 ? ChannelState.INACTIVE : ChannelState.ACTIVE));
-    }
-  }
-
-  private void showDrumInfo(Song song) {
-    int drumBeatCount = song.getChannelNoteCount(Midi.DRUM);
-    if (drumBeatCount > 0) {
-      System.out.println("CHN 9 TOT " + drumBeatCount);
-      int[] distinctNoteCount = song.getDistinctNoteCount(Midi.DRUM);
-      for (int drum = 0; drum < Midi.NOTES; drum++) {
-        int count = distinctNoteCount[drum];
-        if (count > 0) {
-          System.out.printf("%4d [%s]\n", count, Instruments.getDrumName(drum));
-        }
-      }
-    }
-  }
 }

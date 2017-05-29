@@ -13,7 +13,6 @@ import com.example.afs.fluidsynth.FluidSynth;
 import com.example.afs.fluidsynth.Synthesizer;
 import com.example.afs.fluidsynth.Synthesizer.Settings;
 import com.example.afs.musicpad.device.common.DeviceWatcher;
-import com.example.afs.musicpad.device.midi.MidiWatcherBehavior;
 import com.example.afs.musicpad.device.qwerty.QwertyWatcherBehavior;
 import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnAllTasksStarted;
@@ -37,7 +36,6 @@ public class MusicPad {
 
   private Broker<Message> broker;
   private Conductor conductor;
-  private DeviceWatcher midiWatcher;
   private DeviceWatcher qwertyWatcher;
   private TransportTask transportTask;
   private RendererTask rendererTask;
@@ -49,7 +47,6 @@ public class MusicPad {
     this.broker = new Broker<Message>();
     this.conductor = new Conductor(broker, libraryPath);
     this.commandProcessor = new CommandProcessor(broker);
-    this.midiWatcher = new DeviceWatcher(broker, synthesizer, new MidiWatcherBehavior());
     this.qwertyWatcher = new DeviceWatcher(broker, synthesizer, new QwertyWatcherBehavior());
     this.transportTask = new TransportTask(broker, synthesizer);
     this.rendererTask = new RendererTask(broker);
@@ -65,7 +62,6 @@ public class MusicPad {
 
   private void start() {
     conductor.start();
-    midiWatcher.start();
     qwertyWatcher.start();
     transportTask.start();
     rendererTask.start();

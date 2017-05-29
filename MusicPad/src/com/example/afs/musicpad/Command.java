@@ -25,7 +25,6 @@ public enum Command {
   TEMPO, //
   BACKING, //
   GAIN, //
-  SHOW_CHANNEL_STATE, //
   SHOW_DRUM_INFO, //
   TRANSPOSE, //
   TRANSPOSE_TO, //

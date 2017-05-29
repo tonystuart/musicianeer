@@ -32,15 +32,13 @@ public class ChannelRenderer {
   private int deviceIndex;
   private Song song;
   private int channel;
-  private InputType inputType;
   private OutputType outputType;
 
-  public ChannelRenderer(String deviceName, int deviceIndex, Song song, int channel, InputType inputType, OutputType outputType) {
+  public ChannelRenderer(String deviceName, int deviceIndex, Song song, int channel, OutputType outputType) {
     this.deviceName = deviceName;
     this.deviceIndex = deviceIndex;
     this.song = song;
     this.channel = channel;
-    this.inputType = inputType;
     this.outputType = outputType;
   }
 
@@ -92,7 +90,7 @@ public class ChannelRenderer {
 
   private Select getInputSelect() {
     Select select = new Select("input-select-" + deviceIndex);
-    select.appendProperty("value", inputType.ordinal());
+    select.appendProperty("value", InputType.NUMERIC.ordinal());
     select.appendProperty("onchange", PropertyRenderer.render(DeviceCommand.INPUT, deviceIndex));
     return select;
   }
