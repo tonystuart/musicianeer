@@ -15,4 +15,8 @@ public class Input extends Hypertext {
     super("input");
   }
 
+  public void setText(String value) {
+    appendProperty("value", value);
+  }
+
 }

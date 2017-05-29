@@ -18,7 +18,7 @@ public class Button extends Input {
   public Button(String id, String value) {
     this();
     setId(id);
-    appendProperty("value", value);
+    setText(value);
   }
 
 }
