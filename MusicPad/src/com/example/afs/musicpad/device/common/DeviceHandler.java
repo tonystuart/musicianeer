@@ -16,7 +16,7 @@ import java.util.Set;
 import com.example.afs.fluidsynth.Synthesizer;
 import com.example.afs.musicpad.Command;
 import com.example.afs.musicpad.DeviceCommand;
-import com.example.afs.musicpad.device.qwerty.NumericMapping;
+import com.example.afs.musicpad.device.qwerty.Device;
 import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnChannelAssigned;
 import com.example.afs.musicpad.message.OnCommand;
@@ -61,7 +61,7 @@ public class DeviceHandler extends BrokerTask<Message> {
 
   private Song song;
   private int channel;
-  private NumericMapping numericMapping;
+  private Device device;
   private Synthesizer synthesizer;
   private int ticksPerPixel;
 
@@ -70,7 +70,7 @@ public class DeviceHandler extends BrokerTask<Message> {
     this.synthesizer = synthesizer;
     this.deviceName = name;
     this.deviceIndex = getDeviceIndex(name);
-    this.numericMapping = new NumericMapping(new Player(synthesizer, deviceIndex));
+    this.device = new Device(new Player(synthesizer, deviceIndex));
     delegate(OnControlChange.class, message -> doControlChange(message.getControl(), message.getValue()));
     delegate(OnPitchBend.class, message -> doPitchBend(message.getPitchBend()));
     subscribe(OnDeviceCommand.class, message -> doDeviceCommand(message.getDeviceCommand(), message.getDeviceIndex(), message.getParameter()));
@@ -95,8 +95,8 @@ public class DeviceHandler extends BrokerTask<Message> {
     return deviceName;
   }
 
-  public NumericMapping getNumericMapping() {
-    return numericMapping;
+  public Device getDevice() {
+    return device;
   }
 
   public Synthesizer getSynthesizer() {
@@ -113,7 +113,7 @@ public class DeviceHandler extends BrokerTask<Message> {
   }
 
   private void doControlChange(int control, int value) {
-    numericMapping.changeControl(control, value);
+    device.changeControl(control, value);
   }
 
   private void doDeviceCommand(DeviceCommand command, int deviceIndex, int parameter) {
@@ -156,7 +156,7 @@ public class DeviceHandler extends BrokerTask<Message> {
   }
 
   private void doPitchBend(int pitchBend) {
-    numericMapping.bendPitch(pitchBend);
+    device.bendPitch(pitchBend);
   }
 
   private void doSong(Song song, Map<Integer, Integer> deviceChannelMap, int ticksPerPixel) {
@@ -178,7 +178,7 @@ public class DeviceHandler extends BrokerTask<Message> {
   }
 
   private String getMusic() {
-    Notator notator = new Notator(song, channel, ticksPerPixel, numericMapping);
+    Notator notator = new Notator(song, channel, ticksPerPixel, device);
     String music = notator.getMusic();
     return music;
   }
@@ -193,11 +193,11 @@ public class DeviceHandler extends BrokerTask<Message> {
   }
 
   private void selectProgram(int program) {
-    numericMapping.selectProgram(program);
+    device.selectProgram(program);
   }
 
   private void setVelocity(int velocity) {
-    numericMapping.setPercentVelocity(Range.scaleMidiToPercent(velocity));
+    device.setPercentVelocity(Range.scaleMidiToPercent(velocity));
   }
 
   private void updatePlayer() {
@@ -205,7 +205,7 @@ public class DeviceHandler extends BrokerTask<Message> {
       Set<Integer> programs = song.getPrograms(channel);
       if (programs.size() > 0) {
         int program = programs.iterator().next();
-        numericMapping.selectProgram(program);
+        device.selectProgram(program);
       }
       getBroker().publish(new OnMusic(deviceIndex, getChannelControls(), getMusic()));
     }

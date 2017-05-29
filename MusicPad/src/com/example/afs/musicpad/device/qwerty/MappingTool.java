@@ -32,7 +32,7 @@ public class MappingTool {
     toMidiNote(cMajor, sequence);
   }
 
-  public static void numericMapping() {
+  public static void device() {
     doChromaticScale("123E456+789-N/+B");
   }
 

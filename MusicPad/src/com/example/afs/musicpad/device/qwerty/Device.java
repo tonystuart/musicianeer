@@ -22,7 +22,7 @@ import com.example.afs.musicpad.song.Note;
 import com.example.afs.musicpad.util.DirectList;
 import com.example.afs.musicpad.util.RandomAccessList;
 
-public class NumericMapping {
+public class Device {
 
   private int octave;
   private int register;
@@ -30,7 +30,7 @@ public class NumericMapping {
   private Player player;
   private int[] activeMidiNotes = new int[256]; // NB: KeyEvents VK codes, not midiNotes
 
-  public NumericMapping(Player player) {
+  public Device(Player player) {
     this.player = player;
     Arrays.fill(activeMidiNotes, -1);
   }

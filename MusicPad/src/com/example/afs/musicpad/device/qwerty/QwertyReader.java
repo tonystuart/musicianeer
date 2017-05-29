@@ -63,7 +63,7 @@ public class QwertyReader {
   private void processKeyDown(short keyCode) {
     if (keyCode < QwertyKeyCodes.inputCodes.length) {
       char inputCode = QwertyKeyCodes.inputCodes[keyCode];
-      deviceHandler.getNumericMapping().onDown(inputCode);
+      deviceHandler.getDevice().onDown(inputCode);
     } else {
       // e.g. windows meta key (125)
     }
@@ -72,7 +72,7 @@ public class QwertyReader {
   private void processKeyUp(short keyCode) {
     if (keyCode < QwertyKeyCodes.inputCodes.length) {
       char inputCode = QwertyKeyCodes.inputCodes[keyCode];
-      deviceHandler.getNumericMapping().onUp(inputCode);
+      deviceHandler.getDevice().onUp(inputCode);
     } else {
       // e.g. windows meta key (125)
     }
