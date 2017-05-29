@@ -24,7 +24,7 @@ import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.util.RandomAccessList;
 import com.example.afs.musicpad.util.Velocity;
 
-public abstract class Player {
+public class Player {
 
   public enum Action {
     PRESS, RELEASE
@@ -65,7 +65,9 @@ public abstract class Player {
     synthesizer.changeControl(playbackChannel, control, value);
   }
 
-  public abstract void play(Action action, int midiNote);
+  public void play(Action action, int midiNote) {
+    playMidiNote(action, midiNote);
+  }
 
   public void selectProgram(int program) {
     synthesizer.changeProgram(playbackChannel, program);
@@ -74,10 +76,6 @@ public abstract class Player {
   public void setPercentVelocity(int percentVelocity) {
     this.percentVelocity = percentVelocity;
   }
-
-  public abstract String toKeyCap(Chord chord);
-
-  public abstract String toKeyCap(int midiNote);
 
   public RandomAccessList<KeyCap> toKeyCaps(RandomAccessList<Slice> slices) {
     return numericMapping.toKeyCaps(slices);

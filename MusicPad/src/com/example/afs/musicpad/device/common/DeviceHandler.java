@@ -26,8 +26,6 @@ import com.example.afs.musicpad.message.OnNoteOff;
 import com.example.afs.musicpad.message.OnNoteOn;
 import com.example.afs.musicpad.message.OnPitchBend;
 import com.example.afs.musicpad.message.OnSong;
-import com.example.afs.musicpad.player.ChordPlayer;
-import com.example.afs.musicpad.player.NotePlayer;
 import com.example.afs.musicpad.player.Player;
 import com.example.afs.musicpad.player.Player.Action;
 import com.example.afs.musicpad.renderer.ChannelRenderer;
@@ -69,7 +67,6 @@ public class DeviceHandler extends BrokerTask<Message> {
   private NumericMapping numericMapping;
   private Synthesizer synthesizer;
   private int ticksPerPixel;
-  private OutputType desiredOutputType;
 
   public DeviceHandler(Broker<Message> messageBroker, Synthesizer synthesizer, String name) {
     super(messageBroker);
@@ -112,23 +109,7 @@ public class DeviceHandler extends BrokerTask<Message> {
   }
 
   private Player createPlayer(Song song) {
-    OutputType outputType;
-    if (desiredOutputType != null) {
-      outputType = desiredOutputType;
-    } else {
-      outputType = OutputType.NOTE;
-    }
-    switch (outputType) {
-    case CHORD:
-      player = new ChordPlayer(this, song);
-      break;
-    case NOTE:
-      player = new NotePlayer(this, song);
-      break;
-    default:
-      break;
-    }
-    return player;
+    return new Player(this, song);
   }
 
   private void doChannelAssigned(OnChannelAssigned message) {
@@ -188,12 +169,6 @@ public class DeviceHandler extends BrokerTask<Message> {
   }
 
   private void doOutput(int typeIndex) {
-    OutputType outputType = OutputType.values()[typeIndex];
-    if (outputType == OutputType.AUTO) {
-      desiredOutputType = null;
-    } else {
-      desiredOutputType = outputType;
-    }
     updatePlayer();
   }
 
@@ -226,15 +201,7 @@ public class DeviceHandler extends BrokerTask<Message> {
   }
 
   private OutputType getOutputType() {
-    OutputType outputType;
-    if (player instanceof NotePlayer) {
-      outputType = OutputType.NOTE;
-    } else if (player instanceof ChordPlayer) {
-      outputType = OutputType.CHORD;
-    } else {
-      throw new UnsupportedOperationException();
-    }
-    return outputType;
+    return OutputType.NOTE;
   }
 
   private void selectChannel(int channel) {
