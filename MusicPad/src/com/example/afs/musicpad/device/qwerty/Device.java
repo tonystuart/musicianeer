@@ -11,11 +11,13 @@ package com.example.afs.musicpad.device.qwerty;
 
 import java.awt.event.KeyEvent;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
-import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.player.Player;
 import com.example.afs.musicpad.player.Player.Action;
-import com.example.afs.musicpad.renderer.Notator;
 import com.example.afs.musicpad.renderer.Notator.KeyCap;
 import com.example.afs.musicpad.renderer.Notator.Slice;
 import com.example.afs.musicpad.song.Note;
@@ -24,11 +26,12 @@ import com.example.afs.musicpad.util.RandomAccessList;
 
 public class Device {
 
-  private int octave;
-  private int register;
-  private boolean sharp;
+  private static final String KEYS = "0.E123456+789-N/*B";
+
   private Player player;
   private int[] activeMidiNotes = new int[256]; // NB: KeyEvents VK codes, not midiNotes
+  private Map<Integer, Integer> keyCapCodeToMidiNote = new HashMap<>();
+  private Map<Integer, Character> midiNoteToKeyCap = new HashMap<>();
 
   public Device(Player player) {
     this.player = player;
@@ -44,65 +47,66 @@ public class Device {
   }
 
   public void onDown(int inputCode) {
-    int midiNote = -1;
+    int keyCapCode = -1;
     switch (inputCode) {
-    case '/':
-      register--;
-      break;
-    case '*':
-      register++;
-      break;
-    case '-':
-      octave--;
-      break;
-    case '+':
-      octave++;
-      break;
-    case KeyEvent.VK_NUM_LOCK:
-      octave = 0;
-      register = 0;
-      break;
     case '0':
-      sharp = true;
+      keyCapCode = 0;
+      break;
+    case '.':
+      keyCapCode = 1;
+      break;
+    case KeyEvent.VK_ENTER:
+      keyCapCode = 2;
       break;
     case '1':
-      midiNote = 53;
+      keyCapCode = 3;
       break;
     case '2':
-      midiNote = 55;
+      keyCapCode = 4;
       break;
     case '3':
-      midiNote = 57;
+      keyCapCode = 5;
       break;
     case '4':
-      midiNote = 59;
+      keyCapCode = 6;
       break;
     case '5':
-      midiNote = 60;
+      keyCapCode = 7;
       break;
     case '6':
-      midiNote = 62;
+      keyCapCode = 8;
+      break;
+    case '+':
+      keyCapCode = 9;
       break;
     case '7':
-      midiNote = 64;
+      keyCapCode = 10;
       break;
     case '8':
-      midiNote = 65;
+      keyCapCode = 11;
       break;
     case '9':
-      midiNote = 67;
+      keyCapCode = 12;
+      break;
+    case '-':
+      keyCapCode = 13;
+      break;
+    case KeyEvent.VK_NUM_LOCK:
+      keyCapCode = 14;
+      break;
+    case '/':
+      keyCapCode = 15;
+      break;
+    case '*':
+      keyCapCode = 16;
+      break;
+    case KeyEvent.VK_BACK_SPACE:
+      keyCapCode = 17;
       break;
     }
-    if (midiNote != -1) {
-      midiNote += octave * Midi.SEMITONES_PER_OCTAVE;
-      if (register != 0) {
-        midiNote += register * Midi.SEMITONES_PER_OCTAVE;
-        register = 0;
-      }
-      if (sharp) {
-        midiNote++;
-        sharp = false;
-      }
+    Integer midiNote = keyCapCodeToMidiNote.get(keyCapCode);
+    if (midiNote != null) {
+      System.out.println("inputCode=" + inputCode + ", keyCapCode=" + keyCapCode + ", midiNote=" + midiNote);
       player.play(Action.PRESS, midiNote);
       activeMidiNotes[inputCode] = midiNote;
     }
@@ -126,39 +130,33 @@ public class Device {
 
   public RandomAccessList<KeyCap> toKeyCaps(RandomAccessList<Slice> slices) {
     RandomAccessList<KeyCap> keyCaps = new DirectList<>();
-    int currentOctave = -1;
+    Set<Integer> midiNotes = new HashSet<>();
+    for (Slice slice : slices) {
+      for (Note note : slice) {
+        midiNotes.add(note.getMidiNote());
+      }
+    }
+    int index = 0;
+    int[] orderedMidiNotes = new int[midiNotes.size()];
+    for (int midiNote : midiNotes) {
+      orderedMidiNotes[index++] = midiNote;
+    }
+    Arrays.sort(orderedMidiNotes);
+    keyCapCodeToMidiNote.clear();
+    midiNoteToKeyCap.clear();
+    for (int i = 0; i < orderedMidiNotes.length; i++) {
+      keyCapCodeToMidiNote.put(i, orderedMidiNotes[i]);
+      midiNoteToKeyCap.put(orderedMidiNotes[i], toKeyCap(i));
+    }
     for (Slice slice : slices) {
       StringBuilder s = new StringBuilder();
       for (Note note : slice) {
         if (s.length() > 0) {
-          s.append(" / ");
-        }
-        if (currentOctave == -1) {
-          s.append("N ");
-          currentOctave = 5;
+          s.append("/");
         }
         int midiNote = note.getMidiNote();
-        int noteOctave = (midiNote + 5) / Midi.SEMITONES_PER_OCTAVE; // (60 + 5) / 12 -> 5   five because C is on 5 key
-        int distance = noteOctave - currentOctave;
-        if (distance < 0) {
-          if (noteOctave == 5) {
-            s.append("N ");
-          } else {
-            for (int i = 0; i < distance; i++) {
-              s.append("- ");
-            }
-          }
-        } else if (distance > 0) {
-          if (noteOctave == 5) {
-            s.append("N ");
-          } else {
-            for (int i = 0; i < distance; i++) {
-              s.append("+ ");
-            }
-          }
-        }
-        s.append(toKeyCap(midiNote));
-        currentOctave = noteOctave;
+        Character keyCap = midiNoteToKeyCap.get(midiNote);
+        s.append(keyCap);
       }
       KeyCap keyCap = new KeyCap(slice, s.toString());
       keyCaps.add(keyCap);
@@ -166,38 +164,14 @@ public class Device {
     return keyCaps;
   }
 
-  private String toKeyCap(int midiNote) {
-    StringBuilder s = new StringBuilder();
-    int scaleNote = midiNote % Midi.SEMITONES_PER_OCTAVE;
-    if (Notator.isSharp(scaleNote)) {
-      scaleNote--;
-      s.append("0 ");
+  private char toKeyCap(int noteIndex) {
+    char keyCap;
+    if (noteIndex < KEYS.length()) {
+      keyCap = KEYS.charAt(noteIndex);
+    } else {
+      keyCap = '?';
     }
-    String noteName = "";
-    switch (scaleNote) {
-    case 0:
-      noteName = "5";
-      break;
-    case 2:
-      noteName = "6";
-      break;
-    case 4:
-      noteName = "7";
-      break;
-    case 5:
-      noteName = "8";
-      break;
-    case 7:
-      noteName = "2";
-      break;
-    case 9:
-      noteName = "3";
-      break;
-    case 11:
-      noteName = "4";
-    }
-    s.append(noteName);
-    return s.toString();
+    return keyCap;
   }
 
 }
