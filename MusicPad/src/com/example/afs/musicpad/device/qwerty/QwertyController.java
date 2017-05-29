@@ -20,7 +20,7 @@ public class QwertyController implements Controller {
 
   public QwertyController(DeviceHandler deviceHandler, DeviceBundle deviceBundle) {
     this.deviceHandler = deviceHandler;
-    qwertyReader = new QwertyReader(deviceHandler.getInputQueue(), deviceHandler);
+    qwertyReader = new QwertyReader(deviceHandler);
   }
 
   @Override

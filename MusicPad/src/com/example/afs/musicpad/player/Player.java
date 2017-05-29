@@ -9,19 +9,11 @@
 
 package com.example.afs.musicpad.player;
 
-import java.util.Set;
-
 import com.example.afs.fluidsynth.FluidSynth;
 import com.example.afs.fluidsynth.Synthesizer;
 import com.example.afs.musicpad.Trace;
 import com.example.afs.musicpad.analyzer.Names;
-import com.example.afs.musicpad.device.common.DeviceHandler;
-import com.example.afs.musicpad.device.qwerty.NumericMapping;
 import com.example.afs.musicpad.midi.Midi;
-import com.example.afs.musicpad.renderer.Notator.KeyCap;
-import com.example.afs.musicpad.renderer.Notator.Slice;
-import com.example.afs.musicpad.song.Song;
-import com.example.afs.musicpad.util.RandomAccessList;
 import com.example.afs.musicpad.util.Velocity;
 
 public class Player {
@@ -37,32 +29,23 @@ public class Player {
   private static final int DEFAULT_VELOCITY = 96;
   private static final int DEFAULT_PERCENT_VELOCITY = 100;
 
-  protected Song song;
-  protected int songChannel;
   protected int deviceIndex;
-  protected String mappingType;
-  protected NumericMapping numericMapping;
-  private int playbackChannel;
+  private int playerChannel;
   private Synthesizer synthesizer;
   private int percentVelocity = DEFAULT_PERCENT_VELOCITY;
 
-  public Player(DeviceHandler deviceHandler, Song song) {
-    this.deviceIndex = deviceHandler.getDeviceIndex();
-    this.songChannel = deviceHandler.getChannel();
-    this.numericMapping = deviceHandler.getNumericMapping();
-    this.mappingType = numericMapping.getClass().getSimpleName();
-    this.synthesizer = deviceHandler.getSynthesizer();
-    this.song = song;
-    initializeDeviceChannel();
-    initializeChannelProgram();
+  public Player(Synthesizer synthesizer, int deviceIndex) {
+    this.synthesizer = synthesizer;
+    this.deviceIndex = deviceIndex;
+    this.playerChannel = PLAYER_BASE + deviceIndex;
   }
 
   public void bendPitch(int pitchBend) {
-    synthesizer.bendPitch(playbackChannel, pitchBend);
+    synthesizer.bendPitch(playerChannel, pitchBend);
   }
 
   public void changeControl(int control, int value) {
-    synthesizer.changeControl(playbackChannel, control, value);
+    synthesizer.changeControl(playerChannel, control, value);
   }
 
   public void play(Action action, int midiNote) {
@@ -70,31 +53,17 @@ public class Player {
   }
 
   public void selectProgram(int program) {
-    synthesizer.changeProgram(playbackChannel, program);
+    if (program == -1) {
+      synthesizer.setChannelType(playerChannel, FluidSynth.CHANNEL_TYPE_DRUM);
+      synthesizer.changeProgram(playerChannel, 0); // initialize fluid_synth.c channel
+    } else {
+      synthesizer.setChannelType(playerChannel, FluidSynth.CHANNEL_TYPE_MELODIC);
+      synthesizer.changeProgram(playerChannel, program);
+    }
   }
 
   public void setPercentVelocity(int percentVelocity) {
     this.percentVelocity = percentVelocity;
-  }
-
-  public RandomAccessList<KeyCap> toKeyCaps(RandomAccessList<Slice> slices) {
-    return numericMapping.toKeyCaps(slices);
-  }
-
-  protected int getHighestMidiNote() {
-    int highestMidiNote = song.getHighestMidiNote(songChannel);
-    if (highestMidiNote == -1) {
-      highestMidiNote = 24;
-    }
-    return highestMidiNote;
-  }
-
-  protected int getLowestMidiNote() {
-    int lowestMidiNote = song.getLowestMidiNote(songChannel);
-    if (lowestMidiNote == -1) {
-      lowestMidiNote = 84;
-    }
-    return lowestMidiNote;
   }
 
   protected void playMidiChord(Action action, Chord chord) {
@@ -114,31 +83,13 @@ public class Player {
     synthesizeNote(action, midiNote);
   }
 
-  private void initializeChannelProgram() {
-    Set<Integer> programs = song.getPrograms(songChannel);
-    if (programs.size() > 0) {
-      int program = programs.iterator().next();
-      synthesizer.changeProgram(playbackChannel, program);
-    }
-  }
-
-  private void initializeDeviceChannel() {
-    this.playbackChannel = PLAYER_BASE + deviceIndex;
-    if (songChannel == Midi.DRUM) {
-      synthesizer.setChannelType(playbackChannel, FluidSynth.CHANNEL_TYPE_DRUM);
-    } else {
-      synthesizer.setChannelType(playbackChannel, FluidSynth.CHANNEL_TYPE_MELODIC);
-    }
-    synthesizer.changeProgram(playbackChannel, 0); // initialize fluid_synth.c channel
-  }
-
   private void synthesizeNote(Action action, int midiNote) {
     switch (action) {
     case PRESS:
-      synthesizer.pressKey(playbackChannel, midiNote, Velocity.scale(DEFAULT_VELOCITY, percentVelocity));
+      synthesizer.pressKey(playerChannel, midiNote, Velocity.scale(DEFAULT_VELOCITY, percentVelocity));
       break;
     case RELEASE:
-      synthesizer.releaseKey(playbackChannel, midiNote);
+      synthesizer.releaseKey(playerChannel, midiNote);
       break;
     default:
       throw new UnsupportedOperationException();

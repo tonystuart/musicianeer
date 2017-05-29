@@ -14,14 +14,9 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.util.Arrays;
-import java.util.concurrent.BlockingQueue;
 
 import com.example.afs.fluidsynth.FluidSynth;
 import com.example.afs.musicpad.device.common.DeviceHandler;
-import com.example.afs.musicpad.message.Message;
-import com.example.afs.musicpad.message.OnNoteOff;
-import com.example.afs.musicpad.message.OnNoteOn;
 import com.example.afs.musicpad.util.ByteArray;
 
 // See /usr/include/linux/input.h
@@ -32,16 +27,12 @@ public class QwertyReader {
   private static final int EV_KEY = 0x01;
 
   private Thread deviceReader;
-  private BlockingQueue<Message> queue;
   private DeviceHandler deviceHandler;
 
   private boolean isTerminated;
-  private int[] activeMidiNotes = new int[256]; // NB: KeyEvents VK codes, not midiNotes
 
-  public QwertyReader(BlockingQueue<Message> queue, DeviceHandler deviceHandler) {
-    this.queue = queue;
+  public QwertyReader(DeviceHandler deviceHandler) {
     this.deviceHandler = deviceHandler;
-    Arrays.fill(activeMidiNotes, -1);
   }
 
   public void start() {
@@ -69,27 +60,10 @@ public class QwertyReader {
     }
   }
 
-  private void processInputCodeDown(int inputCode) {
-    int midiNote = deviceHandler.getNumericMapping().onDown(inputCode);
-    if (midiNote != -1) {
-      activeMidiNotes[inputCode] = midiNote;
-      queue.add(new OnNoteOn(midiNote));
-    }
-  }
-
-  private void processInputCodeUp(int inputCode) {
-    deviceHandler.getNumericMapping().onUp(inputCode);
-    int midiNote = activeMidiNotes[inputCode];
-    if (midiNote != -1) {
-      queue.add(new OnNoteOff(midiNote));
-      activeMidiNotes[inputCode] = -1;
-    }
-  }
-
   private void processKeyDown(short keyCode) {
     if (keyCode < QwertyKeyCodes.inputCodes.length) {
       char inputCode = QwertyKeyCodes.inputCodes[keyCode];
-      processInputCodeDown(inputCode);
+      deviceHandler.getNumericMapping().onDown(inputCode);
     } else {
       // e.g. windows meta key (125)
     }
@@ -98,7 +72,7 @@ public class QwertyReader {
   private void processKeyUp(short keyCode) {
     if (keyCode < QwertyKeyCodes.inputCodes.length) {
       char inputCode = QwertyKeyCodes.inputCodes[keyCode];
-      processInputCodeUp(inputCode);
+      deviceHandler.getNumericMapping().onUp(inputCode);
     } else {
       // e.g. windows meta key (125)
     }

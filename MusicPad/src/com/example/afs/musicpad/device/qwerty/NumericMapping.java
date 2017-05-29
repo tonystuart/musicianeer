@@ -10,8 +10,11 @@
 package com.example.afs.musicpad.device.qwerty;
 
 import java.awt.event.KeyEvent;
+import java.util.Arrays;
 
 import com.example.afs.musicpad.midi.Midi;
+import com.example.afs.musicpad.player.Player;
+import com.example.afs.musicpad.player.Player.Action;
 import com.example.afs.musicpad.renderer.Notator;
 import com.example.afs.musicpad.renderer.Notator.KeyCap;
 import com.example.afs.musicpad.renderer.Notator.Slice;
@@ -23,10 +26,24 @@ public class NumericMapping {
 
   private int octave;
   private int register;
-
   private boolean sharp;
+  private Player player;
+  private int[] activeMidiNotes = new int[256]; // NB: KeyEvents VK codes, not midiNotes
 
-  public int onDown(int inputCode) {
+  public NumericMapping(Player player) {
+    this.player = player;
+    Arrays.fill(activeMidiNotes, -1);
+  }
+
+  public void bendPitch(int pitchBend) {
+    player.bendPitch(pitchBend);
+  }
+
+  public void changeControl(int control, int value) {
+    player.changeControl(control, value);
+  }
+
+  public void onDown(int inputCode) {
     int midiNote = -1;
     switch (inputCode) {
     case '/':
@@ -86,45 +103,25 @@ public class NumericMapping {
         midiNote++;
         sharp = false;
       }
+      player.play(Action.PRESS, midiNote);
+      activeMidiNotes[inputCode] = midiNote;
     }
-    return midiNote;
   }
 
   public void onUp(int inputCode) {
+    int midiNote = activeMidiNotes[inputCode];
+    if (midiNote != -1) {
+      player.play(Action.RELEASE, midiNote);
+      activeMidiNotes[inputCode] = -1;
+    }
   }
 
-  public String toKeyCap(int midiNote) {
-    StringBuilder s = new StringBuilder();
-    int scaleNote = midiNote % Midi.SEMITONES_PER_OCTAVE;
-    if (Notator.isSharp(scaleNote)) {
-      scaleNote--;
-      s.append("0 ");
-    }
-    String noteName = "";
-    switch (scaleNote) {
-    case 0:
-      noteName = "5";
-      break;
-    case 2:
-      noteName = "6";
-      break;
-    case 4:
-      noteName = "7";
-      break;
-    case 5:
-      noteName = "8";
-      break;
-    case 7:
-      noteName = "2";
-      break;
-    case 9:
-      noteName = "3";
-      break;
-    case 11:
-      noteName = "4";
-    }
-    s.append(noteName);
-    return s.toString();
+  public void selectProgram(int program) {
+    player.selectProgram(program);
+  }
+
+  public void setPercentVelocity(int percentVelocity) {
+    player.setPercentVelocity(percentVelocity);
   }
 
   public RandomAccessList<KeyCap> toKeyCaps(RandomAccessList<Slice> slices) {
@@ -167,6 +164,40 @@ public class NumericMapping {
       keyCaps.add(keyCap);
     }
     return keyCaps;
+  }
+
+  private String toKeyCap(int midiNote) {
+    StringBuilder s = new StringBuilder();
+    int scaleNote = midiNote % Midi.SEMITONES_PER_OCTAVE;
+    if (Notator.isSharp(scaleNote)) {
+      scaleNote--;
+      s.append("0 ");
+    }
+    String noteName = "";
+    switch (scaleNote) {
+    case 0:
+      noteName = "5";
+      break;
+    case 2:
+      noteName = "6";
+      break;
+    case 4:
+      noteName = "7";
+      break;
+    case 5:
+      noteName = "8";
+      break;
+    case 7:
+      noteName = "2";
+      break;
+    case 9:
+      noteName = "3";
+      break;
+    case 11:
+      noteName = "4";
+    }
+    s.append(noteName);
+    return s.toString();
   }
 
 }

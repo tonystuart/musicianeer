@@ -14,9 +14,9 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import com.example.afs.musicpad.analyzer.Names;
+import com.example.afs.musicpad.device.qwerty.NumericMapping;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.player.Chord;
-import com.example.afs.musicpad.player.Player;
 import com.example.afs.musicpad.song.Default;
 import com.example.afs.musicpad.song.Note;
 import com.example.afs.musicpad.song.Song;
@@ -190,14 +190,12 @@ public class Notator {
 
   private static final int TOP = RADIUS * 1;
   private static final int SPAN = (POSITION[HIGHEST] - POSITION[LOWEST]) + 1;
-
   private static final int BOTTOM = TOP + (SPAN * RADIUS) + INTER_CLEF;
-
   private static final int WORDS = BOTTOM / 2;
+
   private static final long RESOLUTION = Default.TICKS_PER_BEAT / 2;
 
   private static final String CLOSED = "closed";
-
   private static final String OPEN = "open";
 
   public static boolean isSharp(int midiNote) {
@@ -226,16 +224,14 @@ public class Notator {
 
   private Song song;
   private int channel;
-
-  private Player player;
-
   private int ticksPerPixel;
+  private NumericMapping numericMapping;
 
-  public Notator(Player player, Song song, int channel, int ticksPerPixel) {
-    this.player = player;
+  public Notator(Song song, int channel, int ticksPerPixel, NumericMapping numericMapping) {
     this.song = song;
     this.channel = channel;
     this.ticksPerPixel = ticksPerPixel;
+    this.numericMapping = numericMapping;
   }
 
   public String getMusic() {
@@ -291,7 +287,7 @@ public class Notator {
   }
 
   private void drawNoteNames(Svg staff, RandomAccessList<Slice> slices) {
-    RandomAccessList<KeyCap> keyCaps = player.toKeyCaps(slices);
+    RandomAccessList<KeyCap> keyCaps = numericMapping.toKeyCaps(slices);
     for (KeyCap keyCap : keyCaps) {
       int wordX = getX(keyCap.getTick() - RADIUS); // align with left edge of note head
       Slice slice = keyCap.getSlice();
