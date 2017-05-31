@@ -13,7 +13,6 @@ import java.util.Iterator;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import com.example.afs.musicpad.analyzer.Names;
 import com.example.afs.musicpad.device.qwerty.Device;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.player.Chord;
@@ -57,15 +56,25 @@ public class Notator {
     private SortedSet<Note> notes;
     private long tick;
     private Note first;
+    private Chord chord;
 
     public Slice(SortedSet<Note> notes) {
       this.notes = notes;
-      first = notes.first();
+      this.first = notes.first();
       this.tick = first.getTick();
+      this.chord = new Chord(notes);
     }
 
     public Note first() {
       return first;
+    }
+
+    public Chord getChord() {
+      return chord;
+    }
+
+    public String getName() {
+      return chord.getChordType().getName();
     }
 
     public long getTick() {
@@ -291,15 +300,9 @@ public class Notator {
     for (KeyCap keyCap : keyCaps) {
       int wordX = getX(keyCap.getTick() - RADIUS); // align with left edge of note head
       Slice slice = keyCap.getSlice();
-      String noteDescription;
-      if (slice.size() == 1) {
-        noteDescription = Names.getNoteName(slice.first().getMidiNote());
-      } else {
-        Chord chord = new Chord(slice);
-        noteDescription = chord.getChordType().getName();
-      }
+      String name = slice.getName();
       staff.add(new Text(wordX, WORDS + 3 * RADIUS, keyCap.getKeyCap()));
-      staff.add(new Text(wordX, 3 * RADIUS, noteDescription));
+      staff.add(new Text(wordX, 3 * RADIUS, name));
     }
   }
 
@@ -334,11 +337,10 @@ public class Notator {
   }
 
   private void drawSlice(Svg staff, Slice slice) {
-    int midiNote = 0;
     RandomAccessList<Note> trebleNotes = new DirectList<>();
     RandomAccessList<Note> bassNotes = new DirectList<>();
     for (Note note : slice) {
-      midiNote = note.getMidiNote();
+      int midiNote = note.getMidiNote();
       if (midiNote < MIDDLE) {
         bassNotes.add(note);
       } else {

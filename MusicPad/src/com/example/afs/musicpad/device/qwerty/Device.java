@@ -10,17 +10,15 @@
 package com.example.afs.musicpad.device.qwerty;
 
 import java.awt.event.KeyEvent;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
+import com.example.afs.musicpad.player.Chord;
 import com.example.afs.musicpad.player.Player;
 import com.example.afs.musicpad.player.Player.Action;
 import com.example.afs.musicpad.renderer.Notator.KeyCap;
 import com.example.afs.musicpad.renderer.Notator.Slice;
-import com.example.afs.musicpad.song.Note;
+import com.example.afs.musicpad.util.Count;
 import com.example.afs.musicpad.util.DirectList;
 import com.example.afs.musicpad.util.RandomAccessList;
 
@@ -29,13 +27,12 @@ public class Device {
   private static final String KEYS = "0.E123456+789-N/*B";
 
   private Player player;
-  private int[] activeMidiNotes = new int[256]; // NB: KeyEvents VK codes, not midiNotes
-  private Map<Integer, Integer> keyCapCodeToMidiNote = new HashMap<>();
-  private Map<Integer, Character> midiNoteToKeyCap = new HashMap<>();
+  private Chord[] activeChords = new Chord[256]; // NB: KeyEvents VK codes, not midiNotes
+  private Map<Integer, Chord> keyCapCodeToChord = new HashMap<>();
+  private Map<Chord, String> chordToKeyCap = new HashMap<>();
 
   public Device(Player player) {
     this.player = player;
-    Arrays.fill(activeMidiNotes, -1);
   }
 
   public void bendPitch(int pitchBend) {
@@ -104,19 +101,19 @@ public class Device {
       keyCapCode = 17;
       break;
     }
-    Integer midiNote = keyCapCodeToMidiNote.get(keyCapCode);
-    if (midiNote != null) {
-      System.out.println("inputCode=" + inputCode + ", keyCapCode=" + keyCapCode + ", midiNote=" + midiNote);
-      player.play(Action.PRESS, midiNote);
-      activeMidiNotes[inputCode] = midiNote;
+    Chord chord = keyCapCodeToChord.get(keyCapCode);
+    if (chord != null) {
+      System.out.println("inputCode=" + inputCode + ", keyCapCode=" + keyCapCode + ", chord=" + chord);
+      player.play(Action.PRESS, chord);
+      activeChords[inputCode] = chord;
     }
   }
 
   public void onUp(int inputCode) {
-    int midiNote = activeMidiNotes[inputCode];
-    if (midiNote != -1) {
-      player.play(Action.RELEASE, midiNote);
-      activeMidiNotes[inputCode] = -1;
+    Chord chord = activeChords[inputCode];
+    if (chord != null) {
+      player.play(Action.RELEASE, chord);
+      activeChords[inputCode] = null;
     }
   }
 
@@ -130,46 +127,44 @@ public class Device {
 
   public RandomAccessList<KeyCap> toKeyCaps(RandomAccessList<Slice> slices) {
     RandomAccessList<KeyCap> keyCaps = new DirectList<>();
-    Set<Integer> midiNotes = new HashSet<>();
+    Map<Chord, Count<Chord>> chords = new HashMap<>();
     for (Slice slice : slices) {
-      for (Note note : slice) {
-        midiNotes.add(note.getMidiNote());
+      Chord chord = slice.getChord();
+      Count<Chord> count = chords.get(chord);
+      if (count == null) {
+        count = new Count<Chord>(chord);
+        chords.put(chord, count);
       }
+      count.increment();
     }
-    int index = 0;
-    int[] orderedMidiNotes = new int[midiNotes.size()];
-    for (int midiNote : midiNotes) {
-      orderedMidiNotes[index++] = midiNote;
+    DirectList<Count<Chord>> orderedChords = new DirectList<>(chords.values());
+    orderedChords.sort((e1, e2) -> -e1.compareTo(e2));
+    while (orderedChords.size() > KEYS.length()) {
+      orderedChords.remove(orderedChords.size() - 1);
     }
-    Arrays.sort(orderedMidiNotes);
-    keyCapCodeToMidiNote.clear();
-    midiNoteToKeyCap.clear();
-    for (int i = 0; i < orderedMidiNotes.length; i++) {
-      keyCapCodeToMidiNote.put(i, orderedMidiNotes[i]);
-      midiNoteToKeyCap.put(orderedMidiNotes[i], toKeyCap(i));
+    int chordCount = orderedChords.size();
+    orderedChords.sort((e1, e2) -> e1.getValue().compareTo(e2.getValue()));
+    keyCapCodeToChord.clear();
+    chordToKeyCap.clear();
+    for (int i = 0; i < chordCount; i++) {
+      Chord chord = orderedChords.get(i).getValue();
+      keyCapCodeToChord.put(i, chord);
+      chordToKeyCap.put(chord, toKeyCap(i));
     }
     for (Slice slice : slices) {
-      StringBuilder s = new StringBuilder();
-      for (Note note : slice) {
-        if (s.length() > 0) {
-          s.append("/");
-        }
-        int midiNote = note.getMidiNote();
-        Character keyCap = midiNoteToKeyCap.get(midiNote);
-        s.append(keyCap);
-      }
-      KeyCap keyCap = new KeyCap(slice, s.toString());
+      Chord chord = slice.getChord();
+      KeyCap keyCap = new KeyCap(slice, chordToKeyCap.get(chord));
       keyCaps.add(keyCap);
     }
     return keyCaps;
   }
 
-  private char toKeyCap(int noteIndex) {
-    char keyCap;
+  private String toKeyCap(int noteIndex) {
+    String keyCap;
     if (noteIndex < KEYS.length()) {
-      keyCap = KEYS.charAt(noteIndex);
+      keyCap = String.valueOf(KEYS.charAt(noteIndex));
     } else {
-      keyCap = '?';
+      keyCap = "?";
     }
     return keyCap;
   }

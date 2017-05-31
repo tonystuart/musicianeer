@@ -48,8 +48,21 @@ public class Player {
     synthesizer.changeControl(playerChannel, control, value);
   }
 
+  public void play(Action action, Chord chord) {
+    if (action == Action.PRESS && Trace.isTracePlay()) {
+      System.out.println("Player.play: chordType=" + chord);
+    }
+    for (int midiNote : chord.getMidiNotes()) {
+      // TODO: Consider arpeggiator options
+      synthesizeNote(action, midiNote);
+    }
+  }
+
   public void play(Action action, int midiNote) {
-    playMidiNote(action, midiNote);
+    if (action == Action.PRESS && Trace.isTracePlay()) {
+      System.out.println("Player.play: midiNote=" + Names.formatNote(midiNote));
+    }
+    synthesizeNote(action, midiNote);
   }
 
   public void selectProgram(int program) {
@@ -64,23 +77,6 @@ public class Player {
 
   public void setPercentVelocity(int percentVelocity) {
     this.percentVelocity = percentVelocity;
-  }
-
-  protected void playMidiChord(Action action, Chord chord) {
-    if (action == Action.PRESS && Trace.isTracePlay()) {
-      System.out.println("Player.play: chordType=" + chord);
-    }
-    for (int midiNote : chord.getMidiNotes()) {
-      // TODO: Consider arpeggiator options
-      synthesizeNote(action, midiNote);
-    }
-  }
-
-  protected void playMidiNote(Action action, int midiNote) {
-    if (action == Action.PRESS && Trace.isTracePlay()) {
-      System.out.println("Player.play: midiNote=" + Names.formatNote(midiNote));
-    }
-    synthesizeNote(action, midiNote);
   }
 
   private void synthesizeNote(Action action, int midiNote) {

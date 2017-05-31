@@ -12,12 +12,11 @@ package com.example.afs.musicpad.player;
 import java.util.Arrays;
 import java.util.Collection;
 
-import com.example.afs.musicpad.renderer.Notator.Slice;
 import com.example.afs.musicpad.song.Note;
 import com.example.afs.musicpad.theory.ChordType;
 import com.example.afs.musicpad.theory.IntervalSet;
 
-public class Chord {
+public class Chord implements Comparable<Chord> {
   private ChordType chordType;
   private int[] midiNotes;
 
@@ -33,12 +32,16 @@ public class Chord {
     this.midiNotes = notes;
   }
 
-  public Chord(Slice slice) {
-    int index = 0;
-    midiNotes = new int[slice.size()];
-    for (Note note : slice) {
-      midiNotes[index++] = note.getMidiNote();
+  @Override
+  public int compareTo(Chord that) {
+    int controllingLength = Math.min(this.midiNotes.length, that.midiNotes.length);
+    for (int i = 0; i < controllingLength; i++) {
+      int delta = this.midiNotes[i] - that.midiNotes[i];
+      if (delta != 0) {
+        return delta;
+      }
     }
+    return this.midiNotes.length - that.midiNotes.length;
   }
 
   @Override
