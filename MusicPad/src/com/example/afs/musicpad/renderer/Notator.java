@@ -31,16 +31,16 @@ import com.example.afs.musicpad.util.Value;
 public class Notator {
 
   public static class KeyCap {
-    private String keyCap;
+    private String legend;
     private Slice slice;
 
-    public KeyCap(Slice slice, String keyCap) {
+    public KeyCap(Slice slice, String legend) {
       this.slice = slice;
-      this.keyCap = keyCap;
+      this.legend = legend;
     }
 
-    public String getKeyCap() {
-      return keyCap;
+    public String getLegend() {
+      return legend;
     }
 
     public Slice getSlice() {
@@ -49,6 +49,11 @@ public class Notator {
 
     public long getTick() {
       return slice.getTick();
+    }
+
+    @Override
+    public String toString() {
+      return "KeyCap [legend=" + legend + ", slice=" + slice + "]";
     }
   }
 
@@ -301,7 +306,7 @@ public class Notator {
       int wordX = getX(keyCap.getTick() - RADIUS); // align with left edge of note head
       Slice slice = keyCap.getSlice();
       String name = slice.getName();
-      staff.add(new Text(wordX, WORDS + 3 * RADIUS, keyCap.getKeyCap()));
+      staff.add(new Text(wordX, WORDS + 3 * RADIUS, keyCap.getLegend()));
       staff.add(new Text(wordX, 3 * RADIUS, name));
     }
   }
