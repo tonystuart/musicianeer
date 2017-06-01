@@ -25,6 +25,7 @@ import com.example.afs.musicpad.message.OnDeviceCommand;
 import com.example.afs.musicpad.message.OnMusic;
 import com.example.afs.musicpad.message.OnPitchBend;
 import com.example.afs.musicpad.message.OnSong;
+import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.player.Player;
 import com.example.afs.musicpad.renderer.ChannelRenderer;
 import com.example.afs.musicpad.renderer.Notator;
@@ -87,16 +88,16 @@ public class DeviceHandler extends BrokerTask<Message> {
     return channel;
   }
 
+  public Device getDevice() {
+    return device;
+  }
+
   public int getDeviceIndex() {
     return deviceIndex;
   }
 
   public String getDeviceName() {
     return deviceName;
-  }
-
-  public Device getDevice() {
-    return device;
   }
 
   public Synthesizer getSynthesizer() {
@@ -202,10 +203,14 @@ public class DeviceHandler extends BrokerTask<Message> {
 
   private void updatePlayer() {
     if (song != null) {
-      Set<Integer> programs = song.getPrograms(channel);
-      if (programs.size() > 0) {
-        int program = programs.iterator().next();
-        device.selectProgram(program);
+      if (channel == Midi.DRUM) {
+        device.selectProgram(-1);
+      } else {
+        Set<Integer> programs = song.getPrograms(channel);
+        if (programs.size() > 0) {
+          int program = programs.iterator().next();
+          device.selectProgram(program);
+        }
       }
       getBroker().publish(new OnMusic(deviceIndex, getChannelControls(), getMusic()));
     }

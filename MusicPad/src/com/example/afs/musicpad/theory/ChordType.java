@@ -42,11 +42,7 @@ public class ChordType implements Comparable<ChordType> {
         return deltaSemitone;
       }
     }
-    int deltaLength = this.commonNotes.length - that.commonNotes.length;
-    if (deltaLength != 0) {
-      return deltaLength;
-    }
-    return 0;
+    return this.commonNotes.length - that.commonNotes.length;
   }
 
   @Override

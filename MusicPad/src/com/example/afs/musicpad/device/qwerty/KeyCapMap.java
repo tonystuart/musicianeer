@@ -35,9 +35,11 @@ public class KeyCapMap {
 
   }
 
-  private static final int DIGITS = 9;
-  private static final int REGISTERS = 5;
-  private static final int MAX_CHORDS = REGISTERS * DIGITS;
+  private static final String NOTE_KEYS = "123456789";
+  private static final String REGISTER_KEYS = " 0/*-+";
+  private static final int NOTES = NOTE_KEYS.length();
+  private static final int REGISTERS = REGISTER_KEYS.length();
+  private static final int MAX_CHORDS = REGISTERS * NOTES;
 
   private int autoRegister;
   private Chord[][] keyIndexToChords;
@@ -60,17 +62,17 @@ public class KeyCapMap {
 
   public Chord onDown(int inputCode) {
     Chord chord;
-    if (inputCode >= '1' && inputCode <= '9') {
-      int keyIndex = inputCode - '1';
+    int keyIndex = NOTE_KEYS.indexOf(inputCode);
+    if (keyIndex != -1) {
       int thisRegister = registerDown != 0 ? registerDown : autoRegister;
       chord = keyIndexToChords[thisRegister][keyIndex];
       System.out.println("inputCode=" + inputCode + ", keyIndex=" + keyIndex + ", chord=" + chord);
       autoRegister = 0;
     } else {
       chord = null;
-      int index = "/*-+".indexOf(inputCode);
+      int index = REGISTER_KEYS.indexOf(inputCode);
       if (index != -1) {
-        registerDown = index + 1;
+        registerDown = index;
         autoRegister = registerDown;
       }
     }
@@ -78,7 +80,7 @@ public class KeyCapMap {
   }
 
   public void onUp(int inputCode) {
-    if ("/*-+".indexOf(inputCode) != -1) {
+    if (REGISTER_KEYS.indexOf(inputCode) != -1) {
       registerDown = 0;
     }
   }
@@ -87,7 +89,7 @@ public class KeyCapMap {
     int index = 0;
     Map<Chord, String> chordToLegend = new HashMap<>();
     for (int i = 0; i < REGISTERS && index < maxChords; i++) {
-      for (int j = 0; j < DIGITS && index < maxChords; j++) {
+      for (int j = 0; j < NOTES && index < maxChords; j++) {
         Chord chord = keyIndexToChord[i][j];
         chordToLegend.put(chord, getLegend(i, j));
         index++;
@@ -98,9 +100,9 @@ public class KeyCapMap {
 
   private Chord[][] assignChordsToRegisters(ChordCount[] sortedChords, int maxChords) {
     int index = 0;
-    Chord[][] keyIndexToChord = new Chord[REGISTERS][DIGITS];
+    Chord[][] keyIndexToChord = new Chord[REGISTERS][NOTES];
     for (int i = 0; i < REGISTERS; i++) {
-      for (int j = 0; j < DIGITS; j++) {
+      for (int j = 0; j < NOTES; j++) {
         if (index < maxChords) {
           Chord chord = sortedChords[index].getValue();
           keyIndexToChord[i][j] = chord;
@@ -129,25 +131,10 @@ public class KeyCapMap {
 
   private String getLegend(int register, int digit) {
     String registerString;
-    switch (register) {
-    case 0:
+    if (register == 0) {
       registerString = "";
-      break;
-    case 1:
-      registerString = "/";
-      break;
-    case 2:
-      registerString = "*";
-      break;
-    case 3:
-      registerString = "-";
-      break;
-    case 4:
-      registerString = "+";
-      break;
-    default:
-      registerString = "?";
-      break;
+    } else {
+      registerString = String.valueOf(REGISTER_KEYS.charAt(register));
     }
     return registerString + String.valueOf(digit + 1);
   }
@@ -179,8 +166,8 @@ public class KeyCapMap {
   private void sortByPitch(Chord[][] keyIndexToChord, int maxChords) {
     int amountRemaining = maxChords;
     for (int i = 0; amountRemaining > 0 && i < keyIndexToChord[i].length; i++) {
-      Arrays.sort(keyIndexToChord[i], 0, Math.min(DIGITS, amountRemaining));
-      amountRemaining = Math.max(amountRemaining - DIGITS, 0);
+      Arrays.sort(keyIndexToChord[i], 0, Math.min(NOTES, amountRemaining));
+      amountRemaining = Math.max(amountRemaining - NOTES, 0);
     }
   }
 
