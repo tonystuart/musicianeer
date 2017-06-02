@@ -67,7 +67,7 @@ public class Notator {
       this.notes = notes;
       this.first = notes.first();
       this.tick = first.getTick();
-      this.chord = new Chord(notes.first().getMidiNote()); // Just use first note for testing
+      this.chord = new Chord(notes);
     }
 
     public Note first() {
