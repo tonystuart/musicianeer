@@ -18,6 +18,7 @@ import java.util.Set;
 
 import com.example.afs.fluidsynth.Synthesizer;
 import com.example.afs.musicpad.Command;
+import com.example.afs.musicpad.device.common.DeviceHandler.InputType;
 import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnDeviceAttached;
@@ -58,7 +59,10 @@ public class DeviceWatcher extends BrokerTask<Message> {
   }
 
   private void attachDevice(String name, DeviceBundle deviceBundle) {
-    DeviceHandler deviceHandler = new DeviceHandler(getBroker(), synthesizer, name);
+    // TODO: Replace the overwrought WatcherBehavior with a case statement on DeviceType
+    int deviceIndex = DeviceIdFactory.getDeviceIndex(name);
+    InputType inputType = watcherBehavior.getInputType();
+    DeviceHandler deviceHandler = new DeviceHandler(getBroker(), synthesizer, name, deviceIndex, inputType);
     Controller controller = watcherBehavior.attachDevice(deviceHandler, deviceBundle);
     oldDevices.put(name, controller);
     controller.start();

@@ -22,6 +22,7 @@ import javax.sound.midi.MidiUnavailableException;
 import com.example.afs.musicpad.device.common.Controller;
 import com.example.afs.musicpad.device.common.DeviceBundle;
 import com.example.afs.musicpad.device.common.DeviceHandler;
+import com.example.afs.musicpad.device.common.DeviceHandler.InputType;
 import com.example.afs.musicpad.device.common.WatcherBehavior;
 
 public class MidiWatcherBehavior implements WatcherBehavior {
@@ -73,6 +74,11 @@ public class MidiWatcherBehavior implements WatcherBehavior {
     } catch (MidiUnavailableException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  @Override
+  public InputType getInputType() {
+    return InputType.MIDI;
   }
 
 }

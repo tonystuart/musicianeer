@@ -13,7 +13,7 @@ import java.util.Iterator;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import com.example.afs.musicpad.device.qwerty.Device;
+import com.example.afs.musicpad.device.common.DeviceHandler;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.player.Chord;
 import com.example.afs.musicpad.song.Default;
@@ -239,13 +239,13 @@ public class Notator {
   private Song song;
   private int channel;
   private int ticksPerPixel;
-  private Device device;
+  private DeviceHandler devicehandler;
 
-  public Notator(Song song, int channel, int ticksPerPixel, Device device) {
+  public Notator(Song song, int channel, int ticksPerPixel, DeviceHandler devicehandler) {
     this.song = song;
     this.channel = channel;
     this.ticksPerPixel = ticksPerPixel;
-    this.device = device;
+    this.devicehandler = devicehandler;
   }
 
   public String getMusic() {
@@ -301,7 +301,7 @@ public class Notator {
   }
 
   private void drawNoteNames(Svg staff, RandomAccessList<Slice> slices) {
-    RandomAccessList<KeyCap> keyCaps = device.toKeyCaps(slices);
+    RandomAccessList<KeyCap> keyCaps = devicehandler.toKeyCaps(slices);
     for (KeyCap keyCap : keyCaps) {
       int wordX = getX(keyCap.getTick() - RADIUS); // align with left edge of note head
       Slice slice = keyCap.getSlice();

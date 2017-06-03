@@ -16,6 +16,7 @@ import java.util.Map;
 import com.example.afs.musicpad.device.common.Controller;
 import com.example.afs.musicpad.device.common.DeviceBundle;
 import com.example.afs.musicpad.device.common.DeviceHandler;
+import com.example.afs.musicpad.device.common.DeviceHandler.InputType;
 import com.example.afs.musicpad.device.common.WatcherBehavior;
 
 public class QwertyWatcherBehavior implements WatcherBehavior {
@@ -46,6 +47,11 @@ public class QwertyWatcherBehavior implements WatcherBehavior {
       });
     }
     return devices;
+  }
+
+  @Override
+  public InputType getInputType() {
+    return InputType.NUMERIC;
   }
 
   private boolean isMusicPad(String name) {

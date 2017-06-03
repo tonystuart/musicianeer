@@ -9,18 +9,20 @@
 
 package com.example.afs.musicpad.device.common;
 
+import java.util.HashMap;
 import java.util.Map;
 
-import com.example.afs.musicpad.device.common.DeviceHandler.InputType;
+public class DeviceIdFactory {
+  private static int nextDeviceIndex;
+  private static Map<String, Integer> devices = new HashMap<>();
 
-public interface WatcherBehavior {
-
-  Controller attachDevice(DeviceHandler deviceHandler, DeviceBundle deviceBundle);
-
-  void detachDevice(String name, Controller controller);
-
-  Map<String, DeviceBundle> getDevices();
-
-  InputType getInputType();
+  public static synchronized int getDeviceIndex(String name) {
+    Integer deviceIndex = devices.get(name);
+    if (deviceIndex == null) {
+      deviceIndex = nextDeviceIndex++;
+      devices.put(name, deviceIndex);
+    }
+    return deviceIndex;
+  }
 
 }
