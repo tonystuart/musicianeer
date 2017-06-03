@@ -26,12 +26,8 @@ public class Device {
     this.player = player;
   }
 
-  public void bendPitch(int pitchBend) {
-    player.bendPitch(pitchBend);
-  }
-
-  public void changeControl(int control, int value) {
-    player.changeControl(control, value);
+  public Player getPlayer() {
+    return player;
   }
 
   public void onDown(int inputCode) {

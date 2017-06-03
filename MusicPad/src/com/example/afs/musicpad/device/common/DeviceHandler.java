@@ -20,10 +20,8 @@ import com.example.afs.musicpad.device.qwerty.Device;
 import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnChannelAssigned;
 import com.example.afs.musicpad.message.OnCommand;
-import com.example.afs.musicpad.message.OnControlChange;
 import com.example.afs.musicpad.message.OnDeviceCommand;
 import com.example.afs.musicpad.message.OnMusic;
-import com.example.afs.musicpad.message.OnPitchBend;
 import com.example.afs.musicpad.message.OnSong;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.player.Player;
@@ -72,8 +70,6 @@ public class DeviceHandler extends BrokerTask<Message> {
     this.deviceName = name;
     this.deviceIndex = getDeviceIndex(name);
     this.device = new Device(new Player(synthesizer, deviceIndex));
-    delegate(OnControlChange.class, message -> doControlChange(message.getControl(), message.getValue()));
-    delegate(OnPitchBend.class, message -> doPitchBend(message.getPitchBend()));
     subscribe(OnDeviceCommand.class, message -> doDeviceCommand(message.getDeviceCommand(), message.getDeviceIndex(), message.getParameter()));
     subscribe(OnSong.class, message -> doSong(message.getSong(), message.getDeviceChannelMap(), message.getTicksPerPixel()));
     subscribe(OnChannelAssigned.class, message -> doChannelAssigned(message));
@@ -113,10 +109,6 @@ public class DeviceHandler extends BrokerTask<Message> {
     }
   }
 
-  private void doControlChange(int control, int value) {
-    device.changeControl(control, value);
-  }
-
   private void doDeviceCommand(DeviceCommand command, int deviceIndex, int parameter) {
     if (deviceIndex == this.deviceIndex) {
       switch (command) {
@@ -154,10 +146,6 @@ public class DeviceHandler extends BrokerTask<Message> {
 
   private void doOutput(int typeIndex) {
     updatePlayer();
-  }
-
-  private void doPitchBend(int pitchBend) {
-    device.bendPitch(pitchBend);
   }
 
   private void doSong(Song song, Map<Integer, Integer> deviceChannelMap, int ticksPerPixel) {

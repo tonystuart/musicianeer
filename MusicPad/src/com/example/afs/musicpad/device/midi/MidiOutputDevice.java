@@ -7,29 +7,26 @@
 // This program is made available on an "as is" basis, without
 // warranties or conditions of any kind, either express or implied.
 
-package com.example.afs.musicpad.message;
+package com.example.afs.musicpad.device.midi;
 
-public class OnControlChange extends Message {
+import javax.sound.midi.MidiDevice;
 
-  private int control;
-  private int value;
+public class MidiOutputDevice {
+  private MidiDevice midiDevice;
+  private int port;
 
-  public OnControlChange(int control, int value) {
-    this.control = control;
-    this.value = value;
+  public MidiOutputDevice(MidiDevice midiDevice, int port) {
+    this.midiDevice = midiDevice;
+    this.port = port;
   }
 
-  public int getControl() {
-    return control;
-  }
-
-  public int getValue() {
-    return value;
+  public MidiDevice getMidiDevice() {
+    return midiDevice;
   }
 
   @Override
   public String toString() {
-    return "OnControlChange [control=" + control + ", value=" + value + "]";
+    return "MidiOutputDevice [midiDevice=" + midiDevice + ", port=" + port + "]";
   }
 
 }
