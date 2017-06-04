@@ -75,6 +75,9 @@ public class Player {
     }
   }
 
+  public void setPercentTempo(int scaleMidiToPercent) {
+  }
+
   public void setPercentVelocity(int percentVelocity) {
     this.percentVelocity = percentVelocity;
   }

@@ -66,6 +66,7 @@ public class DeviceHandler extends BrokerTask<Message> {
     this.deviceIndex = deviceIndex;
     this.inputType = inputType;
     this.player = new Player(synthesizer, deviceIndex);
+    subscribe(OnCommand.class, message -> doCommand(message.getCommand(), message.getParameter()));
     subscribe(OnDeviceCommand.class, message -> doDeviceCommand(message.getDeviceCommand(), message.getDeviceIndex(), message.getParameter()));
     subscribe(OnSong.class, message -> doSong(message.getSong(), message.getDeviceChannelMap(), message.getTicksPerPixel()));
     subscribe(OnChannelAssigned.class, message -> doChannelAssigned(message));
@@ -134,6 +135,16 @@ public class DeviceHandler extends BrokerTask<Message> {
       this.channel = message.getChannel();
       this.ticksPerPixel = message.getTicksPerPixel();
       updatePlayer();
+    }
+  }
+
+  private void doCommand(Command command, int parameter) {
+    switch (command) {
+    case TEMPO:
+      player.setPercentTempo(Range.scaleMidiToPercent(parameter));
+      break;
+    default:
+      break;
     }
   }
 

@@ -11,7 +11,6 @@ package com.example.afs.musicpad.renderer;
 
 import java.util.Iterator;
 import java.util.SortedSet;
-import java.util.TreeSet;
 
 import com.example.afs.musicpad.device.common.DeviceHandler;
 import com.example.afs.musicpad.midi.Midi;
@@ -58,32 +57,34 @@ public class Notator {
   }
 
   public static class Slice implements Iterable<Note> {
-    private SortedSet<Note> notes;
-    private long tick;
-    private Note first;
+    private RandomAccessList<Note> notes = new DirectList<>();
     private Chord chord;
 
-    public Slice(SortedSet<Note> notes) {
-      this.notes = notes;
-      this.first = notes.first();
-      this.tick = first.getTick();
-      this.chord = new Chord(notes);
+    public Slice() {
+    }
+
+    public void add(Note note) {
+      notes.add(note);
+      chord = null;
     }
 
     public Note first() {
-      return first;
+      return notes.get(0);
     }
 
     public Chord getChord() {
+      if (chord == null) {
+        chord = new Chord(notes);
+      }
       return chord;
     }
 
     public String getName() {
-      return chord.getChordType().getName();
+      return getChord().getChordType().getName();
     }
 
     public long getTick() {
-      return tick;
+      return first().getTick();
     }
 
     @Override
@@ -254,17 +255,22 @@ public class Notator {
       long duration = song.getDuration();
       Svg staff = getStaff(duration);
       drawMeasures(staff, duration);
-      long tick = 0;
+      int lastGroup = -1;
+      Slice slice = null;
       RandomAccessList<Slice> slices = new DirectList<>();
-      TreeSet<Note> notes = song.getNotes(channel);
-      while (tick < duration) {
-        SortedSet<Note> subSet = notes.subSet(new Note(tick), new Note(tick + RESOLUTION));
-        if (subSet.size() > 0) {
-          Slice slice = new Slice(subSet);
-          slices.add(slice);
-          drawSlice(staff, slice);
+      for (Note note : song.getNotes()) {
+        if (note.getChannel() == channel) {
+          int group = note.getGroup();
+          if (group != lastGroup) {
+            lastGroup = group;
+            if (slice != null) {
+              slices.add(slice);
+              drawSlice(staff, slice);
+            }
+            slice = new Slice();
+          }
+          slice.add(note);
         }
-        tick += RESOLUTION;
       }
       drawNoteNames(staff, slices);
       drawWords(staff);

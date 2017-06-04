@@ -27,6 +27,10 @@ public class SequencerTask<T> extends BrokerTask<T> {
     this.scheduler = scheduler;
   }
 
+  public Scheduler<T> getScheduler() {
+    return scheduler;
+  }
+
   @Override
   protected BlockingQueue<T> createInputQueue() {
     return new PriorityBlockingQueue<>();
