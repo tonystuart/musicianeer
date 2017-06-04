@@ -38,18 +38,17 @@ public class TransportTask extends BrokerTask<Message> {
     BACKWARD, FORWARD
   }
 
-  public static final int DEFAULT_PERCENT_VELOCITY = 25;
-
+  private static final int DEFAULT_PERCENT_VELOCITY = 25;
   private static final float DEFAULT_GAIN = 5 * Synthesizer.DEFAULT_GAIN;
   private static final long FIRST_NOTE = -1;
-
   private static final long LAST_NOTE = -1;
+
   private Song song;
   private Synthesizer synthesizer;
   private NoteEventScheduler scheduler;
   private PausibleSequencerTask<NoteEvent> sequencer;
-
   private int percentVelocity = DEFAULT_PERCENT_VELOCITY;
+  private int[] currentPrograms = new int[Midi.CHANNELS];
 
   public TransportTask(Broker<Message> broker, Synthesizer synthesizer) {
     super(broker);
@@ -293,13 +292,25 @@ public class TransportTask extends BrokerTask<Message> {
   private void processNoteEvent(NoteEvent noteEvent) {
     Note note = noteEvent.getNote();
     switch (noteEvent.getType()) {
-    case NOTE_OFF:
-      synthesizer.releaseKey(note.getChannel(), note.getMidiNote());
+    case NOTE_OFF: {
+      int channel = note.getChannel();
+      int midiNote = note.getMidiNote();
+      synthesizer.releaseKey(channel, midiNote);
       break;
-    case NOTE_ON:
-      synthesizer.changeProgram(note.getChannel(), note.getProgram());
-      synthesizer.pressKey(note.getChannel(), note.getMidiNote(), Velocity.scale(note.getVelocity(), percentVelocity));
+    }
+    case NOTE_ON: {
+      int channel = note.getChannel();
+      int midiNote = note.getMidiNote();
+      int velocity = note.getVelocity();
+      int program = note.getProgram();
+      if (currentPrograms[channel] != program) {
+        synthesizer.changeProgram(channel, program);
+        currentPrograms[channel] = program;
+      }
+      int scaledVelocity = Velocity.scale(velocity, percentVelocity);
+      synthesizer.pressKey(channel, midiNote, scaledVelocity);
       break;
+    }
     case TICK:
       publishTick(noteEvent.getTick());
       break;
