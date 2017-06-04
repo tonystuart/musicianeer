@@ -103,6 +103,10 @@ public class Parser {
           consume();
           parent.add(new ThenSendCommand(lineIndex, tokens));
           break;
+        case "sendDeviceCommand":
+          consume();
+          parent.add(new ThenSendDeviceCommand(lineIndex, tokens));
+          break;
         case "sendDeviceMessage":
           consume();
           parent.add(new ThenSendDeviceMessage(lineIndex, tokens));
@@ -112,7 +116,7 @@ public class Parser {
           parent.add(new ThenSendHandlerMessage(lineIndex, tokens));
           break;
         default:
-          throw new IllegalArgumentException(formatMessage("Expected directive"));
+          throw new IllegalArgumentException(formatMessage("Expected valid directive, got " + tokens[0]));
         }
       }
     }

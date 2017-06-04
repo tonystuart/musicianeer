@@ -117,7 +117,7 @@ public class DeviceHandler extends BrokerTask<Message> {
       keyCapMap = new QwertyKeyCapMap("ABCDEFGHIJKLMNOPQRSTUVWXYZ", " " + (char) KeyEvent.VK_SHIFT, slices);
       break;
     case NUMERIC:
-      keyCapMap = new QwertyKeyCapMap("123456789", " /*-+", slices);
+      keyCapMap = new QwertyKeyCapMap("123456789", " 0/*-+", slices);
       break;
     case MIDI:
       keyCapMap = new MidiKeyCapMap(slices);

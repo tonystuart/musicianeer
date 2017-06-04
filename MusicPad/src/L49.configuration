@@ -25,95 +25,95 @@ on input
     if data1 96
      set selectedChannel 1
      sendCommand PLAY_SAMPLE 1
-     sendCommand SELECT_CHANNEL 1
+     sendDeviceCommand CHANNEL 1
      return
     if data1 97
      set selectedChannel 2
      sendCommand PLAY_SAMPLE 2
-     sendCommand SELECT_CHANNEL 2
+     sendDeviceCommand CHANNEL 2
      return
     if data1 98
      set selectedChannel 3
      sendCommand PLAY_SAMPLE 3
-     sendCommand SELECT_CHANNEL 3
+     sendDeviceCommand CHANNEL 3
      return
     if data1 99
      set selectedChannel 4
      sendCommand PLAY_SAMPLE 4
-     sendCommand SELECT_CHANNEL 4
+     sendDeviceCommand CHANNEL 4
      return
     if data1 100
      set selectedChannel 5
      sendCommand PLAY_SAMPLE 5
-     sendCommand SELECT_CHANNEL 5
+     sendDeviceCommand CHANNEL 5
      return
     if data1 101
      set selectedChannel 6
      sendCommand PLAY_SAMPLE 6
-     sendCommand SELECT_CHANNEL 6
+     sendDeviceCommand CHANNEL 6
      return
     if data1 102
      set selectedChannel 7
      sendCommand PLAY_SAMPLE 7
-     sendCommand SELECT_CHANNEL 7
+     sendDeviceCommand CHANNEL 7
      return
     if data1 103
      set selectedChannel 8
      sendCommand PLAY_SAMPLE 8
-     sendCommand SELECT_CHANNEL 8
+     sendDeviceCommand CHANNEL 8
      return
     if data1 112
      set selectedChannel 9
      sendCommand PLAY_SAMPLE 9
-     sendCommand SELECT_CHANNEL 9
+     sendDeviceCommand CHANNEL 9
      return
     if data1 113
      set selectedChannel 10
      sendCommand PLAY_SAMPLE 10
-     sendCommand SELECT_CHANNEL 10
+     sendDeviceCommand CHANNEL 10
      return
     if data1 114
      set selectedChannel 11
      sendCommand PLAY_SAMPLE 11
-     sendCommand SELECT_CHANNEL 11
+     sendDeviceCommand CHANNEL 11
      return
     if data1 115
      set selectedChannel 12
      sendCommand PLAY_SAMPLE 12
-     sendCommand SELECT_CHANNEL 12
+     sendDeviceCommand CHANNEL 12
      return
     if data1 116
      set selectedChannel 13
      sendCommand PLAY_SAMPLE 13
-     sendCommand SELECT_CHANNEL 13
+     sendDeviceCommand CHANNEL 13
      return
     if data1 117
      set selectedChannel 14
      sendCommand PLAY_SAMPLE 14
-     sendCommand SELECT_CHANNEL 14
+     sendDeviceCommand CHANNEL 14
      return
     if data1 118
      set selectedChannel 15
      sendCommand PLAY_SAMPLE 15
-     sendCommand SELECT_CHANNEL 15
+     sendDeviceCommand CHANNEL 15
      return
     if data1 119
      set selectedChannel 16
      sendCommand PLAY_SAMPLE 16
-     sendCommand SELECT_CHANNEL 16
+     sendDeviceCommand CHANNEL 16
      return
   if type 176
    if data1 7
     # Slider 9
-    sendCommand SET_MASTER_GAIN data2
+    sendCommand GAIN data2
     return
    if data1 47
     # Slider 7
-    sendCommand SET_PLAYER_VELOCITY data2
+    sendDeviceCommand VELOCITY data2
     return
    if data1 48
     # Slider 8
-    sendCommand SET_TRANSPORT_VELOCITY data2
+    sendCommand VELOCITY data2
     return
    if data1 27
     # Rotary 7
@@ -121,14 +121,14 @@ on input
     return
    if data1 28
     # Rotary 8
-    sendCommand SET_TRANSPORT_TEMPO data2
+    sendCommand TEMPO data2
     return
    if data2 127
     if data1 112
-     sendCommand PREVIOUS_MEASURE 0
+     sendCommand BACKWARD 0
      return
     if data1 113
-     sendCommand NEXT_MEASURE 0
+     sendCommand FORWARD 0
      return
     if data1 114
      sendCommand STOP_PAUSE 0

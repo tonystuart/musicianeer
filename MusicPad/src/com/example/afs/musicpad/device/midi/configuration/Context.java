@@ -14,6 +14,7 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.example.afs.musicpad.Command;
+import com.example.afs.musicpad.DeviceCommand;
 import com.example.afs.musicpad.Trace;
 
 /**
@@ -28,6 +29,10 @@ public class Context {
 
   public interface HasSendCommand {
     void sendCommand(Command command, Integer parameter);
+  }
+
+  public interface HasSendDeviceCommand {
+    void sendDeviceCommand(DeviceCommand command, Integer parameter);
   }
 
   public interface HasSendDeviceMessage {
@@ -48,6 +53,7 @@ public class Context {
   private static final Object NULL = Optional.empty();
 
   private HasSendCommand hasSendCommand;
+  private HasSendDeviceCommand hasSendDeviceCommand;
   private HasSendDeviceMessage hasSendDeviceMessage;
   private HasSendHandlerMessage hasSendHandlerMessage;
 
@@ -74,11 +80,18 @@ public class Context {
     } else if (objectValue instanceof Integer) {
       enumValue = type.getEnumConstants()[(int) objectValue];
     }
+    if (enumValue == null) {
+      throw new IllegalArgumentException("Cannot interpret " + key + " as enum value for " + type.getName());
+    }
     return enumValue;
   }
 
   public HasSendCommand getHasSendCommand() {
     return hasSendCommand;
+  }
+
+  public HasSendDeviceCommand getHasSendDeviceCommand() {
+    return hasSendDeviceCommand;
   }
 
   public HasSendDeviceMessage getHasSendDeviceMessage() {
@@ -137,6 +150,10 @@ public class Context {
 
   public void setHasSendCommand(HasSendCommand hasSendCommand) {
     this.hasSendCommand = hasSendCommand;
+  }
+
+  public void setHasSendDeviceCommand(HasSendDeviceCommand hasSendDeviceCommand) {
+    this.hasSendDeviceCommand = hasSendDeviceCommand;
   }
 
   public void setHasSendDeviceMessage(HasSendDeviceMessage hasSendDeviceMessage) {

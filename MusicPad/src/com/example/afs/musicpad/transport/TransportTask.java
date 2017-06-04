@@ -114,7 +114,7 @@ public class TransportTask extends BrokerTask<Message> {
     case TEMPO:
       doTempo(parameter);
       break;
-    case BACKING:
+    case VELOCITY:
       doSetVelocity(parameter);
       break;
     case GAIN:

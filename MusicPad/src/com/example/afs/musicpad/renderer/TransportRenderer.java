@@ -41,7 +41,7 @@ public class TransportRenderer {
 
   private Range getBackingRange() {
     Range range = new Range("backing", 0, 127, 1, 64);
-    range.appendProperty("oninput", PropertyRenderer.render(Command.BACKING));
+    range.appendProperty("oninput", PropertyRenderer.render(Command.VELOCITY));
     return range;
   }
 

@@ -16,8 +16,10 @@ import javax.sound.midi.Receiver;
 import javax.sound.midi.ShortMessage;
 
 import com.example.afs.musicpad.Command;
+import com.example.afs.musicpad.DeviceCommand;
 import com.example.afs.musicpad.device.midi.configuration.Context;
 import com.example.afs.musicpad.device.midi.configuration.Context.HasSendCommand;
+import com.example.afs.musicpad.device.midi.configuration.Context.HasSendDeviceCommand;
 import com.example.afs.musicpad.device.midi.configuration.Context.HasSendDeviceMessage;
 import com.example.afs.musicpad.device.midi.configuration.Context.HasSendHandlerMessage;
 import com.example.afs.musicpad.device.midi.configuration.MidiConfiguration;
@@ -25,12 +27,13 @@ import com.example.afs.musicpad.device.midi.configuration.Node.ReturnState;
 import com.example.afs.musicpad.device.midi.configuration.On;
 import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnCommand;
+import com.example.afs.musicpad.message.OnDeviceCommand;
 import com.example.afs.musicpad.message.OnDeviceMessage;
 import com.example.afs.musicpad.player.Player;
 import com.example.afs.musicpad.player.Player.Action;
 import com.example.afs.musicpad.util.Broker;
 
-public class MidiReader implements HasSendCommand, HasSendDeviceMessage, HasSendHandlerMessage {
+public class MidiReader implements HasSendCommand, HasSendDeviceMessage, HasSendHandlerMessage, HasSendDeviceCommand {
 
   private class MidiReceiver implements Receiver {
 
@@ -55,14 +58,17 @@ public class MidiReader implements HasSendCommand, HasSendDeviceMessage, HasSend
   private MidiConfiguration configuration;
   private Context context;
   private Player player;
+  private int deviceIndex;
 
-  public MidiReader(Broker<Message> broker, Player player, MidiDeviceBundle deviceBundle, MidiConfiguration configuration) {
+  public MidiReader(Broker<Message> broker, Player player, int deviceIndex, MidiDeviceBundle deviceBundle, MidiConfiguration configuration) {
     this.broker = broker;
     this.player = player;
+    this.deviceIndex = deviceIndex;
     this.deviceBundle = deviceBundle;
     this.configuration = configuration;
     this.context = configuration.getContext();
     context.setHasSendCommand(this);
+    context.setHasSendDeviceCommand(this);
     context.setHasSendDeviceMessage(this);
     context.setHasSendHandlerMessage(this);
     connectDevices();
@@ -71,6 +77,11 @@ public class MidiReader implements HasSendCommand, HasSendDeviceMessage, HasSend
   @Override
   public void sendCommand(Command handlerCommand, Integer parameter) {
     broker.publish(new OnCommand(handlerCommand, parameter));
+  }
+
+  @Override
+  public void sendDeviceCommand(DeviceCommand deviceCommand, Integer parameter) {
+    broker.publish(new OnDeviceCommand(deviceCommand, deviceIndex, parameter));
   }
 
   @Override

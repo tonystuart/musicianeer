@@ -23,7 +23,7 @@ public enum Command {
   BACKWARD, //
   FORWARD, //
   TEMPO, //
-  BACKING, //
+  VELOCITY, //
   GAIN, //
   SHOW_DRUM_INFO, //
   TRANSPOSE, //
