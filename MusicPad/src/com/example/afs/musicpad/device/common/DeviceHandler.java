@@ -26,7 +26,7 @@ import com.example.afs.musicpad.message.OnDeviceCommand;
 import com.example.afs.musicpad.message.OnMusic;
 import com.example.afs.musicpad.message.OnSong;
 import com.example.afs.musicpad.midi.Midi;
-import com.example.afs.musicpad.player.Chord;
+import com.example.afs.musicpad.player.Sound;
 import com.example.afs.musicpad.player.Player;
 import com.example.afs.musicpad.player.Player.Action;
 import com.example.afs.musicpad.renderer.ChannelRenderer;
@@ -47,7 +47,7 @@ public class DeviceHandler extends BrokerTask<Message> {
   }
 
   public static enum OutputType {
-    NOTE, CHORD, AUTO
+    NOTE, SOUND, AUTO
   }
 
   private Song song;
@@ -56,7 +56,7 @@ public class DeviceHandler extends BrokerTask<Message> {
   private Player player;
   private InputType inputType;
   private KeyCapMap keyCapMap;
-  private Chord[] activeChords = new Chord[256]; // NB: KeyEvents VK codes, not midiNotes
+  private Sound[] activeSounds = new Sound[256]; // NB: KeyEvents VK codes, not midiNotes
   private int deviceIndex;
   private String deviceName;
 
@@ -94,21 +94,21 @@ public class DeviceHandler extends BrokerTask<Message> {
   }
 
   public void onDown(int inputCode) {
-    Chord chord = keyCapMap.onDown(inputCode);
-    if (chord != null) {
-      if (chord != null) {
-        player.play(Action.PRESS, chord);
-        activeChords[inputCode] = chord;
+    Sound sound = keyCapMap.onDown(inputCode);
+    if (sound != null) {
+      if (sound != null) {
+        player.play(Action.PRESS, sound);
+        activeSounds[inputCode] = sound;
       }
     }
   }
 
   public void onUp(int inputCode) {
     keyCapMap.onUp(inputCode);
-    Chord chord = activeChords[inputCode];
-    if (chord != null) {
-      player.play(Action.RELEASE, chord);
-      activeChords[inputCode] = null;
+    Sound sound = activeSounds[inputCode];
+    if (sound != null) {
+      player.play(Action.RELEASE, sound);
+      activeSounds[inputCode] = null;
     }
   }
 

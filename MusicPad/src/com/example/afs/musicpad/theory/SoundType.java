@@ -13,12 +13,12 @@ import java.util.Arrays;
 
 import com.example.afs.musicpad.analyzer.Names;
 
-public class ChordType implements Comparable<ChordType> {
+public class SoundType implements Comparable<SoundType> {
 
   private String name;
   private int[] commonNotes;
 
-  public ChordType(int root, Intervals intervals) {
+  public SoundType(int root, Intervals intervals) {
     name = Names.getNoteName(root) + intervals.getName();
     int[] intervalArray = intervals.getIntervals();
     commonNotes = new int[intervalArray.length];
@@ -28,13 +28,13 @@ public class ChordType implements Comparable<ChordType> {
     }
   }
 
-  public ChordType(String name, int... commonNotes) {
+  public SoundType(String name, int... commonNotes) {
     this.name = name;
     this.commonNotes = commonNotes;
   }
 
   @Override
-  public int compareTo(ChordType that) {
+  public int compareTo(SoundType that) {
     int limit = Math.min(this.commonNotes.length, that.commonNotes.length);
     for (int i = 0; i < limit; i++) {
       int deltaSemitone = this.commonNotes[i] - that.commonNotes[i];
@@ -56,7 +56,7 @@ public class ChordType implements Comparable<ChordType> {
     if (getClass() != obj.getClass()) {
       return false;
     }
-    ChordType other = (ChordType) obj;
+    SoundType other = (SoundType) obj;
     if (!Arrays.equals(commonNotes, other.commonNotes)) {
       return false;
     }
@@ -85,7 +85,7 @@ public class ChordType implements Comparable<ChordType> {
 
   @Override
   public String toString() {
-    return "ChordType [name=" + name + ", commonNotes=" + Arrays.toString(commonNotes) + "]";
+    return "SoundType [name=" + name + ", commonNotes=" + Arrays.toString(commonNotes) + "]";
   }
 
 }

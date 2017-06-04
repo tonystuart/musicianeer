@@ -13,14 +13,14 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import com.example.afs.musicpad.song.Note;
-import com.example.afs.musicpad.theory.ChordType;
+import com.example.afs.musicpad.theory.SoundType;
 import com.example.afs.musicpad.theory.IntervalSet;
 
-public class Chord implements Comparable<Chord> {
-  private ChordType chordType;
+public class Sound implements Comparable<Sound> {
+  private SoundType soundType;
   private int[] midiNotes;
 
-  public Chord(Collection<Note> notes) {
+  public Sound(Collection<Note> notes) {
     int noteIndex = 0;
     this.midiNotes = new int[notes.size()];
     for (Note note : notes) {
@@ -28,12 +28,12 @@ public class Chord implements Comparable<Chord> {
     }
   }
 
-  public Chord(int... notes) {
+  public Sound(int... notes) {
     this.midiNotes = notes;
   }
 
   @Override
-  public int compareTo(Chord that) {
+  public int compareTo(Sound that) {
     int controllingLength = Math.min(this.midiNotes.length, that.midiNotes.length);
     for (int i = 0; i < controllingLength; i++) {
       int delta = this.midiNotes[i] - that.midiNotes[i];
@@ -55,22 +55,22 @@ public class Chord implements Comparable<Chord> {
     if (getClass() != obj.getClass()) {
       return false;
     }
-    Chord other = (Chord) obj;
+    Sound other = (Sound) obj;
     if (!Arrays.equals(midiNotes, other.midiNotes)) {
       return false;
     }
     return true;
   }
 
-  public ChordType getChordType() {
-    if (chordType == null) {
+  public SoundType getSoundType() {
+    if (soundType == null) {
       IntervalSet intervalSet = new IntervalSet();
       for (int i = 0; i < midiNotes.length; i++) {
         intervalSet.add(midiNotes[i]);
       }
-      chordType = intervalSet.getChordType();
+      soundType = intervalSet.getSoundType();
     }
-    return chordType;
+    return soundType;
   }
 
   public int[] getMidiNotes() {
@@ -87,7 +87,7 @@ public class Chord implements Comparable<Chord> {
 
   @Override
   public String toString() {
-    return "Chord [chordType=" + getChordType() + ", midiNotes=" + Arrays.toString(midiNotes) + "]";
+    return "Sound [soundType=" + getSoundType() + ", midiNotes=" + Arrays.toString(midiNotes) + "]";
   }
 
 }

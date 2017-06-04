@@ -13,7 +13,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.example.afs.musicpad.player.Chord;
+import com.example.afs.musicpad.player.Sound;
 import com.example.afs.musicpad.renderer.Notator.KeyCap;
 import com.example.afs.musicpad.renderer.Notator.Slice;
 import com.example.afs.musicpad.util.Count;
@@ -22,14 +22,14 @@ import com.example.afs.musicpad.util.RandomAccessList;
 
 public class QwertyKeyCapMap implements KeyCapMap {
 
-  private static class ChordCount extends Count<Chord> {
+  private static class SoundCount extends Count<Sound> {
 
-    public ChordCount(Chord value) {
+    public SoundCount(Sound value) {
       super(value);
     }
 
     @Override
-    public int compareTo(Count<Chord> that) {
+    public int compareTo(Count<Sound> that) {
       return -super.compareTo(that); // descending sort order
     }
 
@@ -39,8 +39,8 @@ public class QwertyKeyCapMap implements KeyCapMap {
   private final String registerKeys;
   private final int noteKeyCount;
   private final int registerKeyCount;
-  private final int supportedChords;
-  private final Chord[][] keyIndexToChords;
+  private final int supportedSounds;
+  private final Sound[][] keyIndexToSounds;
   private final RandomAccessList<KeyCap> keyCaps;
 
   private int autoRegister;
@@ -51,14 +51,14 @@ public class QwertyKeyCapMap implements KeyCapMap {
     this.registerKeys = registerKeys;
     this.noteKeyCount = noteKeys.length();
     this.registerKeyCount = registerKeys.length();
-    this.supportedChords = noteKeyCount * registerKeyCount;
-    Map<Chord, ChordCount> chords = getUniqueChordCounts(slices);
-    ChordCount[] sortedChords = sortByFrequency(chords);
-    int maxChords = Math.min(chords.size(), supportedChords);
-    keyIndexToChords = assignChordsToRegisters(sortedChords, maxChords);
-    sortByPitch(keyIndexToChords, maxChords);
-    Map<Chord, String> chordToLegend = assignChordsToLegend(keyIndexToChords, maxChords);
-    keyCaps = getKeyCaps(chordToLegend, slices);
+    this.supportedSounds = noteKeyCount * registerKeyCount;
+    Map<Sound, SoundCount> sounds = getUniqueSoundCounts(slices);
+    SoundCount[] sortedSounds = sortByFrequency(sounds);
+    int maxSounds = Math.min(sounds.size(), supportedSounds);
+    keyIndexToSounds = assignSoundsToRegisters(sortedSounds, maxSounds);
+    sortByPitch(keyIndexToSounds, maxSounds);
+    Map<Sound, String> soundToLegend = assignSoundsToLegend(keyIndexToSounds, maxSounds);
+    keyCaps = getKeyCaps(soundToLegend, slices);
   }
 
   @Override
@@ -67,23 +67,23 @@ public class QwertyKeyCapMap implements KeyCapMap {
   }
 
   @Override
-  public Chord onDown(int inputCode) {
-    Chord chord;
+  public Sound onDown(int inputCode) {
+    Sound sound;
     int keyIndex = noteKeys.indexOf(inputCode);
     if (keyIndex != -1) {
       int thisRegister = registerDown != 0 ? registerDown : autoRegister;
-      chord = keyIndexToChords[thisRegister][keyIndex];
-      System.out.println("inputCode=" + inputCode + ", keyIndex=" + keyIndex + ", chord=" + chord);
+      sound = keyIndexToSounds[thisRegister][keyIndex];
+      System.out.println("inputCode=" + inputCode + ", keyIndex=" + keyIndex + ", sound=" + sound);
       autoRegister = 0;
     } else {
-      chord = null;
+      sound = null;
       int index = registerKeys.indexOf(inputCode);
       if (index != -1) {
         registerDown = index;
         autoRegister = registerDown;
       }
     }
-    return chord;
+    return sound;
   }
 
   @Override
@@ -93,41 +93,41 @@ public class QwertyKeyCapMap implements KeyCapMap {
     }
   }
 
-  private Map<Chord, String> assignChordsToLegend(Chord[][] keyIndexToChord, int maxChords) {
+  private Map<Sound, String> assignSoundsToLegend(Sound[][] keyIndexToSound, int maxSounds) {
     int index = 0;
-    Map<Chord, String> chordToLegend = new HashMap<>();
-    for (int i = 0; i < registerKeyCount && index < maxChords; i++) {
-      for (int j = 0; j < noteKeyCount && index < maxChords; j++) {
-        Chord chord = keyIndexToChord[i][j];
-        chordToLegend.put(chord, getLegend(i, j));
+    Map<Sound, String> soundToLegend = new HashMap<>();
+    for (int i = 0; i < registerKeyCount && index < maxSounds; i++) {
+      for (int j = 0; j < noteKeyCount && index < maxSounds; j++) {
+        Sound sound = keyIndexToSound[i][j];
+        soundToLegend.put(sound, getLegend(i, j));
         index++;
       }
     }
-    return chordToLegend;
+    return soundToLegend;
   }
 
-  private Chord[][] assignChordsToRegisters(ChordCount[] sortedChords, int maxChords) {
+  private Sound[][] assignSoundsToRegisters(SoundCount[] sortedSounds, int maxSounds) {
     int index = 0;
-    Chord[][] keyIndexToChord = new Chord[registerKeyCount][noteKeyCount];
+    Sound[][] keyIndexToSound = new Sound[registerKeyCount][noteKeyCount];
     for (int i = 0; i < registerKeyCount; i++) {
       for (int j = 0; j < noteKeyCount; j++) {
-        if (index < maxChords) {
-          Chord chord = sortedChords[index].getValue();
-          keyIndexToChord[i][j] = chord;
+        if (index < maxSounds) {
+          Sound sound = sortedSounds[index].getValue();
+          keyIndexToSound[i][j] = sound;
           index++;
         } else {
-          keyIndexToChord[i][j] = null;
+          keyIndexToSound[i][j] = null;
         }
       }
     }
-    return keyIndexToChord;
+    return keyIndexToSound;
   }
 
-  private RandomAccessList<KeyCap> getKeyCaps(Map<Chord, String> chordToLegend, RandomAccessList<Slice> slices) {
+  private RandomAccessList<KeyCap> getKeyCaps(Map<Sound, String> soundToLegend, RandomAccessList<Slice> slices) {
     RandomAccessList<KeyCap> keyCaps = new DirectList<>();
     for (Slice slice : slices) {
-      Chord chord = slice.getChord();
-      String legend = chordToLegend.get(chord);
+      Sound sound = slice.getSound();
+      String legend = soundToLegend.get(sound);
       if (legend == null) {
         legend = "?";
       }
@@ -147,34 +147,34 @@ public class QwertyKeyCapMap implements KeyCapMap {
     return registerString + String.valueOf(noteKeys.charAt(digit));
   }
 
-  private Map<Chord, ChordCount> getUniqueChordCounts(RandomAccessList<Slice> slices) {
-    Map<Chord, ChordCount> chords = new HashMap<>();
+  private Map<Sound, SoundCount> getUniqueSoundCounts(RandomAccessList<Slice> slices) {
+    Map<Sound, SoundCount> sounds = new HashMap<>();
     for (Slice slice : slices) {
-      Chord chord = slice.getChord();
-      ChordCount count = chords.get(chord);
+      Sound sound = slice.getSound();
+      SoundCount count = sounds.get(sound);
       if (count == null) {
-        count = new ChordCount(chord);
-        chords.put(chord, count);
+        count = new SoundCount(sound);
+        sounds.put(sound, count);
       }
       count.increment();
     }
-    return chords;
+    return sounds;
   }
 
-  private ChordCount[] sortByFrequency(Map<Chord, ChordCount> chords) {
+  private SoundCount[] sortByFrequency(Map<Sound, SoundCount> sounds) {
     int index = 0;
-    ChordCount[] sortedChords = new ChordCount[chords.size()];
-    for (ChordCount chordCount : chords.values()) {
-      sortedChords[index++] = chordCount;
+    SoundCount[] sortedSounds = new SoundCount[sounds.size()];
+    for (SoundCount soundCount : sounds.values()) {
+      sortedSounds[index++] = soundCount;
     }
-    Arrays.sort(sortedChords);
-    return sortedChords;
+    Arrays.sort(sortedSounds);
+    return sortedSounds;
   }
 
-  private void sortByPitch(Chord[][] keyIndexToChord, int maxChords) {
-    int amountRemaining = maxChords;
-    for (int i = 0; amountRemaining > 0 && i < keyIndexToChord[i].length; i++) {
-      Arrays.sort(keyIndexToChord[i], 0, Math.min(noteKeyCount, amountRemaining));
+  private void sortByPitch(Sound[][] keyIndexToSound, int maxSounds) {
+    int amountRemaining = maxSounds;
+    for (int i = 0; amountRemaining > 0 && i < keyIndexToSound[i].length; i++) {
+      Arrays.sort(keyIndexToSound[i], 0, Math.min(noteKeyCount, amountRemaining));
       amountRemaining = Math.max(amountRemaining - noteKeyCount, 0);
     }
   }

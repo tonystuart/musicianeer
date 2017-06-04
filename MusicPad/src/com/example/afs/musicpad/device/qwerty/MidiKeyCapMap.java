@@ -9,7 +9,7 @@
 
 package com.example.afs.musicpad.device.qwerty;
 
-import com.example.afs.musicpad.player.Chord;
+import com.example.afs.musicpad.player.Sound;
 import com.example.afs.musicpad.renderer.Notator.KeyCap;
 import com.example.afs.musicpad.renderer.Notator.Slice;
 import com.example.afs.musicpad.song.Note;
@@ -27,11 +27,11 @@ public class MidiKeyCapMap implements KeyCapMap {
   }
 
   @Override
-  public Chord onDown(int inputCode) {
+  public Sound onDown(int inputCode) {
     // TODO: Use a common base class with a derived class that handles single notes
     RandomAccessList<Note> notes = new DirectList<>();
     notes.add(new Note.NoteBuilder().withMidiNote(inputCode).create());
-    return new Chord(notes);
+    return new Sound(notes);
   }
 
   @Override

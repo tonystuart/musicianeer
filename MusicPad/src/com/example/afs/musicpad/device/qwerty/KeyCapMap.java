@@ -9,7 +9,7 @@
 
 package com.example.afs.musicpad.device.qwerty;
 
-import com.example.afs.musicpad.player.Chord;
+import com.example.afs.musicpad.player.Sound;
 import com.example.afs.musicpad.renderer.Notator.KeyCap;
 import com.example.afs.musicpad.util.RandomAccessList;
 
@@ -17,7 +17,7 @@ public interface KeyCapMap {
 
   RandomAccessList<KeyCap> getKeyCaps();
 
-  Chord onDown(int inputCode);
+  Sound onDown(int inputCode);
 
   void onUp(int inputCode);
 

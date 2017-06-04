@@ -49,21 +49,21 @@ public class IntervalSet {
     commonNotes[midiNote % Midi.SEMITONES_PER_OCTAVE] = true;
   }
 
-  public ChordType getChordType() {
+  public SoundType getSoundType() {
     RootIntervals[] rootIntervals = getRootIntervals();
     for (int i = 0; i < Intervals.INTERVALS.length; i++) {
       Intervals targetIntervals = Intervals.INTERVALS[i];
       for (int j = 0; j < rootIntervals.length; j++) {
         RootIntervals sourceIntervals = rootIntervals[j];
         if (targetIntervals.matches(sourceIntervals.getIntervals())) {
-          ChordType chordType = new ChordType(sourceIntervals.getRoot(), targetIntervals);
-          return chordType;
+          SoundType soundType = new SoundType(sourceIntervals.getRoot(), targetIntervals);
+          return soundType;
         }
       }
     }
     RootIntervals lowestIntervals = findLowestIntervals(rootIntervals);
-    ChordType chordType = createChordType(lowestIntervals);
-    return chordType;
+    SoundType soundType = createSoundType(lowestIntervals);
+    return soundType;
   }
 
   public int[][] getIntervals() {
@@ -121,7 +121,7 @@ public class IntervalSet {
     return rootIntervals;
   }
 
-  private ChordType createChordType(RootIntervals rootIntervals) {
+  private SoundType createSoundType(RootIntervals rootIntervals) {
     StringBuilder s = new StringBuilder();
     for (int i = 1; i < rootIntervals.getIntervals().length; i++) {
       int interval = rootIntervals.getIntervals()[i] - rootIntervals.getIntervals()[0];
@@ -129,8 +129,8 @@ public class IntervalSet {
       s.append(Intervals.intervalNames[interval]);
     }
     Intervals intervals = new Intervals(s.toString(), rootIntervals.getIntervals());
-    ChordType chordType = new ChordType(rootIntervals.getRoot(), intervals);
-    return chordType;
+    SoundType soundType = new SoundType(rootIntervals.getRoot(), intervals);
+    return soundType;
   }
 
   private RootIntervals findLowestIntervals(RootIntervals[] rootIntervals) {

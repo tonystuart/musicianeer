@@ -48,11 +48,11 @@ public class Player {
     synthesizer.changeControl(playerChannel, control, value);
   }
 
-  public void play(Action action, Chord chord) {
+  public void play(Action action, Sound sound) {
     if (action == Action.PRESS && Trace.isTracePlay()) {
-      System.out.println("Player.play: chordType=" + chord);
+      System.out.println("Player.play: soundType=" + sound);
     }
-    for (int midiNote : chord.getMidiNotes()) {
+    for (int midiNote : sound.getMidiNotes()) {
       // TODO: Consider arpeggiator options
       synthesizeNote(action, midiNote);
     }

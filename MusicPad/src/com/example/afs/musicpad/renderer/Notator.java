@@ -14,7 +14,7 @@ import java.util.SortedSet;
 
 import com.example.afs.musicpad.device.common.DeviceHandler;
 import com.example.afs.musicpad.midi.Midi;
-import com.example.afs.musicpad.player.Chord;
+import com.example.afs.musicpad.player.Sound;
 import com.example.afs.musicpad.song.Default;
 import com.example.afs.musicpad.song.Note;
 import com.example.afs.musicpad.song.Song;
@@ -58,29 +58,29 @@ public class Notator {
 
   public static class Slice implements Iterable<Note> {
     private RandomAccessList<Note> notes = new DirectList<>();
-    private Chord chord;
+    private Sound sound;
 
     public Slice() {
     }
 
     public void add(Note note) {
       notes.add(note);
-      chord = null;
+      sound = null;
     }
 
     public Note first() {
       return notes.get(0);
     }
 
-    public Chord getChord() {
-      if (chord == null) {
-        chord = new Chord(notes);
+    public Sound getSound() {
+      if (sound == null) {
+        sound = new Sound(notes);
       }
-      return chord;
+      return sound;
     }
 
     public String getName() {
-      return getChord().getChordType().getName();
+      return getSound().getSoundType().getName();
     }
 
     public long getTick() {
