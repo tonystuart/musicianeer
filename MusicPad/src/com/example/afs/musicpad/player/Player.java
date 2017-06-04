@@ -36,6 +36,7 @@ public class Player {
 
   private Synthesizer synthesizer;
   private Arpeggiator arpeggiator;
+  private Sound repeatArpeggiation;
 
   public Player(Synthesizer synthesizer, int deviceIndex) {
     this.synthesizer = synthesizer;
@@ -71,12 +72,11 @@ public class Player {
             arpeggiator.setPercentTempo(percentTempo);
           }
         }
+        repeatArpeggiation = sound;
         synthesizer.allNotesOff();
         arpeggiator.play(sound);
       } else {
-        // Let arpeggiator play through, chord will be silenced on next chord played
-        // arpeggiator.reset();
-        // synthesizer.allNotesOff();
+        repeatArpeggiation = null;
       }
     } else {
       for (int midiNote : sound.getMidiNotes()) {
@@ -120,6 +120,9 @@ public class Player {
       break;
     default:
       throw new UnsupportedOperationException();
+    }
+    if (arpeggiator.getInputQueue().size() == 0 && repeatArpeggiation != null) {
+      arpeggiator.play(repeatArpeggiation);
     }
   }
 
