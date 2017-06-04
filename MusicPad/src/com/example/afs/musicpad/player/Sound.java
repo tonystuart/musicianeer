@@ -12,6 +12,7 @@ package com.example.afs.musicpad.player;
 import java.util.Arrays;
 import java.util.Collection;
 
+import com.example.afs.musicpad.song.Default;
 import com.example.afs.musicpad.song.Note;
 import com.example.afs.musicpad.theory.IntervalSet;
 import com.example.afs.musicpad.theory.SoundType;
@@ -26,7 +27,9 @@ public class Sound implements Comparable<Sound> {
   public Sound(Collection<Note> notes) {
     int noteIndex = 0;
     this.midiNotes = new int[notes.size()];
-    this.arpeggiation = new Arpeggiation(notes);
+    if (requiresArpeggiation(notes)) {
+      this.arpeggiation = new Arpeggiation(notes);
+    }
     for (Note note : notes) {
       this.midiNotes[noteIndex++] = note.getMidiNote();
     }
@@ -96,6 +99,23 @@ public class Sound implements Comparable<Sound> {
   @Override
   public String toString() {
     return "Sound [soundType=" + getSoundType() + ", midiNotes=" + Arrays.toString(midiNotes) + "]";
+  }
+
+  private boolean requiresArpeggiation(Collection<Note> notes) {
+    long firstTick = Long.MAX_VALUE;
+    long lastTick = Long.MIN_VALUE;
+    for (Note note : notes) {
+      long tick = note.getTick();
+      if (tick < firstTick) {
+        firstTick = tick;
+      }
+      if (tick > lastTick) {
+        lastTick = tick;
+      }
+    }
+    long spread = lastTick - firstTick;
+    boolean requiresArpeggiation = spread > (Default.TICKS_PER_BEAT / 4);
+    return requiresArpeggiation;
   }
 
 }
