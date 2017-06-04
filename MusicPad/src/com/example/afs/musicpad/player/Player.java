@@ -14,6 +14,7 @@ import com.example.afs.fluidsynth.Synthesizer;
 import com.example.afs.musicpad.Trace;
 import com.example.afs.musicpad.analyzer.Names;
 import com.example.afs.musicpad.midi.Midi;
+import com.example.afs.musicpad.transport.NoteEvent;
 import com.example.afs.musicpad.util.Velocity;
 
 public class Player {
@@ -29,14 +30,15 @@ public class Player {
   private static final int DEFAULT_VELOCITY = 96;
   private static final int DEFAULT_PERCENT_VELOCITY = 100;
 
-  protected int deviceIndex;
   private int playerChannel;
-  private Synthesizer synthesizer;
+  private int percentTempo;
   private int percentVelocity = DEFAULT_PERCENT_VELOCITY;
+
+  private Synthesizer synthesizer;
+  private Arpeggiator arpeggiator;
 
   public Player(Synthesizer synthesizer, int deviceIndex) {
     this.synthesizer = synthesizer;
-    this.deviceIndex = deviceIndex;
     this.playerChannel = PLAYER_BASE + deviceIndex;
   }
 
@@ -48,21 +50,39 @@ public class Player {
     synthesizer.changeControl(playerChannel, control, value);
   }
 
-  public void play(Action action, Sound sound) {
-    if (action == Action.PRESS && Trace.isTracePlay()) {
-      System.out.println("Player.play: soundType=" + sound);
-    }
-    for (int midiNote : sound.getMidiNotes()) {
-      // TODO: Consider arpeggiator options
-      synthesizeNote(action, midiNote);
-    }
-  }
-
   public void play(Action action, int midiNote) {
     if (action == Action.PRESS && Trace.isTracePlay()) {
       System.out.println("Player.play: midiNote=" + Names.formatNote(midiNote));
     }
     synthesizeNote(action, midiNote);
+  }
+
+  public void play(Action action, Sound sound) {
+    if (action == Action.PRESS && Trace.isTracePlay()) {
+      System.out.println("Player.play: soundType=" + sound);
+    }
+    Arpeggiation arpeggiation = sound.getArpeggiation();
+    if (arpeggiation != null) {
+      if (action == Action.PRESS) {
+        if (arpeggiator == null) {
+          arpeggiator = new Arpeggiator(noteEvent -> processNoteEvent(noteEvent));
+          arpeggiator.start();
+          if (percentTempo != 0) {
+            arpeggiator.setPercentTempo(percentTempo);
+          }
+        }
+        synthesizer.allNotesOff();
+        arpeggiator.play(sound);
+      } else {
+        // Let arpeggiator play through, chord will be silenced on next chord played
+        // arpeggiator.reset();
+        // synthesizer.allNotesOff();
+      }
+    } else {
+      for (int midiNote : sound.getMidiNotes()) {
+        synthesizeNote(action, midiNote);
+      }
+    }
   }
 
   public void selectProgram(int program) {
@@ -75,20 +95,45 @@ public class Player {
     }
   }
 
-  public void setPercentTempo(int scaleMidiToPercent) {
+  public void setPercentTempo(int percentTempo) {
+    this.percentTempo = percentTempo;
+    if (arpeggiator != null) {
+      arpeggiator.setPercentTempo(percentTempo);
+    }
   }
 
   public void setPercentVelocity(int percentVelocity) {
     this.percentVelocity = percentVelocity;
   }
 
+  private void press(int midiNote) {
+    synthesizer.pressKey(playerChannel, midiNote, Velocity.scale(DEFAULT_VELOCITY, percentVelocity));
+  }
+
+  private void processNoteEvent(NoteEvent noteEvent) {
+    switch (noteEvent.getType()) {
+    case NOTE_OFF:
+      release(noteEvent.getNote().getMidiNote());
+      break;
+    case NOTE_ON:
+      press(noteEvent.getNote().getMidiNote());
+      break;
+    default:
+      throw new UnsupportedOperationException();
+    }
+  }
+
+  private void release(int midiNote) {
+    synthesizer.releaseKey(playerChannel, midiNote);
+  }
+
   private void synthesizeNote(Action action, int midiNote) {
     switch (action) {
     case PRESS:
-      synthesizer.pressKey(playerChannel, midiNote, Velocity.scale(DEFAULT_VELOCITY, percentVelocity));
+      press(midiNote);
       break;
     case RELEASE:
-      synthesizer.releaseKey(playerChannel, midiNote);
+      release(midiNote);
       break;
     default:
       throw new UnsupportedOperationException();

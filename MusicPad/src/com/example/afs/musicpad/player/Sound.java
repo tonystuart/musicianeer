@@ -13,16 +13,20 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import com.example.afs.musicpad.song.Note;
-import com.example.afs.musicpad.theory.SoundType;
 import com.example.afs.musicpad.theory.IntervalSet;
+import com.example.afs.musicpad.theory.SoundType;
 
 public class Sound implements Comparable<Sound> {
-  private SoundType soundType;
+
   private int[] midiNotes;
+
+  private SoundType soundType;
+  private Arpeggiation arpeggiation;
 
   public Sound(Collection<Note> notes) {
     int noteIndex = 0;
     this.midiNotes = new int[notes.size()];
+    this.arpeggiation = new Arpeggiation(notes);
     for (Note note : notes) {
       this.midiNotes[noteIndex++] = note.getMidiNote();
     }
@@ -62,6 +66,14 @@ public class Sound implements Comparable<Sound> {
     return true;
   }
 
+  public Arpeggiation getArpeggiation() {
+    return arpeggiation;
+  }
+
+  public int[] getMidiNotes() {
+    return midiNotes;
+  }
+
   public SoundType getSoundType() {
     if (soundType == null) {
       IntervalSet intervalSet = new IntervalSet();
@@ -71,10 +83,6 @@ public class Sound implements Comparable<Sound> {
       soundType = intervalSet.getSoundType();
     }
     return soundType;
-  }
-
-  public int[] getMidiNotes() {
-    return midiNotes;
   }
 
   @Override

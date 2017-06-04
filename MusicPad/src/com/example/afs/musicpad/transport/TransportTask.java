@@ -9,9 +9,7 @@
 
 package com.example.afs.musicpad.transport;
 
-import java.util.NavigableSet;
 import java.util.TreeSet;
-import java.util.concurrent.BlockingQueue;
 
 import com.example.afs.fluidsynth.Synthesizer;
 import com.example.afs.musicpad.ChannelCommand;
@@ -26,8 +24,6 @@ import com.example.afs.musicpad.song.Default;
 import com.example.afs.musicpad.song.Note;
 import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.task.BrokerTask;
-import com.example.afs.musicpad.task.PausibleSequencerTask;
-import com.example.afs.musicpad.transport.NoteEvent.Type;
 import com.example.afs.musicpad.util.Broker;
 import com.example.afs.musicpad.util.Range;
 import com.example.afs.musicpad.util.Velocity;
@@ -41,14 +37,14 @@ public class TransportTask extends BrokerTask<Message> {
   private static final int DEFAULT_PERCENT_VELOCITY = 25;
   private static final float DEFAULT_GAIN = 5 * Synthesizer.DEFAULT_GAIN;
   private static final long FIRST_NOTE = -1;
-  private static final long LAST_NOTE = -1;
+  static final long LAST_NOTE = -1;
+
+  private int percentVelocity = DEFAULT_PERCENT_VELOCITY;
+  private int[] currentPrograms = new int[Midi.CHANNELS];
 
   private Song song;
   private Synthesizer synthesizer;
-  private NoteEventScheduler scheduler;
-  private PausibleSequencerTask<NoteEvent> sequencer;
-  private int percentVelocity = DEFAULT_PERCENT_VELOCITY;
-  private int[] currentPrograms = new int[Midi.CHANNELS];
+  private TransportSequencer sequencer;
 
   public TransportTask(Broker<Message> broker, Synthesizer synthesizer) {
     super(broker);
@@ -57,17 +53,8 @@ public class TransportTask extends BrokerTask<Message> {
     subscribe(OnSong.class, message -> doSong(message.getSong()));
     subscribe(OnCommand.class, message -> doCommand(message.getCommand(), message.getParameter()));
     subscribe(OnChannelCommand.class, message -> doChannelCommand(message.getChannelCommand(), message.getChannel(), message.getParameter()));
-    scheduler = new NoteEventScheduler();
-    sequencer = new PausibleSequencerTask<NoteEvent>(scheduler, new Broker<>());
-    sequencer.subscribe(NoteEvent.class, noteEvent -> processNoteEvent(noteEvent));
+    this.sequencer = new TransportSequencer(noteEvent -> processNoteEvent(noteEvent));
     sequencer.start();
-  }
-
-  private void clear() {
-    sequencer.getInputQueue().clear();
-    sequencer.setPaused(false);
-    synthesizer.allNotesOff();
-    scheduler.resetAll();
   }
 
   private void doBackward() {
@@ -188,7 +175,7 @@ public class TransportTask extends BrokerTask<Message> {
   }
 
   private void doTempo(int tempo) {
-    scheduler.setPercentTempo(Range.scaleMidiToPercent(tempo));
+    sequencer.setPercentTempo(Range.scaleMidiToPercent(tempo));
   }
 
   private void doTransposeTo(int midiTransposition) {
@@ -219,9 +206,19 @@ public class TransportTask extends BrokerTask<Message> {
     return null;
   }
 
+  private Note findLastNote(Note firstNote, long baseDuration) {
+    Note lastNote;
+    if (baseDuration == TransportTask.LAST_NOTE) {
+      lastNote = song.getNotes().last();
+    } else {
+      lastNote = new Note(firstNote.getTick() + baseDuration);
+    }
+    return lastNote;
+  }
+
   private void move(Direction direction) {
     sequencer.setPaused(true);
-    long oldTick = scheduler.getTick();
+    long oldTick = sequencer.getTick();
     int ticksPerMeasure = song.getTicksPerMeasure(oldTick);
     int measure;
     int nextMeasure;
@@ -245,43 +242,15 @@ public class TransportTask extends BrokerTask<Message> {
 
   private void pause() {
     sequencer.setPaused(true);
-    scheduler.resetBaseTime();
     synthesizer.allNotesOff();
   }
 
   private void play(int channel, long baseTick, long baseDuration) {
-    clear();
+    reset();
     Note firstNote = findFirstNote(channel, baseTick);
     if (firstNote != null) {
-      long firstTick = firstNote.getTick();
-      scheduler.setBaseTick(firstTick);
-      scheduler.resetBaseTime();
-      Note lastNote;
-      if (baseDuration == LAST_NOTE) {
-        lastNote = song.getNotes().last();
-      } else {
-        lastNote = new Note(firstTick + baseDuration);
-      }
-      BlockingQueue<NoteEvent> inputQueue = sequencer.getInputQueue();
-      NavigableSet<Note> notes = song.getNotes().subSet(firstNote, true, lastNote, false);
-      for (Note note : notes) {
-        if (channel == -1 || channel == note.getChannel()) {
-          long tick = note.getTick();
-          long duration = note.getDuration();
-          inputQueue.add(new NoteEvent(Type.NOTE_ON, tick, note));
-          inputQueue.add(new NoteEvent(Type.NOTE_OFF, tick + duration, note));
-        }
-      }
-      for (long tick = 0; tick < lastNote.getTick(); tick += Default.RESOLUTION) {
-        int beatsPerMinute;
-        Note previousNote = notes.lower(new Note(tick));
-        if (previousNote == null) {
-          beatsPerMinute = Default.BEATS_PER_MINUTE;
-        } else {
-          beatsPerMinute = previousNote.getBeatsPerMinute();
-        }
-        inputQueue.add(new NoteEvent(Type.TICK, tick, beatsPerMinute));
-      }
+      Note lastNote = findLastNote(firstNote, baseDuration);
+      sequencer.play(song, channel, firstNote, lastNote);
     }
   }
 
@@ -306,6 +275,7 @@ public class TransportTask extends BrokerTask<Message> {
       if (currentPrograms[channel] != program) {
         synthesizer.changeProgram(channel, program);
         currentPrograms[channel] = program;
+        // TODO: Publish this for Player
       }
       int scaledVelocity = Velocity.scale(velocity, percentVelocity);
       synthesizer.pressKey(channel, midiNote, scaledVelocity);
@@ -323,12 +293,17 @@ public class TransportTask extends BrokerTask<Message> {
     getBroker().publish(new OnTick(tick));
   }
 
+  private void reset() {
+    sequencer.reset();
+    synthesizer.allNotesOff();
+  }
+
   private void resume() {
     sequencer.setPaused(false);
   }
 
   private void stop() {
-    clear();
+    reset();
     publishTick(0);
   }
 }
