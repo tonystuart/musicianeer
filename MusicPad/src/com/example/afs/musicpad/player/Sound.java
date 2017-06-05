@@ -9,46 +9,34 @@
 
 package com.example.afs.musicpad.player;
 
-import java.util.Arrays;
-import java.util.Collection;
-
-import com.example.afs.musicpad.song.Default;
 import com.example.afs.musicpad.song.Note;
 import com.example.afs.musicpad.theory.IntervalSet;
 import com.example.afs.musicpad.theory.SoundType;
+import com.example.afs.musicpad.util.RandomAccessList;
+
+// NB: equals, hashCode and compareTo use only the midiNote values in notes.
 
 public class Sound implements Comparable<Sound> {
 
-  private int[] midiNotes;
-
   private SoundType soundType;
-  private Arpeggiation arpeggiation;
+  private RandomAccessList<Note> notes;
 
-  public Sound(Collection<Note> notes) {
-    int noteIndex = 0;
-    this.midiNotes = new int[notes.size()];
-    if (requiresArpeggiation(notes)) {
-      this.arpeggiation = new Arpeggiation(notes);
-    }
-    for (Note note : notes) {
-      this.midiNotes[noteIndex++] = note.getMidiNote();
-    }
-  }
-
-  public Sound(int... notes) {
-    this.midiNotes = notes;
+  public Sound(RandomAccessList<Note> notes) {
+    this.notes = notes;
   }
 
   @Override
   public int compareTo(Sound that) {
-    int controllingLength = Math.min(this.midiNotes.length, that.midiNotes.length);
+    int thisNoteCount = this.notes.size();
+    int thatNoteCount = that.notes.size();
+    int controllingLength = Math.min(thisNoteCount, thatNoteCount);
     for (int i = 0; i < controllingLength; i++) {
-      int delta = this.midiNotes[i] - that.midiNotes[i];
+      int delta = this.notes.get(i).getMidiNote() - that.notes.get(i).getMidiNote();
       if (delta != 0) {
         return delta;
       }
     }
-    return this.midiNotes.length - that.midiNotes.length;
+    return thisNoteCount - thatNoteCount;
   }
 
   @Override
@@ -63,25 +51,23 @@ public class Sound implements Comparable<Sound> {
       return false;
     }
     Sound other = (Sound) obj;
-    if (!Arrays.equals(midiNotes, other.midiNotes)) {
+    if (compareTo(other) != 0) {
       return false;
     }
     return true;
   }
 
-  public Arpeggiation getArpeggiation() {
-    return arpeggiation;
-  }
-
-  public int[] getMidiNotes() {
-    return midiNotes;
+  public RandomAccessList<Note> getNotes() {
+    return notes;
   }
 
   public SoundType getSoundType() {
     if (soundType == null) {
+      int noteCount = notes.size();
       IntervalSet intervalSet = new IntervalSet();
-      for (int i = 0; i < midiNotes.length; i++) {
-        intervalSet.add(midiNotes[i]);
+      for (int i = 0; i < noteCount; i++) {
+        Note note = notes.get(i);
+        intervalSet.add(note.getMidiNote());
       }
       soundType = intervalSet.getSoundType();
     }
@@ -92,30 +78,17 @@ public class Sound implements Comparable<Sound> {
   public int hashCode() {
     final int prime = 31;
     int result = 1;
-    result = prime * result + Arrays.hashCode(midiNotes);
+    int noteCount = notes.size();
+    for (int i = 0; i < noteCount; i++) {
+      Note note = notes.get(i);
+      result = prime * result + note.getMidiNote();
+    }
     return result;
   }
 
   @Override
   public String toString() {
-    return "Sound [soundType=" + getSoundType() + ", midiNotes=" + Arrays.toString(midiNotes) + "]";
-  }
-
-  private boolean requiresArpeggiation(Collection<Note> notes) {
-    long firstTick = Long.MAX_VALUE;
-    long lastTick = Long.MIN_VALUE;
-    for (Note note : notes) {
-      long tick = note.getTick();
-      if (tick < firstTick) {
-        firstTick = tick;
-      }
-      if (tick > lastTick) {
-        lastTick = tick;
-      }
-    }
-    long spread = lastTick - firstTick;
-    boolean requiresArpeggiation = spread > (Default.TICKS_PER_BEAT / 4);
-    return requiresArpeggiation;
+    return "Sound [soundType=" + getSoundType() + ", notes=" + notes + "]";
   }
 
 }

@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.example.afs.musicpad.device.common.DeviceHandler.OutputType;
 import com.example.afs.musicpad.player.Sound;
 import com.example.afs.musicpad.renderer.Notator.KeyCap;
 import com.example.afs.musicpad.renderer.Notator.Slice;
@@ -35,20 +36,23 @@ public class QwertyKeyCapMap implements KeyCapMap {
 
   }
 
-  private final String noteKeys;
-  private final String registerKeys;
   private final int noteKeyCount;
   private final int registerKeyCount;
   private final int supportedSounds;
+
+  private final String noteKeys;
+  private final String registerKeys;
+  private final OutputType outputType;
   private final Sound[][] keyIndexToSounds;
   private final RandomAccessList<KeyCap> keyCaps;
 
   private int autoRegister;
   private int registerDown;
 
-  public QwertyKeyCapMap(String noteKeys, String registerKeys, RandomAccessList<Slice> slices) {
+  public QwertyKeyCapMap(String noteKeys, String registerKeys, RandomAccessList<Slice> slices, OutputType outputType) {
     this.noteKeys = noteKeys;
     this.registerKeys = registerKeys;
+    this.outputType = outputType;
     this.noteKeyCount = noteKeys.length();
     this.registerKeyCount = registerKeys.length();
     this.supportedSounds = noteKeyCount * registerKeyCount;
@@ -73,7 +77,7 @@ public class QwertyKeyCapMap implements KeyCapMap {
     if (keyIndex != -1) {
       int thisRegister = registerDown != 0 ? registerDown : autoRegister;
       sound = keyIndexToSounds[thisRegister][keyIndex];
-      System.out.println("inputCode=" + inputCode + ", keyIndex=" + keyIndex + ", sound=" + sound);
+      //System.out.println("inputCode=" + inputCode + ", keyIndex=" + keyIndex + ", sound=" + sound);
       autoRegister = 0;
     } else {
       sound = null;
