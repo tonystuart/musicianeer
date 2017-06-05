@@ -14,12 +14,14 @@ public class ActiveNote {
   private int midiNote;
   private int program;
   private int velocity;
+  private int startIndex;
 
-  public ActiveNote(long tick, int midiNote, int program, int velocity) {
+  public ActiveNote(long tick, int midiNote, int program, int velocity, int startIndex) {
     this.tick = tick;
     this.midiNote = midiNote;
     this.program = program;
     this.velocity = velocity;
+    this.startIndex = startIndex;
   }
 
   public int getMidiNote() {
@@ -28,6 +30,10 @@ public class ActiveNote {
 
   public int getProgram() {
     return program;
+  }
+
+  public int getStartIndex() {
+    return startIndex;
   }
 
   public long getTick() {

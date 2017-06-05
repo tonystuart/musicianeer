@@ -7,15 +7,23 @@ import com.example.afs.musicpad.song.Default;
 
 public class Detail {
 
+  private static final int CONTOUR_MINIMUM = Default.TICKS_PER_BEAT / 8;
+  private static final int START_INDEX_RESOLUTION = Default.TICKS_PER_BEAT / 8;
+
   private long gapTicks;
   private long previousTick;
   private long concurrentTicks;
+  private long contourTick;
+  private int program;
+  private int startIndex;
+
   private ActiveNote contourNote;
   private Map<Integer, ActiveNote> activeNotes = new HashMap<>();
-  private int program;
-  private long xtick;
 
   public void add(long tick, int midiNote, int velocity) {
+    if (tick > (previousTick + START_INDEX_RESOLUTION)) {
+      startIndex++;
+    }
     int activeNoteCount = activeNotes.size();
     long deltaTick = tick - previousTick;
     if (activeNoteCount == 0) {
@@ -23,7 +31,7 @@ public class Detail {
     } else {
       concurrentTicks = concurrentTicks + activeNoteCount * deltaTick;
     }
-    activeNotes.put(midiNote, new ActiveNote(tick, midiNote, program, velocity));
+    activeNotes.put(midiNote, new ActiveNote(tick, midiNote, program, velocity, startIndex));
     updateContour(tick);
     previousTick = tick;
   }
@@ -69,9 +77,9 @@ public class Detail {
     this.program = program;
   }
 
-  private ActiveNote findHighestNote(Map<Integer, ActiveNote> groupNotes) {
+  private ActiveNote findHighestNote(Map<Integer, ActiveNote> activeNotes) {
     ActiveNote highestNote = null;
-    for (ActiveNote tickEvent : groupNotes.values()) {
+    for (ActiveNote tickEvent : activeNotes.values()) {
       if (highestNote == null || tickEvent.getMidiNote() > highestNote.getMidiNote()) {
         highestNote = tickEvent;
       }
@@ -83,12 +91,12 @@ public class Detail {
     ActiveNote highestNote = findHighestNote(activeNotes);
     if (highestNote != contourNote) {
       if (contourNote != null) {
-        long xduration = tick - xtick;
-        if (xduration > Default.TICKS_PER_BEAT / 8) {
+        long xduration = tick - contourTick;
+        if (xduration > CONTOUR_MINIMUM) {
           // contour.add(new Contour(xtick, contourNote.getMidiNote(), xduration));
         }
       }
-      xtick = tick;
+      contourTick = tick;
       contourNote = highestNote;
     }
   }

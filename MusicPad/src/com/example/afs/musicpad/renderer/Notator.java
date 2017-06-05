@@ -255,14 +255,14 @@ public class Notator {
       long duration = song.getDuration();
       Svg staff = getStaff(duration);
       drawMeasures(staff, duration);
-      int lastGroup = -1;
+      int lastEndIndex = -1;
       Slice slice = null;
       RandomAccessList<Slice> slices = new DirectList<>();
       for (Note note : song.getNotes()) {
         if (note.getChannel() == channel) {
-          int group = note.getGroup();
-          if (group != lastGroup) {
-            lastGroup = group;
+          int endIndex = note.getEndIndex();
+          if (endIndex != lastEndIndex) {
+            lastEndIndex = endIndex;
             if (slice != null) {
               slices.add(slice);
               drawSlice(staff, slice);

@@ -18,7 +18,7 @@ public class MidiParser {
 
   private static final int USEC_PER_MINUTE = 60000000;
 
-  private int groupIndex;
+  private int endIndex;
   private Listener listener;
   private int defaultResolution;
   private ChannelDetails channelDetails = new ChannelDetails();
@@ -99,13 +99,14 @@ public class MidiParser {
     if (activeNote != null) {
       int program = activeNote.getProgram();
       int velocity = activeNote.getVelocity();
+      int startIndex = activeNote.getStartIndex();
       long start = activeNote.getTick();
       long duration = tick - start;
       if (duration > 0) {
-        listener.onNote(start, channel, midiNote, velocity, duration, program, groupIndex);
+        listener.onNote(start, channel, midiNote, velocity, duration, program, startIndex, endIndex);
         detail.remove(tick, midiNote);
         if (detail.allNotesAreOff()) {
-          groupIndex++;
+          endIndex++;
         }
       }
     }

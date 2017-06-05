@@ -21,13 +21,14 @@ public class Note extends Item<Note> {
     private int velocity;
     private long duration;
     private int program;
-    private int group;
+    private int startIndex;
+    private int endIndex;
     private int beatsPerMinute = Default.BEATS_PER_MINUTE;
     private int beatsPerMeasure = Default.BEATS_PER_MEASURE;
     private int beatUnit = Default.BEAT_UNIT;
 
     public Note create() {
-      return new Note(tick, channel, midiNote, velocity, duration, program, group, beatsPerMinute, beatsPerMeasure, beatUnit);
+      return new Note(tick, channel, midiNote, velocity, duration, program, startIndex, endIndex, beatsPerMinute, beatsPerMeasure, beatUnit);
     }
 
     public NoteBuilder withBeatsPerMeasure(int beatsPerMeasure) {
@@ -55,8 +56,8 @@ public class Note extends Item<Note> {
       return this;
     }
 
-    public NoteBuilder withGroup(int group) {
-      this.group = group;
+    public NoteBuilder withEndIndex(int endIndex) {
+      this.endIndex = endIndex;
       return this;
     }
 
@@ -72,7 +73,7 @@ public class Note extends Item<Note> {
       velocity = note.getVelocity();
       duration = note.getDuration();
       program = note.getProgram();
-      group = note.getGroup();
+      endIndex = note.getEndIndex();
       beatsPerMinute = note.getBeatsPerMinute();
       beatsPerMeasure = note.getBeatsPerMeasure();
       beatUnit = note.getBeatUnit();
@@ -81,6 +82,11 @@ public class Note extends Item<Note> {
 
     public NoteBuilder withProgram(int program) {
       this.program = program;
+      return this;
+    }
+
+    public NoteBuilder withStartIndex(int startIndex) {
+      this.startIndex = startIndex;
       return this;
     }
 
@@ -100,7 +106,8 @@ public class Note extends Item<Note> {
   private int velocity;
   private long duration;
   private int program;
-  private int group;
+  private int startIndex;
+  private int endIndex;
   private int beatsPerMinute;
   private int beatsPerMeasure;
   private int beatUnit;
@@ -109,14 +116,15 @@ public class Note extends Item<Note> {
     super(tick);
   }
 
-  public Note(long tick, int channel, int midiNote, int velocity, long duration, int program, int group, int beatsPerMinute, int beatsPerMeasure, int beatUnit) {
+  public Note(long tick, int channel, int midiNote, int velocity, long duration, int program, int startIndex, int endIndex, int beatsPerMinute, int beatsPerMeasure, int beatUnit) {
     super(tick);
     this.channel = channel;
     this.midiNote = midiNote;
     this.velocity = velocity;
     this.duration = duration;
     this.program = program;
-    this.group = group;
+    this.startIndex = startIndex;
+    this.endIndex = endIndex;
     this.beatsPerMinute = beatsPerMinute;
     this.beatsPerMeasure = beatsPerMeasure;
     this.beatUnit = beatUnit;
@@ -183,8 +191,8 @@ public class Note extends Item<Note> {
     return duration;
   }
 
-  public int getGroup() {
-    return group;
+  public int getEndIndex() {
+    return endIndex;
   }
 
   public int getMeasure() {
@@ -197,6 +205,10 @@ public class Note extends Item<Note> {
 
   public int getProgram() {
     return program;
+  }
+
+  public int getStartIndex() {
+    return startIndex;
   }
 
   public long getTickOfNextMeasure() {

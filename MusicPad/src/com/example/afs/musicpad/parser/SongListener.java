@@ -51,10 +51,10 @@ public class SongListener implements Listener {
   }
 
   @Override
-  public void onNote(long tick, int channel, int midiNote, int velocity, long duration, int program, int group) {
+  public void onNote(long tick, int channel, int midiNote, int velocity, long duration, int program, int startIndex, int endIndex) {
     Tempo tempo = tempos.floorEntry(tick).getValue();
     TimeSignature timeSignature = timeSignatures.floorEntry(tick).getValue();
-    song.add(new Note(tick, channel, midiNote, velocity, duration, program, group, tempo.getQuarterNotesPerMinute(), timeSignature.getBeatsPerMeasure(), timeSignature.getBeatUnit()));
+    song.add(new Note(tick, channel, midiNote, velocity, duration, program, startIndex, endIndex, tempo.getQuarterNotesPerMinute(), timeSignature.getBeatsPerMeasure(), timeSignature.getBeatUnit()));
   }
 
   @Override

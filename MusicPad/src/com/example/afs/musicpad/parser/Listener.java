@@ -19,7 +19,7 @@ public interface Listener {
 
   void onLyrics(long tick, String lyrics);
 
-  void onNote(long tick, int channel, int midiNote, int velocity, long duration, int program, int group);
+  void onNote(long tick, int channel, int midiNote, int velocity, long duration, int program, int startIndex, int endIndex);
 
   void onOccupancy(int channel, int occupancy);
 
