@@ -12,6 +12,7 @@ public class Detail {
 
   private long gapTicks;
   private long previousTick;
+  private long previousStartTick;
   private long concurrentTicks;
   private long contourTick;
   private int program;
@@ -21,7 +22,7 @@ public class Detail {
   private Map<Integer, ActiveNote> activeNotes = new HashMap<>();
 
   public void add(long tick, int midiNote, int velocity) {
-    if (tick > (previousTick + START_INDEX_RESOLUTION)) {
+    if (tick > (previousStartTick + START_INDEX_RESOLUTION)) {
       startIndex++;
     }
     int activeNoteCount = activeNotes.size();
@@ -34,6 +35,7 @@ public class Detail {
     activeNotes.put(midiNote, new ActiveNote(tick, midiNote, program, velocity, startIndex));
     updateContour(tick);
     previousTick = tick;
+    previousStartTick = tick;
   }
 
   public boolean allNotesAreOff() {

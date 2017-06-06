@@ -72,15 +72,15 @@ public class Notator {
       return notes.get(0);
     }
 
+    public String getName() {
+      return getSound().getSoundType().getName();
+    }
+
     public Sound getSound() {
       if (sound == null) {
         sound = new Sound(notes);
       }
       return sound;
-    }
-
-    public String getName() {
-      return getSound().getSoundType().getName();
     }
 
     public long getTick() {
@@ -255,14 +255,14 @@ public class Notator {
       long duration = song.getDuration();
       Svg staff = getStaff(duration);
       drawMeasures(staff, duration);
-      int lastEndIndex = -1;
+      int lastStartIndex = -1;
       Slice slice = null;
       RandomAccessList<Slice> slices = new DirectList<>();
       for (Note note : song.getNotes()) {
         if (note.getChannel() == channel) {
-          int endIndex = note.getEndIndex();
-          if (endIndex != lastEndIndex) {
-            lastEndIndex = endIndex;
+          int startIndex = note.getStartIndex();
+          if (startIndex != lastStartIndex) {
+            lastStartIndex = startIndex;
             if (slice != null) {
               slices.add(slice);
               drawSlice(staff, slice);
