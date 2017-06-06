@@ -9,7 +9,6 @@
 
 package com.example.afs.musicpad.renderer;
 
-import java.util.Iterator;
 import java.util.SortedSet;
 
 import com.example.afs.musicpad.device.qwerty.KeyCapMap;
@@ -31,10 +30,10 @@ public class Notator {
 
   public static class KeyCap {
     private String legend;
-    private Slice slice;
+    private Sound sound;
 
-    public KeyCap(Slice slice, String legend) {
-      this.slice = slice;
+    public KeyCap(Sound sound, String legend) {
+      this.sound = sound;
       this.legend = legend;
     }
 
@@ -42,58 +41,17 @@ public class Notator {
       return legend;
     }
 
-    public Slice getSlice() {
-      return slice;
-    }
-
-    public long getTick() {
-      return slice.getTick();
-    }
-
-    @Override
-    public String toString() {
-      return "KeyCap [legend=" + legend + ", slice=" + slice + "]";
-    }
-  }
-
-  public static class Slice implements Iterable<Note> {
-    private RandomAccessList<Note> notes = new DirectList<>();
-    private Sound sound;
-
-    public Slice() {
-    }
-
-    public void add(Note note) {
-      notes.add(note);
-      sound = null;
-    }
-
-    public Note first() {
-      return notes.get(0);
-    }
-
-    public String getName() {
-      return getSound().getSoundType().getName();
-    }
-
     public Sound getSound() {
-      if (sound == null) {
-        sound = new Sound(notes);
-      }
       return sound;
     }
 
     public long getTick() {
-      return first().getTick();
+      return sound.getTick();
     }
 
     @Override
-    public Iterator<Note> iterator() {
-      return notes.iterator();
-    }
-
-    public int size() {
-      return notes.size();
+    public String toString() {
+      return "KeyCap [legend=" + legend + ", sound=" + sound + "]";
     }
   }
 
@@ -208,8 +166,6 @@ public class Notator {
   private static final int BOTTOM = TOP + (SPAN * RADIUS) + INTER_CLEF;
   private static final int WORDS = BOTTOM / 2;
 
-  private static final long RESOLUTION = Default.TICKS_PER_BEAT / 2;
-
   private static final String CLOSED = "closed";
   private static final String OPEN = "open";
 
@@ -294,8 +250,8 @@ public class Notator {
     RandomAccessList<KeyCap> keyCaps = keyCapMap.getKeyCaps();
     for (KeyCap keyCap : keyCaps) {
       int wordX = getX(keyCap.getTick() - RADIUS); // align with left edge of note head
-      Slice slice = keyCap.getSlice();
-      String name = slice.getName();
+      Sound sound = keyCap.getSound();
+      String name = sound.getName();
       staff.add(new Text(wordX, WORDS + 3 * RADIUS, keyCap.getLegend()));
       staff.add(new Text(wordX, 3 * RADIUS, name));
     }
@@ -303,22 +259,22 @@ public class Notator {
 
   private void drawNotes(Svg staff) {
     int lastStartIndex = -1;
-    Slice slice = null;
+    Sound sound = null;
     for (Note note : song.getNotes()) {
       if (note.getChannel() == channel) {
         int startIndex = note.getStartIndex();
         if (startIndex != lastStartIndex) {
           lastStartIndex = startIndex;
-          if (slice != null) {
-            drawSlice(staff, slice);
+          if (sound != null) {
+            drawSound(staff, sound);
           }
-          slice = new Slice();
+          sound = new Sound();
         }
-        slice.add(note);
+        sound.add(note);
         keyCapMap.add(note);
       }
     }
-    drawSlice(staff, slice);
+    drawSound(staff, sound);
   }
 
   private void drawNotes(Svg staff, long firstTick, RandomAccessList<Note> notes, int midPoint) {
@@ -351,10 +307,10 @@ public class Notator {
     staff.add(new Line(x + half, y - full, x + half, y + full));
   }
 
-  private void drawSlice(Svg staff, Slice slice) {
+  private void drawSound(Svg staff, Sound sound) {
     RandomAccessList<Note> trebleNotes = new DirectList<>();
     RandomAccessList<Note> bassNotes = new DirectList<>();
-    for (Note note : slice) {
+    for (Note note : sound) {
       int midiNote = note.getMidiNote();
       if (midiNote < MIDDLE) {
         bassNotes.add(note);
@@ -362,8 +318,8 @@ public class Notator {
         trebleNotes.add(note);
       }
     }
-    drawNotes(staff, slice.getTick(), trebleNotes, TREBLE_MIDI_NOTES[2]);
-    drawNotes(staff, slice.getTick(), bassNotes, BASS_MIDI_NOTES[2]);
+    drawNotes(staff, sound.getTick(), trebleNotes, TREBLE_MIDI_NOTES[2]);
+    drawNotes(staff, sound.getTick(), bassNotes, BASS_MIDI_NOTES[2]);
   }
 
   private void drawStem(Svg staff, long firstTick, Context context) {

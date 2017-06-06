@@ -31,10 +31,7 @@ public class MidiKeyCapMap implements KeyCapMap {
 
   @Override
   public Sound onDown(int inputCode) {
-    // TODO: Use a common base class with a derived class that handles single notes
-    RandomAccessList<Note> notes = new DirectList<>();
-    notes.add(new Note.NoteBuilder().withMidiNote(inputCode).create());
-    return new Sound(notes);
+    return new Sound(new Note.NoteBuilder().withMidiNote(inputCode).create());
   }
 
   @Override

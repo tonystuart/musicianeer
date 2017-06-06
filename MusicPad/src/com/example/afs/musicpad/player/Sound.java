@@ -9,20 +9,33 @@
 
 package com.example.afs.musicpad.player;
 
+import java.util.Iterator;
+
 import com.example.afs.musicpad.song.Note;
 import com.example.afs.musicpad.theory.IntervalSet;
 import com.example.afs.musicpad.theory.SoundType;
+import com.example.afs.musicpad.util.DirectList;
 import com.example.afs.musicpad.util.RandomAccessList;
 
 // NB: equals, hashCode and compareTo use only the midiNote values in notes.
 
-public class Sound implements Comparable<Sound> {
+public class Sound implements Comparable<Sound>, Iterable<Note> {
 
   private SoundType soundType;
-  private RandomAccessList<Note> notes;
+  private RandomAccessList<Note> notes = new DirectList<>();
 
-  public Sound(RandomAccessList<Note> notes) {
-    this.notes = notes;
+  public Sound() {
+  }
+
+  public Sound(Note... notes) {
+    for (Note note : notes) {
+      add(note);
+    }
+  }
+
+  public void add(Note note) {
+    notes.add(note);
+    soundType = null;
   }
 
   @Override
@@ -57,6 +70,10 @@ public class Sound implements Comparable<Sound> {
     return true;
   }
 
+  public String getName() {
+    return getSoundType().getName();
+  }
+
   public RandomAccessList<Note> getNotes() {
     return notes;
   }
@@ -74,6 +91,10 @@ public class Sound implements Comparable<Sound> {
     return soundType;
   }
 
+  public long getTick() {
+    return notes.get(0).getTick();
+  }
+
   @Override
   public int hashCode() {
     final int prime = 31;
@@ -84,6 +105,11 @@ public class Sound implements Comparable<Sound> {
       result = prime * result + note.getMidiNote();
     }
     return result;
+  }
+
+  @Override
+  public Iterator<Note> iterator() {
+    return notes.iterator();
   }
 
   @Override
