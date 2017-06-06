@@ -112,8 +112,8 @@ public class Song {
     return channelFacets.getFacet(channel).getTotalNoteCount();
   }
 
-  public int[] getCommonNoteCounts(int channel) {
-    return channelFacets.getFacet(channel).getCommonNoteCounts();
+  public int[] getChromaticNoteCounts(int channel) {
+    return channelFacets.getFacet(channel).getChromaticNoteCounts();
   }
 
   public int getConcurrency(int channel) {

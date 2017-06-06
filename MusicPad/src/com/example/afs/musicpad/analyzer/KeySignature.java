@@ -19,15 +19,15 @@ public final class KeySignature {
 
   // See http://en.wikipedia.org/wiki/Chord_%28music%29
 
-  public KeyScore getKeyScore(int[] semitoneCounts) {
+  public KeyScore getKeyScore(int[] chromaticCounts) {
     int naturals = 0;
     int accidentals = 0;
-    for (int i = 0; i < semitoneCounts.length; i++) {
+    for (int i = 0; i < chromaticCounts.length; i++) {
       boolean isInKey = notes.charAt(i) == '1';
       if (isInKey) {
-        naturals += semitoneCounts[i];
+        naturals += chromaticCounts[i];
       } else {
-        accidentals += semitoneCounts[i];
+        accidentals += chromaticCounts[i];
       }
     }
     int third;
@@ -37,8 +37,8 @@ public final class KeySignature {
       third = (tonic + Midi.SEMITONES_TO_MINOR_THIRD) % Midi.SEMITONES_PER_OCTAVE;
     }
     int perfectFifth = (tonic + Midi.SEMITONES_TO_PERFECT_FIFTH) % Midi.SEMITONES_PER_OCTAVE;
-    int tonicThirdCount = Math.min(semitoneCounts[tonic], semitoneCounts[third]);
-    int tonicTriadCount = Math.min(tonicThirdCount, semitoneCounts[perfectFifth]);
+    int tonicThirdCount = Math.min(chromaticCounts[tonic], chromaticCounts[third]);
+    int tonicTriadCount = Math.min(tonicThirdCount, chromaticCounts[perfectFifth]);
     KeyScore keyScore = new KeyScore(naturals, accidentals, tonicThirdCount, tonicTriadCount, tonic, relativeTonic, isMajor, sharpsOrFlats);
     return keyScore;
   }

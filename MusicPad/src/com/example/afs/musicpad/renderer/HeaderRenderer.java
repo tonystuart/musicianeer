@@ -80,7 +80,7 @@ public class HeaderRenderer {
     for (int channel = 0; channel < Midi.CHANNELS; channel++) {
       if (song.getChannelNoteCount(channel) > 0) {
         if (channel != Midi.DRUM) {
-          int[] channelNoteCounts = song.getCommonNoteCounts(channel);
+          int[] channelNoteCounts = song.getChromaticNoteCounts(channel);
           for (int i = 0; i < noteCounts.length; i++) {
             noteCounts[i] += channelNoteCounts[i];
           }

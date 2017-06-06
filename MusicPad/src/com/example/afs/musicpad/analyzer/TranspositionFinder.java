@@ -38,13 +38,13 @@ public class TranspositionFinder {
       for (int channel = 0; channel < Midi.CHANNELS; channel++) {
         if (channel != Midi.DRUM) {
           for (int semitone = 0; semitone < Midi.SEMITONES_PER_OCTAVE; semitone++) {
-            int semitoneCount = song.getCommonNoteCounts(channel)[semitone];
-            if (semitoneCount > 0) {
+            int chromaticCount = song.getChromaticNoteCounts(channel)[semitone];
+            if (chromaticCount > 0) {
               int transposedSemitone = normalize(semitone + transposeDistance);
               if (isWhite[transposedSemitone]) {
-                naturals += semitoneCount;
+                naturals += chromaticCount;
               } else {
-                accidentals += semitoneCount;
+                accidentals += chromaticCount;
               }
             }
           }

@@ -51,11 +51,11 @@ public class KeySignatures {
   //new KeySignature("010110101011", 8, 11, false, -7), // Ab min/Cb Maj (Bb, Cb, Db, Eb, Fb, Gb, Ab)
   };
 
-  public static KeyScore[] getKeyScores(int[] semitoneCounts) {
+  public static KeyScore[] getKeyScores(int[] chromaticCounts) {
     KeyScore[] keyScores = new KeyScore[keySignatures.length];
     for (int i = 0; i < keySignatures.length; i++) {
       KeySignature keySignature = keySignatures[i];
-      keyScores[i] = keySignature.getKeyScore(semitoneCounts);
+      keyScores[i] = keySignature.getKeyScore(chromaticCounts);
     }
     Arrays.sort(keyScores);
     for (int i = 0; i < keySignatures.length; i++) {

@@ -40,13 +40,13 @@ public class IntervalSet {
   }
 
   private int lowestMidiNote = Midi.MAX_VALUE;
-  private boolean[] commonNotes = new boolean[Midi.SEMITONES_PER_OCTAVE];
+  private boolean[] chromaticNotes = new boolean[Midi.SEMITONES_PER_OCTAVE];
 
   public void add(int midiNote) {
     if (midiNote < lowestMidiNote) {
       lowestMidiNote = midiNote;
     }
-    commonNotes[midiNote % Midi.SEMITONES_PER_OCTAVE] = true;
+    chromaticNotes[midiNote % Midi.SEMITONES_PER_OCTAVE] = true;
   }
 
   public SoundType getSoundType() {
@@ -83,15 +83,15 @@ public class IntervalSet {
 
   public int[][] getInversions() {
     int noteCount = 0;
-    for (int i = 0; i < commonNotes.length; i++) {
-      if (commonNotes[i]) {
+    for (int i = 0; i < chromaticNotes.length; i++) {
+      if (chromaticNotes[i]) {
         noteCount++;
       }
     }
     int next = 0;
     int[] sortedNotes = new int[noteCount];
-    for (int i = 0; i < commonNotes.length; i++) {
-      if (commonNotes[i]) {
+    for (int i = 0; i < chromaticNotes.length; i++) {
+      if (chromaticNotes[i]) {
         sortedNotes[next++] = i;
       }
     }

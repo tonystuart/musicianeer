@@ -24,7 +24,7 @@ public class Facet {
   private int lowestMidiNote = Midi.NOTES;
   private Set<Integer> programs = new LinkedHashSet<>();
   private int[] distinctNoteCounts = new int[Midi.NOTES];
-  private int[] commonNoteCounts = new int[Midi.SEMITONES_PER_OCTAVE];
+  private int[] chromaticNoteCounts = new int[Midi.SEMITONES_PER_OCTAVE];
 
   public void addProgram(int program) {
     this.programs.add(program);
@@ -33,7 +33,7 @@ public class Facet {
   public void countNote(int midiNote) {
     totalNoteCount++;
     distinctNoteCounts[midiNote]++;
-    commonNoteCounts[midiNote % Midi.SEMITONES_PER_OCTAVE]++;
+    chromaticNoteCounts[midiNote % Midi.SEMITONES_PER_OCTAVE]++;
     if (midiNote < lowestMidiNote) {
       lowestMidiNote = midiNote;
     }
@@ -47,8 +47,8 @@ public class Facet {
     return totalNoteCount > 0 ? totalMidiNote / totalNoteCount : 0;
   }
 
-  public int[] getCommonNoteCounts() {
-    return commonNoteCounts;
+  public int[] getChromaticNoteCounts() {
+    return chromaticNoteCounts;
   }
 
   public int getConcurrency() {

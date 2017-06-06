@@ -68,8 +68,8 @@ public class FooterRenderer {
           row.append(occupancy);
           row.append(concurrency);
           for (int semitone = 0; semitone < Midi.SEMITONES_PER_OCTAVE; semitone++) {
-            int commonNoteCount = song.getCommonNoteCounts(channel)[semitone];
-            row.append(commonNoteCount);
+            int chromaticNoteCount = song.getChromaticNoteCounts(channel)[semitone];
+            row.append(chromaticNoteCount);
           }
           table.appendChild(row);
         }

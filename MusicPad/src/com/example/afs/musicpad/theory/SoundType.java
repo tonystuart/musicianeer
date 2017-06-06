@@ -16,33 +16,33 @@ import com.example.afs.musicpad.analyzer.Names;
 public class SoundType implements Comparable<SoundType> {
 
   private String name;
-  private int[] commonNotes;
+  private int[] chromaticNotes;
 
   public SoundType(int root, Intervals intervals) {
     name = Names.getNoteName(root) + intervals.getName();
     int[] intervalArray = intervals.getIntervals();
-    commonNotes = new int[intervalArray.length];
-    for (int i = 0; i < commonNotes.length; i++) {
-      int commonNote = root + intervalArray[i];
-      commonNotes[i] = commonNote;
+    chromaticNotes = new int[intervalArray.length];
+    for (int i = 0; i < chromaticNotes.length; i++) {
+      int chromaticNote = root + intervalArray[i];
+      chromaticNotes[i] = chromaticNote;
     }
   }
 
-  public SoundType(String name, int... commonNotes) {
+  public SoundType(String name, int... chromaticNotes) {
     this.name = name;
-    this.commonNotes = commonNotes;
+    this.chromaticNotes = chromaticNotes;
   }
 
   @Override
   public int compareTo(SoundType that) {
-    int limit = Math.min(this.commonNotes.length, that.commonNotes.length);
+    int limit = Math.min(this.chromaticNotes.length, that.chromaticNotes.length);
     for (int i = 0; i < limit; i++) {
-      int deltaSemitone = this.commonNotes[i] - that.commonNotes[i];
+      int deltaSemitone = this.chromaticNotes[i] - that.chromaticNotes[i];
       if (deltaSemitone != 0) {
         return deltaSemitone;
       }
     }
-    return this.commonNotes.length - that.commonNotes.length;
+    return this.chromaticNotes.length - that.chromaticNotes.length;
   }
 
   @Override
@@ -57,18 +57,18 @@ public class SoundType implements Comparable<SoundType> {
       return false;
     }
     SoundType other = (SoundType) obj;
-    if (!Arrays.equals(commonNotes, other.commonNotes)) {
+    if (!Arrays.equals(chromaticNotes, other.chromaticNotes)) {
       return false;
     }
     return true;
   }
 
-  public int[] getCommonNotes() {
-    return commonNotes;
+  public int[] getChromaticNotes() {
+    return chromaticNotes;
   }
 
   public int getLength() {
-    return commonNotes.length;
+    return chromaticNotes.length;
   }
 
   public String getName() {
@@ -79,13 +79,13 @@ public class SoundType implements Comparable<SoundType> {
   public int hashCode() {
     final int prime = 31;
     int result = 1;
-    result = prime * result + Arrays.hashCode(commonNotes);
+    result = prime * result + Arrays.hashCode(chromaticNotes);
     return result;
   }
 
   @Override
   public String toString() {
-    return "SoundType [name=" + name + ", commonNotes=" + Arrays.toString(commonNotes) + "]";
+    return "SoundType [name=" + name + ", chromaticNotes=" + Arrays.toString(chromaticNotes) + "]";
   }
 
 }
