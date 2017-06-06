@@ -21,16 +21,14 @@ import com.example.afs.musicpad.device.qwerty.MidiKeyCapMap;
 import com.example.afs.musicpad.device.qwerty.QwertyKeyCapMap;
 import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnChannelAssigned;
+import com.example.afs.musicpad.message.OnChannelUpdate;
 import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnDeviceCommand;
-import com.example.afs.musicpad.message.OnMusic;
 import com.example.afs.musicpad.message.OnSong;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.player.Player;
 import com.example.afs.musicpad.player.Player.Action;
 import com.example.afs.musicpad.player.Sound;
-import com.example.afs.musicpad.renderer.ChannelRenderer;
-import com.example.afs.musicpad.renderer.Notator;
 import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.task.BrokerTask;
 import com.example.afs.musicpad.util.Broker;
@@ -49,7 +47,6 @@ public class DeviceHandler extends BrokerTask<Message> {
 
   private Song song;
   private int channel;
-  private int ticksPerPixel;
   private Player player;
   private InputType inputType;
   private KeyCapMap keyCapMap;
@@ -126,7 +123,6 @@ public class DeviceHandler extends BrokerTask<Message> {
   private void doChannelAssigned(OnChannelAssigned message) {
     if (this.deviceIndex == message.getDeviceIndex()) {
       this.song = message.getSong();
-      this.ticksPerPixel = message.getTicksPerPixel();
       selectChannel(message.getChannel());
     }
   }
@@ -172,8 +168,7 @@ public class DeviceHandler extends BrokerTask<Message> {
     case MIDI:
     case NUMERIC:
       this.inputType = inputType;
-      // TODO: Publish OnRender message
-      publishMusic();
+      publishChannelUpdate();
       break;
     case DETACH:
       getBroker().publish(new OnCommand(Command.DETACH, deviceIndex));
@@ -186,12 +181,11 @@ public class DeviceHandler extends BrokerTask<Message> {
   private void doOutput(int typeIndex) {
     OutputType outputType = OutputType.values()[typeIndex];
     player.setOutputType(outputType);
-    publishMusic();
+    publishChannelUpdate();
   }
 
   private void doSong(Song song, Map<Integer, Integer> deviceChannelMap, int ticksPerPixel) {
     this.song = song;
-    this.ticksPerPixel = ticksPerPixel;
     if (deviceChannelMap.containsKey(deviceIndex)) {
       selectChannel(deviceChannelMap.get(deviceIndex));
     } else {
@@ -200,27 +194,9 @@ public class DeviceHandler extends BrokerTask<Message> {
     }
   }
 
-  private String getChannelControls() {
-    ChannelRenderer channelRenderer = new ChannelRenderer(deviceName, deviceIndex, song, channel, inputType, getOutputType());
-    String channelControls = channelRenderer.render();
-    return channelControls;
-  }
-
-  private String getMusic() {
+  private void publishChannelUpdate() {
     keyCapMap = createKeyCapMap();
-    Notator notator = new Notator(song, channel, ticksPerPixel, keyCapMap);
-    String music = notator.getMusic();
-    return music;
-  }
-
-  private OutputType getOutputType() {
-    return player.getOutputType();
-  }
-
-  private void publishMusic() {
-    if (song != null) {
-      getBroker().publish(new OnMusic(deviceIndex, getChannelControls(), getMusic()));
-    }
+    getBroker().publish(new OnChannelUpdate(deviceIndex, deviceName, channel, inputType, player.getOutputType(), keyCapMap));
   }
 
   private void selectChannel(int channel) {
@@ -234,7 +210,7 @@ public class DeviceHandler extends BrokerTask<Message> {
         selectProgram(program);
       }
     }
-    publishMusic();
+    publishChannelUpdate();
   }
 
   private void selectProgram(int program) {

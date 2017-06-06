@@ -15,12 +15,16 @@ import java.util.List;
 
 import com.example.afs.musicpad.device.common.DeviceHandler;
 import com.example.afs.musicpad.device.common.DeviceHandler.InputType;
+import com.example.afs.musicpad.device.common.DeviceHandler.OutputType;
+import com.example.afs.musicpad.device.qwerty.KeyCapMap;
 import com.example.afs.musicpad.html.Option;
 import com.example.afs.musicpad.html.Template;
 import com.example.afs.musicpad.message.Message;
+import com.example.afs.musicpad.message.OnChannelUpdate;
 import com.example.afs.musicpad.message.OnFooter;
 import com.example.afs.musicpad.message.OnHeader;
 import com.example.afs.musicpad.message.OnMidiFiles;
+import com.example.afs.musicpad.message.OnMusic;
 import com.example.afs.musicpad.message.OnSong;
 import com.example.afs.musicpad.message.OnTemplates;
 import com.example.afs.musicpad.message.OnTransport;
@@ -33,15 +37,35 @@ import com.example.afs.musicpad.util.RandomAccessList;
 
 public class RendererTask extends BrokerTask<Message> {
 
+  private int ticksPerPixel;
+
+  private Song song;
   private RandomAccessList<File> midiFiles;
 
   public RendererTask(Broker<Message> broker) {
     super(broker);
-    subscribe(OnMidiFiles.class, message -> publishTemplates(message.getMidiFiles()));
-    subscribe(OnSong.class, message -> doSong(message.getSong(), message.getTicksPerPixel()));
+    subscribe(OnMidiFiles.class, message -> publishTemplates(message));
+    subscribe(OnSong.class, message -> doSong(message));
+    subscribe(OnChannelUpdate.class, message -> doChannelUpdate(message));
   }
 
-  private void doSong(Song song, int ticksPerPixel) {
+  private void doChannelUpdate(OnChannelUpdate message) {
+    int deviceIndex = message.getDeviceIndex();
+    String deviceName = message.getDeviceName();
+    int channel = message.getChannel();
+    InputType inputType = message.getInputType();
+    OutputType outputType = message.getOutputType();
+    KeyCapMap keyCapMap = message.getKeyCapMap();
+    ChannelRenderer channelRenderer = new ChannelRenderer(deviceName, deviceIndex, song, channel, inputType, outputType);
+    String channelControls = channelRenderer.render();
+    Notator notator = new Notator(song, channel, ticksPerPixel, keyCapMap);
+    String music = notator.getMusic();
+    getBroker().publish(new OnMusic(deviceIndex, channelControls, music));
+  }
+
+  private void doSong(OnSong message) {
+    song = message.getSong();
+    ticksPerPixel = message.getTicksPerPixel();
     publish(new OnHeader(song.getTitle(), ticksPerPixel, new HeaderRenderer(midiFiles, song).render()));
     publish(new OnFooter(new FooterRenderer(song).render()));
     publish(new OnTransport(new TransportRenderer(song).render()));
@@ -102,8 +126,8 @@ public class RendererTask extends BrokerTask<Message> {
     return transposeOptions;
   }
 
-  private void publishTemplates(RandomAccessList<File> midiFiles) {
-    this.midiFiles = midiFiles;
+  private void publishTemplates(OnMidiFiles message) {
+    this.midiFiles = message.getMidiFiles();
     List<String> templates = new LinkedList<>();
     templates.add(getSongOptions(midiFiles));
     templates.add(getProgramOptions());
