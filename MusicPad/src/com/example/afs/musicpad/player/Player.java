@@ -39,7 +39,7 @@ public class Player {
   private Synthesizer synthesizer;
   private Arpeggiator arpeggiator;
   private Sound repeatArpeggiation;
-  private OutputType outputType = OutputType.ASSIST;
+  private OutputType outputType = OutputType.NORMAL;
 
   public Player(Synthesizer synthesizer, int deviceIndex) {
     this.synthesizer = synthesizer;
@@ -70,10 +70,10 @@ public class Player {
       System.out.println("Player.play: soundType=" + sound);
     }
     switch (outputType) {
-    case ASSIST:
+    case ARPEGGIO:
       sendToArpeggiator(action, sound);
       break;
-    case MANUAL:
+    case NORMAL:
       sendToSynthesizer(action, sound);
       break;
     default:

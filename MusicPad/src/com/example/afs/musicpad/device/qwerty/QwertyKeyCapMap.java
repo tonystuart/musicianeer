@@ -17,6 +17,7 @@ import com.example.afs.musicpad.device.common.DeviceHandler.OutputType;
 import com.example.afs.musicpad.player.Sound;
 import com.example.afs.musicpad.renderer.Notator.KeyCap;
 import com.example.afs.musicpad.renderer.Notator.Slice;
+import com.example.afs.musicpad.song.Note;
 import com.example.afs.musicpad.util.Count;
 import com.example.afs.musicpad.util.DirectList;
 import com.example.afs.musicpad.util.RandomAccessList;
@@ -43,30 +44,51 @@ public class QwertyKeyCapMap implements KeyCapMap {
   private final String noteKeys;
   private final String registerKeys;
   private final OutputType outputType;
-  private final Sound[][] keyIndexToSounds;
-  private final RandomAccessList<KeyCap> keyCaps;
+
+  private Slice slice;
+  private Sound[][] keyIndexToSounds;
+  private RandomAccessList<Slice> slices = new DirectList<>();
 
   private int autoRegister;
   private int registerDown;
+  private int lastIndex = -1;
 
-  public QwertyKeyCapMap(String noteKeys, String registerKeys, RandomAccessList<Slice> slices, OutputType outputType) {
+  public QwertyKeyCapMap(String noteKeys, String registerKeys, OutputType outputType) {
     this.noteKeys = noteKeys;
     this.registerKeys = registerKeys;
     this.outputType = outputType;
     this.noteKeyCount = noteKeys.length();
     this.registerKeyCount = registerKeys.length();
     this.supportedSounds = noteKeyCount * registerKeyCount;
+  }
+
+  @Override
+  public void add(Note note) {
+    int index;
+    if (outputType == OutputType.NORMAL) {
+      index = note.getStartIndex();
+    } else {
+      index = note.getEndIndex();
+    }
+    if (index != lastIndex) {
+      lastIndex = index;
+      if (slice != null) {
+        slices.add(slice);
+      }
+      slice = new Slice();
+    }
+    slice.add(note);
+  }
+
+  @Override
+  public RandomAccessList<KeyCap> getKeyCaps() {
     Map<Sound, SoundCount> sounds = getUniqueSoundCounts(slices);
     SoundCount[] sortedSounds = sortByFrequency(sounds);
     int maxSounds = Math.min(sounds.size(), supportedSounds);
     keyIndexToSounds = assignSoundsToRegisters(sortedSounds, maxSounds);
     sortByPitch(keyIndexToSounds, maxSounds);
     Map<Sound, String> soundToLegend = assignSoundsToLegend(keyIndexToSounds, maxSounds);
-    keyCaps = getKeyCaps(soundToLegend, slices);
-  }
-
-  @Override
-  public RandomAccessList<KeyCap> getKeyCaps() {
+    RandomAccessList<KeyCap> keyCaps = getKeyCaps(soundToLegend, slices);
     return keyCaps;
   }
 

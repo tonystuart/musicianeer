@@ -11,9 +11,12 @@ package com.example.afs.musicpad.device.qwerty;
 
 import com.example.afs.musicpad.player.Sound;
 import com.example.afs.musicpad.renderer.Notator.KeyCap;
+import com.example.afs.musicpad.song.Note;
 import com.example.afs.musicpad.util.RandomAccessList;
 
 public interface KeyCapMap {
+
+  void add(Note note);
 
   RandomAccessList<KeyCap> getKeyCaps();
 

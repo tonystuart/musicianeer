@@ -12,7 +12,7 @@ package com.example.afs.musicpad.renderer;
 import java.util.Iterator;
 import java.util.SortedSet;
 
-import com.example.afs.musicpad.device.common.DeviceHandler;
+import com.example.afs.musicpad.device.qwerty.KeyCapMap;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.player.Sound;
 import com.example.afs.musicpad.song.Default;
@@ -240,13 +240,13 @@ public class Notator {
   private Song song;
   private int channel;
   private int ticksPerPixel;
-  private DeviceHandler devicehandler;
+  private KeyCapMap keyCapMap;
 
-  public Notator(Song song, int channel, int ticksPerPixel, DeviceHandler devicehandler) {
+  public Notator(Song song, int channel, int ticksPerPixel, KeyCapMap keyCapMap) {
     this.song = song;
     this.channel = channel;
     this.ticksPerPixel = ticksPerPixel;
-    this.devicehandler = devicehandler;
+    this.keyCapMap = keyCapMap;
   }
 
   public String getMusic() {
@@ -255,24 +255,8 @@ public class Notator {
       long duration = song.getDuration();
       Svg staff = getStaff(duration);
       drawMeasures(staff, duration);
-      int lastStartIndex = -1;
-      Slice slice = null;
-      RandomAccessList<Slice> slices = new DirectList<>();
-      for (Note note : song.getNotes()) {
-        if (note.getChannel() == channel) {
-          int startIndex = note.getStartIndex();
-          if (startIndex != lastStartIndex) {
-            lastStartIndex = startIndex;
-            if (slice != null) {
-              slices.add(slice);
-              drawSlice(staff, slice);
-            }
-            slice = new Slice();
-          }
-          slice.add(note);
-        }
-      }
-      drawNoteNames(staff, slices);
+      drawNotes(staff);
+      drawNoteNames(staff);
       drawWords(staff);
       music = staff.render();
     }
@@ -306,8 +290,8 @@ public class Notator {
     }
   }
 
-  private void drawNoteNames(Svg staff, RandomAccessList<Slice> slices) {
-    RandomAccessList<KeyCap> keyCaps = devicehandler.toKeyCaps(slices);
+  private void drawNoteNames(Svg staff) {
+    RandomAccessList<KeyCap> keyCaps = keyCapMap.getKeyCaps();
     for (KeyCap keyCap : keyCaps) {
       int wordX = getX(keyCap.getTick() - RADIUS); // align with left edge of note head
       Slice slice = keyCap.getSlice();
@@ -315,6 +299,26 @@ public class Notator {
       staff.add(new Text(wordX, WORDS + 3 * RADIUS, keyCap.getLegend()));
       staff.add(new Text(wordX, 3 * RADIUS, name));
     }
+  }
+
+  private void drawNotes(Svg staff) {
+    int lastStartIndex = -1;
+    Slice slice = null;
+    for (Note note : song.getNotes()) {
+      if (note.getChannel() == channel) {
+        int startIndex = note.getStartIndex();
+        if (startIndex != lastStartIndex) {
+          lastStartIndex = startIndex;
+          if (slice != null) {
+            drawSlice(staff, slice);
+          }
+          slice = new Slice();
+        }
+        slice.add(note);
+        keyCapMap.add(note);
+      }
+    }
+    drawSlice(staff, slice);
   }
 
   private void drawNotes(Svg staff, long firstTick, RandomAccessList<Note> notes, int midPoint) {

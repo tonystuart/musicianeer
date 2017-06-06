@@ -31,12 +31,9 @@ import com.example.afs.musicpad.player.Player.Action;
 import com.example.afs.musicpad.player.Sound;
 import com.example.afs.musicpad.renderer.ChannelRenderer;
 import com.example.afs.musicpad.renderer.Notator;
-import com.example.afs.musicpad.renderer.Notator.KeyCap;
-import com.example.afs.musicpad.renderer.Notator.Slice;
 import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.task.BrokerTask;
 import com.example.afs.musicpad.util.Broker;
-import com.example.afs.musicpad.util.RandomAccessList;
 import com.example.afs.musicpad.util.Range;
 import com.example.afs.musicpad.util.Value;
 
@@ -47,7 +44,7 @@ public class DeviceHandler extends BrokerTask<Message> {
   }
 
   public static enum OutputType {
-    MANUAL, ASSIST
+    NORMAL, ARPEGGIO
   }
 
   private Song song;
@@ -108,21 +105,22 @@ public class DeviceHandler extends BrokerTask<Message> {
     }
   }
 
-  public RandomAccessList<KeyCap> toKeyCaps(RandomAccessList<Slice> slices) {
+  private KeyCapMap createKeyCapMap() {
+    KeyCapMap keyCapMap;
     switch (inputType) {
     case ALPHA:
-      keyCapMap = new QwertyKeyCapMap("ABCDEFGHIJKLMNOPQRSTUVWXYZ", " " + (char) KeyEvent.VK_SHIFT, slices, player.getOutputType());
+      keyCapMap = new QwertyKeyCapMap("ABCDEFGHIJKLMNOPQRSTUVWXYZ", " " + (char) KeyEvent.VK_SHIFT, player.getOutputType());
       break;
     case NUMERIC:
-      keyCapMap = new QwertyKeyCapMap("123456789", " 0/*-+", slices, player.getOutputType());
+      keyCapMap = new QwertyKeyCapMap("123456789", " 0/*-+", player.getOutputType());
       break;
     case MIDI:
-      keyCapMap = new MidiKeyCapMap(slices);
+      keyCapMap = new MidiKeyCapMap();
       break;
     default:
       throw new UnsupportedOperationException();
     }
-    return keyCapMap.getKeyCaps();
+    return keyCapMap;
   }
 
   private void doChannelAssigned(OnChannelAssigned message) {
@@ -209,7 +207,8 @@ public class DeviceHandler extends BrokerTask<Message> {
   }
 
   private String getMusic() {
-    Notator notator = new Notator(song, channel, ticksPerPixel, this);
+    keyCapMap = createKeyCapMap();
+    Notator notator = new Notator(song, channel, ticksPerPixel, keyCapMap);
     String music = notator.getMusic();
     return music;
   }

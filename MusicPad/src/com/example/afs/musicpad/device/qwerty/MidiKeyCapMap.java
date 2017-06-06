@@ -11,14 +11,17 @@ package com.example.afs.musicpad.device.qwerty;
 
 import com.example.afs.musicpad.player.Sound;
 import com.example.afs.musicpad.renderer.Notator.KeyCap;
-import com.example.afs.musicpad.renderer.Notator.Slice;
 import com.example.afs.musicpad.song.Note;
 import com.example.afs.musicpad.util.DirectList;
 import com.example.afs.musicpad.util.RandomAccessList;
 
 public class MidiKeyCapMap implements KeyCapMap {
 
-  public MidiKeyCapMap(RandomAccessList<Slice> slices) {
+  public MidiKeyCapMap() {
+  }
+
+  @Override
+  public void add(Note note) {
   }
 
   @Override
