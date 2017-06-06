@@ -24,7 +24,6 @@ import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnChannelAssigned;
 import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnDeviceMessage;
-import com.example.afs.musicpad.message.OnSong;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.task.BrokerTask;
@@ -49,7 +48,6 @@ public class MidiWriter extends BrokerTask<Message> implements HasSendDeviceMess
     this.context = configuration.getContext();
     context.setHasSendDeviceMessage(this);
     subscribe(OnCommand.class, message -> doCommand(message));
-    subscribe(OnSong.class, message -> doSong(message));
     subscribe(OnChannelAssigned.class, message -> doChannelAssigned(message));
     subscribe(OnDeviceMessage.class, message -> doDeviceMessage(message));
     connectDevices();
@@ -103,8 +101,22 @@ public class MidiWriter extends BrokerTask<Message> implements HasSendDeviceMess
 
   private void doChannelAssigned(OnChannelAssigned message) {
     if (this.deviceIndex == message.getDeviceIndex()) {
-      int channel = message.getChannel();
-      setChannelState(channel, ChannelState.SELECTED);
+      Song song = message.getSong();
+      int assignedChannel = message.getChannel();
+      for (int channel = 0; channel < Midi.CHANNELS; channel++) {
+        int channelNoteCount = song.getChannelNoteCount(channel);
+        ChannelState channelState;
+        if (channel == assignedChannel) {
+          channelState = ChannelState.SELECTED;
+        } else {
+          if (channelNoteCount == 0) {
+            channelState = ChannelState.INACTIVE;
+          } else {
+            channelState = ChannelState.ACTIVE;
+          }
+        }
+        setChannelState(channel, channelState);
+      }
     }
   }
 
@@ -124,15 +136,6 @@ public class MidiWriter extends BrokerTask<Message> implements HasSendDeviceMess
     int data1 = message.getData1();
     int data2 = message.getData2();
     sendDeviceMessage(port, command, channel, data1, data2);
-  }
-
-  private void doSong(OnSong message) {
-    Song song = message.getSong();
-    for (int channel = 0; channel < Midi.CHANNELS; channel++) {
-      int channelNoteCount = song.getChannelNoteCount(channel);
-      ChannelState channelState = channelNoteCount == 0 ? ChannelState.INACTIVE : ChannelState.ACTIVE;
-      setChannelState(channel, channelState);
-    }
   }
 
   private void initializeDevice() {

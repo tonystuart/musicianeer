@@ -80,11 +80,11 @@ public class Conductor extends BrokerTask<Message> {
       }
     }
     assignChannel(deviceIndex, assignedChannel);
-    getBroker().publish(new OnChannelAssigned(song, deviceIndex, assignedChannel));
   }
 
   private void assignChannel(int deviceIndex, int assignedChannel) {
     deviceChannelMap.put(deviceIndex, assignedChannel);
+    getBroker().publish(new OnChannelAssigned(song, deviceIndex, assignedChannel));
   }
 
   private void assignChannels() {

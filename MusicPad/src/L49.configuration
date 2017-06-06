@@ -23,82 +23,66 @@ on input
      return
    else
     if data1 96
-     set selectedChannel 1
      sendCommand PLAY_SAMPLE 1
      sendDeviceCommand CHANNEL 1
      return
     if data1 97
-     set selectedChannel 2
      sendCommand PLAY_SAMPLE 2
      sendDeviceCommand CHANNEL 2
      return
     if data1 98
-     set selectedChannel 3
      sendCommand PLAY_SAMPLE 3
      sendDeviceCommand CHANNEL 3
      return
     if data1 99
-     set selectedChannel 4
      sendCommand PLAY_SAMPLE 4
      sendDeviceCommand CHANNEL 4
      return
     if data1 100
-     set selectedChannel 5
      sendCommand PLAY_SAMPLE 5
      sendDeviceCommand CHANNEL 5
      return
     if data1 101
-     set selectedChannel 6
      sendCommand PLAY_SAMPLE 6
      sendDeviceCommand CHANNEL 6
      return
     if data1 102
-     set selectedChannel 7
      sendCommand PLAY_SAMPLE 7
      sendDeviceCommand CHANNEL 7
      return
     if data1 103
-     set selectedChannel 8
      sendCommand PLAY_SAMPLE 8
      sendDeviceCommand CHANNEL 8
      return
     if data1 112
-     set selectedChannel 9
      sendCommand PLAY_SAMPLE 9
      sendDeviceCommand CHANNEL 9
      return
     if data1 113
-     set selectedChannel 10
      sendCommand PLAY_SAMPLE 10
      sendDeviceCommand CHANNEL 10
      return
     if data1 114
-     set selectedChannel 11
      sendCommand PLAY_SAMPLE 11
      sendDeviceCommand CHANNEL 11
      return
     if data1 115
-     set selectedChannel 12
      sendCommand PLAY_SAMPLE 12
      sendDeviceCommand CHANNEL 12
      return
     if data1 116
-     set selectedChannel 13
      sendCommand PLAY_SAMPLE 13
      sendDeviceCommand CHANNEL 13
      return
     if data1 117
-     set selectedChannel 14
      sendCommand PLAY_SAMPLE 14
      sendDeviceCommand CHANNEL 14
      return
     if data1 118
-     set selectedChannel 15
      sendCommand PLAY_SAMPLE 15
      sendDeviceCommand CHANNEL 15
      return
     if data1 119
-     set selectedChannel 16
      sendCommand PLAY_SAMPLE 16
      sendDeviceCommand CHANNEL 16
      return
@@ -139,7 +123,7 @@ on input
 
 on channelStatus
  if statusChannel 1
-  if selectedChannel 1
+  if channelState SELECTED
    sendDeviceMessage 1 144 0 96 127
    return
   if channelState ACTIVE
@@ -149,7 +133,7 @@ on channelStatus
    sendDeviceMessage 1 144 0 96 7
    return
  if statusChannel 2
-  if selectedChannel 2
+  if channelState SELECTED
    sendDeviceMessage 1 144 0 97 127
    return
   if channelState ACTIVE
@@ -159,7 +143,7 @@ on channelStatus
    sendDeviceMessage 1 144 0 97 7
    return
  if statusChannel 3
-  if selectedChannel 3
+  if channelState SELECTED
    sendDeviceMessage 1 144 0 98 127
    return
   if channelState ACTIVE
@@ -169,7 +153,7 @@ on channelStatus
    sendDeviceMessage 1 144 0 98 7
    return
  if statusChannel 4
-  if selectedChannel 4
+  if channelState SELECTED
    sendDeviceMessage 1 144 0 99 127
    return
   if channelState ACTIVE
@@ -179,7 +163,7 @@ on channelStatus
    sendDeviceMessage 1 144 0 99 7
    return
  if statusChannel 5
-  if selectedChannel 5
+  if channelState SELECTED
    sendDeviceMessage 1 144 0 100 127
    return
   if channelState ACTIVE
@@ -189,7 +173,7 @@ on channelStatus
    sendDeviceMessage 1 144 0 100 7
    return
  if statusChannel 6
-  if selectedChannel 6
+  if channelState SELECTED
    sendDeviceMessage 1 144 0 101 127
    return
   if channelState ACTIVE
@@ -199,7 +183,7 @@ on channelStatus
    sendDeviceMessage 1 144 0 101 7
    return
  if statusChannel 7
-  if selectedChannel 7
+  if channelState SELECTED
    sendDeviceMessage 1 144 0 102 127
    return
   if channelState ACTIVE
@@ -209,7 +193,7 @@ on channelStatus
    sendDeviceMessage 1 144 0 102 7
    return
  if statusChannel 8
-  if selectedChannel 8
+  if channelState SELECTED
    sendDeviceMessage 1 144 0 103 127
    return
   if channelState ACTIVE
@@ -219,7 +203,7 @@ on channelStatus
    sendDeviceMessage 1 144 0 103 7
    return
  if statusChannel 9
-  if selectedChannel 9
+  if channelState SELECTED
    sendDeviceMessage 1 144 0 112 127
    return
   if channelState ACTIVE
@@ -229,7 +213,7 @@ on channelStatus
    sendDeviceMessage 1 144 0 112 7
    return
  if statusChannel 10
-  if selectedChannel 10
+  if channelState SELECTED
    sendDeviceMessage 1 144 0 113 127
    return
   if channelState ACTIVE
@@ -239,7 +223,7 @@ on channelStatus
    sendDeviceMessage 1 144 0 113 7
    return
  if statusChannel 11
-  if selectedChannel 11
+  if channelState SELECTED
    sendDeviceMessage 1 144 0 114 127
    return
   if channelState ACTIVE
@@ -249,7 +233,7 @@ on channelStatus
    sendDeviceMessage 1 144 0 114 7
    return
  if statusChannel 12
-  if selectedChannel 12
+  if channelState SELECTED
    sendDeviceMessage 1 144 0 115 127
    return
   if channelState ACTIVE
@@ -259,7 +243,7 @@ on channelStatus
    sendDeviceMessage 1 144 0 115 7
    return
  if statusChannel 13
-  if selectedChannel 13
+  if channelState SELECTED
    sendDeviceMessage 1 144 0 116 127
    return
   if channelState ACTIVE
@@ -269,7 +253,7 @@ on channelStatus
    sendDeviceMessage 1 144 0 116 7
    return
  if statusChannel 14
-  if selectedChannel 14
+  if channelState SELECTED
    sendDeviceMessage 1 144 0 117 7
    return
   if channelState ACTIVE
@@ -279,7 +263,7 @@ on channelStatus
    sendDeviceMessage 1 144 0 117 7
    return
  if statusChannel 15
-  if selectedChannel 15
+  if channelState SELECTED
    sendDeviceMessage 1 144 0 118 127
    return
   if channelState ACTIVE
@@ -289,7 +273,7 @@ on channelStatus
    sendDeviceMessage 1 144 0 118 7
    return
  if statusChannel 16
-  if selectedChannel 16
+  if channelState SELECTED
    sendDeviceMessage 1 144 0 119 127
    return
   if channelState ACTIVE
@@ -298,7 +282,3 @@ on channelStatus
   if channelState INACTIVE
    sendDeviceMessage 1 144 0 119 7
    return
-
-on command
- if command SELECT_SONG
-  clear selectedChannel
