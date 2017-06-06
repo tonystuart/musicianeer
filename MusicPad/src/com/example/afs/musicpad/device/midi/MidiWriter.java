@@ -9,15 +9,12 @@
 
 package com.example.afs.musicpad.device.midi;
 
-import java.util.Map;
-
 import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.MidiDevice;
 import javax.sound.midi.MidiUnavailableException;
 import javax.sound.midi.Receiver;
 import javax.sound.midi.ShortMessage;
 
-import com.example.afs.musicpad.Command;
 import com.example.afs.musicpad.device.midi.configuration.ChannelState;
 import com.example.afs.musicpad.device.midi.configuration.Context;
 import com.example.afs.musicpad.device.midi.configuration.Context.HasSendDeviceMessage;
@@ -38,21 +35,23 @@ import com.example.afs.musicpad.util.Value;
 
 public class MidiWriter extends BrokerTask<Message> implements HasSendDeviceMessage {
 
+  private int deviceIndex;
   private Context context;
   private MidiDeviceBundle deviceBundle;
   private MidiConfiguration configuration;
   private RandomAccessList<Receiver> receivers = new DirectList<>();
 
-  public MidiWriter(Broker<Message> broker, MidiDeviceBundle deviceBundle, MidiConfiguration configuration) {
+  public MidiWriter(Broker<Message> broker, MidiDeviceBundle deviceBundle, MidiConfiguration configuration, int deviceIndex) {
     super(broker);
     this.deviceBundle = deviceBundle;
     this.configuration = configuration;
+    this.deviceIndex = deviceIndex;
     this.context = configuration.getContext();
     context.setHasSendDeviceMessage(this);
-    subscribe(OnCommand.class, message -> doCommand(message.getCommand(), message.getParameter()));
-    subscribe(OnSong.class, message -> doSong(message.getSong(), message.getDeviceChannelMap()));
-    subscribe(OnChannelAssigned.class, message -> doChannelAssigned(message.getDeviceIndex(), message.getChannel()));
-    subscribe(OnDeviceMessage.class, message -> sendDeviceMessage(message.getPort(), message.getCommand(), message.getChannel(), message.getData1(), message.getData2()));
+    subscribe(OnCommand.class, message -> doCommand(message));
+    subscribe(OnSong.class, message -> doSong(message));
+    subscribe(OnChannelAssigned.class, message -> doChannelAssigned(message));
+    subscribe(OnDeviceMessage.class, message -> doDeviceMessage(message));
     connectDevices();
   }
 
@@ -102,20 +101,33 @@ public class MidiWriter extends BrokerTask<Message> implements HasSendDeviceMess
     }
   }
 
-  private void doChannelAssigned(int deviceIndex, int channel) {
+  private void doChannelAssigned(OnChannelAssigned message) {
+    if (this.deviceIndex == message.getDeviceIndex()) {
+      int channel = message.getChannel();
+      setChannelState(channel, ChannelState.SELECTED);
+    }
   }
 
-  private void doCommand(Command command, int parameter) {
-    context.set("command", command);
-    context.set("parameter", parameter);
+  private void doCommand(OnCommand message) {
+    context.set("command", message.getCommand());
+    context.set("parameter", message.getParameter());
     On onCommand = configuration.getOn(MidiConfiguration.COMMAND);
     if (onCommand != null) {
       onCommand.execute(context);
     }
   }
 
-  private void doSong(Song song, Map<Integer, Integer> deviceChannelMap) {
-    // TODO: Once we know deviceIndex, get ASSIGNED from deviceChannelMap
+  private void doDeviceMessage(OnDeviceMessage message) {
+    int port = message.getPort();
+    int command = message.getCommand();
+    int channel = message.getChannel();
+    int data1 = message.getData1();
+    int data2 = message.getData2();
+    sendDeviceMessage(port, command, channel, data1, data2);
+  }
+
+  private void doSong(OnSong message) {
+    Song song = message.getSong();
     for (int channel = 0; channel < Midi.CHANNELS; channel++) {
       int channelNoteCount = song.getChannelNoteCount(channel);
       ChannelState channelState = channelNoteCount == 0 ? ChannelState.INACTIVE : ChannelState.ACTIVE;

@@ -9,37 +9,29 @@
 
 package com.example.afs.musicpad.message;
 
-import java.util.Map;
-
 import com.example.afs.musicpad.song.Song;
 
 public class OnSong extends Message {
 
   private Song song;
-  private Map<Integer, Integer> deviceChannelMap;
   private int ticksPerPixel;
 
-  public OnSong(Song song, Map<Integer, Integer> deviceChannelMap, int ticksPerPixel) {
+  public OnSong(Song song, int ticksPerPixel) {
     this.song = song;
-    this.deviceChannelMap = deviceChannelMap;
     this.ticksPerPixel = ticksPerPixel;
-  }
-
-  public Map<Integer, Integer> getDeviceChannelMap() {
-    return deviceChannelMap;
-  }
-
-  public int getTicksPerPixel() {
-    return ticksPerPixel;
   }
 
   public Song getSong() {
     return song;
   }
 
+  public int getTicksPerPixel() {
+    return ticksPerPixel;
+  }
+
   @Override
   public String toString() {
-    return "OnSong [song=" + song + ", deviceChannelMap=" + deviceChannelMap + ", ticksPerPixel=" + ticksPerPixel + "]";
+    return "OnSong [song=" + song + ", ticksPerPixel=" + ticksPerPixel + "]";
   }
 
 }

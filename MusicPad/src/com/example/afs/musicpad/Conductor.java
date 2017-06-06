@@ -51,14 +51,14 @@ public class Conductor extends BrokerTask<Message> {
     this.midiFiles = new DirectList<>();
     listMidiFiles(midiFiles, directory);
     midiFiles.sort((o1, o2) -> o1.getPath().compareTo(o2.getPath()));
-    subscribe(OnCommand.class, message -> doCommand(message.getCommand(), message.getParameter()));
-    subscribe(OnDeviceCommand.class, message -> doCommand(message.getDeviceCommand(), message.getDeviceIndex(), message.getParameter()));
+    subscribe(OnCommand.class, message -> doCommand(message));
+    subscribe(OnDeviceCommand.class, message -> doDeviceCommand(message));
     subscribe(OnAllTasksStarted.class, message -> doAllTasksStarted());
-    subscribe(OnDeviceAttached.class, message -> doDeviceAttached(message.getDeviceIndex()));
-    subscribe(OnDeviceDetached.class, message -> doDeviceDetached(message.getDeviceIndex()));
+    subscribe(OnDeviceAttached.class, message -> doDeviceAttached(message));
+    subscribe(OnDeviceDetached.class, message -> doDeviceDetached(message));
   }
 
-  private int assignChannel(int deviceIndex) {
+  private void assignChannel(int deviceIndex) {
     unassignChannel(deviceIndex);
     int assignedChannel = -1;
     int firstActiveChannel = -1;
@@ -80,7 +80,7 @@ public class Conductor extends BrokerTask<Message> {
       }
     }
     assignChannel(deviceIndex, assignedChannel);
-    return assignedChannel;
+    getBroker().publish(new OnChannelAssigned(song, deviceIndex, assignedChannel));
   }
 
   private void assignChannel(int deviceIndex, int assignedChannel) {
@@ -103,7 +103,9 @@ public class Conductor extends BrokerTask<Message> {
     assignChannel(deviceIndex, channel);
   }
 
-  private void doCommand(Command command, int parameter) {
+  private void doCommand(OnCommand message) {
+    Command command = message.getCommand();
+    int parameter = message.getParameter();
     switch (command) {
     case SONG:
       doSelectSong(parameter);
@@ -116,7 +118,18 @@ public class Conductor extends BrokerTask<Message> {
     }
   }
 
-  private void doCommand(DeviceCommand deviceCommand, int deviceIndex, int parameter) {
+  private void doDeviceAttached(OnDeviceAttached message) {
+    int deviceIndex = message.getDeviceIndex();
+    deviceIndexes.add(deviceIndex);
+    if (song != null) {
+      assignChannel(deviceIndex);
+    }
+  }
+
+  private void doDeviceCommand(OnDeviceCommand message) {
+    int deviceIndex = message.getDeviceIndex();
+    DeviceCommand deviceCommand = message.getDeviceCommand();
+    int parameter = message.getParameter();
     switch (deviceCommand) {
     case CHANNEL:
       doChannel(deviceIndex, Value.toIndex(parameter));
@@ -127,15 +140,8 @@ public class Conductor extends BrokerTask<Message> {
     }
   }
 
-  private void doDeviceAttached(int deviceIndex) {
-    deviceIndexes.add(deviceIndex);
-    if (song != null) {
-      int channel = assignChannel(deviceIndex);
-      getBroker().publish(new OnChannelAssigned(song, deviceIndex, channel, TICKS_PER_PIXEL));
-    }
-  }
-
-  private void doDeviceDetached(int deviceIndex) {
+  private void doDeviceDetached(OnDeviceDetached message) {
+    int deviceIndex = message.getDeviceIndex();
     deviceIndexes.remove(deviceIndex);
   }
 
@@ -147,7 +153,7 @@ public class Conductor extends BrokerTask<Message> {
 
   private void doTranspose(int distance) {
     song.transposeTo(distance);
-    publish(new OnSong(song, deviceChannelMap, TICKS_PER_PIXEL));
+    publish(new OnSong(song, TICKS_PER_PIXEL));
   }
 
   private boolean isChannelAssigned(int channel) {
@@ -202,8 +208,8 @@ public class Conductor extends BrokerTask<Message> {
     SongBuilder songBuilder = new SongBuilder();
     song = songBuilder.createSong(midiFile);
     System.out.println("Selecting song " + songIndex + " - " + song.getTitle());
+    publish(new OnSong(song, TICKS_PER_PIXEL));
     assignChannels();
-    publish(new OnSong(song, deviceChannelMap, TICKS_PER_PIXEL));
   }
 
   private void unassignChannel(int deviceIndex) {

@@ -10,7 +10,6 @@
 package com.example.afs.musicpad.device.common;
 
 import java.awt.event.KeyEvent;
-import java.util.Map;
 import java.util.Set;
 
 import com.example.afs.fluidsynth.Synthesizer;
@@ -24,7 +23,6 @@ import com.example.afs.musicpad.message.OnChannelAssigned;
 import com.example.afs.musicpad.message.OnChannelUpdate;
 import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnDeviceCommand;
-import com.example.afs.musicpad.message.OnSong;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.player.Player;
 import com.example.afs.musicpad.player.Player.Action;
@@ -60,9 +58,8 @@ public class DeviceHandler extends BrokerTask<Message> {
     this.deviceIndex = deviceIndex;
     this.inputType = inputType;
     this.player = new Player(synthesizer, deviceIndex);
-    subscribe(OnCommand.class, message -> doCommand(message.getCommand(), message.getParameter()));
-    subscribe(OnDeviceCommand.class, message -> doDeviceCommand(message.getDeviceCommand(), message.getDeviceIndex(), message.getParameter()));
-    subscribe(OnSong.class, message -> doSong(message.getSong(), message.getDeviceChannelMap(), message.getTicksPerPixel()));
+    subscribe(OnCommand.class, message -> doCommand(message));
+    subscribe(OnDeviceCommand.class, message -> doDeviceCommand(message));
     subscribe(OnChannelAssigned.class, message -> doChannelAssigned(message));
   }
 
@@ -127,7 +124,9 @@ public class DeviceHandler extends BrokerTask<Message> {
     }
   }
 
-  private void doCommand(Command command, int parameter) {
+  private void doCommand(OnCommand message) {
+    Command command = message.getCommand();
+    int parameter = message.getParameter();
     switch (command) {
     case TEMPO:
       player.setPercentTempo(Range.scaleMidiToPercent(parameter));
@@ -137,9 +136,11 @@ public class DeviceHandler extends BrokerTask<Message> {
     }
   }
 
-  private void doDeviceCommand(DeviceCommand command, int deviceIndex, int parameter) {
-    if (deviceIndex == this.deviceIndex) {
-      switch (command) {
+  private void doDeviceCommand(OnDeviceCommand message) {
+    if (this.deviceIndex == message.getDeviceIndex()) {
+      DeviceCommand deviceCommand = message.getDeviceCommand();
+      int parameter = message.getParameter();
+      switch (deviceCommand) {
       case CHANNEL:
         selectChannel(Value.toIndex(parameter));
         break;
@@ -182,16 +183,6 @@ public class DeviceHandler extends BrokerTask<Message> {
     OutputType outputType = OutputType.values()[typeIndex];
     player.setOutputType(outputType);
     publishChannelUpdate();
-  }
-
-  private void doSong(Song song, Map<Integer, Integer> deviceChannelMap, int ticksPerPixel) {
-    this.song = song;
-    if (deviceChannelMap.containsKey(deviceIndex)) {
-      selectChannel(deviceChannelMap.get(deviceIndex));
-    } else {
-      // TODO: Resolve race condition between publishing initial song and connecting device
-      System.err.println("DeviceHandler.doSongSelected: deviceChannelMap does not contain channel for device " + deviceIndex);
-    }
   }
 
   private void publishChannelUpdate() {
