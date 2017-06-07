@@ -14,8 +14,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.example.afs.musicpad.device.common.DeviceHandler.OutputType;
+import com.example.afs.musicpad.keycap.KeyCap;
+import com.example.afs.musicpad.keycap.KeyCapMap;
 import com.example.afs.musicpad.player.Sound;
-import com.example.afs.musicpad.renderer.Notator.KeyCap;
 import com.example.afs.musicpad.song.Note;
 import com.example.afs.musicpad.util.Count;
 import com.example.afs.musicpad.util.DirectList;

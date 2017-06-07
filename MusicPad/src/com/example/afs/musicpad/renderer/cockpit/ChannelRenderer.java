@@ -7,7 +7,7 @@
 // This program is made available on an "as is" basis, without
 // warranties or conditions of any kind, either express or implied.
 
-package com.example.afs.musicpad.renderer;
+package com.example.afs.musicpad.renderer.cockpit;
 
 import java.util.Set;
 

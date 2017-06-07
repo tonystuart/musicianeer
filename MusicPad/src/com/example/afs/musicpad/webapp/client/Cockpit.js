@@ -1,28 +1,28 @@
 "use strict";
-var musicPad = musicPad || {};
+var cockpit = cockpit || {};
 
-musicPad.ticksPerPixel = 1;
-musicPad.connected = false;
+cockpit.ticksPerPixel = 1;
+cockpit.connected = false;
 
-musicPad.createWebSocketClient = function() {
-  musicPad.ws = new WebSocket("ws://localhost:8080/v1/message");
-  musicPad.ws.onopen = function() {
+cockpit.createWebSocketClient = function() {
+  cockpit.ws = new WebSocket("ws://localhost:8080/v1/message");
+  cockpit.ws.onopen = function() {
     console.log("ws.onopen: entered");
-    musicPad.connected = true;
+    cockpit.connected = true;
   }
-  musicPad.ws.onmessage = function(message) {
-    musicPad.processResponse(message.data);
+  cockpit.ws.onmessage = function(message) {
+    cockpit.processResponse(message.data);
   }
-  musicPad.ws.onclose = function() {
+  cockpit.ws.onclose = function() {
     console.log("ws.onclose: entered, connecting again in 1000 ms.");
-    musicPad.connected = false;
+    cockpit.connected = false;
     let scroller = document.getElementById("notator-scroller");
     scroller.scrollLeft = 0;
-    setTimeout(musicPad.createWebSocketClient, 1000);
+    setTimeout(cockpit.createWebSocketClient, 1000);
   }
 }
 
-musicPad.appendTemplate = function(containerId, templateId) {
+cockpit.appendTemplate = function(containerId, templateId) {
   let container = document.getElementById(containerId);
   let template = document.getElementById(templateId); 
   container.appendChild(template.content.cloneNode(true));
@@ -32,46 +32,46 @@ musicPad.appendTemplate = function(containerId, templateId) {
   }
 }
 
-musicPad.fragmentToElement = function(fragment) {
+cockpit.fragmentToElement = function(fragment) {
   let container = document.createElement("div");
   container.innerHTML = fragment;
   return container.firstElementChild;
 }
 
-musicPad.onClick = function(event) {
+cockpit.onClick = function(event) {
   let id = event.target.id;
 }
 
-musicPad.onDeviceDetached = function(response) {
+cockpit.onDeviceDetached = function(response) {
   let notator = document.getElementById("notator-" + response.deviceIndex);
   if (notator) {
     notator.parentNode.removeChild(notator);
   }
 }
 
-musicPad.onHeader = function(response) {
+cockpit.onHeader = function(response) {
   let header = document.getElementById("header");
-  musicPad.title = response.title;
+  cockpit.title = response.title;
   header.innerHTML = response.html;
-  musicPad.appendTemplate("title", "song-options");
-  musicPad.appendTemplate("transpose", "transpose-options");
-  musicPad.ticksPerPixel = response.ticksPerPixel;
+  cockpit.appendTemplate("title", "song-options");
+  cockpit.appendTemplate("transpose", "transpose-options");
+  cockpit.ticksPerPixel = response.ticksPerPixel;
 }
 
-musicPad.onFooter = function(response) {
+cockpit.onFooter = function(response) {
   let footer = document.getElementById("footer");
   footer.innerHTML = response.html;
 }
 
-musicPad.onLoad = function() {
-  musicPad.createWebSocketClient();
+cockpit.onLoad = function() {
+  cockpit.createWebSocketClient();
 }
 
-musicPad.onMusic = function(response) {
+cockpit.onMusic = function(response) {
   let notator = document.createElement("div");
   notator.className = "notator";
   notator.innerHTML = response.html;
-  let channelControls = musicPad.fragmentToElement(response.channelControls)
+  let channelControls = cockpit.fragmentToElement(response.channelControls)
   notator.id = "notator-" + response.deviceIndex;
   notator.appendChild(channelControls);
   let oldNotator = document.getElementById(notator.id);
@@ -84,22 +84,22 @@ musicPad.onMusic = function(response) {
   let programId = "program-select-" + response.deviceIndex;
   let inputId = "input-select-" + response.deviceIndex;
   let outputId = "output-select-" + response.deviceIndex;
-  musicPad.appendTemplate(programId, "program-options");
-  musicPad.appendTemplate(inputId, "input-options");
-  musicPad.appendTemplate(outputId, "output-options");
+  cockpit.appendTemplate(programId, "program-options");
+  cockpit.appendTemplate(inputId, "input-options");
+  cockpit.appendTemplate(outputId, "output-options");
 }
 
-musicPad.onNotatorScroll = function(event) {
+cockpit.onNotatorScroll = function(event) {
   let scroller = document.getElementById("notator-scroller");
   let svg = scroller.querySelector("svg");
   let mid = scroller.offsetWidth / 2; // start of svg
   let x1 = scroller.scrollLeft + mid;
-  let x2 = musicPad.toSvg(svg, x1);
-  let x3 = musicPad.toScreen(svg, x2);
+  let x2 = cockpit.toSvg(svg, x1);
+  let x3 = cockpit.toScreen(svg, x2);
   console.log("x1="+x1+", x2="+x2 + ", x3="+x3);
 }
 
-musicPad.toSvg = function(svg, x) {
+cockpit.toSvg = function(svg, x) {
   let screenPoint = svg.createSVGPoint();
   screenPoint.x = x;
   let ctm = svg.getScreenCTM();
@@ -108,7 +108,7 @@ musicPad.toSvg = function(svg, x) {
   return svgPoint.x;
 }
 
-musicPad.toScreen = function(svg, x) {
+cockpit.toScreen = function(svg, x) {
   let svgPoint = svg.createSVGPoint();
   svgPoint.x = x;
   let ctm = svg.getScreenCTM();
@@ -116,22 +116,22 @@ musicPad.toScreen = function(svg, x) {
   return screenPoint.x;
 }
 
-musicPad.onTemplates = function(response) {
+cockpit.onTemplates = function(response) {
   let templates = document.getElementById('templates');
   templates.innerHTML = "";
   for (let i in response.templates) {
     let templateHtml = response.templates[i];
-    let templateElement = musicPad.fragmentToElement(templateHtml);
+    let templateElement = cockpit.fragmentToElement(templateHtml);
     templates.appendChild(templateElement);
   }
 }
 
-musicPad.onTick = function(tick) {
+cockpit.onTick = function(tick) {
   let scroller = document.getElementById("notator-scroller");
   let svg = scroller.querySelector("svg");
   if (svg) {
-    let scaledTick = tick / musicPad.ticksPerPixel;
-    let screenX = musicPad.toScreen(svg, scaledTick);
+    let scaledTick = tick / cockpit.ticksPerPixel;
+    let screenX = cockpit.toScreen(svg, scaledTick);
     let width = scroller.offsetWidth;
     let midPoint = width / 2;
     scroller.scrollLeft += screenX - midPoint;
@@ -139,68 +139,68 @@ musicPad.onTick = function(tick) {
   }
 }
 
-musicPad.onTransport = function(response) {
+cockpit.onTransport = function(response) {
   let transport = document.getElementById("transport");
   transport.innerHTML = response.html;
 }
 
-musicPad.processResponse = function(json) {
+cockpit.processResponse = function(json) {
   let response = JSON.parse(json);
   switch (response.type) {
   case "OnHeader":
-    musicPad.onHeader(response);
+    cockpit.onHeader(response);
     break;
   case "OnFooter":
-    musicPad.onFooter(response);
+    cockpit.onFooter(response);
     break;
   case "OnTransport":
-    musicPad.onTransport(response);
+    cockpit.onTransport(response);
     break;
   case "OnMusic":
-    musicPad.onMusic(response);
+    cockpit.onMusic(response);
     break;
   case "OnTemplates":
-    musicPad.onTemplates(response);
+    cockpit.onTemplates(response);
     break;
   case "OnTick":
-    musicPad.onTick(response.tick);
+    cockpit.onTick(response.tick);
     break;
   case "OnDeviceDetached":
-    musicPad.onDeviceDetached(response);
+    cockpit.onDeviceDetached(response);
     break;
   }
 }
 
-musicPad.request = function(resource) {
+cockpit.request = function(resource) {
   let httpRequest = new XMLHttpRequest();
   httpRequest.onreadystatechange = function() {
     if (httpRequest.readyState == 4 && httpRequest.status == 200) {
-      musicPad.processResponse(httpRequest.responseText);
+      cockpit.processResponse(httpRequest.responseText);
     }
   };
   httpRequest.open("GET", "v1/rest/" + resource, true);
   httpRequest.send();
 }
 
-musicPad.send = function(json) {
-  if (musicPad.connected) {
-    musicPad.ws.send(json);
+cockpit.send = function(json) {
+  if (cockpit.connected) {
+    cockpit.ws.send(json);
   }
 }
 
-musicPad.sendCommand = function(command, parameter) {
+cockpit.sendCommand = function(command, parameter) {
   console.log("command="+command+", parameter="+parameter);
-  musicPad.send(JSON.stringify({type : "OnCommand", command : command, parameter : parameter}));
+  cockpit.send(JSON.stringify({type : "OnCommand", command : command, parameter : parameter}));
 }
 
-musicPad.sendChannelCommand = function(command, channel, parameter) {
+cockpit.sendChannelCommand = function(command, channel, parameter) {
   console.log("command="+command+", channel="+channel+", parameter="+parameter);
-  musicPad.send(JSON.stringify({type : "OnChannelCommand", channelCommand : command, channel : channel, parameter: parameter}));
+  cockpit.send(JSON.stringify({type : "OnChannelCommand", channelCommand : command, channel : channel, parameter: parameter}));
 }
 
-musicPad.sendDeviceCommand = function(command, deviceIndex, parameter) {
+cockpit.sendDeviceCommand = function(command, deviceIndex, parameter) {
   console.log("command="+command+", deviceIndex="+deviceIndex+", parameter="+parameter);
-  musicPad.send(JSON.stringify({type : "OnDeviceCommand", deviceCommand : command, deviceIndex : deviceIndex, parameter: parameter}));
+  cockpit.send(JSON.stringify({type : "OnDeviceCommand", deviceCommand : command, deviceIndex : deviceIndex, parameter: parameter}));
 }
 
 

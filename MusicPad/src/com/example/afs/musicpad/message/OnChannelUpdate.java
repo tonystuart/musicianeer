@@ -11,7 +11,7 @@ package com.example.afs.musicpad.message;
 
 import com.example.afs.musicpad.device.common.DeviceHandler.InputType;
 import com.example.afs.musicpad.device.common.DeviceHandler.OutputType;
-import com.example.afs.musicpad.device.qwerty.KeyCapMap;
+import com.example.afs.musicpad.keycap.KeyCapMap;
 
 public class OnChannelUpdate extends Message {
 

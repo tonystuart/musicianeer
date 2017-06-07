@@ -7,10 +7,9 @@
 // This program is made available on an "as is" basis, without
 // warranties or conditions of any kind, either express or implied.
 
-package com.example.afs.musicpad.device.qwerty;
+package com.example.afs.musicpad.keycap;
 
 import com.example.afs.musicpad.player.Sound;
-import com.example.afs.musicpad.renderer.Notator.KeyCap;
 import com.example.afs.musicpad.song.Note;
 import com.example.afs.musicpad.util.RandomAccessList;
 

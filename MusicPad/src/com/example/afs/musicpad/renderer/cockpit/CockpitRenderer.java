@@ -7,7 +7,7 @@
 // This program is made available on an "as is" basis, without
 // warranties or conditions of any kind, either express or implied.
 
-package com.example.afs.musicpad.renderer;
+package com.example.afs.musicpad.renderer.cockpit;
 
 import java.io.File;
 import java.util.LinkedList;
@@ -16,9 +16,9 @@ import java.util.List;
 import com.example.afs.musicpad.device.common.DeviceHandler;
 import com.example.afs.musicpad.device.common.DeviceHandler.InputType;
 import com.example.afs.musicpad.device.common.DeviceHandler.OutputType;
-import com.example.afs.musicpad.device.qwerty.KeyCapMap;
 import com.example.afs.musicpad.html.Option;
 import com.example.afs.musicpad.html.Template;
+import com.example.afs.musicpad.keycap.KeyCapMap;
 import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnChannelUpdate;
 import com.example.afs.musicpad.message.OnFooter;
@@ -35,14 +35,14 @@ import com.example.afs.musicpad.task.BrokerTask;
 import com.example.afs.musicpad.util.Broker;
 import com.example.afs.musicpad.util.RandomAccessList;
 
-public class RendererTask extends BrokerTask<Message> {
+public class CockpitRenderer extends BrokerTask<Message> {
 
   private int ticksPerPixel;
 
   private Song song;
   private RandomAccessList<File> midiFiles;
 
-  public RendererTask(Broker<Message> broker) {
+  public CockpitRenderer(Broker<Message> broker) {
     super(broker);
     subscribe(OnMidiFiles.class, message -> publishTemplates(message));
     subscribe(OnSong.class, message -> doSong(message));
@@ -58,8 +58,8 @@ public class RendererTask extends BrokerTask<Message> {
     KeyCapMap keyCapMap = message.getKeyCapMap();
     ChannelRenderer channelRenderer = new ChannelRenderer(deviceName, deviceIndex, song, channel, inputType, outputType);
     String channelControls = channelRenderer.render();
-    Notator notator = new Notator(song, channel, ticksPerPixel, keyCapMap);
-    String music = notator.getMusic();
+    StaffRenderer staffRenderer = new StaffRenderer(song, channel, ticksPerPixel, keyCapMap);
+    String music = staffRenderer.getMusic();
     getBroker().publish(new OnMusic(deviceIndex, channelControls, music));
   }
 

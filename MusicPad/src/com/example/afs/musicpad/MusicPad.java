@@ -18,7 +18,8 @@ import com.example.afs.musicpad.device.qwerty.QwertyWatcherBehavior;
 import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnAllTasksStarted;
 import com.example.afs.musicpad.player.Player;
-import com.example.afs.musicpad.renderer.RendererTask;
+import com.example.afs.musicpad.renderer.cockpit.CockpitRenderer;
+import com.example.afs.musicpad.renderer.karaoke.KaraokeRenderer;
 import com.example.afs.musicpad.transport.TransportTask;
 import com.example.afs.musicpad.util.Broker;
 import com.example.afs.musicpad.webapp.WebApp;
@@ -40,7 +41,8 @@ public class MusicPad {
   private DeviceWatcher qwertyWatcher;
   private DeviceWatcher midiWatcher;
   private TransportTask transportTask;
-  private RendererTask rendererTask;
+  private CockpitRenderer cockpitRenderer;
+  private KaraokeRenderer karaokeRenderer;
   private CommandProcessor commandProcessor;
   private WebApp webApp;
   private Synthesizer synthesizer = createSynthesizer();
@@ -52,7 +54,8 @@ public class MusicPad {
     this.qwertyWatcher = new DeviceWatcher(broker, synthesizer, new QwertyWatcherBehavior());
     this.midiWatcher = new DeviceWatcher(broker, synthesizer, new MidiWatcherBehavior());
     this.transportTask = new TransportTask(broker, synthesizer);
-    this.rendererTask = new RendererTask(broker);
+    this.cockpitRenderer = new CockpitRenderer(broker);
+    this.karaokeRenderer = new KaraokeRenderer(broker);
     this.webApp = new WebApp(broker);
   }
 
@@ -68,7 +71,8 @@ public class MusicPad {
     qwertyWatcher.start();
     midiWatcher.start();
     transportTask.start();
-    rendererTask.start();
+    cockpitRenderer.start();
+    karaokeRenderer.start();
     commandProcessor.start();
     webApp.start();
     broker.publish(new OnAllTasksStarted());

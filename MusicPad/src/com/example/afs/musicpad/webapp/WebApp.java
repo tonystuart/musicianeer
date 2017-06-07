@@ -36,6 +36,7 @@ import com.example.afs.musicpad.message.OnDeviceCommand;
 import com.example.afs.musicpad.message.OnDeviceDetached;
 import com.example.afs.musicpad.message.OnFooter;
 import com.example.afs.musicpad.message.OnHeader;
+import com.example.afs.musicpad.message.OnKaraoke;
 import com.example.afs.musicpad.message.OnMusic;
 import com.example.afs.musicpad.message.OnTemplates;
 import com.example.afs.musicpad.message.OnTick;
@@ -66,6 +67,7 @@ public class WebApp extends BrokerTask<Message> {
     subscribe(OnFooter.class, message -> doStatefulMessage(message));
     subscribe(OnTransport.class, message -> doStatefulMessage(message));
     subscribe(OnMusic.class, message -> doMusic(message));
+    subscribe(OnKaraoke.class, message -> doStatefulMessage(message));
     subscribe(OnTick.class, message -> doMessage(message));
     subscribe(OnDeviceDetached.class, message -> doDeviceDetached(message));
   }

@@ -7,11 +7,12 @@
 // This program is made available on an "as is" basis, without
 // warranties or conditions of any kind, either express or implied.
 
-package com.example.afs.musicpad.renderer;
+package com.example.afs.musicpad.renderer.cockpit;
 
 import java.util.SortedSet;
 
-import com.example.afs.musicpad.device.qwerty.KeyCapMap;
+import com.example.afs.musicpad.keycap.KeyCap;
+import com.example.afs.musicpad.keycap.KeyCapMap;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.player.Sound;
 import com.example.afs.musicpad.song.Default;
@@ -26,34 +27,7 @@ import com.example.afs.musicpad.util.DirectList;
 import com.example.afs.musicpad.util.RandomAccessList;
 import com.example.afs.musicpad.util.Value;
 
-public class Notator {
-
-  public static class KeyCap {
-    private String legend;
-    private Sound sound;
-
-    public KeyCap(Sound sound, String legend) {
-      this.sound = sound;
-      this.legend = legend;
-    }
-
-    public String getLegend() {
-      return legend;
-    }
-
-    public Sound getSound() {
-      return sound;
-    }
-
-    public long getTick() {
-      return sound.getTick();
-    }
-
-    @Override
-    public String toString() {
-      return "KeyCap [legend=" + legend + ", sound=" + sound + "]";
-    }
-  }
+public class StaffRenderer {
 
   private static class Context {
     private NoteType noteType;
@@ -198,7 +172,7 @@ public class Notator {
   private int ticksPerPixel;
   private KeyCapMap keyCapMap;
 
-  public Notator(Song song, int channel, int ticksPerPixel, KeyCapMap keyCapMap) {
+  public StaffRenderer(Song song, int channel, int ticksPerPixel, KeyCapMap keyCapMap) {
     this.song = song;
     this.channel = channel;
     this.ticksPerPixel = ticksPerPixel;
@@ -209,7 +183,7 @@ public class Notator {
     String music = "No music for channel " + Value.toNumber(channel);
     if (song.getChannelNoteCount(channel) > 0) {
       long duration = song.getDuration();
-      Svg staff = getStaff(duration);
+      Svg staff = drawStaff(duration);
       drawMeasures(staff, duration);
       drawNotes(staff);
       drawNoteNames(staff);
@@ -397,7 +371,7 @@ public class Notator {
     return context;
   }
 
-  private Svg getStaff(long duration) {
+  private Svg drawStaff(long duration) {
     int bottom = getY(POSITION[LOWEST]);
     int width = getX(duration);
     Svg staff = new Svg(0, 0, width, bottom);

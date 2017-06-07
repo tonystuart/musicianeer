@@ -81,13 +81,13 @@ public class Hypertext extends Element {
         }
       }
     }
-    s.append(">\n");
+    s.append(">");
     if (childElements != null) {
       for (Element element : childElements) {
         element.render(s);
       }
     }
-    s.append(format("</%s>", type));
+    s.append(format("</%s>\n", type));
   }
 
   public void setClassName(String className) {
