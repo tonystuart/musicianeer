@@ -53,31 +53,16 @@ public class QwertyKeyCapMap implements KeyCapMap {
   private int registerDown;
   private int lastIndex = -1;
 
-  public QwertyKeyCapMap(String noteKeys, String registerKeys, OutputType outputType) {
+  public QwertyKeyCapMap(Iterable<Note> notes, OutputType outputType, String noteKeys, String registerKeys) {
     this.noteKeys = noteKeys;
     this.registerKeys = registerKeys;
     this.outputType = outputType;
     this.noteKeyCount = noteKeys.length();
     this.registerKeyCount = registerKeys.length();
     this.supportedSounds = noteKeyCount * registerKeyCount;
-  }
-
-  @Override
-  public void add(Note note) {
-    int index;
-    if (outputType == OutputType.NORMAL) {
-      index = note.getStartIndex();
-    } else {
-      index = note.getEndIndex();
+    for (Note note : notes) {
+      add(note);
     }
-    if (index != lastIndex) {
-      lastIndex = index;
-      if (sound != null) {
-        sounds.add(sound);
-      }
-      sound = new Sound();
-    }
-    sound.add(note);
   }
 
   @Override
@@ -117,6 +102,23 @@ public class QwertyKeyCapMap implements KeyCapMap {
     if (registerKeys.indexOf(inputCode) != -1) {
       registerDown = 0;
     }
+  }
+
+  private void add(Note note) {
+    int index;
+    if (outputType == OutputType.NORMAL) {
+      index = note.getStartIndex();
+    } else {
+      index = note.getEndIndex();
+    }
+    if (index != lastIndex) {
+      lastIndex = index;
+      if (sound != null) {
+        sounds.add(sound);
+      }
+      sound = new Sound();
+    }
+    sound.add(note);
   }
 
   private Map<Sound, String> assignSoundsToLegend(int maxSounds) {

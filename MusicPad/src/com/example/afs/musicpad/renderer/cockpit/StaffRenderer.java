@@ -245,7 +245,6 @@ public class StaffRenderer {
           sound = new Sound();
         }
         sound.add(note);
-        keyCapMap.add(note);
       }
     }
     drawSound(staff, sound);
@@ -294,6 +293,21 @@ public class StaffRenderer {
     }
     drawNotes(staff, sound.getTick(), trebleNotes, TREBLE_MIDI_NOTES[2]);
     drawNotes(staff, sound.getTick(), bassNotes, BASS_MIDI_NOTES[2]);
+  }
+
+  private Svg drawStaff(long duration) {
+    int bottom = getY(POSITION[LOWEST]);
+    int width = getX(duration);
+    Svg staff = new Svg(0, 0, width, bottom);
+    for (int i = 0; i < TREBLE_MIDI_NOTES.length; i++) {
+      int y = getY(TREBLE_MIDI_NOTES[i]);
+      staff.add(new Line(0, y, width, y));
+    }
+    for (int i = 0; i < BASS_MIDI_NOTES.length; i++) {
+      int y = getY(BASS_MIDI_NOTES[i]);
+      staff.add(new Line(0, y, width, y));
+    }
+    return staff;
   }
 
   private void drawStem(Svg staff, long firstTick, Context context) {
@@ -369,21 +383,6 @@ public class StaffRenderer {
     }
     Context context = new Context(noteType, stem, lowestMidiNote, highestMidiNote);
     return context;
-  }
-
-  private Svg drawStaff(long duration) {
-    int bottom = getY(POSITION[LOWEST]);
-    int width = getX(duration);
-    Svg staff = new Svg(0, 0, width, bottom);
-    for (int i = 0; i < TREBLE_MIDI_NOTES.length; i++) {
-      int y = getY(TREBLE_MIDI_NOTES[i]);
-      staff.add(new Line(0, y, width, y));
-    }
-    for (int i = 0; i < BASS_MIDI_NOTES.length; i++) {
-      int y = getY(BASS_MIDI_NOTES[i]);
-      staff.add(new Line(0, y, width, y));
-    }
-    return staff;
   }
 
   private int getX(long tick) {

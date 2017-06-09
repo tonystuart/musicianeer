@@ -10,9 +10,11 @@
 package com.example.afs.musicpad.song;
 
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.NavigableSet;
+import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -23,6 +25,49 @@ import com.example.afs.musicpad.song.Note.NoteBuilder;
 import com.example.afs.musicpad.util.Value;
 
 public class Song {
+
+  public class ChannelNoteIterator implements Iterator<Note>, Iterable<Note> {
+
+    private int channel;
+    private Note nextChannelNote;
+    private Iterator<Note> iterator;
+
+    public ChannelNoteIterator(int channel) {
+      this.channel = channel;
+      this.iterator = notes.iterator();
+    }
+
+    @Override
+    public boolean hasNext() {
+      loadNextChannelNote();
+      return nextChannelNote != null;
+    }
+
+    @Override
+    public Iterator<Note> iterator() {
+      return this;
+    }
+
+    @Override
+    public Note next() {
+      if (!hasNext()) {
+        throw new NoSuchElementException();
+      }
+      Note note = nextChannelNote;
+      nextChannelNote = null;
+      return note;
+    }
+
+    private void loadNextChannelNote() {
+      while (iterator.hasNext() && nextChannelNote == null) {
+        Note note = iterator.next();
+        if (note.getChannel() == channel) {
+          nextChannelNote = note;
+        }
+      }
+    }
+
+  }
 
   private String title;
   private long duration;
@@ -110,6 +155,10 @@ public class Song {
 
   public int getChannelNoteCount(int channel) {
     return channelFacets.getFacet(channel).getTotalNoteCount();
+  }
+
+  public Iterable<Note> getChannelNotes(int channel) {
+    return new ChannelNoteIterator(channel);
   }
 
   public int[] getChromaticNoteCounts(int channel) {

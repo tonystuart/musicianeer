@@ -9,14 +9,14 @@
 
 package com.example.afs.musicpad.device.common;
 
-import java.awt.event.KeyEvent;
 import java.util.Set;
 
 import com.example.afs.fluidsynth.Synthesizer;
 import com.example.afs.musicpad.Command;
 import com.example.afs.musicpad.DeviceCommand;
 import com.example.afs.musicpad.device.midi.MidiKeyCapMap;
-import com.example.afs.musicpad.device.qwerty.QwertyKeyCapMap;
+import com.example.afs.musicpad.device.qwerty.AlphaKeyCapMap;
+import com.example.afs.musicpad.device.qwerty.NumericKeyCapMap;
 import com.example.afs.musicpad.keycap.KeyCapMap;
 import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnChannelAssigned;
@@ -103,10 +103,10 @@ public class DeviceHandler extends BrokerTask<Message> {
     KeyCapMap keyCapMap;
     switch (inputType) {
     case ALPHA:
-      keyCapMap = new QwertyKeyCapMap("ABCDEFGHIJKLMNOPQRSTUVWXYZ", " " + (char) KeyEvent.VK_SHIFT, player.getOutputType());
+      keyCapMap = new AlphaKeyCapMap(song.getChannelNotes(channel), player.getOutputType());
       break;
     case NUMERIC:
-      keyCapMap = new QwertyKeyCapMap("123456789", " 0/*-+", player.getOutputType());
+      keyCapMap = new NumericKeyCapMap(song.getChannelNotes(channel), player.getOutputType());
       break;
     case MIDI:
       keyCapMap = new MidiKeyCapMap();

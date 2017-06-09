@@ -22,10 +22,6 @@ public class MidiKeyCapMap implements KeyCapMap {
   }
 
   @Override
-  public void add(Note note) {
-  }
-
-  @Override
   public RandomAccessList<KeyCap> getKeyCaps() {
     return new DirectList<>();
   }
