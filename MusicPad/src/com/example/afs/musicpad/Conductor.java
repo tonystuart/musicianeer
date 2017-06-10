@@ -95,7 +95,8 @@ public class Conductor extends BrokerTask<Message> {
 
   private void doAllTasksStarted() {
     getBroker().publish(new OnMidiFiles(midiFiles));
-    selectRandomSong();
+    // selectRandomSong();
+    selectSong("The Beatles - Yesterday.kar");
   }
 
   private void doChannel(int deviceIndex, int channel) {
@@ -185,6 +186,7 @@ public class Conductor extends BrokerTask<Message> {
     }
   }
 
+  @SuppressWarnings("unused")
   private void selectRandomSong() {
     boolean selected = false;
     while (!selected) {
@@ -210,6 +212,16 @@ public class Conductor extends BrokerTask<Message> {
     System.out.println("Selecting song " + songIndex + " - " + song.getTitle());
     publish(new OnSong(song, TICKS_PER_PIXEL));
     assignChannels();
+  }
+
+  private void selectSong(String name) {
+    int songCount = midiFiles.size();
+    for (int i = 0; i < songCount; i++) {
+      if (name.equals(midiFiles.get(i).getName())) {
+        selectSong(i);
+        return;
+      }
+    }
   }
 
   private void unassignChannel(int deviceIndex) {

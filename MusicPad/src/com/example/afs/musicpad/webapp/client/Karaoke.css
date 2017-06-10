@@ -163,3 +163,77 @@ select {
 select:focus {
     outline: none;
 }
+
+#karaoke {
+	color: white;
+	margin: auto;
+}
+
+#karaoke-scroller {
+  display: flex;
+	overflow-y: auto;
+	background-color: black;
+}
+
+.stanza {
+	margin: 5px;
+	border: 1px solid gray;
+	background-color: #303030;
+}
+
+.line {
+	padding: 0 5px;
+	margin: 5px;
+	border: 1px solid gray;
+	background-color: black;
+}
+
+.tick {
+	display: inline-block;
+	vertical-align: top;
+	padding-right: 10px;
+}
+
+.channel:nth-child(1) {
+	color: #ff0000;
+}
+
+.channel:nth-child(2) {
+	color: #ffff00;
+}
+
+.channel:nth-child(3) {
+  color: #ff00ff;
+}
+
+.channel:nth-child(4) {
+  color: #ffffff;
+}
+
+.channel:nth-child(5) {
+  color: #3fff3f;
+}
+
+.channel:nth-child(6) {
+  color: #ffff7f;
+}
+
+.channel:nth-child(7) {
+  color: #ff7fbf;
+}
+
+.channel:nth-child(8) {
+  color: #bfbfbf;
+}
+
+.words, .channel {
+	min-height: 1.5em;
+}
+
+.words {
+}
+
+.current-tick {
+	color: white;
+	background-color: blue;
+}

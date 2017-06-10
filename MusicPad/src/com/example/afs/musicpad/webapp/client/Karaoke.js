@@ -32,6 +32,29 @@ karaoke.onKaraoke = function(response) {
 }
 
 karaoke.onTick = function(tick) {
+  if (tick == 0) {
+    document.getElementById("karaoke-scroller").scrollTop = 0;
+    if (karaoke.lastTick) {
+      karaoke.lastTick.classList.remove("current-tick");
+    }
+  }
+  let tickDivision = document.getElementById("tick-"+tick);
+  if (tickDivision) {
+    if (karaoke.lastTick) {
+      karaoke.lastTick.classList.remove("current-tick");
+    }
+    tickDivision.classList.add("current-tick");
+    let scroller = document.getElementById("karaoke-scroller");
+    let top = tickDivision.offsetTop;
+    let height = tickDivision.offsetHeight;
+    let bottom = top + height;
+    let scrollerBottomVisible = scroller.scrollTop + scroller.offsetHeight;
+    if (bottom + height > scrollerBottomVisible) {
+      //scroller.scrollTop += tickDivision.offsetTop;
+      tickDivision.scrollIntoView({ behavior : "smooth", block : "start"});
+    }
+    karaoke.lastTick = tickDivision;
+  }
 }
 
 karaoke.processResponse = function(json) {

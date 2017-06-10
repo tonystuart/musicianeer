@@ -10,25 +10,25 @@
 package com.example.afs.musicpad.renderer.karaoke;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.NavigableSet;
-import java.util.TreeSet;
+import java.util.SortedSet;
 
 import com.example.afs.musicpad.device.common.DeviceHandler.InputType;
 import com.example.afs.musicpad.device.common.DeviceHandler.OutputType;
 import com.example.afs.musicpad.html.Division;
-import com.example.afs.musicpad.html.Span;
 import com.example.afs.musicpad.html.TextElement;
 import com.example.afs.musicpad.keycap.KeyCap;
 import com.example.afs.musicpad.keycap.KeyCapMap;
 import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnChannelUpdate;
+import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnKaraoke;
 import com.example.afs.musicpad.message.OnMidiFiles;
 import com.example.afs.musicpad.message.OnSong;
-import com.example.afs.musicpad.song.Item;
+import com.example.afs.musicpad.song.Default;
 import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.song.Word;
 import com.example.afs.musicpad.task.BrokerTask;
@@ -37,80 +37,55 @@ import com.example.afs.musicpad.util.RandomAccessList;
 
 public class KaraokeRenderer extends BrokerTask<Message> {
 
-  public static class KeyCapItem extends Item<KeyCapItem> {
-    private KeyCap keyCap;
-    private int channel;
+  private static class KeyCapIterator {
 
-    public KeyCapItem(KeyCap keyCap, int channel) {
-      super(keyCap.getTick());
-      this.keyCap = keyCap;
-      this.channel = channel;
+    private int index = 0;
+    private RandomAccessList<KeyCap> keyCaps;
+
+    public KeyCapIterator(RandomAccessList<KeyCap> keyCaps) {
+      this.keyCaps = keyCaps;
     }
 
-    public int getChannel() {
-      return channel;
+    public boolean hasNext(long endTick) {
+      if (index < keyCaps.size()) {
+        return keyCaps.get(index).getTick() < endTick;
+      }
+      return false;
     }
 
-    public KeyCap getKeyCap() {
+    public KeyCap next(long endTick) {
+      KeyCap keyCap = null;
+      if (index < keyCaps.size()) {
+        KeyCap thisKeyCap = keyCaps.get(index);
+        if (thisKeyCap.getTick() < endTick) {
+          keyCap = thisKeyCap;
+          index++;
+        }
+      }
       return keyCap;
     }
 
-    @Override
-    public String toString() {
-      return "KeyCapItem [keyCap=" + keyCap + ", channel=" + channel + "]";
-    }
   }
 
   private int ticksPerPixel;
 
   private Song song;
   private RandomAccessList<File> midiFiles;
+  private Map<Integer, Integer> deviceChannelMap = new HashMap<>();
   private Map<Integer, RandomAccessList<KeyCap>> channelKeyCaps = new HashMap<>();
 
   public KaraokeRenderer(Broker<Message> broker) {
     super(broker);
+    subscribe(OnChannelUpdate.class, message -> doChannelUpdate(message));
+    subscribe(OnCommand.class, message -> doCommand(message));
     subscribe(OnMidiFiles.class, message -> publishTemplates(message));
     subscribe(OnSong.class, message -> doSong(message));
-    subscribe(OnChannelUpdate.class, message -> doChannelUpdate(message));
   }
 
-  public String getKaraoke(NavigableSet<Item<?>> items) {
-    Division container = new Division();
-    Division stanza = null;
-    Division line = null;
-    for (Word word : song.getWords()) {
-      String text = word.getText();
-      if (text.length() > 1) {
-        char firstChar = text.charAt(0);
-        if (firstChar == '\\') {
-          stanza = new Division();
-          stanza.setClassName("stanza");
-          container.appendChild(stanza);
-          line = new Division();
-          stanza.appendChild(line);
-          text = text.substring(1);
-        } else if (firstChar == '/') {
-          if (stanza == null) {
-            stanza = new Division();
-            stanza.setClassName("stanza");
-            container.appendChild(stanza);
-          }
-          line = new Division();
-          stanza.appendChild(line);
-          text = text.substring(1);
-        } else if (line == null) {
-          stanza = new Division();
-          stanza.setClassName("stanza");
-          container.appendChild(stanza);
-          line = new Division();
-          stanza.appendChild(line);
-        }
-        Span span = new Span();
-        span.appendChild(new TextElement(text));
-        line.appendChild(span);
-      }
-    }
-    return container.render();
+  @Override
+  protected void onTimeout() throws InterruptedException {
+    publishKaraoke();
+    setTimeoutMillis(0);
   }
 
   private void doChannelUpdate(OnChannelUpdate message) {
@@ -122,29 +97,136 @@ public class KaraokeRenderer extends BrokerTask<Message> {
     KeyCapMap keyCapMap = message.getKeyCapMap();
     RandomAccessList<KeyCap> keyCaps = keyCapMap.getKeyCaps();
     channelKeyCaps.put(channel, keyCaps);
-    String karaoke = renderKaraoke();
-    getBroker().publish(new OnKaraoke(karaoke));
+    deviceChannelMap.put(deviceIndex, channel);
+    setTimer();
+  }
+
+  private void doCommand(OnCommand message) {
+    switch (message.getCommand()) {
+    case DETACH:
+      doDetach(message.getParameter());
+      break;
+    default:
+      break;
+    }
+  }
+
+  private void doDetach(int deviceIndex) {
+    Integer channel = deviceChannelMap.get(deviceIndex);
+    if (channel != null) {
+      channelKeyCaps.remove(channel);
+      deviceChannelMap.remove(deviceIndex);
+      setTimer();
+    }
   }
 
   private void doSong(OnSong message) {
     song = message.getSong();
   }
 
+  private String getText(SortedSet<Word> words) {
+    StringBuilder s = new StringBuilder();
+    for (Word word : words) {
+      s.append(word.getText());
+    }
+    return s.toString();
+  }
+
+  private boolean isKeyCapPresent(Map<Integer, KeyCapIterator> keyCapIterators, long endTick) {
+    for (KeyCapIterator keyCapIterator : keyCapIterators.values()) {
+      if (keyCapIterator.hasNext(endTick)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private void publishKaraoke() {
+    String karaoke = renderKaraoke();
+    getBroker().publish(new OnKaraoke(karaoke));
+  }
+
   private void publishTemplates(OnMidiFiles message) {
   }
 
   private String renderKaraoke() {
-    NavigableSet<Item<?>> items = new TreeSet<>();
+    int index = 0;
+    int[] channels = new int[channelKeyCaps.keySet().size()];
+    Map<Integer, KeyCapIterator> keyCapIterators = new HashMap<>();
     for (Entry<Integer, RandomAccessList<KeyCap>> entry : channelKeyCaps.entrySet()) {
       int channel = entry.getKey();
-      RandomAccessList<KeyCap> list = entry.getValue();
-      for (KeyCap keyCap : list) {
-        KeyCapItem keyCapItem = new KeyCapItem(keyCap, channel);
-        items.add(keyCapItem);
+      RandomAccessList<KeyCap> keyCaps = entry.getValue();
+      channels[index++] = channel;
+      keyCapIterators.put(channel, new KeyCapIterator(keyCaps));
+    }
+    Arrays.sort(channels);
+    Division container = new Division();
+    Division stanza = null;
+    Division line = null;
+    for (long tick = 0; tick < song.getDuration(); tick += Default.RESOLUTION) {
+      long endTick = tick + Default.RESOLUTION;
+      SortedSet<Word> words = song.getWords().subSet(new Word(tick), new Word(endTick));
+      String text = getText(words);
+      if (text.length() > 1) {
+        char firstChar = text.charAt(0);
+        if (firstChar == '\\') {
+          stanza = null;
+          line = null;
+          text = text.substring(1);
+        } else if (firstChar == '/') {
+          line = null;
+          text = text.substring(1);
+        } else if (firstChar == '@') {
+          text = "";
+        }
+      }
+      boolean isTextPresent = text.length() > 0;
+      if (isTextPresent || isKeyCapPresent(keyCapIterators, endTick)) {
+        //        if (!isTextPresent && tick % (Default.TICKS_PER_BEAT * 8) == 0) {
+        //          line = null;
+        //        }
+        if (stanza == null) {
+          stanza = new Division();
+          stanza.setClassName("stanza");
+          container.appendChild(stanza);
+        }
+        if (line == null) {
+          line = new Division();
+          line.setClassName("line");
+          stanza.appendChild(line);
+        }
+        Division tickDivision = new Division("tick-" + tick);
+        tickDivision.setClassName("tick");
+        line.appendChild(tickDivision);
+        for (int i = 0; i < channels.length; i++) {
+          Division channelDivision = new Division();
+          channelDivision.setClassName("channel");
+          tickDivision.appendChild(channelDivision);
+          int channel = channels[i];
+          KeyCap keyCap;
+          KeyCapIterator keyCapIterator = keyCapIterators.get(channel);
+          StringBuilder s = new StringBuilder();
+          while ((keyCap = keyCapIterator.next(endTick)) != null) {
+            if (s.length() > 0) {
+              s.append(" ");
+            }
+            s.append(keyCap.getLegend());
+          }
+          channelDivision.appendChild(new TextElement(s.toString()));
+        }
+        text = text.replace(" ", "&nbsp;");
+        Division textDivision = new Division();
+        textDivision.setClassName("words");
+        tickDivision.appendChild(textDivision);
+        textDivision.appendChild(new TextElement(text));
       }
     }
-    items.addAll(song.getWords());
-    String karaoke = getKaraoke(items);
-    return karaoke;
+    return container.render();
   }
+
+  private void setTimer() {
+    System.out.println("KaraokeRender: setting timer");
+    setTimeoutMillis(2000);
+  }
+
 }
