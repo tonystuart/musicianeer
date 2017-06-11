@@ -12,11 +12,11 @@ package com.example.afs.musicpad.webapp;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.ByteBuffer;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import org.eclipse.jetty.server.Handler;
@@ -55,7 +55,7 @@ public class WebApp extends BrokerTask<Message> {
   private static final ByteBuffer PING = ByteBuffer.wrap("PING".getBytes());
 
   private Server server;
-  private Map<Integer, Message> indexMusic = new HashMap<>();
+  private Map<Integer, Message> deviceMusic = new ConcurrentHashMap<>();
   private Map<Class<? extends Message>, Message> state = new LinkedHashMap<>();
   private BlockingQueue<MessageWebSocket> messageWebSockets = new LinkedBlockingQueue<>(CLIENTS);
 
@@ -77,7 +77,7 @@ public class WebApp extends BrokerTask<Message> {
     for (Message stateMessage : state.values()) {
       messageWebSocket.write(stateMessage);
     }
-    for (Message musicMessage : indexMusic.values()) {
+    for (Message musicMessage : deviceMusic.values()) {
       messageWebSocket.write(musicMessage);
     }
   }
@@ -165,7 +165,7 @@ public class WebApp extends BrokerTask<Message> {
   }
 
   private void doDeviceDetached(OnDeviceDetached message) {
-    indexMusic.remove(message.getDeviceIndex());
+    deviceMusic.remove(message.getDeviceIndex());
     doMessage(message);
   }
 
@@ -176,7 +176,7 @@ public class WebApp extends BrokerTask<Message> {
   }
 
   private void doMusic(OnMusic message) {
-    indexMusic.put(message.getDeviceIndex(), message);
+    deviceMusic.put(message.getDeviceIndex(), message);
     doMessage(message);
   }
 
