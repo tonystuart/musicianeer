@@ -27,6 +27,14 @@ public class Hypertext extends Element {
     this.type = type;
   }
 
+  public void addClassName(String className) {
+    if (this.className == null) {
+      this.className = className;
+    } else {
+      this.className += " " + className;
+    }
+  }
+
   public void appendChild(Element childElement) {
     if (childElements == null) {
       childElements = new DirectList<>();

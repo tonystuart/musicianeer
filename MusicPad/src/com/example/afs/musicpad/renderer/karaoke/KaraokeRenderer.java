@@ -71,7 +71,7 @@ public class KaraokeRenderer extends BrokerTask<Message> {
   private Song song;
   private RandomAccessList<File> midiFiles;
   private Map<Integer, RandomAccessList<KeyCap>> deviceKeyCaps = new HashMap<>();
-  private Map<Integer, KeyCap> leftovers = new HashMap<>();
+  private Map<Integer, KeyCap> deviceSustain = new HashMap<>();
 
   public KaraokeRenderer(Broker<Message> broker) {
     super(broker);
@@ -192,14 +192,15 @@ public class KaraokeRenderer extends BrokerTask<Message> {
           Division channelDivision = new Division();
           channelDivision.setClassName("channel");
           tickDivision.appendChild(channelDivision);
-          StringBuilder s = new StringBuilder();
-          KeyCap keyCap = leftovers.get(deviceIndex);
+          boolean sustain = false;
+          KeyCap keyCap = deviceSustain.get(deviceIndex);
           if (keyCap != null) {
-            s.append("-");
+            sustain = true;
             if (keyCap.getEndTick() < endTick) {
-              leftovers.remove(deviceIndex);
+              deviceSustain.remove(deviceIndex);
             }
           }
+          StringBuilder s = new StringBuilder();
           KeyCapIterator keyCapIterator = keyCapIterators.get(deviceIndex);
           while ((keyCap = keyCapIterator.next(endTick)) != null) {
             if (s.length() > 0) {
@@ -207,10 +208,14 @@ public class KaraokeRenderer extends BrokerTask<Message> {
             }
             s.append(keyCap.getLegend());
             if (keyCap.getEndTick() > endTick) {
-              leftovers.put(deviceIndex, keyCap);
+              deviceSustain.put(deviceIndex, keyCap);
             }
           }
-          channelDivision.appendChild(new TextElement(s.toString()));
+          if (s.length() > 0) {
+            channelDivision.appendChild(new TextElement(s.toString()));
+          } else if (sustain) {
+            channelDivision.appendChild(new TextElement("-"));
+          }
         }
         text = text.replace(" ", "&nbsp;");
         Division textDivision = new Division();

@@ -16,8 +16,8 @@ karaoke.createWebSocketClient = function() {
   karaoke.ws.onclose = function() {
     console.log("ws.onclose: entered, connecting again in 1000 ms.");
     karaoke.connected = false;
-    let scroller = document.getElementById("notator-scroller");
-    scroller.scrollLeft = 0;
+    let scroller = document.getElementById("karaoke-scroller");
+    scroller.scrollTop = 0;
     setTimeout(karaoke.createWebSocketClient, 1000);
   }
 }
