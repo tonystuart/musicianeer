@@ -223,7 +223,7 @@ public class StaffRenderer {
   private void drawNoteNames(Svg staff) {
     RandomAccessList<KeyCap> keyCaps = keyCapMap.getKeyCaps();
     for (KeyCap keyCap : keyCaps) {
-      int wordX = getX(keyCap.getTick() - RADIUS); // align with left edge of note head
+      int wordX = getX(keyCap.getBeginTick() - RADIUS); // align with left edge of note head
       Sound sound = keyCap.getSound();
       String name = sound.getName();
       staff.add(new Text(wordX, WORDS + 3 * RADIUS, keyCap.getLegend()));
@@ -291,8 +291,8 @@ public class StaffRenderer {
         trebleNotes.add(note);
       }
     }
-    drawNotes(staff, sound.getTick(), trebleNotes, TREBLE_MIDI_NOTES[2]);
-    drawNotes(staff, sound.getTick(), bassNotes, BASS_MIDI_NOTES[2]);
+    drawNotes(staff, sound.getBeginTick(), trebleNotes, TREBLE_MIDI_NOTES[2]);
+    drawNotes(staff, sound.getBeginTick(), bassNotes, BASS_MIDI_NOTES[2]);
   }
 
   private Svg drawStaff(long duration) {

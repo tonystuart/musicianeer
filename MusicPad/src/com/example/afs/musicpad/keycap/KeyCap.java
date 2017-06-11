@@ -20,16 +20,20 @@ public class KeyCap {
     this.legend = legend;
   }
 
+  public long getBeginTick() {
+    return sound.getBeginTick();
+  }
+
+  public long getEndTick() {
+    return sound.getEndTick();
+  }
+
   public String getLegend() {
     return legend;
   }
 
   public Sound getSound() {
     return sound;
-  }
-
-  public long getTick() {
-    return sound.getTick();
   }
 
   @Override

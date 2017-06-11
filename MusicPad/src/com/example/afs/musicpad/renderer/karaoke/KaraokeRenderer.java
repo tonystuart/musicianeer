@@ -47,7 +47,7 @@ public class KaraokeRenderer extends BrokerTask<Message> {
 
     public boolean hasNext(long endTick) {
       if (index < keyCaps.size()) {
-        return keyCaps.get(index).getTick() < endTick;
+        return keyCaps.get(index).getBeginTick() < endTick;
       }
       return false;
     }
@@ -56,7 +56,7 @@ public class KaraokeRenderer extends BrokerTask<Message> {
       KeyCap keyCap = null;
       if (index < keyCaps.size()) {
         KeyCap thisKeyCap = keyCaps.get(index);
-        if (thisKeyCap.getTick() < endTick) {
+        if (thisKeyCap.getBeginTick() < endTick) {
           keyCap = thisKeyCap;
           index++;
         }
@@ -71,6 +71,7 @@ public class KaraokeRenderer extends BrokerTask<Message> {
   private Song song;
   private RandomAccessList<File> midiFiles;
   private Map<Integer, RandomAccessList<KeyCap>> deviceKeyCaps = new HashMap<>();
+  private Map<Integer, KeyCap> leftovers = new HashMap<>();
 
   public KaraokeRenderer(Broker<Message> broker) {
     super(broker);
@@ -191,14 +192,23 @@ public class KaraokeRenderer extends BrokerTask<Message> {
           Division channelDivision = new Division();
           channelDivision.setClassName("channel");
           tickDivision.appendChild(channelDivision);
-          KeyCap keyCap;
-          KeyCapIterator keyCapIterator = keyCapIterators.get(deviceIndex);
           StringBuilder s = new StringBuilder();
+          KeyCap keyCap = leftovers.get(deviceIndex);
+          if (keyCap != null) {
+            s.append("-");
+            if (keyCap.getEndTick() < endTick) {
+              leftovers.remove(deviceIndex);
+            }
+          }
+          KeyCapIterator keyCapIterator = keyCapIterators.get(deviceIndex);
           while ((keyCap = keyCapIterator.next(endTick)) != null) {
             if (s.length() > 0) {
               s.append(" ");
             }
             s.append(keyCap.getLegend());
+            if (keyCap.getEndTick() > endTick) {
+              leftovers.put(deviceIndex, keyCap);
+            }
           }
           channelDivision.appendChild(new TextElement(s.toString()));
         }

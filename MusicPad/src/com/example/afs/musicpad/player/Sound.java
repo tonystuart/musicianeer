@@ -21,6 +21,9 @@ import com.example.afs.musicpad.util.RandomAccessList;
 
 public class Sound implements Comparable<Sound>, Iterable<Note> {
 
+  private long beginTick = Long.MAX_VALUE;
+  private long endTick = Long.MIN_VALUE;
+
   private SoundType soundType;
   private RandomAccessList<Note> notes = new DirectList<>();
 
@@ -36,6 +39,9 @@ public class Sound implements Comparable<Sound>, Iterable<Note> {
   public void add(Note note) {
     notes.add(note);
     soundType = null;
+    long tick = note.getTick();
+    beginTick = Math.min(beginTick, tick);
+    endTick = Math.max(endTick, tick + note.getDuration());
   }
 
   @Override
@@ -70,6 +76,14 @@ public class Sound implements Comparable<Sound>, Iterable<Note> {
     return true;
   }
 
+  public long getBeginTick() {
+    return beginTick;
+  }
+
+  public long getEndTick() {
+    return endTick;
+  }
+
   public String getName() {
     return getSoundType().getName();
   }
@@ -89,10 +103,6 @@ public class Sound implements Comparable<Sound>, Iterable<Note> {
       soundType = intervalSet.getSoundType();
     }
     return soundType;
-  }
-
-  public long getTick() {
-    return notes.get(0).getTick();
   }
 
   @Override
