@@ -171,9 +171,9 @@ public class KaraokeRenderer extends BrokerTask<Message> {
       }
       boolean isTextPresent = text.length() > 0;
       if (isTextPresent || isKeyCapPresent(keyCapIterators, endTick)) {
-        //        if (!isTextPresent && tick % (Default.TICKS_PER_BEAT * 8) == 0) {
-        //          line = null;
-        //        }
+        if (line != null && line.getChildCount() > 32) {
+          line = null;
+        }
         if (stanza == null) {
           stanza = new Division();
           stanza.setClassName("stanza");

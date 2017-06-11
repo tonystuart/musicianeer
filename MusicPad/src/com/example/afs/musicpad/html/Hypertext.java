@@ -45,6 +45,14 @@ public class Hypertext extends Element {
     attributes.put(name, value);
   }
 
+  public Element getChild(int childIndex) {
+    return childElements.get(childIndex);
+  }
+
+  public int getChildCount() {
+    return childElements.size();
+  }
+
   public String getClassName() {
     return className;
   }

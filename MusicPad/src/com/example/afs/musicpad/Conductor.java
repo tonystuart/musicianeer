@@ -36,6 +36,9 @@ import com.example.afs.musicpad.util.Value;
 
 public class Conductor extends BrokerTask<Message> {
 
+  //private static final String DEFAULT_SONG = "The Beatles - Yesterday.kar";
+  private static final String DEFAULT_SONG = "Aquarius (James Rado).mid";
+
   private static final int TICKS_PER_PIXEL = 5;
 
   private Song song;
@@ -95,8 +98,15 @@ public class Conductor extends BrokerTask<Message> {
 
   private void doAllTasksStarted() {
     getBroker().publish(new OnMidiFiles(midiFiles));
-    // selectRandomSong();
-    selectSong("The Beatles - Yesterday.kar");
+    if (DEFAULT_SONG != null) {
+      int songIndex = findSong(DEFAULT_SONG);
+      if (songIndex == -1) {
+        throw new IllegalArgumentException("Could not find " + DEFAULT_SONG);
+      }
+      selectSong(songIndex);
+    } else {
+      selectRandomSong();
+    }
   }
 
   private void doChannel(int deviceIndex, int channel) {
@@ -157,6 +167,16 @@ public class Conductor extends BrokerTask<Message> {
     publish(new OnSong(song, TICKS_PER_PIXEL));
   }
 
+  private int findSong(String name) {
+    int songCount = midiFiles.size();
+    for (int i = 0; i < songCount; i++) {
+      if (name.equals(midiFiles.get(i).getName())) {
+        return i;
+      }
+    }
+    return -1;
+  }
+
   private boolean isChannelAssigned(int channel) {
     for (int assignedChannel : deviceChannelMap.values()) {
       if (assignedChannel == channel) {
@@ -186,7 +206,6 @@ public class Conductor extends BrokerTask<Message> {
     }
   }
 
-  @SuppressWarnings("unused")
   private void selectRandomSong() {
     boolean selected = false;
     while (!selected) {
@@ -212,16 +231,6 @@ public class Conductor extends BrokerTask<Message> {
     System.out.println("Selecting song " + songIndex + " - " + song.getTitle());
     publish(new OnSong(song, TICKS_PER_PIXEL));
     assignChannels();
-  }
-
-  private void selectSong(String name) {
-    int songCount = midiFiles.size();
-    for (int i = 0; i < songCount; i++) {
-      if (name.equals(midiFiles.get(i).getName())) {
-        selectSong(i);
-        return;
-      }
-    }
   }
 
   private void unassignChannel(int deviceIndex) {
