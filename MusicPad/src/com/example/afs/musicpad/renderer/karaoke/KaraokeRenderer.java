@@ -10,7 +10,6 @@
 package com.example.afs.musicpad.renderer.karaoke;
 
 import java.io.File;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -71,8 +70,7 @@ public class KaraokeRenderer extends BrokerTask<Message> {
 
   private Song song;
   private RandomAccessList<File> midiFiles;
-  private Map<Integer, Integer> deviceChannelMap = new HashMap<>();
-  private Map<Integer, RandomAccessList<KeyCap>> channelKeyCaps = new HashMap<>();
+  private Map<Integer, RandomAccessList<KeyCap>> deviceKeyCaps = new HashMap<>();
 
   public KaraokeRenderer(Broker<Message> broker) {
     super(broker);
@@ -96,8 +94,7 @@ public class KaraokeRenderer extends BrokerTask<Message> {
     OutputType outputType = message.getOutputType();
     KeyCapMap keyCapMap = message.getKeyCapMap();
     RandomAccessList<KeyCap> keyCaps = keyCapMap.getKeyCaps();
-    channelKeyCaps.put(channel, keyCaps);
-    deviceChannelMap.put(deviceIndex, channel);
+    deviceKeyCaps.put(deviceIndex, keyCaps);
     setTimer();
   }
 
@@ -112,12 +109,8 @@ public class KaraokeRenderer extends BrokerTask<Message> {
   }
 
   private void doDetach(int deviceIndex) {
-    Integer channel = deviceChannelMap.get(deviceIndex);
-    if (channel != null) {
-      channelKeyCaps.remove(channel);
-      deviceChannelMap.remove(deviceIndex);
-      setTimer();
-    }
+    deviceKeyCaps.remove(deviceIndex);
+    setTimer();
   }
 
   private void doSong(OnSong message) {
@@ -150,16 +143,12 @@ public class KaraokeRenderer extends BrokerTask<Message> {
   }
 
   private String renderKaraoke() {
-    int index = 0;
-    int[] channels = new int[channelKeyCaps.keySet().size()];
     Map<Integer, KeyCapIterator> keyCapIterators = new HashMap<>();
-    for (Entry<Integer, RandomAccessList<KeyCap>> entry : channelKeyCaps.entrySet()) {
-      int channel = entry.getKey();
+    for (Entry<Integer, RandomAccessList<KeyCap>> entry : deviceKeyCaps.entrySet()) {
+      int device = entry.getKey();
       RandomAccessList<KeyCap> keyCaps = entry.getValue();
-      channels[index++] = channel;
-      keyCapIterators.put(channel, new KeyCapIterator(keyCaps));
+      keyCapIterators.put(device, new KeyCapIterator(keyCaps));
     }
-    Arrays.sort(channels);
     Division container = new Division();
     Division stanza = null;
     Division line = null;
@@ -198,13 +187,12 @@ public class KaraokeRenderer extends BrokerTask<Message> {
         Division tickDivision = new Division("tick-" + tick);
         tickDivision.setClassName("tick");
         line.appendChild(tickDivision);
-        for (int i = 0; i < channels.length; i++) {
+        for (int deviceIndex : deviceKeyCaps.keySet()) {
           Division channelDivision = new Division();
           channelDivision.setClassName("channel");
           tickDivision.appendChild(channelDivision);
-          int channel = channels[i];
           KeyCap keyCap;
-          KeyCapIterator keyCapIterator = keyCapIterators.get(channel);
+          KeyCapIterator keyCapIterator = keyCapIterators.get(deviceIndex);
           StringBuilder s = new StringBuilder();
           while ((keyCap = keyCapIterator.next(endTick)) != null) {
             if (s.length() > 0) {
