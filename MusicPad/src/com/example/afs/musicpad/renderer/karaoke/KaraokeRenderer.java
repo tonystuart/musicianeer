@@ -185,7 +185,7 @@ public class KaraokeRenderer extends BrokerTask<Message> {
           line.setClassName("line");
           stanza.appendChild(line);
         }
-        Division tickDivision = new Division("tick-" + tick);
+        Division tickDivision = new Division(String.valueOf(tick));
         tickDivision.setClassName("tick");
         line.appendChild(tickDivision);
         for (int deviceIndex : deviceKeyCaps.keySet()) {

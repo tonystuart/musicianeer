@@ -37,7 +37,8 @@ import com.example.afs.musicpad.util.Value;
 public class Conductor extends BrokerTask<Message> {
 
   //private static final String DEFAULT_SONG = "The Beatles - Yesterday.kar";
-  private static final String DEFAULT_SONG = "Aquarius (James Rado).mid";
+  //private static final String DEFAULT_SONG = "Aquarius (James Rado).mid";
+  private static final String DEFAULT_SONG = "The Bee Gees - Stayin' Alive.kar";
 
   private static final int TICKS_PER_PIXEL = 5;
 

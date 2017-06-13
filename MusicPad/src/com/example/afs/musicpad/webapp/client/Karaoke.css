@@ -192,6 +192,7 @@ select:focus {
 	display: inline-block;
 	vertical-align: top;
 	padding-right: 10px;
+	position: relative;
 }
 
 .channel:nth-child(1) {
@@ -236,4 +237,15 @@ select:focus {
 .current-tick {
 	color: white;
 	background-color: blue;
+}
+
+.countdown {
+	color: red;
+	z-index: 100;
+	background-color: blue;
+	position: absolute;
+	bottom: 1px;
+	width: 100%;
+	text-align: left;
+	padding-bottom:  5px;
 }
