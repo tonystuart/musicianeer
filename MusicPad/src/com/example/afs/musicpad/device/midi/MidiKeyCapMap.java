@@ -9,6 +9,7 @@
 
 package com.example.afs.musicpad.device.midi;
 
+import com.example.afs.musicpad.device.common.DeviceHandler.OutputType;
 import com.example.afs.musicpad.keycap.KeyCap;
 import com.example.afs.musicpad.keycap.KeyCapMap;
 import com.example.afs.musicpad.player.Sound;
@@ -18,12 +19,36 @@ import com.example.afs.musicpad.util.RandomAccessList;
 
 public class MidiKeyCapMap implements KeyCapMap {
 
-  public MidiKeyCapMap() {
+  private RandomAccessList<Sound> sounds = new DirectList<>();
+
+  public MidiKeyCapMap(Iterable<Note> notes, OutputType outputType) {
+    int index;
+    int lastIndex = -1;
+    Sound sound = null;
+    for (Note note : notes) {
+      if (outputType == OutputType.NORMAL) {
+        index = note.getStartIndex();
+      } else {
+        index = note.getEndIndex();
+      }
+      if (index != lastIndex) {
+        lastIndex = index;
+        if (sound != null) {
+          sounds.add(sound);
+        }
+        sound = new Sound();
+      }
+      sound.add(note);
+    }
   }
 
   @Override
   public RandomAccessList<KeyCap> getKeyCaps() {
-    return new DirectList<>();
+    DirectList<KeyCap> keyCaps = new DirectList<>();
+    for (Sound sound : sounds) {
+      keyCaps.add(new KeyCap(sound, sound.getName()));
+    }
+    return keyCaps;
   }
 
   @Override

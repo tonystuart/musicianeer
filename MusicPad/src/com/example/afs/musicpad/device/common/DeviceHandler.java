@@ -113,7 +113,7 @@ public class DeviceHandler extends BrokerTask<Message> {
       keyCapMap = new NumericKeyCapMap(song.getChannelNotes(channel), player.getOutputType());
       break;
     case MIDI:
-      keyCapMap = new MidiKeyCapMap();
+      keyCapMap = new MidiKeyCapMap(song.getChannelNotes(channel), player.getOutputType());
       break;
     default:
       throw new UnsupportedOperationException();
