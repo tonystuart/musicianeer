@@ -63,6 +63,10 @@ public class DeviceHandler extends BrokerTask<Message> {
     subscribe(OnChannelAssigned.class, message -> doChannelAssigned(message));
   }
 
+  public void detach() {
+    getBroker().publish(new OnDeviceCommand(DeviceCommand.INPUT, deviceIndex, InputType.DETACH.ordinal()));
+  }
+
   @Override
   public Broker<Message> getBroker() {
     return super.getBroker();

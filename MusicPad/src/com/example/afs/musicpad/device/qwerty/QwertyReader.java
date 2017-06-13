@@ -9,6 +9,7 @@
 
 package com.example.afs.musicpad.device.qwerty;
 
+import java.awt.event.KeyEvent;
 import java.io.FileDescriptor;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -63,6 +64,9 @@ public class QwertyReader {
   private void processKeyDown(short keyCode) {
     if (keyCode < QwertyKeyCodes.inputCodes.length) {
       char inputCode = QwertyKeyCodes.inputCodes[keyCode];
+      if (inputCode == KeyEvent.VK_ESCAPE) {
+        deviceHandler.detach();
+      }
       deviceHandler.onDown(inputCode);
     } else {
       // e.g. windows meta key (125)
