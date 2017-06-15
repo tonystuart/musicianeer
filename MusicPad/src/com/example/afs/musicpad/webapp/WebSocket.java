@@ -6,11 +6,11 @@ import org.eclipse.jetty.websocket.api.WebSocketAdapter;
 import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.util.JsonUtilities;
 
-public class MessageWebSocket extends WebSocketAdapter {
+public class WebSocket extends WebSocketAdapter {
 
   private WebApp webApp;
 
-  public MessageWebSocket(WebApp webApp) {
+  public WebSocket(WebApp webApp) {
     this.webApp = webApp;
   }
 

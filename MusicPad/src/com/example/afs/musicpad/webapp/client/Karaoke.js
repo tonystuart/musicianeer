@@ -5,7 +5,7 @@ karaoke.ticksPerPixel = 1;
 karaoke.connected = false;
 
 karaoke.createWebSocketClient = function() {
-    karaoke.ws = new WebSocket("ws://localhost:8080/v1/message");
+    karaoke.ws = new WebSocket("ws://localhost:8080/v1/karaoke");
     karaoke.ws.onopen = function() {
         console.log("ws.onopen: entered");
         karaoke.connected = true;

@@ -13,6 +13,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
 
@@ -24,6 +25,7 @@ import com.example.afs.musicpad.message.OnDeviceAttached;
 import com.example.afs.musicpad.message.OnDeviceCommand;
 import com.example.afs.musicpad.message.OnDeviceDetached;
 import com.example.afs.musicpad.message.OnMidiFiles;
+import com.example.afs.musicpad.message.OnRepublishState;
 import com.example.afs.musicpad.message.OnSong;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.parser.SongBuilder;
@@ -60,6 +62,7 @@ public class Conductor extends BrokerTask<Message> {
     subscribe(OnAllTasksStarted.class, message -> doAllTasksStarted());
     subscribe(OnDeviceAttached.class, message -> doDeviceAttached(message));
     subscribe(OnDeviceDetached.class, message -> doDeviceDetached(message));
+    subscribe(OnRepublishState.class, message -> doRepublishState());
   }
 
   private void assignChannel(int deviceIndex) {
@@ -88,7 +91,7 @@ public class Conductor extends BrokerTask<Message> {
 
   private void assignChannel(int deviceIndex, int assignedChannel) {
     deviceChannelMap.put(deviceIndex, assignedChannel);
-    getBroker().publish(new OnChannelAssigned(song, deviceIndex, assignedChannel));
+    publish(new OnChannelAssigned(song, deviceIndex, assignedChannel));
   }
 
   private void assignChannels() {
@@ -98,7 +101,7 @@ public class Conductor extends BrokerTask<Message> {
   }
 
   private void doAllTasksStarted() {
-    getBroker().publish(new OnMidiFiles(midiFiles));
+    publish(new OnMidiFiles(midiFiles));
     if (DEFAULT_SONG != null) {
       int songIndex = findSong(DEFAULT_SONG);
       if (songIndex == -1) {
@@ -155,6 +158,16 @@ public class Conductor extends BrokerTask<Message> {
   private void doDeviceDetached(OnDeviceDetached message) {
     int deviceIndex = message.getDeviceIndex();
     deviceIndexes.remove(deviceIndex);
+  }
+
+  private void doRepublishState() {
+    publish(new OnMidiFiles(midiFiles));
+    publish(new OnSong(song, TICKS_PER_PIXEL));
+    for (Entry<Integer, Integer> entry : deviceChannelMap.entrySet()) {
+      int deviceIndex = entry.getKey();
+      int assignedChannel = entry.getValue();
+      publish(new OnChannelAssigned(song, deviceIndex, assignedChannel));
+    }
   }
 
   private void doSelectSong(int songIndex) {

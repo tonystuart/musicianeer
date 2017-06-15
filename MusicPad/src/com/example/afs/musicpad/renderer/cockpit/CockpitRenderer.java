@@ -24,7 +24,7 @@ import com.example.afs.musicpad.message.OnChannelUpdate;
 import com.example.afs.musicpad.message.OnFooter;
 import com.example.afs.musicpad.message.OnHeader;
 import com.example.afs.musicpad.message.OnMidiFiles;
-import com.example.afs.musicpad.message.OnMusic;
+import com.example.afs.musicpad.message.OnStaff;
 import com.example.afs.musicpad.message.OnSong;
 import com.example.afs.musicpad.message.OnTemplates;
 import com.example.afs.musicpad.message.OnTransport;
@@ -60,7 +60,7 @@ public class CockpitRenderer extends BrokerTask<Message> {
     String channelControls = channelRenderer.render();
     StaffRenderer staffRenderer = new StaffRenderer(song, channel, ticksPerPixel, keyCapMap);
     String music = staffRenderer.getMusic();
-    getBroker().publish(new OnMusic(deviceIndex, channelControls, music));
+    getBroker().publish(new OnStaff(deviceIndex, channelControls, music));
   }
 
   private void doSong(OnSong message) {

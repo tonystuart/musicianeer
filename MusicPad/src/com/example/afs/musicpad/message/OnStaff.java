@@ -9,29 +9,33 @@
 
 package com.example.afs.musicpad.message;
 
-public class OnMusic extends Message {
+public class OnStaff extends Message {
 
   private int deviceIndex;
-  private String channelControls;
-  private String html;
+  private String channelHtml;
+  private String staffHtml;
 
-  public OnMusic(int deviceIndex, String channelControls, String html) {
+  public OnStaff(int deviceIndex, String channelHtml, String staffHtml) {
     this.deviceIndex = deviceIndex;
-    this.channelControls = channelControls;
-    this.html = html;
+    this.channelHtml = channelHtml;
+    this.staffHtml = staffHtml;
+  }
+
+  public String getChannelHtml() {
+    return channelHtml;
   }
 
   public int getDeviceIndex() {
     return deviceIndex;
   }
 
-  public String getHtml() {
-    return html;
+  public String getStaffHtml() {
+    return staffHtml;
   }
 
   @Override
   public String toString() {
-    return "OnMusic [deviceIndex=" + deviceIndex + ", channelControls=" + channelControls + ", html=" + html + "]";
+    return "OnStaff [deviceIndex=" + deviceIndex + ", channelHtml=" + channelHtml + ", staffHtml=" + staffHtml + "]";
   }
 
 }

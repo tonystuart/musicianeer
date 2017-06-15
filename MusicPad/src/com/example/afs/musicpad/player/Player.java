@@ -121,7 +121,7 @@ public class Player {
     default:
       throw new UnsupportedOperationException();
     }
-    if (arpeggiator.getInputQueue().size() == 0 && repeatArpeggiation != null) {
+    if (!arpeggiator.isPlaying() && repeatArpeggiation != null) {
       arpeggiator.play(repeatArpeggiation);
     }
   }

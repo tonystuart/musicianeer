@@ -5,7 +5,7 @@ cockpit.ticksPerPixel = 1;
 cockpit.connected = false;
 
 cockpit.createWebSocketClient = function() {
-  cockpit.ws = new WebSocket("ws://localhost:8080/v1/message");
+  cockpit.ws = new WebSocket("ws://localhost:8080/v1/cockpit");
   cockpit.ws.onopen = function() {
     console.log("ws.onopen: entered");
     cockpit.connected = true;
@@ -67,11 +67,11 @@ cockpit.onLoad = function() {
   cockpit.createWebSocketClient();
 }
 
-cockpit.onMusic = function(response) {
+cockpit.onStaff = function(response) {
   let notator = document.createElement("div");
   notator.className = "notator";
-  notator.innerHTML = response.html;
-  let channelControls = cockpit.fragmentToElement(response.channelControls)
+  notator.innerHTML = response.staffHtml;
+  let channelControls = cockpit.fragmentToElement(response.channelHtml)
   notator.id = "notator-" + response.deviceIndex;
   notator.appendChild(channelControls);
   let oldNotator = document.getElementById(notator.id);
@@ -156,8 +156,8 @@ cockpit.processResponse = function(json) {
   case "OnTransport":
     cockpit.onTransport(response);
     break;
-  case "OnMusic":
-    cockpit.onMusic(response);
+  case "OnStaff":
+    cockpit.onStaff(response);
     break;
   case "OnTemplates":
     cockpit.onTemplates(response);
