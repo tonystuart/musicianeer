@@ -7,7 +7,9 @@
 // This program is made available on an "as is" basis, without
 // warranties or conditions of any kind, either express or implied.
 
-package com.example.afs.fluidsynth;
+package com.example.afs.musicpad.tool;
+
+import com.example.afs.fluidsynth.FluidSynth;
 
 public class FluidSynthTest {
 
