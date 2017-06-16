@@ -18,7 +18,6 @@ import com.example.afs.musicpad.device.qwerty.QwertyWatcherBehavior;
 import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnAllTasksStarted;
 import com.example.afs.musicpad.player.Player;
-import com.example.afs.musicpad.renderer.karaoke.KaraokeRenderer;
 import com.example.afs.musicpad.transport.TransportTask;
 import com.example.afs.musicpad.util.Broker;
 import com.example.afs.musicpad.webapp.WebServer;
@@ -40,7 +39,6 @@ public class MusicPad {
   private DeviceWatcher qwertyWatcher;
   private DeviceWatcher midiWatcher;
   private TransportTask transportTask;
-  private KaraokeRenderer karaokeRenderer;
   private CommandProcessor commandProcessor;
   private WebServer webServer;
   private Synthesizer synthesizer = createSynthesizer();
@@ -52,7 +50,6 @@ public class MusicPad {
     this.qwertyWatcher = new DeviceWatcher(broker, synthesizer, new QwertyWatcherBehavior());
     this.midiWatcher = new DeviceWatcher(broker, synthesizer, new MidiWatcherBehavior());
     this.transportTask = new TransportTask(broker, synthesizer);
-    this.karaokeRenderer = new KaraokeRenderer(broker);
     this.webServer = new WebServer(broker);
   }
 
@@ -68,7 +65,6 @@ public class MusicPad {
     qwertyWatcher.start();
     midiWatcher.start();
     transportTask.start();
-    karaokeRenderer.start();
     commandProcessor.start();
     webServer.start();
     broker.publish(new OnAllTasksStarted());
