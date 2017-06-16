@@ -52,7 +52,8 @@ public class WebServer extends BrokerTask<Message> {
   }
 
   private ServletHolder createCockpitServlet() {
-    ServletHolder servletHolder = new ServletHolder("ws-events", new WebAppServlet(cockpitWebAppFactory));
+    WebAppServlet cockpitServlet = new WebAppServlet(cockpitWebAppFactory);
+    ServletHolder servletHolder = new ServletHolder("CockpitServlet", cockpitServlet);
     return servletHolder;
   }
 
@@ -65,7 +66,8 @@ public class WebServer extends BrokerTask<Message> {
   }
 
   private ServletHolder createKaraokeServlet() {
-    ServletHolder servletHolder = new ServletHolder("ws-events", new WebAppServlet(karaokeWebAppFactory));
+    WebAppServlet karaokeServlet = new WebAppServlet(karaokeWebAppFactory);
+    ServletHolder servletHolder = new ServletHolder("KaraokeServlet", karaokeServlet);
     return servletHolder;
   }
 
