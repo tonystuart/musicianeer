@@ -249,3 +249,47 @@ select:focus {
 	text-align: left;
 	padding-bottom:  5px;
 }
+
+#song-selector {
+	display: flex;
+	flex-direction: column;
+	position: fixed;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	z-index: 200;
+	background: red;
+	padding: 20px;
+  background-color: rgb(32, 32, 32);
+  background-image: linear-gradient(45deg, black 25%, transparent 25%, transparent 75%, black 75%, black), linear-gradient(45deg, black 25%, transparent 25%, transparent 75%, black 75%, black), linear-gradient(to bottom, rgb(8, 8, 8), rgb(32, 32, 32));
+  background-size: 10px 10px, 10px 10px, 10px 5px;
+  background-position: 0px 0px, 5px 5px, 0px 0px;
+}
+
+#song-selector-title {
+	color: green;
+	font-size: 3rem;
+	font-weight: bold;
+	margin: auto;
+	padding: 10px;
+}
+
+#song-selector-list {
+	font-size: 2rem;
+	overflow-y: auto;
+	height: 100%;
+	color: green;
+}
+
+#song-selector-controls {
+	font-size: 2rem;
+	padding: 5px;
+}
+
+#song-selector-controls input[type="button"] {
+	font-size: 2rem;
+	background: green;
+	border: 1px solid blue;
+	padding: 10px;
+}

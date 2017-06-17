@@ -32,12 +32,6 @@ cockpit.appendTemplate = function(containerId, templateId) {
   }
 }
 
-cockpit.fragmentToElement = function(fragment) {
-  let container = document.createElement("div");
-  container.innerHTML = fragment;
-  return container.firstElementChild;
-}
-
 cockpit.onClick = function(event) {
   let id = event.target.id;
 }
@@ -71,7 +65,7 @@ cockpit.onStaff = function(response) {
   let notator = document.createElement("div");
   notator.className = "notator";
   notator.innerHTML = response.staffHtml;
-  let channelControls = cockpit.fragmentToElement(response.channelHtml)
+  let channelControls = musicPad.fragmentToElement(response.channelHtml)
   notator.id = "notator-" + response.deviceIndex;
   notator.appendChild(channelControls);
   let oldNotator = document.getElementById(notator.id);
@@ -121,7 +115,7 @@ cockpit.onTemplates = function(response) {
   templates.innerHTML = "";
   for (let i in response.templates) {
     let templateHtml = response.templates[i];
-    let templateElement = cockpit.fragmentToElement(templateHtml);
+    let templateElement = musicPad.fragmentToElement(templateHtml);
     templates.appendChild(templateElement);
   }
 }

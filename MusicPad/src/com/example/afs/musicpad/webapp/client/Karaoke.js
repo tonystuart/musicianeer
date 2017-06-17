@@ -22,6 +22,31 @@ karaoke.createWebSocketClient = function() {
     }
 }
 
+karaoke.getNextTick = function(currentTick) {
+    let next = currentTick.nextElementSibling;
+    if (next) {
+        return next;
+    }
+    let nextRow = currentTick.parentElement.nextElementSibling;
+    if (nextRow) {
+        next = nextRow.firstElementChild;
+        if (next) {
+            return next;
+        }
+    }
+    let nextStanza = currentTick.parentElement.parentElement.nextElementSibling;
+    if (nextStanza) {
+        let firstRow = nextStanza.firstElementChild;
+        if (firstRow) {
+            next = firstRow.firstElementChild;
+            if (next) {
+                return next;
+            }
+        }
+    }
+    return null;
+}
+
 karaoke.onLoad = function() {
     karaoke.createWebSocketClient();
 }
@@ -29,6 +54,16 @@ karaoke.onLoad = function() {
 karaoke.onKaraoke = function(response) {
     let container = document.getElementById("karaoke");
     container.innerHTML = response.karaoke;
+}
+
+karaoke.onSongSelector = function(response) {
+    let songSelector = musicPad.fragmentToElement(response.html);
+    let oldSongSelector = document.getElementById("song-selector");
+    if (oldSongSelector) {
+        oldSongSelector.parentElement.replaceChild(songSelector, oldSongSelector);
+    } else {
+        document.body.appendChild(songSelector);
+    }
 }
 
 karaoke.onTick = function(tick) {
@@ -67,6 +102,9 @@ karaoke.processResponse = function(json) {
     case "OnKaraoke":
         karaoke.onKaraoke(response);
         break;
+    case "OnSongSelector":
+        //karaoke.onSongSelector(response);
+        break;
     case "OnTick":
         karaoke.onTick(response.tick);
         break;
@@ -94,30 +132,6 @@ karaoke.selectTick = function(tickDivision) {
     karaoke.lastTick = tickDivision;
 }
 
-karaoke.getNextTick = function(currentTick) {
-    let next = currentTick.nextElementSibling;
-    if (next) {
-        return next;
-    }
-    let nextRow = currentTick.parentElement.nextElementSibling;
-    if (nextRow) {
-        next = nextRow.firstElementChild;
-        if (next) {
-            return next;
-        }
-    }
-    let nextStanza = currentTick.parentElement.parentElement.nextElementSibling;
-    if (nextStanza) {
-        let firstRow = nextStanza.firstElementChild;
-        if (firstRow) {
-            next = firstRow.firstElementChild;
-            if (next) {
-                return next;
-            }
-        }
-    }
-    return null;
-}
 karaoke.showTickCountdown = function(tick) {
     let currentTick = document.querySelector(".current-tick");
     if (currentTick) {

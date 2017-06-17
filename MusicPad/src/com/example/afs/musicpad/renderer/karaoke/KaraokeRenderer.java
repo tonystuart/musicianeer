@@ -27,6 +27,7 @@ import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnKaraoke;
 import com.example.afs.musicpad.message.OnMidiFiles;
 import com.example.afs.musicpad.message.OnSong;
+import com.example.afs.musicpad.message.OnSongSelector;
 import com.example.afs.musicpad.song.Default;
 import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.song.Word;
@@ -69,15 +70,14 @@ public class KaraokeRenderer extends BrokerTask<Message> {
   private int ticksPerPixel;
 
   private Song song;
-  private RandomAccessList<File> midiFiles;
-  private Map<Integer, RandomAccessList<KeyCap>> deviceKeyCaps = new HashMap<>();
   private Map<Integer, KeyCap> deviceSustain = new HashMap<>();
+  private Map<Integer, RandomAccessList<KeyCap>> deviceKeyCaps = new HashMap<>();
 
   public KaraokeRenderer(Broker<Message> broker) {
     super(broker);
     subscribe(OnChannelUpdate.class, message -> doChannelUpdate(message));
     subscribe(OnCommand.class, message -> doCommand(message));
-    subscribe(OnMidiFiles.class, message -> publishTemplates(message));
+    subscribe(OnMidiFiles.class, message -> doMidiFiles(message));
     subscribe(OnSong.class, message -> doSong(message));
   }
 
@@ -114,6 +114,13 @@ public class KaraokeRenderer extends BrokerTask<Message> {
     setTimer();
   }
 
+  private void doMidiFiles(OnMidiFiles message) {
+    RandomAccessList<File> midiFiles = message.getMidiFiles();
+    SongSelector songSelector = new SongSelector(midiFiles);
+    String html = songSelector.render();
+    publish(new OnSongSelector(html));
+  }
+
   private void doSong(OnSong message) {
     song = message.getSong();
   }
@@ -138,9 +145,6 @@ public class KaraokeRenderer extends BrokerTask<Message> {
   private void publishKaraoke() {
     String karaoke = renderKaraoke();
     getBroker().publish(new OnKaraoke(karaoke));
-  }
-
-  private void publishTemplates(OnMidiFiles message) {
   }
 
   private String renderKaraoke() {
