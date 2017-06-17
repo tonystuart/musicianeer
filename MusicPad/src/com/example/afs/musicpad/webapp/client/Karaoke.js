@@ -47,14 +47,14 @@ karaoke.onTick = function(tick) {
         karaoke.selectTick(tickDivision);
     } else {
         if (karaoke.countdown) {
-          let currentTick = document.querySelector(".current-tick");
-          if (currentTick) {
-            let next = currentTick.nextElementSibling;
-            if (next) {
-              // TODO: Pass resolution to client
-              karaoke.countdown.innerHTML = Math.floor((next.id - tick) / 512);
+            let currentTick = document.querySelector(".current-tick");
+            if (currentTick) {
+                let next = karaoke.getNextTick(currentTick);
+                if (next) {
+                    // TODO: Pass resolution to client
+                    karaoke.countdown.innerHTML = Math.floor((next.id - tick) / 512);
+                }
             }
-          }
         } else {
             karaoke.showTickCountdown(tick);
         }
@@ -94,17 +94,41 @@ karaoke.selectTick = function(tickDivision) {
     karaoke.lastTick = tickDivision;
 }
 
-karaoke.showTickCountdown = function(tick) {
-  let currentTick = document.querySelector(".current-tick");
-  if (currentTick) {
+karaoke.getNextTick = function(currentTick) {
     let next = currentTick.nextElementSibling;
     if (next) {
-      karaoke.countdown = document.createElement("div");
-      karaoke.countdown.className = "countdown";
-      // TODO: Pass resolution to client
-      karaoke.countdown.innerHTML = Math.floor((next.id - tick) / 512);
-      //next.appendChild(karaoke.countdown);
-      currentTick.appendChild(karaoke.countdown);
+        return next;
     }
-  }
+    let nextRow = currentTick.parentElement.nextElementSibling;
+    if (nextRow) {
+        next = nextRow.firstElementChild;
+        if (next) {
+            return next;
+        }
+    }
+    let nextStanza = currentTick.parentElement.parentElement.nextElementSibling;
+    if (nextStanza) {
+        let firstRow = nextStanza.firstElementChild;
+        if (firstRow) {
+            next = firstRow.firstElementChild;
+            if (next) {
+                return next;
+            }
+        }
+    }
+    return null;
+}
+karaoke.showTickCountdown = function(tick) {
+    let currentTick = document.querySelector(".current-tick");
+    if (currentTick) {
+        let next = karaoke.getNextTick(currentTick);
+        if (next) {
+            karaoke.countdown = document.createElement("div");
+            karaoke.countdown.className = "countdown";
+            // TODO: Pass resolution to client
+            karaoke.countdown.innerHTML = Math.floor((next.id - tick) / 512);
+            //next.appendChild(karaoke.countdown);
+            currentTick.appendChild(karaoke.countdown);
+        }
+    }
 }
