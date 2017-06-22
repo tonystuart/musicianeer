@@ -1,26 +1,7 @@
-"use strict";
+'use strict';
 var karaoke = karaoke || {};
 
 karaoke.ticksPerPixel = 1;
-karaoke.connected = false;
-
-karaoke.createWebSocketClient = function() {
-    karaoke.ws = new WebSocket("ws://localhost:8080/v1/karaoke");
-    karaoke.ws.onopen = function() {
-        console.log("ws.onopen: entered");
-        karaoke.connected = true;
-    }
-    karaoke.ws.onmessage = function(message) {
-        karaoke.processResponse(message.data);
-    }
-    karaoke.ws.onclose = function() {
-        console.log("ws.onclose: entered, connecting again in 1000 ms.");
-        karaoke.connected = false;
-        let scroller = document.getElementById("karaoke-scroller");
-        scroller.scrollTop = 0;
-        setTimeout(karaoke.createWebSocketClient, 1000);
-    }
-}
 
 karaoke.getNextTick = function(currentTick) {
     let next = currentTick.nextElementSibling;
@@ -48,17 +29,17 @@ karaoke.getNextTick = function(currentTick) {
 }
 
 karaoke.onLoad = function() {
-    karaoke.createWebSocketClient();
+    musicPad.createWebSocketClient("ws://localhost:8080/v1/karaoke", karaoke.onWebSocketMessage, karaoke.onWebSocketClose);
 }
 
 karaoke.onKaraoke = function(response) {
-    let container = document.getElementById("karaoke");
+    let container = document.getElementById('karaoke');
     container.innerHTML = response.karaoke;
 }
 
 karaoke.onSongSelector = function(response) {
     let songSelector = musicPad.fragmentToElement(response.html);
-    let oldSongSelector = document.getElementById("song-selector");
+    let oldSongSelector = document.getElementById('song-selector');
     if (oldSongSelector) {
         oldSongSelector.parentElement.replaceChild(songSelector, oldSongSelector);
     } else {
@@ -66,11 +47,20 @@ karaoke.onSongSelector = function(response) {
     }
 }
 
+karaoke.onSongSelectorPlay = function(response) {
+  let songSelector = document.getElementById('song-selector');
+  let item = songSelector.querySelector('.selected');
+  if (item) {
+    let songIndex = parseInt(item.id.match(/[0-9]+/)[0]); 
+    musicPad.sendCommand('PLAY_SONG', songIndex);
+  }
+}
+
 karaoke.onTick = function(tick) {
     if (tick == 0) {
-        document.getElementById("karaoke-scroller").scrollTop = 0;
+        document.getElementById('karaoke-scroller').scrollTop = 0;
         if (karaoke.lastTick) {
-            karaoke.lastTick.classList.remove("current-tick");
+            karaoke.lastTick.classList.remove('current-tick');
         }
     }
     let tickDivision = document.getElementById(tick);
@@ -82,7 +72,7 @@ karaoke.onTick = function(tick) {
         karaoke.selectTick(tickDivision);
     } else {
         if (karaoke.countdown) {
-            let currentTick = document.querySelector(".current-tick");
+            let currentTick = document.querySelector('.current-tick');
             if (currentTick) {
                 let next = karaoke.getNextTick(currentTick);
                 if (next) {
@@ -96,16 +86,21 @@ karaoke.onTick = function(tick) {
     }
 }
 
-karaoke.processResponse = function(json) {
+karaoke.onWebSocketClose = function() {
+  let scroller = document.getElementById('karaoke-scroller');
+  scroller.scrollTop = 0;
+}
+
+karaoke.onWebSocketMessage = function(json) {
     let response = JSON.parse(json);
     switch (response.type) {
-    case "OnKaraoke":
+    case 'OnKaraoke':
         karaoke.onKaraoke(response);
         break;
-    case "OnSongSelector":
-        //karaoke.onSongSelector(response);
+    case 'OnSongSelector':
+        karaoke.onSongSelector(response);
         break;
-    case "OnTick":
+    case 'OnTick':
         karaoke.onTick(response.tick);
         break;
     }
@@ -113,10 +108,10 @@ karaoke.processResponse = function(json) {
 
 karaoke.selectTick = function(tickDivision) {
     if (karaoke.lastTick) {
-        karaoke.lastTick.classList.remove("current-tick");
+        karaoke.lastTick.classList.remove('current-tick');
     }
-    tickDivision.classList.add("current-tick");
-    let scroller = document.getElementById("karaoke-scroller");
+    tickDivision.classList.add('current-tick');
+    let scroller = document.getElementById('karaoke-scroller');
     let top = tickDivision.offsetTop;
     let height = tickDivision.offsetHeight;
     let bottom = top + height;
@@ -125,20 +120,20 @@ karaoke.selectTick = function(tickDivision) {
         //scroller.scrollTop += tickDivision.offsetTop;
         // This is just a regular immediate scroll with Chrome 58:
         tickDivision.scrollIntoView({
-            behavior: "smooth",
-            block: "start"
+            behavior: 'smooth',
+            block: 'start'
         });
     }
     karaoke.lastTick = tickDivision;
 }
 
 karaoke.showTickCountdown = function(tick) {
-    let currentTick = document.querySelector(".current-tick");
+    let currentTick = document.querySelector('.current-tick');
     if (currentTick) {
         let next = karaoke.getNextTick(currentTick);
         if (next) {
-            karaoke.countdown = document.createElement("div");
-            karaoke.countdown.className = "countdown";
+            karaoke.countdown = document.createElement('div');
+            karaoke.countdown.className = 'countdown';
             // TODO: Pass resolution to client
             karaoke.countdown.innerHTML = Math.floor((next.id - tick) / 512);
             //next.appendChild(karaoke.countdown);

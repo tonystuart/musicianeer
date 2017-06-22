@@ -15,6 +15,7 @@ public enum Command {
   PLAY, //
   PLAY_PAUSE, //
   PLAY_SAMPLE, //
+  PLAY_SONG, //
   PAUSE, //
   RESUME, //
   SEEK, //

@@ -21,6 +21,7 @@ import com.example.afs.musicpad.html.Table;
 import com.example.afs.musicpad.html.TableHeader;
 import com.example.afs.musicpad.html.TableRow;
 import com.example.afs.musicpad.midi.Midi;
+import com.example.afs.musicpad.renderer.CommandRenderer;
 import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.util.RandomAccessList;
 
@@ -106,14 +107,14 @@ public class HeaderRenderer {
   private Select getTitleSelect() {
     Select select = new Select("title");
     select.appendProperty("value", mapTitleToIndex(song.getTitle()));
-    select.appendProperty("onchange", PropertyRenderer.render(Command.SONG));
+    select.appendProperty("onchange", CommandRenderer.render(Command.SONG));
     return select;
   }
 
   private Select getTransposition() {
     Select select = new Select("transpose");
     select.appendProperty("value", song.getTransposition());
-    select.appendProperty("onchange", PropertyRenderer.render(Command.TRANSPOSE));
+    select.appendProperty("onchange", CommandRenderer.render(Command.TRANSPOSE));
     return select;
   }
 

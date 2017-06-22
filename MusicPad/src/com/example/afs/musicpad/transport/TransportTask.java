@@ -50,9 +50,9 @@ public class TransportTask extends BrokerTask<Message> {
     super(broker);
     this.synthesizer = synthesizer;
     synthesizer.setGain(DEFAULT_GAIN);
-    subscribe(OnSong.class, message -> doSong(message.getSong()));
-    subscribe(OnCommand.class, message -> doCommand(message.getCommand(), message.getParameter()));
-    subscribe(OnChannelCommand.class, message -> doChannelCommand(message.getChannelCommand(), message.getChannel(), message.getParameter()));
+    subscribe(OnSong.class, message -> doSong(message));
+    subscribe(OnCommand.class, message -> doCommand(message));
+    subscribe(OnChannelCommand.class, message -> doChannelCommand(message));
     this.sequencer = new TransportSequencer(noteEvent -> processNoteEvent(noteEvent));
     sequencer.start();
   }
@@ -61,11 +61,16 @@ public class TransportTask extends BrokerTask<Message> {
     move(Direction.BACKWARD);
   }
 
-  private void doChannelCommand(ChannelCommand command, int channel, int parameter) {
+  private void doChannelCommand(OnChannelCommand message) {
+    ChannelCommand command = message.getChannelCommand();
+    int channel = message.getChannel();
+    int parameter = message.getParameter();
     System.out.println("TransportTask.doChannelCommand: command=" + command + ", channel=" + channel + ", parameter=" + parameter);
   }
 
-  private void doCommand(Command command, int parameter) {
+  private void doCommand(OnCommand message) {
+    Command command = message.getCommand();
+    int parameter = message.getParameter();
     switch (command) {
     case PLAY:
       doPlay(parameter);
@@ -157,9 +162,9 @@ public class TransportTask extends BrokerTask<Message> {
     this.percentVelocity = Range.scaleMidiToPercent(velocity);
   }
 
-  private void doSong(Song song) {
+  private void doSong(OnSong message) {
     stop();
-    this.song = song;
+    this.song = message.getSong();
   }
 
   private void doStop() {

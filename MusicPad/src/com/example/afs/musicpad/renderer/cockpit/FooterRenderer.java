@@ -17,6 +17,7 @@ import com.example.afs.musicpad.html.Table;
 import com.example.afs.musicpad.html.TableHeader;
 import com.example.afs.musicpad.html.TableRow;
 import com.example.afs.musicpad.midi.Midi;
+import com.example.afs.musicpad.renderer.CommandRenderer;
 import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.util.Value;
 
@@ -95,13 +96,13 @@ public class FooterRenderer {
 
   private CheckBox getMute(int channel) {
     CheckBox checkBox = new CheckBox("mute-" + channel);
-    checkBox.appendProperty("onclick", PropertyRenderer.renderChannelChecked(ChannelCommand.MUTE, channel));
+    checkBox.appendProperty("onclick", CommandRenderer.renderChannelChecked(ChannelCommand.MUTE, channel));
     return checkBox;
   }
 
   private CheckBox getSolo(int channel) {
     CheckBox checkBox = new CheckBox("solo-" + channel);
-    checkBox.appendProperty("onclick", PropertyRenderer.renderChannelChecked(ChannelCommand.SOLO, channel));
+    checkBox.appendProperty("onclick", CommandRenderer.renderChannelChecked(ChannelCommand.SOLO, channel));
     return checkBox;
   }
 

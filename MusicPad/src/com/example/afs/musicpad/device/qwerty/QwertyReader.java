@@ -111,7 +111,7 @@ public class QwertyReader {
     } catch (IOException e1) {
       throw new RuntimeException(e1);
     }
-    System.out.println("Terminating QWERTY device " + deviceHandler);
+    System.out.println("Terminating QWERTY device " + deviceHandler.getDeviceName());
   }
 
 }

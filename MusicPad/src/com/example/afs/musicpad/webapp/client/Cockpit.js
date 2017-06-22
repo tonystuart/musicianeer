@@ -2,35 +2,6 @@
 var cockpit = cockpit || {};
 
 cockpit.ticksPerPixel = 1;
-cockpit.connected = false;
-
-cockpit.createWebSocketClient = function() {
-  cockpit.ws = new WebSocket("ws://localhost:8080/v1/cockpit");
-  cockpit.ws.onopen = function() {
-    console.log("ws.onopen: entered");
-    cockpit.connected = true;
-  }
-  cockpit.ws.onmessage = function(message) {
-    cockpit.processResponse(message.data);
-  }
-  cockpit.ws.onclose = function() {
-    console.log("ws.onclose: entered, connecting again in 1000 ms.");
-    cockpit.connected = false;
-    let scroller = document.getElementById("notator-scroller");
-    scroller.scrollLeft = 0;
-    setTimeout(cockpit.createWebSocketClient, 1000);
-  }
-}
-
-cockpit.appendTemplate = function(containerId, templateId) {
-  let container = document.getElementById(containerId);
-  let template = document.getElementById(templateId); 
-  container.appendChild(template.content.cloneNode(true));
-  let value = container.getAttribute("value");
-  if (value) {
-    container.value = value;
-  }
-}
 
 cockpit.onClick = function(event) {
   let id = event.target.id;
@@ -43,22 +14,32 @@ cockpit.onDeviceDetached = function(response) {
   }
 }
 
-cockpit.onHeader = function(response) {
-  let header = document.getElementById("header");
-  cockpit.title = response.title;
-  header.innerHTML = response.html;
-  cockpit.appendTemplate("title", "song-options");
-  cockpit.appendTemplate("transpose", "transpose-options");
-  cockpit.ticksPerPixel = response.ticksPerPixel;
-}
-
 cockpit.onFooter = function(response) {
   let footer = document.getElementById("footer");
   footer.innerHTML = response.html;
 }
 
+cockpit.onHeader = function(response) {
+  let header = document.getElementById("header");
+  cockpit.title = response.title;
+  header.innerHTML = response.html;
+  musicPad.appendTemplate("title", "song-options");
+  musicPad.appendTemplate("transpose", "transpose-options");
+  cockpit.ticksPerPixel = response.ticksPerPixel;
+}
+
 cockpit.onLoad = function() {
-  cockpit.createWebSocketClient();
+  musicPad.createWebSocketClient("ws://localhost:8080/v1/cockpit", cockpit.onWebSocketMessage, cockpit.onWebSocketClose);
+}
+
+cockpit.onNotatorScroll = function(event) {
+  let scroller = document.getElementById("notator-scroller");
+  let svg = scroller.querySelector("svg");
+  let mid = scroller.offsetWidth / 2; // start of svg
+  let x1 = scroller.scrollLeft + mid;
+  let x2 = musicPad.toSvg(svg, x1);
+  let x3 = musicPad.toScreen(svg, x2);
+  console.log("x1="+x1+", x2="+x2 + ", x3="+x3);
 }
 
 cockpit.onStaff = function(response) {
@@ -78,36 +59,9 @@ cockpit.onStaff = function(response) {
   let programId = "program-select-" + response.deviceIndex;
   let inputId = "input-select-" + response.deviceIndex;
   let outputId = "output-select-" + response.deviceIndex;
-  cockpit.appendTemplate(programId, "program-options");
-  cockpit.appendTemplate(inputId, "input-options");
-  cockpit.appendTemplate(outputId, "output-options");
-}
-
-cockpit.onNotatorScroll = function(event) {
-  let scroller = document.getElementById("notator-scroller");
-  let svg = scroller.querySelector("svg");
-  let mid = scroller.offsetWidth / 2; // start of svg
-  let x1 = scroller.scrollLeft + mid;
-  let x2 = cockpit.toSvg(svg, x1);
-  let x3 = cockpit.toScreen(svg, x2);
-  console.log("x1="+x1+", x2="+x2 + ", x3="+x3);
-}
-
-cockpit.toSvg = function(svg, x) {
-  let screenPoint = svg.createSVGPoint();
-  screenPoint.x = x;
-  let ctm = svg.getScreenCTM();
-  let inverse = ctm.inverse();
-  let svgPoint = screenPoint.matrixTransform(inverse);
-  return svgPoint.x;
-}
-
-cockpit.toScreen = function(svg, x) {
-  let svgPoint = svg.createSVGPoint();
-  svgPoint.x = x;
-  let ctm = svg.getScreenCTM();
-  let screenPoint = svgPoint.matrixTransform(ctm);
-  return screenPoint.x;
+  musicPad.appendTemplate(programId, "program-options");
+  musicPad.appendTemplate(inputId, "input-options");
+  musicPad.appendTemplate(outputId, "output-options");
 }
 
 cockpit.onTemplates = function(response) {
@@ -125,7 +79,7 @@ cockpit.onTick = function(tick) {
   let svg = scroller.querySelector("svg");
   if (svg) {
     let scaledTick = tick / cockpit.ticksPerPixel;
-    let screenX = cockpit.toScreen(svg, scaledTick);
+    let screenX = musicPad.toScreen(svg, scaledTick);
     let width = scroller.offsetWidth;
     let midPoint = width / 2;
     scroller.scrollLeft += screenX - midPoint;
@@ -138,7 +92,12 @@ cockpit.onTransport = function(response) {
   transport.innerHTML = response.html;
 }
 
-cockpit.processResponse = function(json) {
+cockpit.onWebSocketClose = function() {
+  let scroller = document.getElementById("notator-scroller");
+  scroller.scrollLeft = 0;
+}
+
+cockpit.onWebSocketMessage = function(json) {
   let response = JSON.parse(json);
   switch (response.type) {
   case "OnHeader":
@@ -164,37 +123,3 @@ cockpit.processResponse = function(json) {
     break;
   }
 }
-
-cockpit.request = function(resource) {
-  let httpRequest = new XMLHttpRequest();
-  httpRequest.onreadystatechange = function() {
-    if (httpRequest.readyState == 4 && httpRequest.status == 200) {
-      cockpit.processResponse(httpRequest.responseText);
-    }
-  };
-  httpRequest.open("GET", "v1/rest/" + resource, true);
-  httpRequest.send();
-}
-
-cockpit.send = function(json) {
-  if (cockpit.connected) {
-    cockpit.ws.send(json);
-  }
-}
-
-cockpit.sendCommand = function(command, parameter) {
-  console.log("command="+command+", parameter="+parameter);
-  cockpit.send(JSON.stringify({type : "OnCommand", command : command, parameter : parameter}));
-}
-
-cockpit.sendChannelCommand = function(command, channel, parameter) {
-  console.log("command="+command+", channel="+channel+", parameter="+parameter);
-  cockpit.send(JSON.stringify({type : "OnChannelCommand", channelCommand : command, channel : channel, parameter: parameter}));
-}
-
-cockpit.sendDeviceCommand = function(command, deviceIndex, parameter) {
-  console.log("command="+command+", deviceIndex="+deviceIndex+", parameter="+parameter);
-  cockpit.send(JSON.stringify({type : "OnDeviceCommand", deviceCommand : command, deviceIndex : deviceIndex, parameter: parameter}));
-}
-
-

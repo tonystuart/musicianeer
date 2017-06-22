@@ -56,6 +56,7 @@ public class SongSelector {
 
   private Element getSongList(RandomAccessList<File> midiFiles) {
     Division songList = new Division("song-selector-list");
+    songList.appendProperty("onclick", "musicPad.selectElement(event.target, \"song-selector-list\")");
     int midiFileCount = midiFiles.size();
     for (int i = 0; i < midiFileCount; i++) {
       File midiFile = midiFiles.get(i);

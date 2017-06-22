@@ -18,150 +18,11 @@ input {
     margin: 0;
 }
 
-line {
-  stroke: black;
-  stroke-width: 1;
-}
-
-circle {
-  stroke: black;
-  stroke-width: 1;
-}
-
-text {
-	font-size: 18pt;
-}
-
-table {
-  text-align: left;
-  width: 100%;
-}
-
-#header {
-	border-bottom: 1px solid gray;
-	font-size: 2vh;
-}
-
-#footer-detail {
-	overflow-y: auto;
-}
-
-#footer {
-	border-top: 1px solid gray;
-  font-size: 2vh;
-	max-height: 20%;
-	overflow-y: auto;
-}
-
-#transport {
-	background-color: lightgray;
-	font-size: 2vh;
-	width: 100%;
-}
-
-#transport-detail {
-	display: flex;
-	flex-direction: row;
-	justify-content: space-between;
-}
-
-#transport-left {
-	display: flex;
-	flex-direction: row;
-}
-
 #music-pad {
   display: flex;
   flex-direction: column;
   height: 100%;
   width: 100%;
-}
-
-#channel-notators {
-	display: flex;
-	flex-direction: column;
-	flex-grow: 1;
-	position: relative;
-	width: 100%;
-}
-
-#notator-cursor {
-    position: absolute;
-    left: 50%;
-    height: 100%;
-    z-index: 100;
-    border-left: 1px solid red;
-}
-
-#notator-scroller {
-	display: flex;
-	flex-direction: column;
-	flex-grow: 1;
-	height: 100%;
-	overflow-x: auto;
-	width: 100%;
-}
-
-.notator {
-  flex-grow: 1;
-  flex-shrink: 1;
-  position: relative;
-  display: flex;
-}
-
-.notator svg {
-	bottom: 0;
-	height: 100%;
-	left: 0;
-	padding-left: calc(50%);
-	padding-right: calc(50%);
-	position: absolute;
-	right: 0;
-	top: 0;
-}
-
-.channel-controls {
-	border: 1px solid gray;
-	margin-top: auto;
-	margin-bottom: auto;
-	margin-left: 10px;
-	width: calc(50% - 20px);
-	z-index: 1;
-}
-
-.channel-controls input {
-	margin-left: 0px;
-}
-
-.device-name {
-	padding: 2px;
-	background: linear-gradient(white, lightgray);
-	text-align: center;
-}
-
-.notator select {
-}
-
-.notator input {
-	margin-left: 20px;
-}
-
-.open {
-	fill: white;
-}
-
-.close {
-}
-
-select {
-    border: none;
-    /* box-shadow: none; */
-    background: transparent;
-    background-image: none;
-    /* -webkit-appearance: none; */
-}
-select:focus {
-    outline: none;
 }
 
 #karaoke {
@@ -280,6 +141,7 @@ select:focus {
 	overflow-y: auto;
 	height: 100%;
 	color: green;
+	cursor: default;
 }
 
 #song-selector-controls {
@@ -289,7 +151,12 @@ select:focus {
 
 #song-selector-controls input[type="button"] {
 	font-size: 2rem;
-	background: green;
+	background-color: green;
 	border: 1px solid blue;
 	padding: 10px;
+}
+
+.selected {
+	color: black;
+	background-color: green;
 }

@@ -14,6 +14,7 @@ import com.example.afs.musicpad.html.Button;
 import com.example.afs.musicpad.html.Division;
 import com.example.afs.musicpad.html.Range;
 import com.example.afs.musicpad.html.TextElement;
+import com.example.afs.musicpad.renderer.CommandRenderer;
 import com.example.afs.musicpad.song.Song;
 
 public class TransportRenderer {
@@ -41,19 +42,19 @@ public class TransportRenderer {
 
   private Range getBackingRange() {
     Range range = new Range("backing", 0, 127, 1, 64);
-    range.appendProperty("oninput", PropertyRenderer.render(Command.VELOCITY));
+    range.appendProperty("oninput", CommandRenderer.render(Command.VELOCITY));
     return range;
   }
 
   private Button getBackward() {
     Button button = new Button("backward", "Backward");
-    button.appendProperty("onclick", PropertyRenderer.render(Command.BACKWARD, 0));
+    button.appendProperty("onclick", CommandRenderer.render(Command.BACKWARD, 0));
     return button;
   }
 
   private Button getForward() {
     Button button = new Button("forward", "Forward");
-    button.appendProperty("onclick", PropertyRenderer.render(Command.FORWARD, 0));
+    button.appendProperty("onclick", CommandRenderer.render(Command.FORWARD, 0));
     return button;
   }
 
@@ -66,7 +67,7 @@ public class TransportRenderer {
 
   private Range getGainRange() {
     Range range = new Range("gain", 0, 127, 1, 64);
-    range.appendProperty("oninput", PropertyRenderer.render(Command.GAIN));
+    range.appendProperty("oninput", CommandRenderer.render(Command.GAIN));
     return range;
   }
 
@@ -80,13 +81,13 @@ public class TransportRenderer {
 
   private Button getPlay() {
     Button button = new Button("play", "Play");
-    button.appendProperty("onclick", PropertyRenderer.render(Command.PLAY_PAUSE, 0));
+    button.appendProperty("onclick", CommandRenderer.render(Command.PLAY_PAUSE, 0));
     return button;
   }
 
   private Button getReattach() {
     Button button = new Button("reattach", "Reattach");
-    button.appendProperty("onclick", PropertyRenderer.render(Command.REATTACH, 0));
+    button.appendProperty("onclick", CommandRenderer.render(Command.REATTACH, 0));
     return button;
   }
 
@@ -102,7 +103,7 @@ public class TransportRenderer {
 
   private Button getStop() {
     Button button = new Button("stop", "Stop");
-    button.appendProperty("onclick", PropertyRenderer.render(Command.STOP_PAUSE, 0));
+    button.appendProperty("onclick", CommandRenderer.render(Command.STOP_PAUSE, 0));
     return button;
   }
 
@@ -115,7 +116,7 @@ public class TransportRenderer {
 
   private Range getTempoRange() {
     Range range = new Range("tempo", 0, 127, 1, 64);
-    range.appendProperty("oninput", PropertyRenderer.render(Command.TEMPO));
+    range.appendProperty("oninput", CommandRenderer.render(Command.TEMPO));
     return range;
   }
 

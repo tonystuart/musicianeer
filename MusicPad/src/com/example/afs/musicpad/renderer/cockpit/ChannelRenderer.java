@@ -23,6 +23,7 @@ import com.example.afs.musicpad.html.TableHeader;
 import com.example.afs.musicpad.html.TableRow;
 import com.example.afs.musicpad.html.TextElement;
 import com.example.afs.musicpad.midi.Midi;
+import com.example.afs.musicpad.renderer.CommandRenderer;
 import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.util.Value;
 
@@ -79,7 +80,7 @@ public class ChannelRenderer {
         select.appendChild(option);
       }
     }
-    select.appendProperty("onchange", PropertyRenderer.render(DeviceCommand.CHANNEL, deviceIndex));
+    select.appendProperty("onchange", CommandRenderer.render(DeviceCommand.CHANNEL, deviceIndex));
     return select;
   }
 
@@ -93,14 +94,14 @@ public class ChannelRenderer {
   private Select getInputSelect() {
     Select select = new Select("input-select-" + deviceIndex);
     select.appendProperty("value", inputType.ordinal());
-    select.appendProperty("onchange", PropertyRenderer.render(DeviceCommand.INPUT, deviceIndex));
+    select.appendProperty("onchange", CommandRenderer.render(DeviceCommand.INPUT, deviceIndex));
     return select;
   }
 
   private Select getOutputSelect() {
     Select select = new Select("output-select-" + deviceIndex);
     select.appendProperty("value", outputType.ordinal());
-    select.appendProperty("onchange", PropertyRenderer.render(DeviceCommand.OUTPUT, deviceIndex));
+    select.appendProperty("onchange", CommandRenderer.render(DeviceCommand.OUTPUT, deviceIndex));
     return select;
   }
 
@@ -112,13 +113,13 @@ public class ChannelRenderer {
     }
     Select select = new Select("program-select-" + deviceIndex);
     select.appendProperty("value", channelProgram);
-    select.appendProperty("onchange", PropertyRenderer.render(DeviceCommand.PROGRAM, deviceIndex));
+    select.appendProperty("onchange", CommandRenderer.render(DeviceCommand.PROGRAM, deviceIndex));
     return select;
   }
 
   private Range getVolumeRange() {
     Range range = new Range("channel-volume-" + deviceIndex, 0, 127, 1, 64);
-    range.appendProperty("oninput", PropertyRenderer.render(DeviceCommand.VELOCITY, deviceIndex));
+    range.appendProperty("oninput", CommandRenderer.render(DeviceCommand.VELOCITY, deviceIndex));
     return range;
   }
 

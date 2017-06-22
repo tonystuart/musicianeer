@@ -101,6 +101,7 @@ public class Conductor extends BrokerTask<Message> {
   }
 
   private void doAllTasksStarted() {
+    System.out.println("Conductor.doAllTasksStarted: entered");
     publish(new OnMidiFiles(midiFiles));
     if (DEFAULT_SONG != null) {
       int songIndex = findSong(DEFAULT_SONG);
@@ -122,6 +123,9 @@ public class Conductor extends BrokerTask<Message> {
     Command command = message.getCommand();
     int parameter = message.getParameter();
     switch (command) {
+    case PLAY_SONG:
+      doPlaySong(parameter);
+      break;
     case SONG:
       doSelectSong(parameter);
       break;
@@ -160,13 +164,21 @@ public class Conductor extends BrokerTask<Message> {
     deviceIndexes.remove(deviceIndex);
   }
 
+  private void doPlaySong(int songIndex) {
+
+  }
+
   private void doRepublishState() {
-    publish(new OnMidiFiles(midiFiles));
-    publish(new OnSong(song, TICKS_PER_PIXEL));
-    for (Entry<Integer, Integer> entry : deviceChannelMap.entrySet()) {
-      int deviceIndex = entry.getKey();
-      int assignedChannel = entry.getValue();
-      publish(new OnChannelAssigned(song, deviceIndex, assignedChannel));
+    System.out.println("Conductor.doRepublishState: entered, song=" + song);
+    if (song != null) {
+      // TODO: Initialize song based on user interaction
+      publish(new OnMidiFiles(midiFiles));
+      publish(new OnSong(song, TICKS_PER_PIXEL));
+      for (Entry<Integer, Integer> entry : deviceChannelMap.entrySet()) {
+        int deviceIndex = entry.getKey();
+        int assignedChannel = entry.getValue();
+        publish(new OnChannelAssigned(song, deviceIndex, assignedChannel));
+      }
     }
   }
 

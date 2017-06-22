@@ -103,6 +103,11 @@ public class DeviceHandler extends BrokerTask<Message> {
     }
   }
 
+  @Override
+  public String toString() {
+    return "DeviceHandler [deviceName=" + deviceName + ", deviceIndex=" + deviceIndex + ", channel=" + channel + ", inputType=" + inputType + "]";
+  }
+
   private KeyCapMap createKeyCapMap() {
     KeyCapMap keyCapMap;
     switch (inputType) {
