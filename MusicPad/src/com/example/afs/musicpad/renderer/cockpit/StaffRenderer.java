@@ -25,7 +25,6 @@ import com.example.afs.musicpad.svg.Svg;
 import com.example.afs.musicpad.svg.Text;
 import com.example.afs.musicpad.util.DirectList;
 import com.example.afs.musicpad.util.RandomAccessList;
-import com.example.afs.musicpad.util.Value;
 
 public class StaffRenderer {
 
@@ -180,7 +179,7 @@ public class StaffRenderer {
   }
 
   public String getMusic() {
-    String music = "No music for channel " + Value.toNumber(channel);
+    String music = "";
     if (song.getChannelNoteCount(channel) > 0) {
       long duration = song.getDuration();
       Svg staff = drawStaff(duration);

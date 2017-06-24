@@ -76,7 +76,7 @@ public class ChannelRenderer {
     for (int channel = 0; channel < Midi.CHANNELS; channel++) {
       if (song.getChannelNoteCount(channel) > 0) {
         int channelNumber = Value.toNumber(channel);
-        Option option = new Option(Integer.toString(channelNumber), channelNumber, this.channel == channel);
+        Option option = new Option(Integer.toString(channelNumber), channel, this.channel == channel);
         select.appendChild(option);
       }
     }

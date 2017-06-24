@@ -34,13 +34,10 @@ import com.example.afs.musicpad.task.BrokerTask;
 import com.example.afs.musicpad.util.Broker;
 import com.example.afs.musicpad.util.DirectList;
 import com.example.afs.musicpad.util.RandomAccessList;
-import com.example.afs.musicpad.util.Value;
 
 public class Conductor extends BrokerTask<Message> {
 
-  //private static final String DEFAULT_SONG = "The Beatles - Yesterday.kar";
-  //private static final String DEFAULT_SONG = "Aquarius (James Rado).mid";
-  private static final String DEFAULT_SONG = "The Bee Gees - Stayin' Alive.kar";
+  private static final String DEFAULT_SONG = "Beatles, The - Yesterday.kar";
 
   private static final int TICKS_PER_PIXEL = 5;
 
@@ -123,8 +120,8 @@ public class Conductor extends BrokerTask<Message> {
     Command command = message.getCommand();
     int parameter = message.getParameter();
     switch (command) {
-    case PLAY_SONG:
-      doPlaySong(parameter);
+    case SAMPLE:
+      doSample(parameter);
       break;
     case SONG:
       doSelectSong(parameter);
@@ -151,7 +148,7 @@ public class Conductor extends BrokerTask<Message> {
     int parameter = message.getParameter();
     switch (deviceCommand) {
     case CHANNEL:
-      doChannel(deviceIndex, Value.toIndex(parameter));
+      doChannel(deviceIndex, parameter);
       break;
     default:
       break;
@@ -162,10 +159,6 @@ public class Conductor extends BrokerTask<Message> {
   private void doDeviceDetached(OnDeviceDetached message) {
     int deviceIndex = message.getDeviceIndex();
     deviceIndexes.remove(deviceIndex);
-  }
-
-  private void doPlaySong(int songIndex) {
-
   }
 
   private void doRepublishState() {
@@ -180,6 +173,10 @@ public class Conductor extends BrokerTask<Message> {
         publish(new OnChannelAssigned(song, deviceIndex, assignedChannel));
       }
     }
+  }
+
+  private void doSample(int songIndex) {
+
   }
 
   private void doSelectSong(int songIndex) {

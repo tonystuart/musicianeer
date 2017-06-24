@@ -23,68 +23,68 @@ on input
      return
    else
     if data1 96
-     sendCommand PLAY_SAMPLE 1
-     sendDeviceCommand CHANNEL 1
+     sendCommand PLAY 0
+     sendDeviceCommand CHANNEL 0
      return
     if data1 97
-     sendCommand PLAY_SAMPLE 2
-     sendDeviceCommand CHANNEL 2
+     sendCommand PLAY 1
+     sendDeviceCommand CHANNEL 1
      return
     if data1 98
-     sendCommand PLAY_SAMPLE 3
-     sendDeviceCommand CHANNEL 3
+     sendCommand PLAY 2
+     sendDeviceCommand CHANNEL 2
      return
     if data1 99
-     sendCommand PLAY_SAMPLE 4
-     sendDeviceCommand CHANNEL 4
+     sendCommand PLAY 3
+     sendDeviceCommand CHANNEL 3
      return
     if data1 100
-     sendCommand PLAY_SAMPLE 5
-     sendDeviceCommand CHANNEL 5
+     sendCommand PLAY 4
+     sendDeviceCommand CHANNEL 4
      return
     if data1 101
-     sendCommand PLAY_SAMPLE 6
-     sendDeviceCommand CHANNEL 6
+     sendCommand PLAY 5
+     sendDeviceCommand CHANNEL 5
      return
     if data1 102
-     sendCommand PLAY_SAMPLE 7
-     sendDeviceCommand CHANNEL 7
+     sendCommand PLAY 6
+     sendDeviceCommand CHANNEL 6
      return
     if data1 103
-     sendCommand PLAY_SAMPLE 8
-     sendDeviceCommand CHANNEL 8
+     sendCommand PLAY 7
+     sendDeviceCommand CHANNEL 7
      return
     if data1 112
-     sendCommand PLAY_SAMPLE 9
-     sendDeviceCommand CHANNEL 9
+     sendCommand PLAY 8
+     sendDeviceCommand CHANNEL 8
      return
     if data1 113
-     sendCommand PLAY_SAMPLE 10
-     sendDeviceCommand CHANNEL 10
+     sendCommand PLAY 9
+     sendDeviceCommand CHANNEL 9
      return
     if data1 114
-     sendCommand PLAY_SAMPLE 11
-     sendDeviceCommand CHANNEL 11
+     sendCommand PLAY 10
+     sendDeviceCommand CHANNEL 10
      return
     if data1 115
-     sendCommand PLAY_SAMPLE 12
-     sendDeviceCommand CHANNEL 12
+     sendCommand PLAY 11
+     sendDeviceCommand CHANNEL 11
      return
     if data1 116
-     sendCommand PLAY_SAMPLE 13
-     sendDeviceCommand CHANNEL 13
+     sendCommand PLAY 12
+     sendDeviceCommand CHANNEL 12
      return
     if data1 117
-     sendCommand PLAY_SAMPLE 14
-     sendDeviceCommand CHANNEL 14
+     sendCommand PLAY 13
+     sendDeviceCommand CHANNEL 13
      return
     if data1 118
-     sendCommand PLAY_SAMPLE 15
-     sendDeviceCommand CHANNEL 15
+     sendCommand PLAY 14
+     sendDeviceCommand CHANNEL 14
      return
     if data1 119
-     sendCommand PLAY_SAMPLE 16
-     sendDeviceCommand CHANNEL 16
+     sendCommand PLAY 15
+     sendDeviceCommand CHANNEL 15
      return
   if type 176
    if data1 7
@@ -115,10 +115,10 @@ on input
      sendCommand FORWARD 0
      return
     if data1 114
-     sendCommand STOP_PAUSE 0
+     sendCommand STOP 0
      return
     if data1 115
-     sendCommand PLAY_PAUSE 0
+     sendCommand PLAY -1
      return
 
 on channelStatus

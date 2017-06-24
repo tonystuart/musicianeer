@@ -13,14 +13,9 @@ public enum Command {
   HELP, //
   SONG, //
   PLAY, //
-  PLAY_PAUSE, //
-  PLAY_SAMPLE, //
-  PLAY_SONG, //
-  PAUSE, //
-  RESUME, //
+  SAMPLE, //
   SEEK, //
   STOP, //
-  STOP_PAUSE, //
   BACKWARD, //
   FORWARD, //
   TEMPO, //

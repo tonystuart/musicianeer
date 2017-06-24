@@ -15,6 +15,7 @@ import com.example.afs.musicpad.html.Division;
 import com.example.afs.musicpad.html.Range;
 import com.example.afs.musicpad.html.TextElement;
 import com.example.afs.musicpad.renderer.CommandRenderer;
+import com.example.afs.musicpad.song.ChannelNotes;
 import com.example.afs.musicpad.song.Song;
 
 public class TransportRenderer {
@@ -81,7 +82,7 @@ public class TransportRenderer {
 
   private Button getPlay() {
     Button button = new Button("play", "Play");
-    button.appendProperty("onclick", CommandRenderer.render(Command.PLAY_PAUSE, 0));
+    button.appendProperty("onclick", CommandRenderer.render(Command.PLAY, ChannelNotes.ALL_CHANNELS));
     return button;
   }
 
@@ -103,7 +104,7 @@ public class TransportRenderer {
 
   private Button getStop() {
     Button button = new Button("stop", "Stop");
-    button.appendProperty("onclick", CommandRenderer.render(Command.STOP_PAUSE, 0));
+    button.appendProperty("onclick", CommandRenderer.render(Command.STOP, 0));
     return button;
   }
 

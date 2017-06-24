@@ -30,6 +30,10 @@ public abstract class SimpleTask<M> {
     this.name = getClass().getSimpleName();
   }
 
+  public BlockingQueue<M> getInputQueue() {
+    return inputQueue;
+  }
+
   public void start() {
     thread = new Thread(() -> run(), name);
     thread.start();
@@ -45,10 +49,6 @@ public abstract class SimpleTask<M> {
 
   protected BlockingQueue<M> createInputQueue() {
     return new LinkedBlockingQueue<>();
-  }
-
-  protected BlockingQueue<M> getInputQueue() {
-    return inputQueue;
   }
 
   protected boolean isTerminated() {

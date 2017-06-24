@@ -31,7 +31,6 @@ import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.task.BrokerTask;
 import com.example.afs.musicpad.util.Broker;
 import com.example.afs.musicpad.util.Range;
-import com.example.afs.musicpad.util.Value;
 
 public class DeviceHandler extends BrokerTask<Message> {
 
@@ -151,7 +150,7 @@ public class DeviceHandler extends BrokerTask<Message> {
       int parameter = message.getParameter();
       switch (deviceCommand) {
       case CHANNEL:
-        selectChannel(Value.toIndex(parameter));
+        selectChannel(parameter);
         break;
       case PROGRAM:
         selectProgram(parameter);
