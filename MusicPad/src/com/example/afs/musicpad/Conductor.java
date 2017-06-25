@@ -14,7 +14,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Random;
 import java.util.Set;
 
 import com.example.afs.musicpad.message.Message;
@@ -37,13 +36,10 @@ import com.example.afs.musicpad.util.RandomAccessList;
 
 public class Conductor extends BrokerTask<Message> {
 
-  private static final String DEFAULT_SONG = "Beatles, The - Yesterday.kar";
-
   private static final int TICKS_PER_PIXEL = 5;
 
   private Song song;
   private File directory;
-  private Random random = new Random();
   private RandomAccessList<File> midiFiles;
   private Map<Integer, Integer> deviceChannelMap = new HashMap<>();
   private Set<Integer> deviceIndexes = new HashSet<>();
@@ -98,17 +94,8 @@ public class Conductor extends BrokerTask<Message> {
   }
 
   private void doAllTasksStarted() {
-    System.out.println("Conductor.doAllTasksStarted: entered");
-    publish(new OnMidiFiles(midiFiles));
-    if (DEFAULT_SONG != null) {
-      int songIndex = findSong(DEFAULT_SONG);
-      if (songIndex == -1) {
-        throw new IllegalArgumentException("Could not find " + DEFAULT_SONG);
-      }
-      selectSong(songIndex);
-    } else {
-      selectRandomSong();
-    }
+    System.out.println("Conductor.doAllTasksStarted: deferring initialization until OnRepublishState");
+    //publish(new OnMidiFiles(midiFiles));
   }
 
   private void doChannel(int deviceIndex, int channel) {
@@ -163,9 +150,9 @@ public class Conductor extends BrokerTask<Message> {
 
   private void doRepublishState() {
     System.out.println("Conductor.doRepublishState: entered, song=" + song);
+    publish(new OnMidiFiles(midiFiles));
     if (song != null) {
       // TODO: Initialize song based on user interaction
-      publish(new OnMidiFiles(midiFiles));
       publish(new OnSong(song, TICKS_PER_PIXEL));
       for (Entry<Integer, Integer> entry : deviceChannelMap.entrySet()) {
         int deviceIndex = entry.getKey();
@@ -188,16 +175,6 @@ public class Conductor extends BrokerTask<Message> {
   private void doTranspose(int distance) {
     song.transposeTo(distance);
     publish(new OnSong(song, TICKS_PER_PIXEL));
-  }
-
-  private int findSong(String name) {
-    int songCount = midiFiles.size();
-    for (int i = 0; i < songCount; i++) {
-      if (name.equals(midiFiles.get(i).getName())) {
-        return i;
-      }
-    }
-    return -1;
   }
 
   private boolean isChannelAssigned(int channel) {
@@ -225,24 +202,6 @@ public class Conductor extends BrokerTask<Message> {
         midiFiles.add(file);
       } else if (file.isDirectory()) {
         listMidiFiles(midiFiles, file);
-      }
-    }
-  }
-
-  private void selectRandomSong() {
-    boolean selected = false;
-    while (!selected) {
-      try {
-        int songIndex = random.nextInt(midiFiles.size());
-        selectSong(songIndex);
-        selected = true;
-      } catch (RuntimeException e) {
-        e.printStackTrace();
-        try {
-          Thread.sleep(100);
-        } catch (InterruptedException e1) {
-          throw new RuntimeException(e1);
-        }
       }
     }
   }

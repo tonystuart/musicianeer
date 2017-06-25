@@ -125,29 +125,7 @@ public class KaraokeRenderer extends BrokerTask<Message> {
     song = message.getSong();
   }
 
-  private String getText(SortedSet<Word> words) {
-    StringBuilder s = new StringBuilder();
-    for (Word word : words) {
-      s.append(word.getText());
-    }
-    return s.toString();
-  }
-
-  private boolean isKeyCapPresent(Map<Integer, KeyCapIterator> keyCapIterators, long endTick) {
-    for (KeyCapIterator keyCapIterator : keyCapIterators.values()) {
-      if (keyCapIterator.hasNext(endTick)) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  private void publishKaraoke() {
-    String karaoke = renderKaraoke();
-    getBroker().publish(new OnKaraoke(karaoke));
-  }
-
-  private String renderKaraoke() {
+  private Division getKaraoke() {
     Map<Integer, KeyCapIterator> keyCapIterators = new HashMap<>();
     for (Entry<Integer, RandomAccessList<KeyCap>> entry : deviceKeyCaps.entrySet()) {
       int device = entry.getKey();
@@ -228,7 +206,30 @@ public class KaraokeRenderer extends BrokerTask<Message> {
         textDivision.appendChild(new TextElement(text));
       }
     }
-    return container.render();
+    return container;
+  }
+
+  private String getText(SortedSet<Word> words) {
+    StringBuilder s = new StringBuilder();
+    for (Word word : words) {
+      s.append(word.getText());
+    }
+    return s.toString();
+  }
+
+  private boolean isKeyCapPresent(Map<Integer, KeyCapIterator> keyCapIterators, long endTick) {
+    for (KeyCapIterator keyCapIterator : keyCapIterators.values()) {
+      if (keyCapIterator.hasNext(endTick)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private void publishKaraoke() {
+    Division karaoke = getKaraoke();
+    String html = karaoke.render();
+    getBroker().publish(new OnKaraoke(html));
   }
 
   private void setTimer() {

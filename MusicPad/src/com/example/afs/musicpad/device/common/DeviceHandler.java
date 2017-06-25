@@ -84,21 +84,25 @@ public class DeviceHandler extends BrokerTask<Message> {
   }
 
   public void onDown(int inputCode) {
-    Sound sound = keyCapMap.onDown(inputCode);
-    if (sound != null) {
+    if (keyCapMap != null) {
+      Sound sound = keyCapMap.onDown(inputCode);
       if (sound != null) {
-        player.play(Action.PRESS, sound);
-        activeSounds[inputCode] = sound;
+        if (sound != null) {
+          player.play(Action.PRESS, sound);
+          activeSounds[inputCode] = sound;
+        }
       }
     }
   }
 
   public void onUp(int inputCode) {
-    keyCapMap.onUp(inputCode);
-    Sound sound = activeSounds[inputCode];
-    if (sound != null) {
-      player.play(Action.RELEASE, sound);
-      activeSounds[inputCode] = null;
+    if (keyCapMap != null) {
+      keyCapMap.onUp(inputCode);
+      Sound sound = activeSounds[inputCode];
+      if (sound != null) {
+        player.play(Action.RELEASE, sound);
+        activeSounds[inputCode] = null;
+      }
     }
   }
 

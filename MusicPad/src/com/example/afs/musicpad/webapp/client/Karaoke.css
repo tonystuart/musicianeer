@@ -1,16 +1,14 @@
-@CHARSET "UTF-8";
-
-html {
-  height: 100%;
-  width: 100%;
-  font-family: Sans-Serif;
+@CHARSET "UTF-8"; html {
+    height: 100%;
+    width: 100%;
+    font-family: Sans-Serif;
 }
 
 body {
-  height: 100%;
-  margin: 0px;
-  width: 100%;
-  font-size: 2vh;
+    height: 100%;
+    margin: 0px;
+    width: 100%;
+    font-size: 2vh;
 }
 
 input {
@@ -19,144 +17,150 @@ input {
 }
 
 #music-pad {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  width: 100%;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
 }
 
 #karaoke {
-	color: white;
-	margin: auto;
+    color: white;
+    margin: auto;
 }
 
 #karaoke-scroller {
-  display: flex;
-	overflow-y: auto;
-	background-color: black;
+    display: flex;
+    overflow-y: auto;
+    background-color: black;
 }
 
 .stanza {
-	margin: 5px;
-	border: 1px solid gray;
-	background-color: #303030;
+    margin: 5px;
+    border: 1px solid gray;
+    background-color: #303030;
 }
 
 .line {
-	padding: 0 5px;
-	margin: 5px;
-	border: 1px solid gray;
-	background-color: black;
+    padding: 0 5px;
+    margin: 5px;
+    border: 1px solid gray;
+    background-color: black;
 }
 
 .tick {
-	display: inline-block;
-	vertical-align: top;
-	padding-right: 10px;
-	position: relative;
+    display: inline-block;
+    vertical-align: top;
+    padding-right: 10px;
+    position: relative;
 }
 
 .channel:nth-child(1) {
-	color: #ff0000;
+    color: #ff0000;
 }
 
 .channel:nth-child(2) {
-	color: #ffff00;
+    color: #ffff00;
 }
 
 .channel:nth-child(3) {
-  color: #ff00ff;
+    color: #ff00ff;
 }
 
 .channel:nth-child(4) {
-  color: #ffffff;
+    color: #ffffff;
 }
 
 .channel:nth-child(5) {
-  color: #3fff3f;
+    color: #3fff3f;
 }
 
 .channel:nth-child(6) {
-  color: #ffff7f;
+    color: #ffff7f;
 }
 
 .channel:nth-child(7) {
-  color: #ff7fbf;
+    color: #ff7fbf;
 }
 
 .channel:nth-child(8) {
-  color: #bfbfbf;
+    color: #bfbfbf;
 }
 
 .words, .channel {
-	min-height: 1.5em;
+    min-height: 1.5em;
 }
 
 .words {
 }
 
 .current-tick {
-	color: white;
-	background-color: blue;
+    color: white;
+    background-color: blue;
 }
 
 .countdown {
-	color: red;
-	z-index: 100;
-	background-color: blue;
-	position: absolute;
-	bottom: 1px;
-	width: 100%;
-	text-align: left;
-	padding-bottom:  5px;
+    color: red;
+    z-index: 100;
+    background-color: blue;
+    position: absolute;
+    bottom: 1px;
+    width: 100%;
+    text-align: left;
+    padding-bottom: 5px;
 }
 
 #song-selector {
-	display: flex;
-	flex-direction: column;
-	position: fixed;
-	top: 0;
-	bottom: 0;
-	left: 0;
-	right: 0;
-	z-index: 200;
-	background: red;
-	padding: 20px;
-  background-color: rgb(32, 32, 32);
-  background-image: linear-gradient(45deg, black 25%, transparent 25%, transparent 75%, black 75%, black), linear-gradient(45deg, black 25%, transparent 25%, transparent 75%, black 75%, black), linear-gradient(to bottom, rgb(8, 8, 8), rgb(32, 32, 32));
-  background-size: 10px 10px, 10px 10px, 10px 5px;
-  background-position: 0px 0px, 5px 5px, 0px 0px;
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 200;
+    background: red;
+    padding: 20px;
+    background-color: rgb(32, 32, 32);
+    background-image: linear-gradient(45deg, black 25%, transparent 25%, transparent 75%, black 75%, black), linear-gradient(45deg, black 25%, transparent 25%, transparent 75%, black 75%, black), linear-gradient(to bottom, rgb(8, 8, 8), rgb(32, 32, 32));
+    background-size: 10px 10px, 10px 10px, 10px 5px;
+    background-position: 0px 0px, 5px 5px, 0px 0px;
 }
 
 #song-selector-title {
-	color: green;
-	font-size: 3rem;
-	font-weight: bold;
-	margin: auto;
-	padding: 10px;
+    color: green;
+    font-size: 3rem;
+    font-weight: bold;
+    margin: auto;
+    padding: 10px;
 }
 
 #song-selector-list {
-	font-size: 2rem;
-	overflow-y: auto;
-	height: 100%;
-	color: green;
-	cursor: default;
+    font-size: 5vh;
+    overflow-y: auto;
+    height: 100%;
+    color: green;
+    cursor: default;
+    text-align: center;
+    line-height: 120%;
+}
+
+#song-selector-list:nth-child(1) {
+    color: red;
 }
 
 #song-selector-controls {
-	font-size: 2rem;
-	padding: 5px;
+    font-size: 2rem;
+    padding: 5px;
 }
 
 #song-selector-controls input[type="button"] {
-	font-size: 2rem;
-	background-color: green;
-	border: 1px solid blue;
-	padding: 10px;
+    font-size: 2rem;
+    background-color: green;
+    border: 1px solid blue;
+    padding: 10px;
 }
 
 .selected {
-	color: black;
-	background-color: green;
+    color: black;
+    background-color: green;
 }

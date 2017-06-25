@@ -43,14 +43,14 @@ public class SongSelector {
   }
 
   private Button getPlay() {
-    Button button = new Button("song-selector-play", "Play");
-    button.appendProperty("onclick", "karaoke.onSongSelectorPlay()");
+    Button button = new Button("song-selector-sample", "Sample");
+    button.appendProperty("onclick", "karaoke.onSample()");
     return button;
   }
 
   private Button getSelect() {
     Button button = new Button("song-selector-select", "Select");
-    button.appendProperty("onclick", "karaoke.onSongSelectorSelect()");
+    button.appendProperty("onclick", "karaoke.onSelect()");
     return button;
   }
 

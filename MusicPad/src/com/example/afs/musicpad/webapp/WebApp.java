@@ -35,7 +35,7 @@ public class WebApp extends BrokerTask<Message> {
   private WebAppFactory webAppFactory;
   private Map<Class<? extends Message>, Message> state = new LinkedHashMap<>();
   private BlockingQueue<WebSocket> webSockets = new LinkedBlockingQueue<>(CLIENTS);
-  private BrokerTask<Message> cockpitRenderer;
+  private BrokerTask<Message> rendererTask;
 
   protected WebApp(Broker<Message> broker, WebAppFactory webAppFactory) {
     super(broker, PING_INTERVAL_MS);
@@ -72,13 +72,13 @@ public class WebApp extends BrokerTask<Message> {
   @Override
   public void start() {
     super.start();
-    cockpitRenderer.start();
+    rendererTask.start();
     getBroker().publish(new OnRepublishState());
   }
 
   @Override
   public void terminate() {
-    cockpitRenderer.terminate();
+    rendererTask.terminate();
     super.terminate();
   }
 
@@ -109,8 +109,8 @@ public class WebApp extends BrokerTask<Message> {
 
   }
 
-  protected void setRenderer(BrokerTask<Message> cockpitRenderer) {
-    this.cockpitRenderer = cockpitRenderer;
+  protected void setRenderer(BrokerTask<Message> rendererTask) {
+    this.rendererTask = rendererTask;
   }
 
 }
