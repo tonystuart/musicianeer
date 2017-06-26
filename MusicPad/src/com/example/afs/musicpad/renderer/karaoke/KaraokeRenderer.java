@@ -83,7 +83,10 @@ public class KaraokeRenderer extends BrokerTask<Message> {
 
   @Override
   protected void onTimeout() throws InterruptedException {
-    publishKaraoke();
+    if (song != null) {
+      System.out.println("KaraokeRenderer.onTimeout: song is null, canceling timer");
+      publishKaraoke();
+    }
     setTimeoutMillis(0);
   }
 
