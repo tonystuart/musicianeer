@@ -29,32 +29,30 @@ karaoke.getNextTick = function(currentTick) {
 }
 
 karaoke.onKaraoke = function(response) {
-  let container = document.getElementById('karaoke');
+  let container = document.getElementById('karaoke-scroller');
   container.innerHTML = response.karaoke;
-  let songSelector = document.getElementById('song-selector');
+  let songSelector = document.getElementById('song-selector-panel');
   songSelector.style.display = 'none';
 }
 
 karaoke.onLoad = function() {
-    musicPad.createWebSocketClient("ws://localhost:8080/v1/karaoke", karaoke.onWebSocketMessage, karaoke.onWebSocketClose);
+    musicPad.createWebSocketClient('ws://localhost:8080/v1/karaoke', karaoke.onWebSocketMessage, karaoke.onWebSocketClose);
 }
 
 karaoke.onNewSong = function() {
-  document.getElementById('song-selector').style.display = 'flex';
+  document.getElementById('song-selector-panel').style.display = 'flex';
 }
 
 karaoke.onSongSelector = function(response) {
-    let songSelector = musicPad.fragmentToElement(response.html);
-    let oldSongSelector = document.getElementById('song-selector');
-    if (oldSongSelector) {
-        oldSongSelector.parentElement.replaceChild(songSelector, oldSongSelector);
-    } else {
-        document.body.appendChild(songSelector);
-    }
+    let songSelectorRight = document.getElementById('song-selector-right');
+    songSelectorRight.innerHTML = response.html;
+   // document.getElementById('prompter-panel').style.display = 'none';
+   document.getElementById('prompter-panel').classList.add("hidden")
 }
 
-karaoke.onSample = function(response) {
-  let songSelector = document.getElementById('song-selector');
+karaoke.onPlaySample = function(response) {
+  console.log('onPlaySample');
+  let songSelector = document.getElementById('song-selector-list');
   let item = songSelector.querySelector('.selected');
   if (item) {
     let songIndex = parseInt(item.id.match(/[0-9]+/)[0]); 
@@ -62,13 +60,18 @@ karaoke.onSample = function(response) {
   }
 }
 
-karaoke.onSelect = function(response) {
-  let songSelector = document.getElementById('song-selector');
+karaoke.onSelectSong = function(response) {
+  console.log('onSelectSong');
+  let songSelector = document.getElementById('song-selector-list');
   let item = songSelector.querySelector('.selected');
   if (item) {
     let songIndex = parseInt(item.id.match(/[0-9]+/)[0]); 
     musicPad.sendCommand('SONG', songIndex);
   }
+}
+
+karaoke.onStopSample = function(response) {
+  console.log('onStopSample');
 }
 
 karaoke.onTick = function(tick) {
@@ -132,7 +135,7 @@ karaoke.selectTick = function(tickDivision) {
     let bottom = top + height;
     let scrollerBottomVisible = scroller.scrollTop + scroller.offsetHeight;
     if (bottom + height > scrollerBottomVisible) {
-        //scroller.scrollTop += tickDivision.offsetTop;
+        // scroller.scrollTop += tickDivision.offsetTop;
         // This is just a regular immediate scroll with Chrome 58:
         tickDivision.scrollIntoView({
             behavior: 'smooth',
@@ -151,7 +154,7 @@ karaoke.showTickCountdown = function(tick) {
             karaoke.countdown.className = 'countdown';
             // TODO: Pass resolution to client
             karaoke.countdown.innerHTML = Math.floor((next.id - tick) / 512);
-            //next.appendChild(karaoke.countdown);
+            // next.appendChild(karaoke.countdown);
             currentTick.appendChild(karaoke.countdown);
         }
     }

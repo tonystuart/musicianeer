@@ -8,19 +8,17 @@ body {
     height: 100%;
     margin: 0px;
     width: 100%;
-    font-size: 2vh;
+    font-size: 3vh;
+    color: magenta;
+    background-color: rgb(32, 32, 32);
+    background-image: linear-gradient(45deg, black 25%, transparent 25%, transparent 75%, black 75%, black), linear-gradient(45deg, black 25%, transparent 25%, transparent 75%, black 75%, black), linear-gradient(to bottom, rgb(8, 8, 8), rgb(32, 32, 32));
+    background-size: 10px 10px, 10px 10px, 10px 5px;
+    background-position: 0px 0px, 5px 5px, 0px 0px;
 }
 
 input {
     padding: 0;
     margin: 0;
-}
-
-#music-pad {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    width: 100%;
 }
 
 #karaoke {
@@ -31,7 +29,6 @@ input {
 #karaoke-scroller {
     display: flex;
     overflow-y: auto;
-    background-color: black;
 }
 
 .stanza {
@@ -109,58 +106,87 @@ input {
     padding-bottom: 5px;
 }
 
-#song-selector {
+#song-selector-panel {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     position: fixed;
     top: 0;
     bottom: 0;
     left: 0;
     right: 0;
-    z-index: 200;
-    background: red;
-    padding: 20px;
-    background-color: rgb(32, 32, 32);
-    background-image: linear-gradient(45deg, black 25%, transparent 25%, transparent 75%, black 75%, black), linear-gradient(45deg, black 25%, transparent 25%, transparent 75%, black 75%, black), linear-gradient(to bottom, rgb(8, 8, 8), rgb(32, 32, 32));
-    background-size: 10px 10px, 10px 10px, 10px 5px;
-    background-position: 0px 0px, 5px 5px, 0px 0px;
+}
+
+#song-selector-left {
+	width: 50%;
+	display: flex;
+	flex-direction: column;
+}
+
+#song-selector-right {
+	width: 50%;
 }
 
 #song-selector-title {
-    color: green;
     font-size: 3rem;
     font-weight: bold;
     margin: auto;
     padding: 10px;
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+}
+
+#song-selector-control-panel {
+	display: flex;
+	flex-direction: row;
+}
+
+#song-selector-control-panel div {
+	margin: 20px;
+	border: 1px solid magenta;
+	padding: 10px;
+	flex-grow: 1;
+}
+
+#song-selector-control-panel div:hover {
+  background-color: gray;
+}
+
+#song-selector-control-panel div:active {
+	color: black;
+	background-color: magenta;
+}
+
+#song-selector-right {
+	margin: 20px;
+	border: 1px solid magenta;
 }
 
 #song-selector-list {
-    font-size: 5vh;
     overflow-y: auto;
     height: 100%;
-    color: green;
     cursor: default;
     text-align: center;
     line-height: 120%;
 }
 
 #song-selector-list:nth-child(1) {
-    color: red;
 }
 
-#song-selector-controls {
-    font-size: 2rem;
-    padding: 5px;
+#song-selector-control-panel {
+    /* padding: 5px; */
 }
 
 #song-selector-controls input[type="button"] {
-    font-size: 2rem;
-    background-color: green;
     border: 1px solid blue;
     padding: 10px;
 }
 
 .selected {
     color: black;
-    background-color: green;
+    background-color: magenta;
+}
+
+.hidden {
+	display: none;
 }
