@@ -25,9 +25,11 @@ import com.example.afs.musicpad.message.OnDeviceCommand;
 import com.example.afs.musicpad.message.OnDeviceDetached;
 import com.example.afs.musicpad.message.OnMidiFiles;
 import com.example.afs.musicpad.message.OnRepublishState;
+import com.example.afs.musicpad.message.OnSample;
 import com.example.afs.musicpad.message.OnSong;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.parser.SongBuilder;
+import com.example.afs.musicpad.song.ChannelNotes;
 import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.task.BrokerTask;
 import com.example.afs.musicpad.util.Broker;
@@ -163,12 +165,23 @@ public class Conductor extends BrokerTask<Message> {
   }
 
   private void doSample(int songIndex) {
-
+    if (songIndex >= 0 && songIndex < midiFiles.size()) {
+      File midiFile = midiFiles.get(songIndex);
+      SongBuilder songBuilder = new SongBuilder();
+      song = songBuilder.createSong(midiFile);
+      System.out.println("Sampling song " + songIndex + " - " + song.getTitle());
+      publish(new OnSample(song, ChannelNotes.ALL_CHANNELS, TICKS_PER_PIXEL));
+    }
   }
 
   private void doSelectSong(int songIndex) {
     if (songIndex >= 0 && songIndex < midiFiles.size()) {
-      selectSong(songIndex);
+      File midiFile = midiFiles.get(songIndex);
+      SongBuilder songBuilder = new SongBuilder();
+      song = songBuilder.createSong(midiFile);
+      System.out.println("Selecting song " + songIndex + " - " + song.getTitle());
+      publish(new OnSong(song, TICKS_PER_PIXEL));
+      assignChannels();
     }
   }
 
@@ -204,15 +217,6 @@ public class Conductor extends BrokerTask<Message> {
         listMidiFiles(midiFiles, file);
       }
     }
-  }
-
-  private void selectSong(int songIndex) {
-    File midiFile = midiFiles.get(songIndex);
-    SongBuilder songBuilder = new SongBuilder();
-    song = songBuilder.createSong(midiFile);
-    System.out.println("Selecting song " + songIndex + " - " + song.getTitle());
-    publish(new OnSong(song, TICKS_PER_PIXEL));
-    assignChannels();
   }
 
   private void unassignChannel(int deviceIndex) {

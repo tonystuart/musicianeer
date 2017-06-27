@@ -37,6 +37,10 @@ public class SongSelector {
     for (int i = 0; i < midiFileCount; i++) {
       File midiFile = midiFiles.get(i);
       String name = midiFile.getName();
+      int lastDot = name.lastIndexOf('.');
+      if (lastDot != -1) {
+        name = name.substring(0, lastDot);
+      }
       Division song = new Division("song-" + i);
       song.appendChild(new TextElement(name));
       songList.appendChild(song);

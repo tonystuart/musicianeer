@@ -72,6 +72,7 @@ karaoke.onSelectSong = function(response) {
 
 karaoke.onStopSample = function(response) {
   console.log('onStopSample');
+  musicPad.sendCommand('STOP');
 }
 
 karaoke.onTick = function(tick) {
