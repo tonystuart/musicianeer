@@ -11,35 +11,27 @@ package com.example.afs.musicpad.message;
 
 import java.util.Arrays;
 
-import com.example.afs.musicpad.song.Song;
+public class OnPartSelector extends Message {
 
-public class OnSong extends Message {
-
-  private Song song;
-  private int ticksPerPixel;
   private int[] deviceIndexes;
+  private String html;
 
-  public OnSong(Song song, int[] deviceIndexes, int ticksPerPixel) {
-    this.song = song;
+  public OnPartSelector(int[] deviceIndexes, String html) {
     this.deviceIndexes = deviceIndexes;
-    this.ticksPerPixel = ticksPerPixel;
+    this.html = html;
   }
 
   public int[] getDeviceIndexes() {
     return deviceIndexes;
   }
 
-  public Song getSong() {
-    return song;
-  }
-
-  public int getTicksPerPixel() {
-    return ticksPerPixel;
+  public String getHtml() {
+    return html;
   }
 
   @Override
   public String toString() {
-    return "OnSong [song=" + song + ", deviceIndexes=" + Arrays.toString(deviceIndexes) + ", ticksPerPixel=" + ticksPerPixel + "]";
+    return "OnPartSelector [deviceIndexes=" + Arrays.toString(deviceIndexes) + ", html=" + html + "]";
   }
 
 }

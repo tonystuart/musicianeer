@@ -22,6 +22,13 @@ public class TableRow extends Hypertext {
     return tableData;
   }
 
+  /**
+   * Converts value to a string and appends it to the TableRow as TableData.
+   * 
+   * @param value
+   *          value to convert to a string
+   * @return the newly created TableData
+   */
   public TableData append(Object value) {
     TableData tableData = new TableData(value);
     appendChild(tableData);

@@ -18,7 +18,6 @@ public class MidiParser {
 
   private static final int USEC_PER_MINUTE = 60000000;
 
-  private int endIndex;
   private Listener listener;
   private int defaultResolution;
   private ChannelDetails channelDetails = new ChannelDetails();
@@ -38,6 +37,8 @@ public class MidiParser {
         Detail detail = channelDetails.getDetail(channel);
         listener.onOccupancy(channel, detail.getOccupancy());
         listener.onConcurrency(channel, detail.getConcurrency());
+        listener.onStartCount(channel, detail.getStartIndex());
+        listener.onEndCount(channel, detail.getEndIndex());
       }
       listener.onEnd(fileName);
     } catch (InvalidMidiDataException | IOException e) {
@@ -100,14 +101,12 @@ public class MidiParser {
       int program = activeNote.getProgram();
       int velocity = activeNote.getVelocity();
       int startIndex = activeNote.getStartIndex();
+      int endIndex = detail.getEndIndex();
       long start = activeNote.getTick();
       long duration = tick - start;
       if (duration > 0) {
         listener.onNote(start, channel, midiNote, velocity, duration, program, startIndex, endIndex);
         detail.remove(tick, midiNote);
-        if (detail.allNotesAreOff()) {
-          endIndex++;
-        }
       }
     }
   }

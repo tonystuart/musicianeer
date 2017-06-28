@@ -17,11 +17,15 @@ public interface Listener {
 
   void onEnd(String fileName);
 
+  void onEndCount(int channel, int endCount);
+
   void onLyrics(long tick, String lyrics);
 
   void onNote(long tick, int channel, int midiNote, int velocity, long duration, int program, int startIndex, int endIndex);
 
   void onOccupancy(int channel, int occupancy);
+
+  void onStartCount(int channel, int startCount);
 
   void onTempoChange(long tick, int usecPerQuarterNote, int quarterNotesPerMinute);
 

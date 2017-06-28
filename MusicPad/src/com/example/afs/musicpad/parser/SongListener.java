@@ -46,6 +46,11 @@ public class SongListener implements Listener {
   }
 
   @Override
+  public void onEndCount(int channel, int endCount) {
+    song.setEndCount(channel, endCount);
+  }
+
+  @Override
   public void onLyrics(long tick, String text) {
     addWord(tick, text);
   }
@@ -60,6 +65,11 @@ public class SongListener implements Listener {
   @Override
   public void onOccupancy(int channel, int occupancy) {
     song.setOccupancy(channel, occupancy);
+  }
+
+  @Override
+  public void onStartCount(int channel, int startCount) {
+    song.setStartCount(channel, startCount);
   }
 
   @Override

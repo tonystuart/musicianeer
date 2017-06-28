@@ -58,6 +58,14 @@ musicPad.selectElement = function(element, containerId) {
     element.classList.add("selected");
 }
 
+musicPad.addClassToAllBut = function(className, selector, id) {
+  let nodeList = document.querySelectorAll(selector);
+  for (let i = 0; i < nodeList.length; i++) {
+    nodeList[i].classList.add(className);
+  }
+  document.getElementById(id).classList.remove(className);
+}
+
 musicPad.send = function(json) {
     if (musicPad.connected) {
         musicPad.ws.send(json);

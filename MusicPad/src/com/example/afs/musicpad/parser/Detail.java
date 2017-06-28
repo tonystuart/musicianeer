@@ -20,6 +20,7 @@ public class Detail {
 
   private ActiveNote contourNote;
   private Map<Integer, ActiveNote> activeNotes = new HashMap<>();
+  private int endIndex;
 
   public void add(long tick, int midiNote, int velocity) {
     if (tick > (previousStartTick + START_INDEX_RESOLUTION)) {
@@ -56,6 +57,10 @@ public class Detail {
     return concurrency;
   }
 
+  public int getEndIndex() {
+    return endIndex;
+  }
+
   public int getOccupancy() {
     int occupancy = 0;
     long totalTicks = previousTick;
@@ -66,6 +71,10 @@ public class Detail {
     return occupancy;
   }
 
+  public int getStartIndex() {
+    return startIndex;
+  }
+
   public void remove(long tick, int midiNote) {
     long deltaTick = tick - previousTick;
     int activeNoteCount = activeNotes.size();
@@ -73,6 +82,9 @@ public class Detail {
     activeNotes.remove(midiNote);
     updateContour(tick);
     previousTick = tick;
+    if (allNotesAreOff()) {
+      endIndex++;
+    }
   }
 
   public void setProgram(int program) {

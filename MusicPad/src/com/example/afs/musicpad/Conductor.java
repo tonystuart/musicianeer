@@ -10,24 +10,19 @@
 package com.example.afs.musicpad;
 
 import java.io.File;
-import java.util.HashMap;
+import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnAllTasksStarted;
-import com.example.afs.musicpad.message.OnChannelAssigned;
 import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnDeviceAttached;
-import com.example.afs.musicpad.message.OnDeviceCommand;
 import com.example.afs.musicpad.message.OnDeviceDetached;
 import com.example.afs.musicpad.message.OnMidiFiles;
 import com.example.afs.musicpad.message.OnRepublishState;
 import com.example.afs.musicpad.message.OnSample;
 import com.example.afs.musicpad.message.OnSong;
-import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.parser.SongBuilder;
 import com.example.afs.musicpad.song.ChannelNotes;
 import com.example.afs.musicpad.song.Song;
@@ -43,7 +38,6 @@ public class Conductor extends BrokerTask<Message> {
   private Song song;
   private File directory;
   private RandomAccessList<File> midiFiles;
-  private Map<Integer, Integer> deviceChannelMap = new HashMap<>();
   private Set<Integer> deviceIndexes = new HashSet<>();
 
   public Conductor(Broker<Message> broker, String path) {
@@ -53,56 +47,15 @@ public class Conductor extends BrokerTask<Message> {
     listMidiFiles(midiFiles, directory);
     midiFiles.sort((o1, o2) -> o1.getPath().compareTo(o2.getPath()));
     subscribe(OnCommand.class, message -> doCommand(message));
-    subscribe(OnDeviceCommand.class, message -> doDeviceCommand(message));
     subscribe(OnAllTasksStarted.class, message -> doAllTasksStarted());
     subscribe(OnDeviceAttached.class, message -> doDeviceAttached(message));
     subscribe(OnDeviceDetached.class, message -> doDeviceDetached(message));
     subscribe(OnRepublishState.class, message -> doRepublishState());
   }
 
-  private void assignChannel(int deviceIndex) {
-    unassignChannel(deviceIndex);
-    int assignedChannel = -1;
-    int firstActiveChannel = -1;
-    for (int channel = 0; channel < Midi.CHANNELS && assignedChannel == -1; channel++) {
-      if (song.getChannelNoteCount(channel) != 0) {
-        if (firstActiveChannel == -1) {
-          firstActiveChannel = channel;
-        }
-        if (!isChannelAssigned(channel)) {
-          assignedChannel = channel;
-        }
-      }
-    }
-    if (assignedChannel == -1) {
-      if (firstActiveChannel != -1) {
-        assignedChannel = firstActiveChannel;
-      } else {
-        assignedChannel = 0;
-      }
-    }
-    assignChannel(deviceIndex, assignedChannel);
-  }
-
-  private void assignChannel(int deviceIndex, int assignedChannel) {
-    deviceChannelMap.put(deviceIndex, assignedChannel);
-    publish(new OnChannelAssigned(song, deviceIndex, assignedChannel));
-  }
-
-  private void assignChannels() {
-    for (int deviceIndex : deviceIndexes) {
-      assignChannel(deviceIndex);
-    }
-  }
-
   private void doAllTasksStarted() {
     System.out.println("Conductor.doAllTasksStarted: deferring initialization until OnRepublishState");
     //publish(new OnMidiFiles(midiFiles));
-  }
-
-  private void doChannel(int deviceIndex, int channel) {
-    unassignChannel(deviceIndex);
-    assignChannel(deviceIndex, channel);
   }
 
   private void doCommand(OnCommand message) {
@@ -126,23 +79,6 @@ public class Conductor extends BrokerTask<Message> {
   private void doDeviceAttached(OnDeviceAttached message) {
     int deviceIndex = message.getDeviceIndex();
     deviceIndexes.add(deviceIndex);
-    if (song != null) {
-      assignChannel(deviceIndex);
-    }
-  }
-
-  private void doDeviceCommand(OnDeviceCommand message) {
-    int deviceIndex = message.getDeviceIndex();
-    DeviceCommand deviceCommand = message.getDeviceCommand();
-    int parameter = message.getParameter();
-    switch (deviceCommand) {
-    case CHANNEL:
-      doChannel(deviceIndex, parameter);
-      break;
-    default:
-      break;
-
-    }
   }
 
   private void doDeviceDetached(OnDeviceDetached message) {
@@ -151,17 +87,7 @@ public class Conductor extends BrokerTask<Message> {
   }
 
   private void doRepublishState() {
-    System.out.println("Conductor.doRepublishState: entered, song=" + song);
     publish(new OnMidiFiles(midiFiles));
-    if (song != null) {
-      // TODO: Initialize song based on user interaction
-      publish(new OnSong(song, TICKS_PER_PIXEL));
-      for (Entry<Integer, Integer> entry : deviceChannelMap.entrySet()) {
-        int deviceIndex = entry.getKey();
-        int assignedChannel = entry.getValue();
-        publish(new OnChannelAssigned(song, deviceIndex, assignedChannel));
-      }
-    }
   }
 
   private void doSample(int songIndex) {
@@ -180,23 +106,23 @@ public class Conductor extends BrokerTask<Message> {
       SongBuilder songBuilder = new SongBuilder();
       song = songBuilder.createSong(midiFile);
       System.out.println("Selecting song " + songIndex + " - " + song.getTitle());
-      publish(new OnSong(song, TICKS_PER_PIXEL));
-      assignChannels();
+      publish(new OnSong(song, getSortedDeviceIndexes(), TICKS_PER_PIXEL));
     }
   }
 
   private void doTranspose(int distance) {
     song.transposeTo(distance);
-    publish(new OnSong(song, TICKS_PER_PIXEL));
+    publish(new OnSong(song, getSortedDeviceIndexes(), TICKS_PER_PIXEL));
   }
 
-  private boolean isChannelAssigned(int channel) {
-    for (int assignedChannel : deviceChannelMap.values()) {
-      if (assignedChannel == channel) {
-        return true;
-      }
+  private int[] getSortedDeviceIndexes() {
+    int[] sortedDeviceIndexes = new int[deviceIndexes.size()];
+    int index = 0;
+    for (Integer deviceIndex : deviceIndexes) {
+      sortedDeviceIndexes[index++] = deviceIndex;
     }
-    return false;
+    Arrays.sort(sortedDeviceIndexes);
+    return sortedDeviceIndexes;
   }
 
   private boolean isMidiFile(String name) {
@@ -219,7 +145,4 @@ public class Conductor extends BrokerTask<Message> {
     }
   }
 
-  private void unassignChannel(int deviceIndex) {
-    deviceChannelMap.remove(deviceIndex);
-  }
 }

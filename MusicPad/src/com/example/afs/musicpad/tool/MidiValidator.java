@@ -32,6 +32,10 @@ public class MidiValidator {
     }
 
     @Override
+    public void onEndCount(int channel, int endCount) {
+    }
+
+    @Override
     public void onLyrics(long tick, String lyrics) {
     }
 
@@ -41,6 +45,10 @@ public class MidiValidator {
 
     @Override
     public void onOccupancy(int channel, int occupancy) {
+    }
+
+    @Override
+    public void onStartCount(int channel, int startCount) {
     }
 
     @Override

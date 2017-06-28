@@ -25,6 +25,8 @@ public class Facet {
   private Set<Integer> programs = new LinkedHashSet<>();
   private int[] distinctNoteCounts = new int[Midi.NOTES];
   private int[] chromaticNoteCounts = new int[Midi.SEMITONES_PER_OCTAVE];
+  private int endCount;
+  private int startCount;
 
   public void addProgram(int program) {
     this.programs.add(program);
@@ -59,6 +61,10 @@ public class Facet {
     return distinctNoteCounts;
   }
 
+  public int getEndCount() {
+    return endCount;
+  }
+
   public int getHighestMidiNote() {
     return totalNoteCount == 0 ? -1 : highestMidiNote;
   }
@@ -75,6 +81,10 @@ public class Facet {
     return programs;
   }
 
+  public int getStartCount() {
+    return startCount;
+  }
+
   public int getTotalNoteCount() {
     return totalNoteCount;
   }
@@ -87,7 +97,15 @@ public class Facet {
     this.concurrency = concurrency;
   }
 
+  public void setEndCount(int endCount) {
+    this.endCount = endCount;
+  }
+
   public void setOccupancy(int occupancy) {
     this.occupancy = occupancy;
+  }
+
+  public void setStartCount(int startCount) {
+    this.startCount = startCount;
   }
 }

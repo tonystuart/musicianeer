@@ -11,6 +11,7 @@ package com.example.afs.musicpad.renderer.karaoke;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.SortedSet;
@@ -18,6 +19,9 @@ import java.util.SortedSet;
 import com.example.afs.musicpad.device.common.DeviceHandler.InputType;
 import com.example.afs.musicpad.device.common.DeviceHandler.OutputType;
 import com.example.afs.musicpad.html.Division;
+import com.example.afs.musicpad.html.Element;
+import com.example.afs.musicpad.html.Table;
+import com.example.afs.musicpad.html.TableRow;
 import com.example.afs.musicpad.html.TextElement;
 import com.example.afs.musicpad.keycap.KeyCap;
 import com.example.afs.musicpad.keycap.KeyCapMap;
@@ -26,8 +30,10 @@ import com.example.afs.musicpad.message.OnChannelUpdate;
 import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnKaraoke;
 import com.example.afs.musicpad.message.OnMidiFiles;
+import com.example.afs.musicpad.message.OnPartSelector;
 import com.example.afs.musicpad.message.OnSong;
 import com.example.afs.musicpad.message.OnSongSelector;
+import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.song.Default;
 import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.song.Word;
@@ -75,10 +81,10 @@ public class KaraokeRenderer extends BrokerTask<Message> {
 
   public KaraokeRenderer(Broker<Message> broker) {
     super(broker);
-    subscribe(OnChannelUpdate.class, message -> doChannelUpdate(message));
+    subscribe(OnSong.class, message -> doSong(message));
     subscribe(OnCommand.class, message -> doCommand(message));
     subscribe(OnMidiFiles.class, message -> doMidiFiles(message));
-    subscribe(OnSong.class, message -> doSong(message));
+    subscribe(OnChannelUpdate.class, message -> doChannelUpdate(message));
   }
 
   @Override
@@ -126,6 +132,9 @@ public class KaraokeRenderer extends BrokerTask<Message> {
 
   private void doSong(OnSong message) {
     song = message.getSong();
+    Element parts = getParts();
+    String html = parts.render();
+    publish(new OnPartSelector(message.getDeviceIndexes(), html));
   }
 
   private Division getKaraoke() {
@@ -210,6 +219,24 @@ public class KaraokeRenderer extends BrokerTask<Message> {
       }
     }
     return container;
+  }
+
+  private Element getParts() {
+    Table parts = new Table();
+    for (int channel = 0; channel < Midi.CHANNELS; channel++) {
+      int channelNoteCount = song.getChannelNoteCount(channel);
+      if (channelNoteCount != 0) {
+        List<String> programNames = song.getProgramNames(channel);
+        int channelStartCount = song.getChannelStartCount(channel);
+        int channelEndCount = song.getChannelEndCount(channel);
+        TableRow row = parts.createRow();
+        row.append(programNames);
+        row.append(channelNoteCount);
+        row.append(channelStartCount);
+        row.append(channelEndCount);
+      }
+    }
+    return parts;
   }
 
   private String getText(SortedSet<Word> words) {

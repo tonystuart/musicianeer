@@ -108,12 +108,20 @@ public class Song {
     return beatUnit;
   }
 
+  public int getChannelEndCount(int channel) {
+    return channelFacets.getFacet(channel).getEndCount();
+  }
+
   public int getChannelNoteCount(int channel) {
     return channelFacets.getFacet(channel).getTotalNoteCount();
   }
 
   public Iterable<Note> getChannelNotes(int channel) {
     return new ChannelNotes(notes, channel);
+  }
+
+  public int getChannelStartCount(int channel) {
+    return channelFacets.getFacet(channel).getStartCount();
   }
 
   public int[] getChromaticNoteCounts(int channel) {
@@ -274,8 +282,16 @@ public class Song {
     channelFacets.getFacet(channel).setConcurrency(concurrency);
   }
 
+  public void setEndCount(int channel, int endCount) {
+    channelFacets.getFacet(channel).setEndCount(endCount);
+  }
+
   public void setOccupancy(int channel, int occupancy) {
     channelFacets.getFacet(channel).setOccupancy(occupancy);
+  }
+
+  public void setStartCount(int channel, int startCount) {
+    channelFacets.getFacet(channel).setStartCount(startCount);
   }
 
   @Override

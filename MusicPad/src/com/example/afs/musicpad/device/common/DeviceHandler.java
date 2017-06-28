@@ -19,7 +19,6 @@ import com.example.afs.musicpad.device.qwerty.AlphaKeyCapMap;
 import com.example.afs.musicpad.device.qwerty.NumericKeyCapMap;
 import com.example.afs.musicpad.keycap.KeyCapMap;
 import com.example.afs.musicpad.message.Message;
-import com.example.afs.musicpad.message.OnChannelAssigned;
 import com.example.afs.musicpad.message.OnChannelUpdate;
 import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnDeviceCommand;
@@ -59,7 +58,6 @@ public class DeviceHandler extends BrokerTask<Message> {
     this.player = new Player(synthesizer, deviceIndex);
     subscribe(OnCommand.class, message -> doCommand(message));
     subscribe(OnDeviceCommand.class, message -> doDeviceCommand(message));
-    subscribe(OnChannelAssigned.class, message -> doChannelAssigned(message));
   }
 
   public void detach() {
@@ -127,13 +125,6 @@ public class DeviceHandler extends BrokerTask<Message> {
       throw new UnsupportedOperationException();
     }
     return keyCapMap;
-  }
-
-  private void doChannelAssigned(OnChannelAssigned message) {
-    if (this.deviceIndex == message.getDeviceIndex()) {
-      this.song = message.getSong();
-      selectChannel(message.getChannel());
-    }
   }
 
   private void doCommand(OnCommand message) {

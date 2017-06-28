@@ -21,10 +21,12 @@ import com.example.afs.musicpad.device.midi.configuration.Context.HasSendDeviceM
 import com.example.afs.musicpad.device.midi.configuration.MidiConfiguration;
 import com.example.afs.musicpad.device.midi.configuration.On;
 import com.example.afs.musicpad.message.Message;
-import com.example.afs.musicpad.message.OnChannelAssigned;
 import com.example.afs.musicpad.message.OnCommand;
+import com.example.afs.musicpad.message.OnDeviceCommand;
 import com.example.afs.musicpad.message.OnDeviceMessage;
+import com.example.afs.musicpad.message.OnSong;
 import com.example.afs.musicpad.midi.Midi;
+import com.example.afs.musicpad.song.ChannelNotes;
 import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.task.BrokerTask;
 import com.example.afs.musicpad.util.Broker;
@@ -39,6 +41,7 @@ public class MidiWriter extends BrokerTask<Message> implements HasSendDeviceMess
   private MidiDeviceBundle deviceBundle;
   private MidiConfiguration configuration;
   private RandomAccessList<Receiver> receivers = new DirectList<>();
+  private Song song;
 
   public MidiWriter(Broker<Message> broker, MidiDeviceBundle deviceBundle, MidiConfiguration configuration, int deviceIndex) {
     super(broker);
@@ -48,8 +51,9 @@ public class MidiWriter extends BrokerTask<Message> implements HasSendDeviceMess
     this.context = configuration.getContext();
     context.setHasSendDeviceMessage(this);
     subscribe(OnCommand.class, message -> doCommand(message));
-    subscribe(OnChannelAssigned.class, message -> doChannelAssigned(message));
+    subscribe(OnDeviceCommand.class, message -> doDeviceCommand(message));
     subscribe(OnDeviceMessage.class, message -> doDeviceMessage(message));
+    subscribe(OnSong.class, message -> doSong(message));
     connectDevices();
   }
 
@@ -99,33 +103,24 @@ public class MidiWriter extends BrokerTask<Message> implements HasSendDeviceMess
     }
   }
 
-  private void doChannelAssigned(OnChannelAssigned message) {
-    if (this.deviceIndex == message.getDeviceIndex()) {
-      Song song = message.getSong();
-      int assignedChannel = message.getChannel();
-      for (int channel = 0; channel < Midi.CHANNELS; channel++) {
-        int channelNoteCount = song.getChannelNoteCount(channel);
-        ChannelState channelState;
-        if (channel == assignedChannel) {
-          channelState = ChannelState.SELECTED;
-        } else {
-          if (channelNoteCount == 0) {
-            channelState = ChannelState.INACTIVE;
-          } else {
-            channelState = ChannelState.ACTIVE;
-          }
-        }
-        setChannelState(channel, channelState);
-      }
-    }
-  }
-
   private void doCommand(OnCommand message) {
     context.set("command", message.getCommand());
     context.set("parameter", message.getParameter());
     On onCommand = configuration.getOn(MidiConfiguration.COMMAND);
     if (onCommand != null) {
       onCommand.execute(context);
+    }
+  }
+
+  private void doDeviceCommand(OnDeviceCommand message) {
+    if (message.getDeviceIndex() == deviceIndex) {
+      switch (message.getDeviceCommand()) {
+      case CHANNEL:
+        updateChannelState(message.getParameter());
+        break;
+      default:
+        break;
+      }
     }
   }
 
@@ -136,6 +131,11 @@ public class MidiWriter extends BrokerTask<Message> implements HasSendDeviceMess
     int data1 = message.getData1();
     int data2 = message.getData2();
     sendDeviceMessage(port, command, channel, data1, data2);
+  }
+
+  private void doSong(OnSong message) {
+    this.song = message.getSong();
+    updateChannelState(ChannelNotes.ALL_CHANNELS);
   }
 
   private void initializeDevice() {
@@ -152,6 +152,23 @@ public class MidiWriter extends BrokerTask<Message> implements HasSendDeviceMess
     On onChannelStatus = configuration.getOn(MidiConfiguration.CHANNEL_STATUS);
     if (onChannelStatus != null) {
       onChannelStatus.execute(context);
+    }
+  }
+
+  private void updateChannelState(int assignedChannel) {
+    for (int channel = 0; channel < Midi.CHANNELS; channel++) {
+      boolean isChannelActive = song != null && song.getChannelNoteCount(channel) > 0;
+      ChannelState channelState;
+      if (channel == assignedChannel) {
+        channelState = ChannelState.SELECTED;
+      } else {
+        if (isChannelActive) {
+          channelState = ChannelState.INACTIVE;
+        } else {
+          channelState = ChannelState.ACTIVE;
+        }
+      }
+      setChannelState(channel, channelState);
     }
   }
 
