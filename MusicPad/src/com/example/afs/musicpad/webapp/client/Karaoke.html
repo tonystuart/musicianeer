@@ -10,28 +10,6 @@
 </head>
 <body onload='karaoke.onLoad()'>
 <body>
-    <div id='song-selector-panel' class='tab'>
-        <div class='left'>
-            <div class='title'>Pick Your Song</div>
-            <div class='control-panel'>
-                <div onclick='karaoke.onPlaySample()'>Listen to Song</div>
-                <div onclick='karaoke.onStopSample()'>Stop Listening</div>
-                <div onclick='karaoke.onSelectSong()'>Select this Song</div>
-            </div>
-        </div>
-        <div id='song-selector-container' class='right'></div>
-    </div>
-    <div id='part-selector-panel' class='tab'>
-        <div id='left'>
-            <div id='part-selector-title'>Pick Your Part</div>
-            <div id='part-selector-control-panel'>
-                <div id='part-selector-play-sample' onclick='karaoke.onPlaySample()'>Listen to Part</div>
-                <div id='part-selector-stop-sample' onclick='karaoke.onStopSample()'>Stop Listening</div>
-                <div id='part-selector-select' onclick='karaoke.onSelectSong()'>Select this Part</div>
-            </div>
-        </div>
-        <div id='part-selector-right'></div>
-    </div>
     <div id='prompter-panel' class='tab'>
         <div id='prompter-panel-left'>
             <input type='button' value='New Song' onclick='karaoke.onNewSong()'>

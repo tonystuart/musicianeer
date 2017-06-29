@@ -49,8 +49,8 @@ musicPad.request = function(resource, callback) {
     httpRequest.send();
 }
 
-musicPad.selectElement = function(element, containerId) {
-    let container = document.getElementById(containerId);
+musicPad.selectElement = function(element) {
+    let container = element.parentElement;
     let previous = container.querySelector(".selected");
     if (previous) {
         previous.classList.remove("selected");
@@ -64,6 +64,10 @@ musicPad.addClassToAllBut = function(className, selector, id) {
     nodeList[i].classList.add(className);
   }
   document.getElementById(id).classList.remove(className);
+}
+
+musicPad.select = function(id) {
+  musicPad.addClassToAllBut("hidden", ".tab", id);
 }
 
 musicPad.send = function(json) {

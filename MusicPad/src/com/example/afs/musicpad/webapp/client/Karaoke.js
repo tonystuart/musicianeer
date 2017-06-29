@@ -49,8 +49,12 @@ karaoke.onNewSong = function() {
 }
 
 karaoke.onSongSelector = function(message) {
-    let songSelectorRight = document.getElementById('song-selector-container');
-    songSelectorRight.innerHTML = message.html;
+    let songs = document.getElementById('songs');
+    if (songs != null) {
+      songs.parentElement.removeChild(songs);
+    }
+    document.body.appendChild(musicPad.fragmentToElement(message.html));
+    musicPad.select("songs");
 }
 
 karaoke.onPlaySample = function(message) {
