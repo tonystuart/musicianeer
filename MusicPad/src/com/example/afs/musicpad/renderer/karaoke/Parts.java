@@ -16,6 +16,7 @@ import com.example.afs.musicpad.html.Element;
 import com.example.afs.musicpad.html.TextElement;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.song.Song;
+import com.example.afs.musicpad.util.FileUtilities;
 
 public class Parts {
 
@@ -99,7 +100,10 @@ public class Parts {
   }
 
   private Element createTitle(int deviceIndex) {
-    return new Division(".title", "Player " + deviceIndex + ": Pick Your Part");
+    Division division = new Division(".title");
+    division.appendChild(new Division(FileUtilities.getBaseName(song.getTitle())));
+    division.appendChild(new Division("Player " + deviceIndex + ": Pick Your Part"));
+    return division;
   }
 
 }

@@ -14,6 +14,7 @@ import java.io.File;
 import com.example.afs.musicpad.html.Division;
 import com.example.afs.musicpad.html.Element;
 import com.example.afs.musicpad.html.TextElement;
+import com.example.afs.musicpad.util.FileUtilities;
 import com.example.afs.musicpad.util.RandomAccessList;
 
 public class Songs {
@@ -77,11 +78,7 @@ public class Songs {
     int midiFileCount = midiFiles.size();
     for (int i = 0; i < midiFileCount; i++) {
       File midiFile = midiFiles.get(i);
-      String name = midiFile.getName();
-      int lastDot = name.lastIndexOf('.');
-      if (lastDot != -1) {
-        name = name.substring(0, lastDot);
-      }
+      String name = FileUtilities.getBaseName(midiFile.getPath());
       Division song = new Division("#song-" + i);
       song.appendChild(new TextElement(name));
       songList.appendChild(song);

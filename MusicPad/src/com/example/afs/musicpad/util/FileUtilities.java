@@ -10,6 +10,7 @@
 package com.example.afs.musicpad.util;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -17,6 +18,16 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 public class FileUtilities {
+
+  public static String getBaseName(String path) {
+    int begin = path.lastIndexOf(File.separatorChar) + 1;
+    int end = path.lastIndexOf('.');
+    if (end == -1) {
+      end = path.length();
+    }
+    String baseName = path.substring(begin, end);
+    return baseName;
+  }
 
   public static String read(InputStream inputStream) {
     try {
