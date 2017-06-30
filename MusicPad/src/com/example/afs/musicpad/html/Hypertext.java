@@ -23,8 +23,22 @@ public class Hypertext extends Element {
   private Map<String, Object> attributes;
   private RandomAccessList<Element> childElements;
 
-  public Hypertext(String type) {
+  protected Hypertext(String type) {
     this.type = type;
+  }
+
+  protected Hypertext(String type, String[] properties) {
+    this(type);
+    for (String property : properties) {
+      char firstChar = property.charAt(0);
+      if (firstChar == '#') {
+        setId(property.substring(1));
+      } else if (firstChar == '.') {
+        setClassName(property.substring(1));
+      } else {
+        appendChild(new TextElement(property));
+      }
+    }
   }
 
   public void addClassName(String className) {

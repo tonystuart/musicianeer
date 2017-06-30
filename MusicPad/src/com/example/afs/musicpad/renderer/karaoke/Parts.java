@@ -28,7 +28,7 @@ public class Parts {
   }
 
   public String render() {
-    Division songs = new Division("parts");
+    Division songs = new Division("#parts");
     for (int i : deviceIndexes) {
       songs.appendChild(createPart(i));
     }
@@ -70,7 +70,7 @@ public class Parts {
       int channelNoteCount = song.getChannelNoteCount(channel);
       if (channelNoteCount != 0) {
         List<String> programNames = song.getProgramNames(channel);
-        Division part = new Division("part-" + channel);
+        Division part = new Division("#part-" + channel);
         part.appendChild(new TextElement(programNames.get(0)));
         partList.appendChild(part);
       }

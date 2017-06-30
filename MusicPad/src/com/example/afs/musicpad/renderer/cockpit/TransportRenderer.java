@@ -73,7 +73,7 @@ public class TransportRenderer {
   }
 
   private Division getLeft() {
-    Division division = new Division("transport-left");
+    Division division = new Division("#transport-left");
     division.appendChild(getGainDivision());
     division.appendChild(getBackingDivision());
     division.appendChild(getTempoDivision());
@@ -93,7 +93,7 @@ public class TransportRenderer {
   }
 
   private Division getRight() {
-    Division division = new Division("transport-right");
+    Division division = new Division("#transport-right");
     division.appendChild(getReattach());
     division.appendChild(getBackward());
     division.appendChild(getForward());

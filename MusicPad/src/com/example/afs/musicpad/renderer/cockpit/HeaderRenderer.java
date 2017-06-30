@@ -59,7 +59,7 @@ public class HeaderRenderer {
     row.append(song.getBeatsPerMeasure(0) + "/" + song.getBeatUnit(0));
     row.append(getDuration());
 
-    Division detail = new Division("header-detail");
+    Division detail = new Division("#header-detail");
     detail.appendChild(table);
 
     String html = detail.render();

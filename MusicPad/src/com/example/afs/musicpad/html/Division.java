@@ -11,13 +11,8 @@ package com.example.afs.musicpad.html;
 
 public class Division extends Hypertext {
 
-  public Division() {
-    super("div");
-  }
-
-  public Division(String id) {
-    this();
-    setId(id);
+  public Division(String... properties) {
+    super("div", properties);
   }
 
 }

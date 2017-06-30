@@ -66,7 +66,7 @@ musicPad.addClassToAllBut = function(className, selector, id) {
   document.getElementById(id).classList.remove(className);
 }
 
-musicPad.select = function(id) {
+musicPad.selectTab = function(id) {
   musicPad.addClassToAllBut("hidden", ".tab", id);
 }
 

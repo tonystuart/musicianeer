@@ -25,50 +25,55 @@ public class Songs {
   }
 
   public String render() {
-    Division songs = new Division("songs");
-    songs.setClassName("tab");
-    songs.appendChild(createHeader());
-    songs.appendChild(createLeft());
-    songs.appendChild(createSongList());
+    Division songs = new Division("#songs", ".tab");
+    songs.appendChild(createTitle());
+    songs.appendChild(createContent());
     String html = songs.render();
     return html;
   }
 
+  private Element createContent() {
+    Division content = new Division(".content");
+    content.appendChild(createLeft());
+    content.appendChild(createRight());
+    return content;
+  }
+
   private Element createControls() {
-    Division controls = new Division();
+    Division controls = new Division(".controls");
     controls.appendChild(createPlayButton());
     controls.appendChild(createStopButton());
     controls.appendChild(createSelectButton());
     return controls;
   }
 
-  private Element createHeader() {
-    return new TextElement("Pick Your Song");
-  }
-
   private Element createLeft() {
-    Division left = new Division();
-    left.appendChild(createControls());
-    return left;
+    Division details = new Division(".left");
+    details.appendChild(createControls());
+    return details;
   }
 
   private Element createPlayButton() {
-    Division playButton = new Division();
-    playButton.appendChild(new TextElement("Listen to Song"));
+    Division playButton = new Division(".play-button", "Listen to Song");
     playButton.appendProperty("onclick", "karaoke.onPlaySample()");
     return playButton;
   }
 
+  private Element createRight() {
+    Division right = new Division(".right");
+    right.appendChild(createSongList());
+    return right;
+  }
+
   private Element createSelectButton() {
-    Division selectButton = new Division();
-    selectButton.appendChild(new TextElement("Select this Song"));
+    Division selectButton = new Division(".select-button", "Select this Song");
     selectButton.appendProperty("onclick", "karaoke.onSelectSong()");
     return selectButton;
   }
 
   private Element createSongList() {
-    Division songList = new Division();
-    songList.appendProperty("onclick", "musicPad.selectElement(event.target, \"song-selector-list\")");
+    Division songList = new Division(".song-list");
+    songList.appendProperty("onclick", "musicPad.selectElement(event.target)");
     int midiFileCount = midiFiles.size();
     for (int i = 0; i < midiFileCount; i++) {
       File midiFile = midiFiles.get(i);
@@ -77,7 +82,7 @@ public class Songs {
       if (lastDot != -1) {
         name = name.substring(0, lastDot);
       }
-      Division song = new Division("song-" + i);
+      Division song = new Division("#song-" + i);
       song.appendChild(new TextElement(name));
       songList.appendChild(song);
     }
@@ -85,10 +90,14 @@ public class Songs {
   }
 
   private Element createStopButton() {
-    Division stopButton = new Division();
-    stopButton.appendChild(new TextElement("Stop Listening"));
+    Division stopButton = new Division(".stop-button", "Stop Listening");
     stopButton.appendProperty("onclick", "karaoke.onStopSample()");
     return stopButton;
+  }
+
+  private Element createTitle() {
+    Division title = new Division(".title", "Pick Your Song");
+    return title;
   }
 
 }
