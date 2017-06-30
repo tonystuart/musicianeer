@@ -10,15 +10,10 @@
 package com.example.afs.musicpad;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
 
 import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnAllTasksStarted;
 import com.example.afs.musicpad.message.OnCommand;
-import com.example.afs.musicpad.message.OnDeviceAttached;
-import com.example.afs.musicpad.message.OnDeviceDetached;
 import com.example.afs.musicpad.message.OnMidiFiles;
 import com.example.afs.musicpad.message.OnRepublishState;
 import com.example.afs.musicpad.message.OnSample;
@@ -38,7 +33,6 @@ public class Conductor extends BrokerTask<Message> {
   private Song song;
   private File directory;
   private RandomAccessList<File> midiFiles;
-  private Set<Integer> deviceIndexes = new HashSet<>();
 
   public Conductor(Broker<Message> broker, String path) {
     super(broker);
@@ -48,8 +42,6 @@ public class Conductor extends BrokerTask<Message> {
     midiFiles.sort((o1, o2) -> o1.getPath().compareTo(o2.getPath()));
     subscribe(OnCommand.class, message -> doCommand(message));
     subscribe(OnAllTasksStarted.class, message -> doAllTasksStarted());
-    subscribe(OnDeviceAttached.class, message -> doDeviceAttached(message));
-    subscribe(OnDeviceDetached.class, message -> doDeviceDetached(message));
     subscribe(OnRepublishState.class, message -> doRepublishState());
   }
 
@@ -76,16 +68,6 @@ public class Conductor extends BrokerTask<Message> {
     }
   }
 
-  private void doDeviceAttached(OnDeviceAttached message) {
-    int deviceIndex = message.getDeviceIndex();
-    deviceIndexes.add(deviceIndex);
-  }
-
-  private void doDeviceDetached(OnDeviceDetached message) {
-    int deviceIndex = message.getDeviceIndex();
-    deviceIndexes.remove(deviceIndex);
-  }
-
   private void doRepublishState() {
     publish(new OnMidiFiles(midiFiles));
   }
@@ -106,23 +88,13 @@ public class Conductor extends BrokerTask<Message> {
       SongBuilder songBuilder = new SongBuilder();
       song = songBuilder.createSong(midiFile);
       System.out.println("Selecting song " + songIndex + " - " + song.getTitle());
-      publish(new OnSong(song, getSortedDeviceIndexes(), TICKS_PER_PIXEL));
+      publish(new OnSong(song, TICKS_PER_PIXEL));
     }
   }
 
   private void doTranspose(int distance) {
     song.transposeTo(distance);
-    publish(new OnSong(song, getSortedDeviceIndexes(), TICKS_PER_PIXEL));
-  }
-
-  private int[] getSortedDeviceIndexes() {
-    int[] sortedDeviceIndexes = new int[deviceIndexes.size()];
-    int index = 0;
-    for (Integer deviceIndex : deviceIndexes) {
-      sortedDeviceIndexes[index++] = deviceIndex;
-    }
-    Arrays.sort(sortedDeviceIndexes);
-    return sortedDeviceIndexes;
+    publish(new OnSong(song, TICKS_PER_PIXEL));
   }
 
   private boolean isMidiFile(String name) {

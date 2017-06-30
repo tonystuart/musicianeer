@@ -9,20 +9,13 @@
 
 package com.example.afs.musicpad.message;
 
-import java.util.Arrays;
 
 public class OnPartSelector extends Message {
 
-  private int[] deviceIndexes;
   private String html;
 
-  public OnPartSelector(int[] deviceIndexes, String html) {
-    this.deviceIndexes = deviceIndexes;
+  public OnPartSelector(String html) {
     this.html = html;
-  }
-
-  public int[] getDeviceIndexes() {
-    return deviceIndexes;
   }
 
   public String getHtml() {
@@ -31,7 +24,7 @@ public class OnPartSelector extends Message {
 
   @Override
   public String toString() {
-    return "OnPartSelector [deviceIndexes=" + Arrays.toString(deviceIndexes) + ", html=" + html + "]";
+    return "OnPartSelector [html=" + html + "]";
   }
 
 }

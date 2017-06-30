@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.SortedSet;
+import java.util.TreeSet;
 
 import com.example.afs.musicpad.device.common.DeviceHandler.InputType;
 import com.example.afs.musicpad.device.common.DeviceHandler.OutputType;
@@ -24,6 +25,8 @@ import com.example.afs.musicpad.keycap.KeyCapMap;
 import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnChannelUpdate;
 import com.example.afs.musicpad.message.OnCommand;
+import com.example.afs.musicpad.message.OnDeviceAttached;
+import com.example.afs.musicpad.message.OnDeviceDetached;
 import com.example.afs.musicpad.message.OnKaraoke;
 import com.example.afs.musicpad.message.OnMidiFiles;
 import com.example.afs.musicpad.message.OnPartSelector;
@@ -73,6 +76,7 @@ public class KaraokeRenderer extends BrokerTask<Message> {
   private Song song;
   private Map<Integer, KeyCap> deviceSustain = new HashMap<>();
   private Map<Integer, RandomAccessList<KeyCap>> deviceKeyCaps = new HashMap<>();
+  private TreeSet<Integer> deviceIndexes = new TreeSet<>();
 
   public KaraokeRenderer(Broker<Message> broker) {
     super(broker);
@@ -80,6 +84,8 @@ public class KaraokeRenderer extends BrokerTask<Message> {
     subscribe(OnCommand.class, message -> doCommand(message));
     subscribe(OnMidiFiles.class, message -> doMidiFiles(message));
     subscribe(OnChannelUpdate.class, message -> doChannelUpdate(message));
+    subscribe(OnDeviceAttached.class, message -> doDeviceAttached(message));
+    subscribe(OnDeviceDetached.class, message -> doDeviceDetached(message));
   }
 
   @Override
@@ -118,6 +124,16 @@ public class KaraokeRenderer extends BrokerTask<Message> {
     setTimer();
   }
 
+  private void doDeviceAttached(OnDeviceAttached message) {
+    int deviceIndex = message.getDeviceIndex();
+    deviceIndexes.add(deviceIndex);
+  }
+
+  private void doDeviceDetached(OnDeviceDetached message) {
+    int deviceIndex = message.getDeviceIndex();
+    deviceIndexes.remove(deviceIndex);
+  }
+
   private void doMidiFiles(OnMidiFiles message) {
     RandomAccessList<File> midiFiles = message.getMidiFiles();
     Songs songs = new Songs(midiFiles);
@@ -126,9 +142,11 @@ public class KaraokeRenderer extends BrokerTask<Message> {
   }
 
   private void doSong(OnSong message) {
-    Parts parts = new Parts(message.getSong(), message.getDeviceIndexes());
+    // TODO: Start the Karaoke app at initialization so it gets all the device attach/detach messages
+    //Parts parts = new Parts(message.getSong(), deviceIndexes.first());
+    Parts parts = new Parts(message.getSong(), 0);
     String html = parts.render();
-    publish(new OnPartSelector(message.getDeviceIndexes(), html));
+    publish(new OnPartSelector(html));
   }
 
   private Division getKaraoke() {

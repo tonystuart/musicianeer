@@ -9,24 +9,16 @@
 
 package com.example.afs.musicpad.message;
 
-import java.util.Arrays;
-
 import com.example.afs.musicpad.song.Song;
 
 public class OnSong extends Message {
 
   private Song song;
   private int ticksPerPixel;
-  private int[] deviceIndexes;
 
-  public OnSong(Song song, int[] deviceIndexes, int ticksPerPixel) {
+  public OnSong(Song song, int ticksPerPixel) {
     this.song = song;
-    this.deviceIndexes = deviceIndexes;
     this.ticksPerPixel = ticksPerPixel;
-  }
-
-  public int[] getDeviceIndexes() {
-    return deviceIndexes;
   }
 
   public Song getSong() {
@@ -39,7 +31,7 @@ public class OnSong extends Message {
 
   @Override
   public String toString() {
-    return "OnSong [song=" + song + ", deviceIndexes=" + Arrays.toString(deviceIndexes) + ", ticksPerPixel=" + ticksPerPixel + "]";
+    return "OnSong [song=" + song + ", ticksPerPixel=" + ticksPerPixel + "]";
   }
 
 }

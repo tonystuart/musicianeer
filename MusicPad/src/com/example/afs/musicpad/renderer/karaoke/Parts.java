@@ -20,47 +20,40 @@ import com.example.afs.musicpad.song.Song;
 public class Parts {
 
   private Song song;
-  private int[] deviceIndexes;
+  private int deviceIndex;
 
-  public Parts(Song song, int[] deviceIndexes) {
+  public Parts(Song song, int deviceIndex) {
     this.song = song;
-    this.deviceIndexes = deviceIndexes;
+    this.deviceIndex = deviceIndex;
   }
 
   public String render() {
-    Division songs = new Division("#parts");
-    for (int i : deviceIndexes) {
-      songs.appendChild(createPart(i));
-    }
-    String html = songs.render();
+    Division parts = new Division("#parts", ".tab");
+    parts.appendChild(createTitle(deviceIndex));
+    parts.appendChild(createContent());
+    String html = parts.render();
     return html;
   }
 
+  private Element createContent() {
+    Division content = new Division(".content");
+    content.appendChild(createLeft());
+    content.appendChild(createRight());
+    return content;
+  }
+
   private Element createControls() {
-    Division controls = new Division();
+    Division controls = new Division(".controls");
     controls.appendChild(createPlayButton());
     controls.appendChild(createStopButton());
     controls.appendChild(createSelectButton());
     return controls;
   }
 
-  private Element createHeader(int deviceIndex) {
-    return new TextElement("Player " + deviceIndex + ", Pick Your Part");
-  }
-
   private Element createLeft() {
-    Division left = new Division();
-    left.appendChild(createControls());
-    return left;
-  }
-
-  private Element createPart(int deviceIndex) {
-    Division part = new Division();
-    part.setClassName("tab");
-    part.appendChild(createHeader(deviceIndex));
-    part.appendChild(createLeft());
-    part.appendChild(createPartList());
-    return part;
+    Division division = new Division(".left");
+    division.appendChild(createPartList());
+    return division;
   }
 
   private Element createPartList() {
@@ -85,6 +78,12 @@ public class Parts {
     return playButton;
   }
 
+  private Element createRight() {
+    Division division = new Division(".right");
+    division.appendChild(createControls());
+    return division;
+  }
+
   private Element createSelectButton() {
     Division selectButton = new Division();
     selectButton.appendChild(new TextElement("Select this Part"));
@@ -95,8 +94,12 @@ public class Parts {
   private Element createStopButton() {
     Division stopButton = new Division();
     stopButton.appendChild(new TextElement("Stop Listening"));
-    stopButton.appendProperty("onclick", "karaoke.onStopSample()");
+    stopButton.appendProperty("onclick", "karaoke.onStopPart()");
     return stopButton;
+  }
+
+  private Element createTitle(int deviceIndex) {
+    return new Division(".title", "Player " + deviceIndex + ": Pick Your Part");
   }
 
 }

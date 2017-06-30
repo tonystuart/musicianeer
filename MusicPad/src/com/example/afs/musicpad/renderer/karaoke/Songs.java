@@ -48,9 +48,9 @@ public class Songs {
   }
 
   private Element createLeft() {
-    Division details = new Division(".left");
-    details.appendChild(createControls());
-    return details;
+    Division division = new Division(".left");
+    division.appendChild(createSongList());
+    return division;
   }
 
   private Element createPlayButton() {
@@ -60,9 +60,9 @@ public class Songs {
   }
 
   private Element createRight() {
-    Division right = new Division(".right");
-    right.appendChild(createSongList());
-    return right;
+    Division division = new Division(".right");
+    division.appendChild(createControls());
+    return division;
   }
 
   private Element createSelectButton() {

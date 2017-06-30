@@ -39,9 +39,12 @@ karaoke.onLoad = function() {
 }
 
 karaoke.onPartSelector = function(message) {
-    let partSelectorRight = document.getElementById('part-selector-right');
-    partSelectorRight.innerHTML = message.html;
-    musicPad.addClassToAllBut("hidden", ".tab", "part-selector-panel")
+  let parts = document.getElementById('parts');
+  if (parts != null) {
+      parts.parentElement.removeChild(parts);
+  }
+  document.body.appendChild(musicPad.fragmentToElement(message.html));
+  musicPad.selectTab("parts");
 }
 
 karaoke.onNewSong = function() {
@@ -68,13 +71,24 @@ karaoke.onPlaySample = function(message) {
 }
 
 karaoke.onSelectSong = function(message) {
-    console.log('onSelectSong');
-    let songSelector = document.getElementById('songs');
-    let item = songSelector.querySelector('.selected');
-    if (item) {
-        let songIndex = parseInt(item.id.match(/[0-9]+/)[0]);
-        musicPad.sendCommand('SONG', songIndex);
-    }
+  console.log('onSelectSong');
+  let songSelector = document.getElementById('songs');
+  let item = songSelector.querySelector('.selected');
+  if (item) {
+      let songIndex = parseInt(item.id.match(/[0-9]+/)[0]);
+      musicPad.sendCommand('SONG', songIndex);
+  }
+}
+
+karaoke.onSelectPart = function(message) {
+  console.log('onSelectPart');
+  let partSelector = document.getElementById('parts');
+  let item = partSelector.querySelector('.selected');
+  if (item) {
+      let partIndex = parseInt(item.id.match(/[0-9]+/)[0]);
+      // TODO: get deviceIndex and channelIndex
+      musicPad.sendDeviceCommand('CHANNEL', partIndex);
+  }
 }
 
 karaoke.onStopSample = function(message) {
