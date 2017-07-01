@@ -38,6 +38,15 @@ musicPad.fragmentToElement = function(fragment) {
     return container.firstElementChild;
 }
 
+musicPad.replaceTab = function(id, html) {
+  let tab = document.getElementById(id);
+  if (tab != null) {
+    tab.parentElement.removeChild(tab);
+  }
+  document.body.appendChild(musicPad.fragmentToElement(html));
+  musicPad.selectTab(id);
+}
+
 musicPad.request = function(resource, callback) {
     let httpRequest = new XMLHttpRequest();
     httpRequest.owebSocketUrlnreadystatechange = function() {

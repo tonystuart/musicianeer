@@ -22,6 +22,7 @@ import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnChannelUpdate;
 import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnDeviceCommand;
+import com.example.afs.musicpad.message.OnSong;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.player.Player;
 import com.example.afs.musicpad.player.Player.Action;
@@ -41,14 +42,15 @@ public class DeviceHandler extends BrokerTask<Message> {
     NORMAL, ARPEGGIO
   }
 
-  private Song song;
+  private int deviceIndex;
   private int channel;
+
+  private Song song;
   private Player player;
+  private String deviceName;
   private InputType inputType;
   private KeyCapMap keyCapMap;
   private Sound[] activeSounds = new Sound[256]; // NB: KeyEvents VK codes, not midiNotes
-  private int deviceIndex;
-  private String deviceName;
 
   public DeviceHandler(Broker<Message> broker, Synthesizer synthesizer, String deviceName, int deviceIndex, InputType inputType) {
     super(broker);
@@ -57,6 +59,7 @@ public class DeviceHandler extends BrokerTask<Message> {
     this.inputType = inputType;
     this.player = new Player(synthesizer, deviceIndex);
     subscribe(OnCommand.class, message -> doCommand(message));
+    subscribe(OnSong.class, message -> doSong(message));
     subscribe(OnDeviceCommand.class, message -> doDeviceCommand(message));
   }
 
@@ -186,6 +189,10 @@ public class DeviceHandler extends BrokerTask<Message> {
     OutputType outputType = OutputType.values()[typeIndex];
     player.setOutputType(outputType);
     publishChannelUpdate();
+  }
+
+  private void doSong(OnSong message) {
+    song = message.getSong();
   }
 
   private void publishChannelUpdate() {

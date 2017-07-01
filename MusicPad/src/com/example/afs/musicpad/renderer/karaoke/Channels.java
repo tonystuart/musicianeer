@@ -18,23 +18,39 @@ import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.util.FileUtilities;
 
-public class Parts {
+public class Channels {
 
   private Song song;
   private int deviceIndex;
 
-  public Parts(Song song, int deviceIndex) {
+  public Channels(Song song, int deviceIndex) {
     this.song = song;
     this.deviceIndex = deviceIndex;
   }
 
   public String render() {
-    Division parts = new Division("#parts", ".tab");
-    parts.appendProperty("data-device-index", deviceIndex);
-    parts.appendChild(createTitle(deviceIndex));
-    parts.appendChild(createContent());
-    String html = parts.render();
+    Division channels = new Division("#channels", ".tab");
+    channels.appendProperty("data-device-index", deviceIndex);
+    channels.appendChild(createTitle(deviceIndex));
+    channels.appendChild(createContent());
+    String html = channels.render();
     return html;
+  }
+
+  private Element createChannelList() {
+    Division channelList = new Division();
+    channelList.appendProperty("onclick", "karaoke.onChannelClick(event.target)");
+    for (int channelIndex = 0; channelIndex < Midi.CHANNELS; channelIndex++) {
+      int channelNoteCount = song.getChannelNoteCount(channelIndex);
+      if (channelNoteCount != 0) {
+        List<String> programNames = song.getProgramNames(channelIndex);
+        Division channel = new Division();
+        channel.appendProperty("data-channel-index", channelIndex);
+        channel.appendChild(new TextElement(programNames.get(0)));
+        channelList.appendChild(channel);
+      }
+    }
+    return channelList;
   }
 
   private Element createContent() {
@@ -54,30 +70,14 @@ public class Parts {
 
   private Element createLeft() {
     Division division = new Division(".left");
-    division.appendChild(createPartList());
+    division.appendChild(createChannelList());
     return division;
-  }
-
-  private Element createPartList() {
-    Division partList = new Division();
-    partList.appendProperty("onclick", "musicPad.selectElement(event.target)");
-    for (int channel = 0; channel < Midi.CHANNELS; channel++) {
-      int channelNoteCount = song.getChannelNoteCount(channel);
-      if (channelNoteCount != 0) {
-        List<String> programNames = song.getProgramNames(channel);
-        Division part = new Division("#part-" + channel);
-        part.appendProperty("data-channel", channel);
-        part.appendChild(new TextElement(programNames.get(0)));
-        partList.appendChild(part);
-      }
-    }
-    return partList;
   }
 
   private Element createPlayButton() {
     Division playButton = new Division();
-    playButton.appendChild(new TextElement("Listen to Part"));
-    playButton.appendProperty("onclick", "karaoke.onPlayPart()");
+    playButton.appendChild(new TextElement("Listen to Channel"));
+    playButton.appendProperty("onclick", "karaoke.onChannelSample()");
     return playButton;
   }
 
@@ -89,22 +89,22 @@ public class Parts {
 
   private Element createSelectButton() {
     Division selectButton = new Division();
-    selectButton.appendChild(new TextElement("Select this Part"));
-    selectButton.appendProperty("onclick", "karaoke.onSelectPart()");
+    selectButton.appendChild(new TextElement("Select this Channel"));
+    selectButton.appendProperty("onclick", "karaoke.onChannelSelect()");
     return selectButton;
   }
 
   private Element createStopButton() {
     Division stopButton = new Division();
     stopButton.appendChild(new TextElement("Stop Listening"));
-    stopButton.appendProperty("onclick", "karaoke.onStopPart()");
+    stopButton.appendProperty("onclick", "karaoke.onStopSample()");
     return stopButton;
   }
 
   private Element createTitle(int deviceIndex) {
     Division division = new Division(".title");
     division.appendChild(new Division(FileUtilities.getBaseName(song.getTitle())));
-    division.appendChild(new Division("Player " + deviceIndex + ": Pick Your Part"));
+    division.appendChild(new Division("Player " + deviceIndex + ": Pick Your Channel"));
     return division;
   }
 

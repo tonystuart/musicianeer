@@ -9,21 +9,21 @@
 
 package com.example.afs.musicpad.message;
 
-public class OnKaraoke extends Message {
+public class OnPrompter extends Message {
 
-  private String karaoke;
+  private String html;
 
-  public OnKaraoke(String karaoke) {
-    this.karaoke = karaoke;
+  public OnPrompter(String html) {
+    this.html = html;
   }
 
-  public String getKaraoke() {
-    return karaoke;
+  public String getHtml() {
+    return html;
   }
 
   @Override
   public String toString() {
-    return "OnKaraoke [karaoke=" + karaoke + "]";
+    return "OnPrompter [html=" + html + "]";
   }
 
 }

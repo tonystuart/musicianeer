@@ -56,7 +56,7 @@ public class Songs {
 
   private Element createPlayButton() {
     Division playButton = new Division(".play-button", "Listen to Song");
-    playButton.appendProperty("onclick", "karaoke.onPlaySample()");
+    playButton.appendProperty("onclick", "karaoke.onSongSample()");
     return playButton;
   }
 
@@ -68,18 +68,19 @@ public class Songs {
 
   private Element createSelectButton() {
     Division selectButton = new Division(".select-button", "Select this Song");
-    selectButton.appendProperty("onclick", "karaoke.onSelectSong()");
+    selectButton.appendProperty("onclick", "karaoke.onSongSelect()");
     return selectButton;
   }
 
   private Element createSongList() {
     Division songList = new Division(".song-list");
-    songList.appendProperty("onclick", "musicPad.selectElement(event.target)");
+    songList.appendProperty("onclick", "karaoke.onSongClick(event.target)");
     int midiFileCount = midiFiles.size();
-    for (int i = 0; i < midiFileCount; i++) {
-      File midiFile = midiFiles.get(i);
+    for (int songIndex = 0; songIndex < midiFileCount; songIndex++) {
+      File midiFile = midiFiles.get(songIndex);
       String name = FileUtilities.getBaseName(midiFile.getPath());
-      Division song = new Division("#song-" + i);
+      Division song = new Division();
+      song.appendProperty("data-song-index", songIndex);
       song.appendChild(new TextElement(name));
       songList.appendChild(song);
     }

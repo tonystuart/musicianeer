@@ -13,8 +13,8 @@ import org.eclipse.jetty.util.log.Log;
 import org.eclipse.jetty.util.log.Logger;
 
 import com.example.afs.musicpad.message.Message;
-import com.example.afs.musicpad.message.OnKaraoke;
-import com.example.afs.musicpad.message.OnPartSelector;
+import com.example.afs.musicpad.message.OnPrompter;
+import com.example.afs.musicpad.message.OnChannelSelector;
 import com.example.afs.musicpad.message.OnSongSelector;
 import com.example.afs.musicpad.message.OnTick;
 import com.example.afs.musicpad.renderer.karaoke.KaraokeRenderer;
@@ -28,9 +28,9 @@ public class KaraokeWebApp extends WebApp {
   public KaraokeWebApp(Broker<Message> broker, KaraokeWebAppFactory karaokeWebAppFactory) {
     super(broker, karaokeWebAppFactory);
     setRenderer(new KaraokeRenderer(broker));
-    subscribe(OnKaraoke.class, message -> doStatefulMessage(message));
+    subscribe(OnPrompter.class, message -> doStatefulMessage(message));
     subscribe(OnSongSelector.class, message -> doStatefulMessage(message));
-    subscribe(OnPartSelector.class, message -> doStatefulMessage(message));
+    subscribe(OnChannelSelector.class, message -> doStatefulMessage(message));
     subscribe(OnTick.class, message -> doMessage(message));
   }
 

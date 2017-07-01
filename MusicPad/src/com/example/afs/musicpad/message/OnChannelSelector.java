@@ -10,11 +10,11 @@
 package com.example.afs.musicpad.message;
 
 
-public class OnPartSelector extends Message {
+public class OnChannelSelector extends Message {
 
   private String html;
 
-  public OnPartSelector(String html) {
+  public OnChannelSelector(String html) {
     this.html = html;
   }
 

@@ -21,12 +21,10 @@ input {
     margin: 0;
 }
 
-#karaoke {
+#prompter {
+    font-size: 10pt;
     color: white;
     margin: auto;
-}
-
-#karaoke-scroller {
     display: flex;
     overflow-y: auto;
 }
