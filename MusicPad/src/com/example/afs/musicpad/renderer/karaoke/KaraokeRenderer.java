@@ -143,6 +143,7 @@ public class KaraokeRenderer extends BrokerTask<Message> {
 
   private void doSong(OnSong message) {
     // TODO: Start the Karaoke app at initialization so it gets all the device attach/detach messages
+    // TODO: Or move the deviceIndexes back to conductor and resend them on refresh state
     //Parts parts = new Parts(message.getSong(), deviceIndexes.first());
     Parts parts = new Parts(message.getSong(), 0);
     String html = parts.render();

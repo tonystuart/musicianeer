@@ -60,14 +60,24 @@ karaoke.onSongSelector = function(message) {
     musicPad.selectTab("songs");
 }
 
+karaoke.onPlayPart = function(message) {
+  console.log('onPlayPart');
+  let partSelector = document.getElementById('parts');
+  let item = partSelector.querySelector('.selected');
+  if (item) {
+    let channel = item.dataset['channel'];
+    musicPad.sendCommand('SAMPLE_CHANNEL', channel);
+  }
+}
+
 karaoke.onPlaySample = function(message) {
-    console.log('onPlaySample');
-    let songSelector = document.getElementById('songs');
-    let item = songSelector.querySelector('.selected');
-    if (item) {
-        let songIndex = parseInt(item.id.match(/[0-9]+/)[0]);
-        musicPad.sendCommand('SAMPLE', songIndex);
-    }
+  console.log('onPlaySample');
+  let songSelector = document.getElementById('songs');
+  let item = songSelector.querySelector('.selected');
+  if (item) {
+      let songIndex = parseInt(item.id.match(/[0-9]+/)[0]);
+      musicPad.sendCommand('SAMPLE', songIndex);
+  }
 }
 
 karaoke.onSelectSong = function(message) {

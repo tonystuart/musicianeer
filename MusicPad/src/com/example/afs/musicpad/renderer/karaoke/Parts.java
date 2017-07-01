@@ -30,6 +30,7 @@ public class Parts {
 
   public String render() {
     Division parts = new Division("#parts", ".tab");
+    parts.appendProperty("data-device-index", deviceIndex);
     parts.appendChild(createTitle(deviceIndex));
     parts.appendChild(createContent());
     String html = parts.render();
@@ -65,6 +66,7 @@ public class Parts {
       if (channelNoteCount != 0) {
         List<String> programNames = song.getProgramNames(channel);
         Division part = new Division("#part-" + channel);
+        part.appendProperty("data-channel", channel);
         part.appendChild(new TextElement(programNames.get(0)));
         partList.appendChild(part);
       }

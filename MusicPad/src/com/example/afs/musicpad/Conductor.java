@@ -57,6 +57,9 @@ public class Conductor extends BrokerTask<Message> {
     case SAMPLE:
       doSample(parameter);
       break;
+    case SAMPLE_CHANNEL:
+      doSampleChannel(parameter);
+      break;
     case SONG:
       doSelectSong(parameter);
       break;
@@ -79,6 +82,13 @@ public class Conductor extends BrokerTask<Message> {
       song = songBuilder.createSong(midiFile);
       System.out.println("Sampling song " + songIndex + " - " + song.getTitle());
       publish(new OnSample(song, ChannelNotes.ALL_CHANNELS, TICKS_PER_PIXEL));
+    }
+  }
+
+  private void doSampleChannel(int channel) {
+    if (song != null) {
+      System.out.println("Sampling channel " + channel);
+      publish(new OnSample(song, channel, TICKS_PER_PIXEL));
     }
   }
 
