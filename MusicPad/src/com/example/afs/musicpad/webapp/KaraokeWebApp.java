@@ -13,9 +13,10 @@ import org.eclipse.jetty.util.log.Log;
 import org.eclipse.jetty.util.log.Logger;
 
 import com.example.afs.musicpad.message.Message;
+import com.example.afs.musicpad.message.OnChannels;
+import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnPrompter;
-import com.example.afs.musicpad.message.OnChannelSelector;
-import com.example.afs.musicpad.message.OnSongSelector;
+import com.example.afs.musicpad.message.OnSongs;
 import com.example.afs.musicpad.message.OnTick;
 import com.example.afs.musicpad.renderer.karaoke.KaraokeRenderer;
 import com.example.afs.musicpad.util.Broker;
@@ -28,10 +29,11 @@ public class KaraokeWebApp extends WebApp {
   public KaraokeWebApp(Broker<Message> broker, KaraokeWebAppFactory karaokeWebAppFactory) {
     super(broker, karaokeWebAppFactory);
     setRenderer(new KaraokeRenderer(broker));
-    subscribe(OnPrompter.class, message -> doStatefulMessage(message));
-    subscribe(OnSongSelector.class, message -> doStatefulMessage(message));
-    subscribe(OnChannelSelector.class, message -> doStatefulMessage(message));
     subscribe(OnTick.class, message -> doMessage(message));
+    subscribe(OnCommand.class, message -> doMessage(message));
+    subscribe(OnSongs.class, message -> doStatefulMessage(message));
+    subscribe(OnChannels.class, message -> doStatefulMessage(message));
+    subscribe(OnPrompter.class, message -> doStatefulMessage(message));
   }
 
 }

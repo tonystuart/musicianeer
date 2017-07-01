@@ -9,11 +9,11 @@
 
 package com.example.afs.musicpad.message;
 
-public class OnSongSelector extends Message {
+public class OnSongs extends Message {
 
   private String html;
 
-  public OnSongSelector(String html) {
+  public OnSongs(String html) {
     this.html = html;
   }
 
@@ -23,7 +23,7 @@ public class OnSongSelector extends Message {
 
   @Override
   public String toString() {
-    return "OnSongSelector [html=" + html + "]";
+    return "OnSongs [html=" + html + "]";
   }
 
 }

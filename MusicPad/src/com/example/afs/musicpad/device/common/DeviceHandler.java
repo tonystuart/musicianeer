@@ -27,6 +27,7 @@ import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.player.Player;
 import com.example.afs.musicpad.player.Player.Action;
 import com.example.afs.musicpad.player.Sound;
+import com.example.afs.musicpad.song.ChannelNotes;
 import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.task.BrokerTask;
 import com.example.afs.musicpad.util.Broker;
@@ -51,6 +52,7 @@ public class DeviceHandler extends BrokerTask<Message> {
   private InputType inputType;
   private KeyCapMap keyCapMap;
   private Sound[] activeSounds = new Sound[256]; // NB: KeyEvents VK codes, not midiNotes
+  private boolean isCommand;
 
   public DeviceHandler(Broker<Message> broker, Synthesizer synthesizer, String deviceName, int deviceIndex, InputType inputType) {
     super(broker);
@@ -85,7 +87,21 @@ public class DeviceHandler extends BrokerTask<Message> {
   }
 
   public void onDown(int inputCode) {
-    if (keyCapMap != null) {
+    if (inputCode == '.') {
+      isCommand = true;
+    } else if (isCommand) {
+      switch (inputCode) {
+      case '0':
+        publish(new OnCommand(Command.NEW_SONG));
+        break;
+      case '1':
+        publish(new OnCommand(Command.PLAY, ChannelNotes.ALL_CHANNELS));
+        break;
+      case '2':
+        publish(new OnCommand(Command.STOP));
+        break;
+      }
+    } else if (keyCapMap != null) {
       Sound sound = keyCapMap.onDown(inputCode);
       if (sound != null) {
         if (sound != null) {
@@ -97,7 +113,10 @@ public class DeviceHandler extends BrokerTask<Message> {
   }
 
   public void onUp(int inputCode) {
-    if (keyCapMap != null) {
+    if (inputCode == '.') {
+      isCommand = false;
+    } else if (isCommand) {
+    } else if (keyCapMap != null) {
       keyCapMap.onUp(inputCode);
       Sound sound = activeSounds[inputCode];
       if (sound != null) {

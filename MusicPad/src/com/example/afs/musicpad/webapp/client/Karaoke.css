@@ -25,7 +25,7 @@ input {
     font-size: 10pt;
     color: white;
     margin: auto;
-    display: flex;
+    /* display: flex; */
     overflow-y: auto;
 }
 

@@ -17,14 +17,14 @@ import java.util.NavigableMap;
 import com.example.afs.musicpad.keycap.KeyCap;
 import com.example.afs.musicpad.keycap.KeyCapMap;
 import com.example.afs.musicpad.message.Message;
-import com.example.afs.musicpad.message.OnChannelSelector;
+import com.example.afs.musicpad.message.OnChannels;
 import com.example.afs.musicpad.message.OnChannelUpdate;
 import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnMidiFiles;
 import com.example.afs.musicpad.message.OnPickChannel;
 import com.example.afs.musicpad.message.OnPrompter;
 import com.example.afs.musicpad.message.OnRenderSong;
-import com.example.afs.musicpad.message.OnSongSelector;
+import com.example.afs.musicpad.message.OnSongs;
 import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.task.BrokerTask;
 import com.example.afs.musicpad.util.Broker;
@@ -87,13 +87,13 @@ public class KaraokeRenderer extends BrokerTask<Message> {
     RandomAccessList<File> midiFiles = message.getMidiFiles();
     Songs songs = new Songs(midiFiles);
     String html = songs.render();
-    publish(new OnSongSelector(html));
+    publish(new OnSongs(html));
   }
 
   private void doPickChannel(OnPickChannel message) {
     Channels channels = new Channels(message.getSong(), message.getDeviceIndex());
     String html = channels.render();
-    publish(new OnChannelSelector(html));
+    publish(new OnChannels(html));
   }
 
   private void doRenderSong(OnRenderSong message) {

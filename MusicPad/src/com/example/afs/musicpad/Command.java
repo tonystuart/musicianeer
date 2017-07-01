@@ -13,6 +13,7 @@ public enum Command {
   HELP, //
   SONG, //
   PLAY, //
+  NEW_SONG, //
   SAMPLE_SONG, //
   SAMPLE_CHANNEL, //
   SEEK, //

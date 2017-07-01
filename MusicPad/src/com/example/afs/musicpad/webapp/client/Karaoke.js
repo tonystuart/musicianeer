@@ -28,6 +28,14 @@ karaoke.getNextTick = function(currentTick) {
     return null;
 }
 
+karaoke.onCommand = function(message) {
+  switch (message.command) {
+  case 'NEW_SONG':
+    musicPad.selectTab('songs');
+    break;
+  }
+}
+
 karaoke.onPrompter = function(message) {
     musicPad.replaceTab('prompter', message.html);
 }
@@ -36,7 +44,7 @@ karaoke.onLoad = function() {
     musicPad.createWebSocketClient('ws://localhost:8080/v1/karaoke', karaoke.onWebSocketMessage, karaoke.onWebSocketClose);
 }
 
-karaoke.onChannelSelector = function(message) {
+karaoke.onChannels = function(message) {
     musicPad.replaceTab('channels', message.html);
 }
 
@@ -44,7 +52,7 @@ karaoke.onNewSong = function() {
     musicPad.selectTab("songs");
 }
 
-karaoke.onSongSelector = function(message) {
+karaoke.onSongs = function(message) {
     musicPad.replaceTab('songs', message.html);
 }
 
@@ -103,8 +111,12 @@ karaoke.onStopSample = function(message) {
 }
 
 karaoke.onTick = function(tick) {
+    let prompter = document.getElementById('prompter');
+    if (!prompter) {
+      return;
+    }
     if (tick == 0) {
-        document.getElementById('karaoke-scroller').scrollTop = 0;
+        prompter.scrollTop = 0;
         if (karaoke.lastTick) {
             karaoke.lastTick.classList.remove('current-tick');
         }
@@ -143,15 +155,18 @@ karaoke.onWebSocketMessage = function(json) {
     case 'OnPrompter':
         karaoke.onPrompter(message);
         break;
-    case 'OnChannelSelector':
-        karaoke.onChannelSelector(message);
+    case 'OnChannels':
+        karaoke.onChannels(message);
         break;
-    case 'OnSongSelector':
-        karaoke.onSongSelector(message);
+    case 'OnSongs':
+        karaoke.onSongs(message);
         break;
     case 'OnTick':
         karaoke.onTick(message.tick);
         break;
+    case 'OnCommand':
+      karaoke.onCommand(message);
+      break;
     }
 }
 

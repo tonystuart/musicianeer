@@ -33,7 +33,7 @@ public class Prompter {
   }
 
   public String render() {
-    Division prompter = new Division("#prompter");
+    Division prompter = new Division("#prompter", ".tab");
     prompter.appendChild(createPrompter());
     String html = prompter.render();
     return html;

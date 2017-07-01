@@ -16,6 +16,10 @@ public class OnCommand extends Message {
   private Command command;
   private int parameter;
 
+  public OnCommand(Command command) {
+    this(command, 0);
+  }
+
   public OnCommand(Command command, int parameter) {
     this.command = command;
     this.parameter = parameter;
