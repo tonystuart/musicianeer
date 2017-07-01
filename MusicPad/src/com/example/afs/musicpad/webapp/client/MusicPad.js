@@ -79,6 +79,12 @@ musicPad.selectTab = function(id) {
   musicPad.addClassToAllBut("hidden", ".tab", id);
 }
 
+musicPad.getRandomInt = function(min, max) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min)) + min;
+}
+
 musicPad.send = function(json) {
     if (musicPad.connected) {
         musicPad.ws.send(json);

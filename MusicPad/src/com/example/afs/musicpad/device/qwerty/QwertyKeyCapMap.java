@@ -9,6 +9,7 @@
 
 package com.example.afs.musicpad.device.qwerty;
 
+import java.awt.event.KeyEvent;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -169,7 +170,16 @@ public class QwertyKeyCapMap implements KeyCapMap {
     if (register == 0) {
       registerString = "";
     } else {
-      registerString = String.valueOf(registerKeys.charAt(register));
+      char registerKeyCap = registerKeys.charAt(register);
+      if (registerKeyCap == KeyEvent.VK_SHIFT) {
+        registerString = "\u21E7";
+      } else if (registerKeyCap == KeyEvent.VK_CONTROL) {
+        registerString = "^";
+      } else if (registerKeyCap == KeyEvent.VK_ALT) {
+        registerString = "\u2325";
+      } else {
+        registerString = String.valueOf(registerKeyCap);
+      }
     }
     return registerString + String.valueOf(noteKeys.charAt(digit));
   }

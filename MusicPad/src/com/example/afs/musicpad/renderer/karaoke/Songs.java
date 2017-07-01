@@ -42,8 +42,7 @@ public class Songs {
 
   private Element createControls() {
     Division controls = new Division(".controls");
-    controls.appendChild(createPlayButton());
-    controls.appendChild(createStopButton());
+    controls.appendChild(createRouletteButton());
     controls.appendChild(createSelectButton());
     return controls;
   }
@@ -54,26 +53,26 @@ public class Songs {
     return division;
   }
 
-  private Element createPlayButton() {
-    Division playButton = new Division(".play-button", "Listen to Song");
-    playButton.appendProperty("onclick", "karaoke.onSongSample()");
-    return playButton;
-  }
-
   private Element createRight() {
     Division division = new Division(".right");
     division.appendChild(createControls());
     return division;
   }
 
+  private Element createRouletteButton() {
+    Division selectButton = new Division("Roulette");
+    selectButton.appendProperty("onclick", "karaoke.onRoulette()");
+    return selectButton;
+  }
+
   private Element createSelectButton() {
-    Division selectButton = new Division(".select-button", "Select this Song");
+    Division selectButton = new Division("Select this Song");
     selectButton.appendProperty("onclick", "karaoke.onSongSelect()");
     return selectButton;
   }
 
   private Element createSongList() {
-    Division songList = new Division(".song-list");
+    Division songList = new Division("#song-list");
     songList.appendProperty("onclick", "karaoke.onSongClick(event.target)");
     int midiFileCount = midiFiles.size();
     for (int songIndex = 0; songIndex < midiFileCount; songIndex++) {
@@ -85,12 +84,6 @@ public class Songs {
       songList.appendChild(song);
     }
     return songList;
-  }
-
-  private Element createStopButton() {
-    Division stopButton = new Division(".stop-button", "Stop Listening");
-    stopButton.appendProperty("onclick", "karaoke.onStopSample()");
-    return stopButton;
   }
 
   private Element createTitle() {

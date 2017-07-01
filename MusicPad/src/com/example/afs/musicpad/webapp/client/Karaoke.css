@@ -122,9 +122,14 @@ input {
 }
 
 .tab .left {
+	flex-grow: 1;
 	width: 50%;
-  margin: 20px;
-  border: 1px solid magenta;
+	margin: 20px;
+	border: 1px solid magenta;
+}
+
+#song-list, #channel-list, .controls div {
+	background-color: black;
 }
 
 ::-webkit-scrollbar {
@@ -145,14 +150,14 @@ input {
 .content {
 	display: flex;
 	flex-direction: row;
+	flex-grow: 1;
 }
 
 .title {
     font-size: 6vh;
     font-weight: bold;
-    margin: auto;
     padding: 40px;
-    flex-grow: 1;
+    /* flex-grow: 1; */
     display: flex;
     align-items: center;
     flex-direction: column;
@@ -161,13 +166,13 @@ input {
 .controls {
 	display: flex;
 	flex-direction: row;
+	justify-content: flex-end;
 }
 
 .controls div {
 	margin: 20px;
 	border: 1px solid magenta;
 	padding: 10px;
-	flex-grow: 1;
 }
 
 .controls div:hover {
@@ -179,7 +184,7 @@ input {
 	background-color: magenta;
 }
 
-.song-list {
+#song-list, #channel-list {
     overflow-y: auto;
     height: 100%;
     cursor: default;

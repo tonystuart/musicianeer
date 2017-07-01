@@ -17,7 +17,7 @@ import com.example.afs.musicpad.song.Note;
 public class AlphaKeyCapMap extends QwertyKeyCapMap {
 
   public AlphaKeyCapMap(Iterable<Note> notes, OutputType outputType) {
-    super(notes, outputType, "ABCDEFGHIJKLMNOPQRSTUVWXYZ", " " + (char) KeyEvent.VK_SHIFT);
+    super(notes, outputType, "ABCDEFGHIJKLMNOPQRSTUVWXYZ", " " + (char) KeyEvent.VK_SHIFT + (char) KeyEvent.VK_CONTROL + (char) KeyEvent.VK_ALT);
   }
 
 }

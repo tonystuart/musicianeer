@@ -37,8 +37,15 @@ public class Channels {
     return html;
   }
 
+  private Element createBackToSongsButton() {
+    Division playButton = new Division();
+    playButton.appendChild(new TextElement("Back to Songs"));
+    playButton.appendProperty("onclick", "karaoke.newSong()");
+    return playButton;
+  }
+
   private Element createChannelList() {
-    Division channelList = new Division();
+    Division channelList = new Division("#channel-list");
     channelList.appendProperty("onclick", "karaoke.onChannelClick(event.target)");
     for (int channelIndex = 0; channelIndex < Midi.CHANNELS; channelIndex++) {
       int channelNoteCount = song.getChannelNoteCount(channelIndex);
@@ -62,8 +69,7 @@ public class Channels {
 
   private Element createControls() {
     Division controls = new Division(".controls");
-    controls.appendChild(createPlayButton());
-    controls.appendChild(createStopButton());
+    controls.appendChild(createBackToSongsButton());
     controls.appendChild(createSelectButton());
     return controls;
   }
@@ -72,13 +78,6 @@ public class Channels {
     Division division = new Division(".left");
     division.appendChild(createChannelList());
     return division;
-  }
-
-  private Element createPlayButton() {
-    Division playButton = new Division();
-    playButton.appendChild(new TextElement("Listen to Channel"));
-    playButton.appendProperty("onclick", "karaoke.onChannelSample()");
-    return playButton;
   }
 
   private Element createRight() {
@@ -94,17 +93,10 @@ public class Channels {
     return selectButton;
   }
 
-  private Element createStopButton() {
-    Division stopButton = new Division();
-    stopButton.appendChild(new TextElement("Stop Listening"));
-    stopButton.appendProperty("onclick", "karaoke.onStopSample()");
-    return stopButton;
-  }
-
   private Element createTitle(int deviceIndex) {
     Division division = new Division(".title");
-    division.appendChild(new Division(FileUtilities.getBaseName(song.getTitle())));
     division.appendChild(new Division("Player " + deviceIndex + ": Pick Your Channel"));
+    division.appendChild(new Division(FileUtilities.getBaseName(song.getTitle())));
     return division;
   }
 

@@ -31,9 +31,13 @@ karaoke.getNextTick = function(currentTick) {
 karaoke.onCommand = function(message) {
   switch (message.command) {
   case 'NEW_SONG':
-    musicPad.selectTab('songs');
+    karaoke.newSong();
     break;
   }
+}
+
+karaoke.newSong = function() {
+  musicPad.selectTab('songs');
 }
 
 karaoke.onPrompter = function(message) {
@@ -62,13 +66,17 @@ karaoke.onSongClick = function(item) {
   musicPad.selectElement(item);
 }
 
-karaoke.onSongSample = function(message) {
-    let songSelector = document.getElementById('songs');
-    let item = songSelector.querySelector('.selected');
-    if (item) {
-        let songIndex = item.dataset['songIndex'];
-        musicPad.sendCommand('SAMPLE_SONG', songIndex);
-    }
+karaoke.onRoulette = function() {
+  let songList = document.getElementById("song-list");
+  let songCount = songList.childElementCount;
+  let songIndex = musicPad.getRandomInt(0, songCount);
+  let item = songList.children[songIndex];
+  musicPad.sendCommand('SAMPLE_SONG', songIndex);
+  musicPad.selectElement(item);
+  //item.scrollIntoView();
+  let midpoint = songList.offsetHeight / 2;
+  let itemTop = item.offsetTop - songList.offsetTop;
+  songList.scrollTop = itemTop - midpoint;
 }
 
 karaoke.onSongSelect = function(message) {
@@ -78,15 +86,6 @@ karaoke.onSongSelect = function(message) {
         let songIndex = item.dataset['songIndex'];
         musicPad.sendCommand('SONG', songIndex);
     }
-}
-
-karaoke.onChannelSample = function(message) {
-  let channelSelector = document.getElementById('channels');
-  let item = channelSelector.querySelector('.selected');
-  if (item) {
-      let channelIndex = item.dataset['channelIndex'];
-      musicPad.sendCommand('SAMPLE_CHANNEL', channelIndex);
-  }
 }
 
 karaoke.onChannelClick = function(item) {
@@ -103,11 +102,6 @@ karaoke.onChannelSelect = function(message) {
         let channelIndex = item.dataset['channelIndex'];
         musicPad.sendDeviceCommand('CHANNEL', deviceIndex, channelIndex);
     }
-}
-
-karaoke.onStopSample = function(message) {
-    console.log('onStopSample');
-    musicPad.sendCommand('STOP');
 }
 
 karaoke.onTick = function(tick) {
@@ -145,8 +139,7 @@ karaoke.onTick = function(tick) {
 }
 
 karaoke.onWebSocketClose = function() {
-    let scroller = document.getElementById('prompter');
-    scroller.scrollTop = 0;
+    karaoke.onTick(0);
 }
 
 karaoke.onWebSocketMessage = function(json) {

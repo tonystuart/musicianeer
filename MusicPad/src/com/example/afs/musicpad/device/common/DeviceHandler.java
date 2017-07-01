@@ -100,6 +100,12 @@ public class DeviceHandler extends BrokerTask<Message> {
       case '2':
         publish(new OnCommand(Command.STOP));
         break;
+      case '3':
+        publish(new OnDeviceCommand(DeviceCommand.INPUT, deviceIndex, InputType.ALPHA.ordinal()));
+        break;
+      case '4':
+        publish(new OnDeviceCommand(DeviceCommand.INPUT, deviceIndex, InputType.NUMERIC.ordinal()));
+        break;
       }
     } else if (keyCapMap != null) {
       Sound sound = keyCapMap.onDown(inputCode);
