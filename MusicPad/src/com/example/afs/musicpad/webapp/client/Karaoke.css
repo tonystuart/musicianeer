@@ -10,6 +10,7 @@ body {
     width: 100%;
     font-size: 3vh;
     color: magenta;
+    cursor: default;
     background-color: rgb(32, 32, 32);
     background-image: linear-gradient(45deg, black 25%, transparent 25%, transparent 75%, black 75%, black), linear-gradient(45deg, black 25%, transparent 25%, transparent 75%, black 75%, black), linear-gradient(to bottom, rgb(8, 8, 8), rgb(32, 32, 32));
     background-size: 10px 10px, 10px 10px, 10px 5px;
@@ -22,13 +23,12 @@ input {
 }
 
 #prompter {
-    font-size: 10pt;
-    color: white;
-    margin: auto;
-    /* display: flex; */
-    overflow-y: auto;
 }
 
+#prompter-list {
+    overflow-y: auto;
+}
+	
 .stanza {
     margin: 5px;
     border: 1px solid gray;
@@ -49,36 +49,36 @@ input {
     position: relative;
 }
 
-.channel:nth-child(1) {
-    color: #ff0000;
+.player-0 {
+	color: red;
 }
 
-.channel:nth-child(2) {
-    color: #ffff00;
+.player-1 {
+	color: lime;
 }
 
-.channel:nth-child(3) {
-    color: #ff00ff;
+.player-2 {
+	color: cyan;
 }
 
-.channel:nth-child(4) {
-    color: #ffffff;
+.player-3 {
+	color: yellow;
 }
 
-.channel:nth-child(5) {
-    color: #3fff3f;
+.player-4 {
+	color: salmon;
 }
 
-.channel:nth-child(6) {
-    color: #ffff7f;
+.player-5 {
+	color: chartreuse;
 }
 
-.channel:nth-child(7) {
-    color: #ff7fbf;
+.player-6 {
+	color: aqua;
 }
 
-.channel:nth-child(8) {
-    color: #bfbfbf;
+.player-7 {
+	color: darkorange;
 }
 
 .words, .channel {
@@ -124,8 +124,14 @@ input {
 .tab .left {
 	flex-grow: 1;
 	width: 50%;
-	margin: 20px;
+	/* margin: 10px; */
 	/* border: 1px solid magenta; */
+	display:  flex;
+	flex-direction: column;
+}
+
+.details {
+	flex-grow: 1;
 }
 
 .controls div {
@@ -156,23 +162,29 @@ input {
 .title {
     font-size: 6vh;
     font-weight: bold;
-    padding: 40px;
-    /* flex-grow: 1; */
-    display: flex;
-    align-items: center;
-    flex-direction: column;
+    margin: 10px;
+    /* display: flex; */
+    /* align-items: center; */
+    /* flex-direction: column; */
+    flex-shrink: 0;
+    text-align: center;
 }
 
 .controls {
 	display: flex;
 	flex-direction: row;
-	justify-content: flex-end;
+	justify-content: space-around;
+	margin: 10px;
+	/* height: 200px; */
+	flex-shrink: 0;
 }
 
 .controls div {
-	margin: 20px;
+	/* margin: 20px; */
 	border: 1px solid magenta;
 	padding: 10px;
+	/* vertical-align: middle; */
+	/* vertical-align: middle; */
 }
 
 .controls div:hover {
@@ -184,12 +196,13 @@ input {
 	background-color: magenta;
 }
 
-#song-list, #channel-list {
+#song-list, #channel-list, #prompter-list {
     overflow-y: auto;
     height: 100%;
-    cursor: default;
     text-align: center;
     line-height: 120%;
+    border: 1px solid magenta;
+    background-color: black;
 }
 
 .selected {

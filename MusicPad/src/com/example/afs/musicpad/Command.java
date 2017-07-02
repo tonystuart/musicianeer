@@ -20,8 +20,12 @@ public enum Command {
   STOP, //
   BACKWARD, //
   FORWARD, //
+  SLOWER, //
+  FASTER, //
   TEMPO, //
   VELOCITY, //
+  SOFTER, //
+  LOUDER, //
   GAIN, //
   SHOW_DRUM_INFO, //
   TRANSPOSE, //

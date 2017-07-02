@@ -15,11 +15,13 @@ import java.util.Map.Entry;
 import java.util.SortedSet;
 
 import com.example.afs.musicpad.html.Division;
+import com.example.afs.musicpad.html.Element;
 import com.example.afs.musicpad.html.TextElement;
 import com.example.afs.musicpad.keycap.KeyCap;
 import com.example.afs.musicpad.song.Default;
 import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.song.Word;
+import com.example.afs.musicpad.util.FileUtilities;
 import com.example.afs.musicpad.util.RandomAccessList;
 
 public class Prompter {
@@ -33,10 +35,77 @@ public class Prompter {
   }
 
   public String render() {
-    Division prompter = new Division("#prompter", ".tab");
-    prompter.appendChild(createPrompter());
-    String html = prompter.render();
+    Division division = new Division("#prompter", ".content", ".tab");
+    division.appendChild(createLeft());
+    division.appendChild(createRight());
+    String html = division.render();
     return html;
+  }
+
+  private Element createBackToSongsButton() {
+    Division division = new Division();
+    division.appendChild(new TextElement("Back to Songs"));
+    division.appendProperty("onclick", "karaoke.onNewSong()");
+    return division;
+  }
+
+  private Element createChannel(Map<Integer, KeyCapIterator> keyCapIterators, long endTick, int deviceIndex) {
+    Division division = new Division(".player-" + deviceIndex);
+    boolean sustain = false;
+    KeyCap keyCap = deviceSustain.get(deviceIndex);
+    if (keyCap != null) {
+      sustain = true;
+      if (keyCap.getEndTick() < endTick) {
+        deviceSustain.remove(deviceIndex);
+      }
+    }
+    StringBuilder s = new StringBuilder();
+    KeyCapIterator keyCapIterator = keyCapIterators.get(deviceIndex);
+    while ((keyCap = keyCapIterator.next(endTick)) != null) {
+      if (s.length() > 0) {
+        s.append(" ");
+      }
+      s.append(keyCap.getLegend());
+      if (keyCap.getEndTick() > endTick) {
+        deviceSustain.put(deviceIndex, keyCap);
+      }
+    }
+    if (s.length() == 0) {
+      division.appendChild(new TextElement("."));
+    } else if (s.length() > 0) {
+      division.appendChild(new TextElement(s.toString()));
+    } else if (sustain) {
+      division.appendChild(new TextElement("-"));
+    }
+    return division;
+  }
+
+  private Element createControls() {
+    Division division = new Division(".controls");
+    division.appendChild(createBackToSongsButton());
+    division.appendChild(createStopButton());
+    division.appendChild(createPlayButton());
+    return division;
+  }
+
+  private Element createDetails() {
+    Division division = new Division(".details");
+    return division;
+  }
+
+  private Element createLeft() {
+    Division division = new Division(".left");
+    division.appendChild(createTitle());
+    division.appendChild(createPrompter());
+    division.appendChild(createControls());
+    return division;
+  }
+
+  private Element createPlayButton() {
+    Division division = new Division();
+    division.appendChild(new TextElement("Play"));
+    division.appendProperty("onclick", "karaoke.onPlay()");
+    return division;
   }
 
   private Division createPrompter() {
@@ -46,7 +115,7 @@ public class Prompter {
       RandomAccessList<KeyCap> keyCaps = entry.getValue();
       keyCapIterators.put(device, new KeyCapIterator(keyCaps));
     }
-    Division container = new Division();
+    Division division = new Division("#prompter-list");
     Division stanza = null;
     Division line = null;
     for (long tick = 0; tick < song.getDuration(); tick += Default.RESOLUTION) {
@@ -68,59 +137,47 @@ public class Prompter {
       }
       boolean isTextPresent = text.length() > 0;
       if (isTextPresent || isKeyCapPresent(keyCapIterators, endTick)) {
-        if (line != null && line.getChildCount() > 32) {
+        if (line != null && line.getChildCount() > 8) {
           line = null;
         }
         if (stanza == null) {
-          stanza = new Division();
-          stanza.setClassName("stanza");
-          container.appendChild(stanza);
+          stanza = new Division(".stanza");
+          division.appendChild(stanza);
         }
         if (line == null) {
-          line = new Division();
-          line.setClassName("line");
+          line = new Division(".line");
           stanza.appendChild(line);
         }
-        Division tickDivision = new Division("#" + String.valueOf(tick));
-        tickDivision.setClassName("tick");
+        Division tickDivision = new Division("#" + String.valueOf(tick), ".tick");
         line.appendChild(tickDivision);
         for (int deviceIndex : deviceKeyCaps.keySet()) {
-          Division channelDivision = new Division();
-          channelDivision.setClassName("channel");
-          tickDivision.appendChild(channelDivision);
-          boolean sustain = false;
-          KeyCap keyCap = deviceSustain.get(deviceIndex);
-          if (keyCap != null) {
-            sustain = true;
-            if (keyCap.getEndTick() < endTick) {
-              deviceSustain.remove(deviceIndex);
-            }
-          }
-          StringBuilder s = new StringBuilder();
-          KeyCapIterator keyCapIterator = keyCapIterators.get(deviceIndex);
-          while ((keyCap = keyCapIterator.next(endTick)) != null) {
-            if (s.length() > 0) {
-              s.append(" ");
-            }
-            s.append(keyCap.getLegend());
-            if (keyCap.getEndTick() > endTick) {
-              deviceSustain.put(deviceIndex, keyCap);
-            }
-          }
-          if (s.length() > 0) {
-            channelDivision.appendChild(new TextElement(s.toString()));
-          } else if (sustain) {
-            channelDivision.appendChild(new TextElement("-"));
-          }
+          tickDivision.appendChild(createChannel(keyCapIterators, endTick, deviceIndex));
         }
         text = text.replace(" ", "&nbsp;");
-        Division textDivision = new Division();
-        textDivision.setClassName("words");
+        Division textDivision = new Division(".words");
         tickDivision.appendChild(textDivision);
         textDivision.appendChild(new TextElement(text));
       }
     }
-    return container;
+    return division;
+  }
+
+  private Element createRight() {
+    Division division = new Division(".right");
+    division.appendChild(createDetails());
+    return division;
+  }
+
+  private Element createStopButton() {
+    Division division = new Division();
+    division.appendChild(new TextElement("Stop"));
+    division.appendProperty("onclick", "karaoke.onStop()");
+    return division;
+  }
+
+  private Element createTitle() {
+    Division division = new Division(".title", FileUtilities.getBaseName(song.getTitle()));
+    return division;
   }
 
   private String getText(SortedSet<Word> words) {

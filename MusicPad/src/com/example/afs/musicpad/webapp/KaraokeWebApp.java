@@ -32,8 +32,8 @@ public class KaraokeWebApp extends WebApp {
     subscribe(OnTick.class, message -> doMessage(message));
     subscribe(OnCommand.class, message -> doMessage(message));
     subscribe(OnSongs.class, message -> doStatefulMessage(message));
-    subscribe(OnChannels.class, message -> doStatefulMessage(message));
-    subscribe(OnPrompter.class, message -> doStatefulMessage(message));
+    subscribe(OnChannels.class, message -> doMessage(message));
+    subscribe(OnPrompter.class, message -> doMessage(message));
   }
 
 }

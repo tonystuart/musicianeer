@@ -17,8 +17,8 @@ import java.util.NavigableMap;
 import com.example.afs.musicpad.keycap.KeyCap;
 import com.example.afs.musicpad.keycap.KeyCapMap;
 import com.example.afs.musicpad.message.Message;
-import com.example.afs.musicpad.message.OnChannels;
 import com.example.afs.musicpad.message.OnChannelUpdate;
+import com.example.afs.musicpad.message.OnChannels;
 import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnMidiFiles;
 import com.example.afs.musicpad.message.OnPickChannel;
@@ -80,6 +80,7 @@ public class KaraokeRenderer extends BrokerTask<Message> {
 
   private void doDetach(int deviceIndex) {
     deviceKeyCaps.remove(deviceIndex);
+    deviceChannelAssignments.remove(deviceIndex);
     renderWhenReady();
   }
 
@@ -91,7 +92,7 @@ public class KaraokeRenderer extends BrokerTask<Message> {
   }
 
   private void doPickChannel(OnPickChannel message) {
-    Channels channels = new Channels(message.getSong(), message.getDeviceIndex());
+    Channels channels = new Channels(message.getSong(), message.getDeviceIndex(), message.getDeviceChannelAssignments());
     String html = channels.render();
     publish(new OnChannels(html));
   }

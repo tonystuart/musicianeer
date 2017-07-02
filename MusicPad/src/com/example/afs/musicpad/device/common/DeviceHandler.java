@@ -9,6 +9,7 @@
 
 package com.example.afs.musicpad.device.common;
 
+import java.awt.event.KeyEvent;
 import java.util.Set;
 
 import com.example.afs.fluidsynth.Synthesizer;
@@ -87,7 +88,13 @@ public class DeviceHandler extends BrokerTask<Message> {
   }
 
   public void onDown(int inputCode) {
-    if (inputCode == '.') {
+    if (inputCode == KeyEvent.VK_NUM_LOCK) {
+      if (inputType == InputType.ALPHA) {
+        publish(new OnDeviceCommand(DeviceCommand.INPUT, deviceIndex, InputType.NUMERIC.ordinal()));
+      } else {
+        publish(new OnDeviceCommand(DeviceCommand.INPUT, deviceIndex, InputType.ALPHA.ordinal()));
+      }
+    } else if (inputCode == '.') {
       isCommand = true;
     } else if (isCommand) {
       switch (inputCode) {
@@ -98,13 +105,19 @@ public class DeviceHandler extends BrokerTask<Message> {
         publish(new OnCommand(Command.PLAY, ChannelNotes.ALL_CHANNELS));
         break;
       case '2':
-        publish(new OnCommand(Command.STOP));
+        publish(new OnCommand(Command.STOP, 0));
         break;
       case '3':
-        publish(new OnDeviceCommand(DeviceCommand.INPUT, deviceIndex, InputType.ALPHA.ordinal()));
+        publish(new OnCommand(Command.SLOWER, 0));
         break;
       case '4':
-        publish(new OnDeviceCommand(DeviceCommand.INPUT, deviceIndex, InputType.NUMERIC.ordinal()));
+        publish(new OnCommand(Command.FASTER, 0));
+        break;
+      case '5':
+        publish(new OnCommand(Command.SOFTER, 0));
+        break;
+      case '6':
+        publish(new OnCommand(Command.LOUDER, 0));
         break;
       }
     } else if (keyCapMap != null) {

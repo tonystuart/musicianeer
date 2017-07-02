@@ -43,7 +43,11 @@ karaoke.onChannelClick = function(item) {
 }
 
 karaoke.onChannels = function(message) {
-  musicPad.replaceTab('channels', message.html);
+  let channels = musicPad.replaceTab('channels', message.html);
+  let defaultChannel = channels.dataset['defaultChannel'];
+  let item = channels.querySelector('div[data-channel-index=\''+defaultChannel+'\']');
+  musicPad.sendCommand('SAMPLE_CHANNEL', defaultChannel);
+  musicPad.selectElement(item);
 }
 
 karaoke.onChannelSelect = function(message) {
@@ -52,7 +56,7 @@ karaoke.onChannelSelect = function(message) {
   if (item) {
     let deviceIndex = channelSelector.dataset['deviceIndex'];
     let channelIndex = item.dataset['channelIndex'];
-    musicPad.sendCommand('STOP', 0);
+    musicPad.sendCommand('STOP', 1);
     musicPad.sendDeviceCommand('CHANNEL', deviceIndex, channelIndex);
   }
 }
@@ -62,15 +66,19 @@ karaoke.onLoad = function() {
 }
 
 karaoke.onNewSong = function() {
-  musicPad.sendCommand('STOP', 0);
+  musicPad.sendCommand('STOP', 1);
   musicPad.selectTab('songs');
+}
+
+karaoke.onPlay = function() {
+  musicPad.sendCommand('PLAY', -1);
 }
 
 karaoke.onPrompter = function(message) {
     musicPad.replaceTab('prompter', message.html);
 }
 
-karaoke.onRoulette = function() {
+karaoke.onSongRoulette = function() {
   let songList = document.getElementById("song-list");
   let songCount = songList.childElementCount;
   let songIndex = musicPad.getRandomInt(0, songCount);
@@ -82,6 +90,10 @@ karaoke.onRoulette = function() {
   songList.scrollTop = itemTop - midpoint;
 }
 
+karaoke.onStop = function() {
+  musicPad.sendCommand('STOP', 0);
+}
+
 karaoke.onSongClick = function(item) {
   let songIndex = item.dataset['songIndex'];
   musicPad.sendCommand('SAMPLE_SONG', songIndex);
@@ -90,6 +102,7 @@ karaoke.onSongClick = function(item) {
 
 karaoke.onSongs = function(message) {
   musicPad.replaceTab('songs', message.html);
+  karaoke.onSongRoulette();
 }
 
 karaoke.onSongSelect = function(message) {
@@ -102,12 +115,12 @@ karaoke.onSongSelect = function(message) {
 }
 
 karaoke.onTick = function(tick) {
-    let prompter = document.getElementById('prompter');
-    if (!prompter) {
+    let prompterList = document.getElementById('prompter-list');
+    if (!prompterList) {
       return;
     }
     if (tick == 0) {
-        prompter.scrollTop = 0;
+        prompterList.scrollTop = 0;
         if (karaoke.lastTick) {
             karaoke.lastTick.classList.remove('current-tick');
         }
@@ -165,19 +178,7 @@ karaoke.selectTick = function(tickDivision) {
         karaoke.lastTick.classList.remove('current-tick');
     }
     tickDivision.classList.add('current-tick');
-    let scroller = document.getElementById('prompter');
-    let top = tickDivision.offsetTop;
-    let height = tickDivision.offsetHeight;
-    let bottom = top + height;
-    let scrollerBottomVisible = scroller.scrollTop + scroller.offsetHeight;
-    if (bottom + height > scrollerBottomVisible) {
-        // scroller.scrollTop += tickDivision.offsetTop;
-        // This is just a regular immediate scroll with Chrome 58:
-        tickDivision.scrollIntoView({
-            behavior: 'smooth',
-            block: 'start'
-        });
-    }
+    tickDivision.scrollIntoView();
     karaoke.lastTick = tickDivision;
 }
 

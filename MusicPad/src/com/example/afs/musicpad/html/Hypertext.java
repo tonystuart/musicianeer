@@ -34,7 +34,7 @@ public class Hypertext extends Element {
       if (firstChar == '#') {
         setId(property.substring(1));
       } else if (firstChar == '.') {
-        setClassName(property.substring(1));
+        addClassName(property.substring(1));
       } else {
         appendChild(new TextElement(property));
       }
@@ -118,10 +118,6 @@ public class Hypertext extends Element {
       }
     }
     s.append(format("</%s>\n", type));
-  }
-
-  public void setClassName(String className) {
-    this.className = className;
   }
 
   public void setId(String id) {

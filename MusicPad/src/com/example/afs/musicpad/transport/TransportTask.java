@@ -60,7 +60,7 @@ public class TransportTask extends BrokerTask<Message> {
       doPlay(parameter);
       break;
     case STOP:
-      doStop();
+      doStop(parameter);
       break;
     case BACKWARD:
       doBackward();
@@ -71,11 +71,23 @@ public class TransportTask extends BrokerTask<Message> {
     case SEEK:
       doSeek(parameter);
       break;
+    case SLOWER:
+      doSlower();
+      break;
+    case FASTER:
+      doFaster();
+      break;
     case TEMPO:
       doTempo(parameter);
       break;
     case VELOCITY:
       doSetVelocity(parameter);
+      break;
+    case SOFTER:
+      doSofter();
+      break;
+    case LOUDER:
+      doLouder();
       break;
     case GAIN:
       doGain(parameter);
@@ -88,6 +100,10 @@ public class TransportTask extends BrokerTask<Message> {
     }
   }
 
+  private void doFaster() {
+    transport.setPercentTempo(Math.min(100, transport.getPercentTempo() + 10));
+  }
+
   private void doForward() {
     transport.seek(Default.TICKS_PER_BEAT * Default.BEATS_PER_MEASURE, Whence.RELATIVE);
   }
@@ -95,6 +111,10 @@ public class TransportTask extends BrokerTask<Message> {
   private void doGain(int masterGain) {
     float gain = Range.scale(0f, 2f, Midi.MIN_VALUE, Midi.MAX_VALUE, masterGain);
     transport.setGain(gain);
+  }
+
+  private void doLouder() {
+    transport.setPercentVelocity(Math.max(0, transport.getPercentVelocity() + 10));
   }
 
   private void doPlay(int channel) {
@@ -119,14 +139,22 @@ public class TransportTask extends BrokerTask<Message> {
     transport.setPercentVelocity(Range.scaleMidiToPercent(velocity));
   }
 
+  private void doSlower() {
+    transport.setPercentTempo(Math.max(0, transport.getPercentTempo() - 10));
+  }
+
+  private void doSofter() {
+    transport.setPercentVelocity(Math.max(0, transport.getPercentVelocity() - 10));
+  }
+
   private void doSong(OnSong message) {
     transport.stop();
     this.song = message.getSong();
 
   }
 
-  private void doStop() {
-    if (transport.isPaused()) {
+  private void doStop(int parameter) {
+    if (transport.isPaused() || parameter == 1) {
       transport.stop();
       publishTick(0);
     } else {

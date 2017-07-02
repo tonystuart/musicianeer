@@ -58,6 +58,14 @@ public class Transport {
     synthesizer.allNotesOff();
   }
 
+  public int getPercentTempo() {
+    return sequencer.getPercentTempo();
+  }
+
+  public int getPercentVelocity() {
+    return percentVelocity;
+  }
+
   public long getTick() {
     return sequencer.getTick();
   }

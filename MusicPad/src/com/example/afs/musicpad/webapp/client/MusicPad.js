@@ -1,6 +1,14 @@
 "use strict";
 var musicPad = musicPad || {};
 
+musicPad.addClassToAllBut = function(className, selector, id) {
+  let nodeList = document.querySelectorAll(selector);
+  for (let i = 0; i < nodeList.length; i++) {
+    nodeList[i].classList.add(className);
+  }
+  document.getElementById(id).classList.remove(className);
+}
+
 musicPad.appendTemplate = function(containerId, templateId) {
     let container = document.getElementById(containerId);
     let template = document.getElementById(templateId);
@@ -38,13 +46,21 @@ musicPad.fragmentToElement = function(fragment) {
     return container.firstElementChild;
 }
 
+musicPad.getRandomInt = function(min, max) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min)) + min;
+}
+
 musicPad.replaceTab = function(id, html) {
   let tab = document.getElementById(id);
   if (tab != null) {
     tab.parentElement.removeChild(tab);
   }
-  document.body.appendChild(musicPad.fragmentToElement(html));
+  let element = musicPad.fragmentToElement(html);
+  document.body.appendChild(element);
   musicPad.selectTab(id);
+  return element;
 }
 
 musicPad.request = function(resource, callback) {
@@ -67,22 +83,8 @@ musicPad.selectElement = function(element) {
     element.classList.add("selected");
 }
 
-musicPad.addClassToAllBut = function(className, selector, id) {
-  let nodeList = document.querySelectorAll(selector);
-  for (let i = 0; i < nodeList.length; i++) {
-    nodeList[i].classList.add(className);
-  }
-  document.getElementById(id).classList.remove(className);
-}
-
 musicPad.selectTab = function(id) {
   musicPad.addClassToAllBut("hidden", ".tab", id);
-}
-
-musicPad.getRandomInt = function(min, max) {
-  min = Math.ceil(min);
-  max = Math.floor(max);
-  return Math.floor(Math.random() * (max - min)) + min;
 }
 
 musicPad.send = function(json) {
@@ -120,15 +122,6 @@ musicPad.sendDeviceCommand = function(command, deviceIndex, parameter) {
     }));
 }
 
-musicPad.toSvg = function(svg, x) {
-    let screenPoint = svg.createSVGPoint();
-    screenPoint.x = x;
-    let ctm = svg.getScreenCTM();
-    let inverse = ctm.inverse();
-    let svgPoint = screenPoint.matrixTransform(inverse);
-    return svgPoint.x;
-}
-
 musicPad.toScreen = function(svg, x) {
     let svgPoint = svg.createSVGPoint();
     svgPoint.x = x;
@@ -136,3 +129,13 @@ musicPad.toScreen = function(svg, x) {
     let screenPoint = svgPoint.matrixTransform(ctm);
     return screenPoint.x;
 }
+
+musicPad.toSvg = function(svg, x) {
+  let screenPoint = svg.createSVGPoint();
+  screenPoint.x = x;
+  let ctm = svg.getScreenCTM();
+  let inverse = ctm.inverse();
+  let svgPoint = screenPoint.matrixTransform(inverse);
+  return svgPoint.x;
+}
+

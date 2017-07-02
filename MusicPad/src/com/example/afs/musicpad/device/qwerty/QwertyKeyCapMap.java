@@ -172,11 +172,11 @@ public class QwertyKeyCapMap implements KeyCapMap {
     } else {
       char registerKeyCap = registerKeys.charAt(register);
       if (registerKeyCap == KeyEvent.VK_SHIFT) {
-        registerString = "\u21E7";
+        registerString = "Shift+";
       } else if (registerKeyCap == KeyEvent.VK_CONTROL) {
-        registerString = "^";
+        registerString = "Ctrl+";
       } else if (registerKeyCap == KeyEvent.VK_ALT) {
-        registerString = "\u2325";
+        registerString = "Alt+";
       } else {
         registerString = String.valueOf(registerKeyCap);
       }

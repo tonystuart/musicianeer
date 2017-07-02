@@ -23,6 +23,10 @@ public class NoteEventSequencer extends PausibleSequencerTask<NoteEvent> {
     subscribe(NoteEvent.class, noteEvent -> noteEventProcessor.processNoteEvent(noteEvent));
   }
 
+  public int getPercentTempo() {
+    return getScheduler().getPercentTempo();
+  }
+
   @Override
   public NoteEventScheduler getScheduler() {
     return (NoteEventScheduler) super.getScheduler();

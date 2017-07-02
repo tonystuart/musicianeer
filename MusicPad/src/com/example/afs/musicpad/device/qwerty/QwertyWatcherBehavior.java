@@ -51,7 +51,7 @@ public class QwertyWatcherBehavior implements WatcherBehavior {
 
   @Override
   public InputType getInputType() {
-    return InputType.NUMERIC;
+    return InputType.ALPHA;
   }
 
   private boolean isMusicPad(String name) {

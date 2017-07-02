@@ -62,8 +62,7 @@ public class ChannelRenderer {
     row.append(getOutputSelect());
     row.append(getVolumeRange());
 
-    Division channelControls = new Division();
-    channelControls.setClassName("channel-controls");
+    Division channelControls = new Division(".channel-controls");
     channelControls.appendChild(getDeviceName());
     channelControls.appendChild(table);
 
@@ -85,8 +84,7 @@ public class ChannelRenderer {
   }
 
   private Division getDeviceName() {
-    Division nameDivision = new Division();
-    nameDivision.setClassName("device-name");
+    Division nameDivision = new Division(".device-name");
     nameDivision.appendChild(new TextElement(deviceName));
     return nameDivision;
   }

@@ -71,6 +71,28 @@ public class Song {
     return appendTick;
   }
 
+  public int getActiveChannelCount() {
+    int activeChannelCount = 0;
+    for (int channel = 0; channel < Midi.CHANNELS; channel++) {
+      if (getChannelNoteCount(channel) > 0) {
+        activeChannelCount++;
+      }
+    }
+    return activeChannelCount;
+  }
+
+  public int[] getActiveChannels() {
+    int index = 0;
+    int activeChannelCount = getActiveChannelCount();
+    int[] activeChannels = new int[activeChannelCount];
+    for (int channel = 0; channel < Midi.CHANNELS; channel++) {
+      if (getChannelNoteCount(channel) > 0) {
+        activeChannels[index++] = channel;
+      }
+    }
+    return activeChannels;
+  }
+
   public int getAverageMidiNote(int channel) {
     return channelFacets.getFacet(channel).getAverageMidiNote();
   }
@@ -233,10 +255,20 @@ public class Song {
 
   public List<String> getProgramNames(int channel) {
     List<String> programNames = new LinkedList<>();
-    Set<Integer> programs = channelFacets.getFacet(channel).getPrograms();
-    for (Integer program : programs) {
-      String programName = Instruments.getProgramName(program) + " (" + Value.toNumber(program) + ")";
-      programNames.add(programName);
+    if (channel == Midi.DRUM) {
+      int[] noteCounts = channelFacets.getFacet(channel).getDistinctNoteCounts();
+      for (int midiNote = 0; midiNote < Midi.NOTES; midiNote++) {
+        if (noteCounts[midiNote] > 0) {
+          String programName = Instruments.getDrumName(midiNote) + " (" + Value.toNumber(midiNote) + ")";
+          programNames.add(programName);
+        }
+      }
+    } else {
+      Set<Integer> programs = channelFacets.getFacet(channel).getPrograms();
+      for (Integer program : programs) {
+        String programName = Instruments.getProgramName(program) + " (" + Value.toNumber(program) + ")";
+        programNames.add(programName);
+      }
     }
     return programNames;
   }
