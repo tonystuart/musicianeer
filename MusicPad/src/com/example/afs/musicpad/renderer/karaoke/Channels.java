@@ -40,7 +40,7 @@ public class Channels {
   private Element createBackToSongsButton() {
     Division playButton = new Division();
     playButton.appendChild(new TextElement("Back to Songs"));
-    playButton.appendProperty("onclick", "karaoke.newSong()");
+    playButton.appendProperty("onclick", "karaoke.onNewSong()");
     return playButton;
   }
 

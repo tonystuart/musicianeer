@@ -125,10 +125,10 @@ input {
 	flex-grow: 1;
 	width: 50%;
 	margin: 20px;
-	border: 1px solid magenta;
+	/* border: 1px solid magenta; */
 }
 
-#song-list, #channel-list, .controls div {
+.controls div {
 	background-color: black;
 }
 

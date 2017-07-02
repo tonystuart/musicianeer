@@ -39,9 +39,6 @@ public class Conductor extends BrokerTask<Message> {
 
   private static final int TICKS_PER_PIXEL = 5;
 
-  private int currentSample = -1;;
-  private int currentChannel = -1;;
-
   private Song song;
   private File directory;
   private RandomAccessList<File> midiFiles;
@@ -68,7 +65,6 @@ public class Conductor extends BrokerTask<Message> {
   }
 
   private void doChannel(int deviceIndex, int channel) {
-    publish(new OnCommand(Command.STOP, 0));
     deviceChannelAssignments.put(deviceIndex, channel);
     Integer next = deviceIndexes.higher(deviceIndex);
     if (next == null) {
@@ -125,28 +121,16 @@ public class Conductor extends BrokerTask<Message> {
   }
 
   private void doSample(int songIndex) {
-    if (songIndex == currentSample) {
-      publish(new OnCommand(Command.STOP, 0));
-      currentSample = -1;
-    } else {
-      File midiFile = midiFiles.get(songIndex);
-      SongBuilder songBuilder = new SongBuilder();
-      song = songBuilder.createSong(midiFile);
-      System.out.println("Sampling song " + songIndex + " - " + song.getTitle());
-      publish(new OnSample(song, ChannelNotes.ALL_CHANNELS, TICKS_PER_PIXEL));
-      currentSample = songIndex;
-    }
+    File midiFile = midiFiles.get(songIndex);
+    SongBuilder songBuilder = new SongBuilder();
+    song = songBuilder.createSong(midiFile);
+    System.out.println("Sampling song " + songIndex + " - " + song.getTitle());
+    publish(new OnSample(song, ChannelNotes.ALL_CHANNELS, TICKS_PER_PIXEL));
   }
 
   private void doSampleChannel(int channel) {
-    if (channel == currentChannel) {
-      publish(new OnCommand(Command.STOP, 0));
-      currentChannel = -1;
-    } else {
-      System.out.println("Sampling channel " + channel);
-      publish(new OnSample(song, channel, TICKS_PER_PIXEL));
-      currentChannel = channel;
-    }
+    System.out.println("Sampling channel " + channel);
+    publish(new OnSample(song, channel, TICKS_PER_PIXEL));
   }
 
   private void doSelectSong(int songIndex) {
