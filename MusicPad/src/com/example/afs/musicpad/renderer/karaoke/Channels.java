@@ -97,7 +97,7 @@ public class Channels {
   }
 
   private Element createDetails() {
-    Division division = new Division(".details");
+    Division division = new Division("#channel-details", ".details");
     return division;
   }
 
@@ -141,7 +141,7 @@ public class Channels {
     int count = 0;
     StringBuilder s = new StringBuilder();
     s.append("Channel " + Value.toNumber(channel) + ": ");
-    s.append(normalize(programNames.get(0)));
+    s.append(Utils.normalizeProgramName(programNames.get(0)));
     for (Entry<Integer, Integer> entry : deviceChannelAssignments.entrySet()) {
       if (entry.getValue() == channel) {
         if (count++ == 0) {
@@ -189,32 +189,5 @@ public class Channels {
       }
     }
     return true;
-  }
-
-  private String normalize(String programName) {
-    boolean ignore = false;
-    boolean capitalize = true;
-    StringBuilder s = new StringBuilder();
-    int length = programName.length();
-    for (int i = 0; i < length; i++) {
-      char c = programName.charAt(i);
-      if (capitalize) {
-        c = Character.toUpperCase(c);
-        capitalize = false;
-      }
-      if (c == '-') {
-        c = ' ';
-        capitalize = true;
-      } else if (c == '(') {
-        ignore = true;
-      }
-      if (!ignore) {
-        s.append(c);
-      }
-      if (c == ')') {
-        ignore = false;
-      }
-    }
-    return s.toString();
   }
 }

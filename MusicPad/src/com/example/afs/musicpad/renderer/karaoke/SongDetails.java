@@ -12,7 +12,6 @@ package com.example.afs.musicpad.renderer.karaoke;
 import com.example.afs.musicpad.analyzer.KeyScore;
 import com.example.afs.musicpad.analyzer.KeySignatures;
 import com.example.afs.musicpad.html.Division;
-import com.example.afs.musicpad.html.Element;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.song.Default;
 import com.example.afs.musicpad.song.Song;
@@ -27,23 +26,16 @@ public class SongDetails {
 
   public String render() {
     Division division = new Division();
-    division.appendChild(createPair("Title", song.getTitle()));
-    division.appendChild(createPair("Duration", getDuration()));
-    division.appendChild(createPair("Parts", song.getActiveChannelCount()));
-    division.appendChild(createPair("Beats per Minute", song.getBeatsPerMinute(0)));
-    division.appendChild(createPair("Time Signature", song.getBeatsPerMeasure(0) + "/" + song.getBeatUnit(0)));
-    division.appendChild(createPair("Predominant Key", getKeyInfo()));
-    division.appendChild(createPair("EZ Keyboard Transposition", song.getDistanceToWhiteKeys()));
-    division.appendChild(createPair("Complexity", getComplexity()));
+    division.appendChild(Utils.createPair("Title", song.getTitle()));
+    division.appendChild(Utils.createPair("Duration", getDuration()));
+    division.appendChild(Utils.createPair("Parts", song.getActiveChannelCount()));
+    division.appendChild(Utils.createPair("Beats per Minute", song.getBeatsPerMinute(0)));
+    division.appendChild(Utils.createPair("Time Signature", song.getBeatsPerMeasure(0) + "/" + song.getBeatUnit(0)));
+    division.appendChild(Utils.createPair("Predominant Key", getKeyInfo()));
+    division.appendChild(Utils.createPair("EZ Keyboard Transposition", song.getDistanceToWhiteKeys()));
+    division.appendChild(Utils.createPair("Complexity", getComplexity()));
     String html = division.render();
     return html;
-  }
-
-  private Element createPair(String name, Object value) {
-    Division division = new Division(".detail");
-    division.appendChild(new Division(".name", name));
-    division.appendChild(new Division(".value", value.toString()));
-    return division;
   }
 
   private double getComplexity() {

@@ -18,25 +18,13 @@ import com.example.afs.musicpad.device.common.DeviceHandler.OutputType;
 import com.example.afs.musicpad.keycap.KeyCap;
 import com.example.afs.musicpad.keycap.KeyCapMap;
 import com.example.afs.musicpad.player.Sound;
+import com.example.afs.musicpad.player.Sounds;
+import com.example.afs.musicpad.player.Sounds.SoundCount;
 import com.example.afs.musicpad.song.Note;
-import com.example.afs.musicpad.util.Count;
 import com.example.afs.musicpad.util.DirectList;
 import com.example.afs.musicpad.util.RandomAccessList;
 
 public class QwertyKeyCapMap implements KeyCapMap {
-
-  private static class SoundCount extends Count<Sound> {
-
-    public SoundCount(Sound value) {
-      super(value);
-    }
-
-    @Override
-    public int compareTo(Count<Sound> that) {
-      return -super.compareTo(that); // descending sort order
-    }
-
-  }
 
   private final int noteKeyCount;
   private final int registerKeyCount;
@@ -44,31 +32,25 @@ public class QwertyKeyCapMap implements KeyCapMap {
 
   private final String noteKeys;
   private final String registerKeys;
-  private final OutputType outputType;
-
-  private Sound sound;
-  private Sound[][] keyIndexToSounds;
-  private RandomAccessList<Sound> sounds = new DirectList<>();
 
   private int autoRegister;
   private int registerDown;
-  private int lastIndex = -1;
+
+  private Sounds sounds;
+  private Sound[][] keyIndexToSounds;
 
   public QwertyKeyCapMap(Iterable<Note> notes, OutputType outputType, String noteKeys, String registerKeys) {
     this.noteKeys = noteKeys;
     this.registerKeys = registerKeys;
-    this.outputType = outputType;
     this.noteKeyCount = noteKeys.length();
     this.registerKeyCount = registerKeys.length();
     this.supportedSounds = noteKeyCount * registerKeyCount;
-    for (Note note : notes) {
-      add(note);
-    }
+    this.sounds = new Sounds(outputType, notes);
   }
 
   @Override
   public RandomAccessList<KeyCap> getKeyCaps() {
-    Map<Sound, SoundCount> uniqueSoundCounts = getUniqueSoundCounts();
+    Map<Sound, SoundCount> uniqueSoundCounts = sounds.getUniqueSoundCounts();
     SoundCount[] sortedSounds = sortByFrequency(uniqueSoundCounts);
     int maxSounds = Math.min(uniqueSoundCounts.size(), supportedSounds);
     keyIndexToSounds = assignSoundsToRegisters(sortedSounds, maxSounds);
@@ -103,23 +85,6 @@ public class QwertyKeyCapMap implements KeyCapMap {
     if (registerKeys.indexOf(inputCode) != -1) {
       registerDown = 0;
     }
-  }
-
-  private void add(Note note) {
-    int index;
-    if (outputType == OutputType.NORMAL) {
-      index = note.getStartIndex();
-    } else {
-      index = note.getEndIndex();
-    }
-    if (index != lastIndex) {
-      lastIndex = index;
-      if (sound != null) {
-        sounds.add(sound);
-      }
-      sound = new Sound();
-    }
-    sound.add(note);
   }
 
   private Map<Sound, String> assignSoundsToLegend(int maxSounds) {
@@ -182,19 +147,6 @@ public class QwertyKeyCapMap implements KeyCapMap {
       }
     }
     return registerString + String.valueOf(noteKeys.charAt(digit));
-  }
-
-  private Map<Sound, SoundCount> getUniqueSoundCounts() {
-    Map<Sound, SoundCount> uniqueSoundCounts = new HashMap<>();
-    for (Sound sound : sounds) {
-      SoundCount count = uniqueSoundCounts.get(sound);
-      if (count == null) {
-        count = new SoundCount(sound);
-        uniqueSoundCounts.put(sound, count);
-      }
-      count.increment();
-    }
-    return uniqueSoundCounts;
   }
 
   private SoundCount[] sortByFrequency(Map<Sound, SoundCount> sounds) {

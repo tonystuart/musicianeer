@@ -17,6 +17,7 @@ import java.util.NavigableMap;
 import com.example.afs.musicpad.keycap.KeyCap;
 import com.example.afs.musicpad.keycap.KeyCapMap;
 import com.example.afs.musicpad.message.Message;
+import com.example.afs.musicpad.message.OnChannelDetails;
 import com.example.afs.musicpad.message.OnChannelUpdate;
 import com.example.afs.musicpad.message.OnChannels;
 import com.example.afs.musicpad.message.OnCommand;
@@ -117,6 +118,9 @@ public class KaraokeRenderer extends BrokerTask<Message> {
       String html = songDetails.render();
       publish(new OnSongDetails(html));
     } else {
+      ChannelDetails channelDetails = new ChannelDetails(song, channel);
+      String html = channelDetails.render();
+      publish(new OnChannelDetails(html));
     }
   }
 

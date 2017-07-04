@@ -7,18 +7,23 @@
 // This program is made available on an "as is" basis, without
 // warranties or conditions of any kind, either express or implied.
 
-package com.example.afs.musicpad;
+package com.example.afs.musicpad.message;
 
-public enum DeviceCommand {
-  CHANNEL, //
-  PROGRAM, //
-  INPUT, //
-  OUTPUT, //
-  VELOCITY, //
-  DECREASE_PLAYER_VELOCITY, //
-  INCREASE_PLAYER_VELOCITY, //
-  PREVIOUS_CHANNEL, //
-  NEXT_CHANNEL, //
-  PREVIOUS_PROGRAM, //
-  NEXT_PROGRAM, //
+public class OnChannelDetails extends Message {
+
+  private String html;
+
+  public OnChannelDetails(String html) {
+    this.html = html;
+  }
+
+  public String getHtml() {
+    return html;
+  }
+
+  @Override
+  public String toString() {
+    return "OnChannelDetails [html=" + html + "]";
+  }
+
 }

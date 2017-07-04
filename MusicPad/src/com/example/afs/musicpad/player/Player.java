@@ -31,6 +31,7 @@ public class Player {
 
   private static final int DEFAULT_VELOCITY = 96;
   private static final int DEFAULT_PERCENT_VELOCITY = 100;
+  public static final int MAX_PERCENT_VELOCITY = (100 * Midi.MAX_VALUE) / DEFAULT_VELOCITY;
 
   private int playerChannel;
   private int percentTempo;
@@ -40,6 +41,7 @@ public class Player {
   private Arpeggiator arpeggiator;
   private Sound repeatArpeggiation;
   private OutputType outputType = OutputType.NORMAL;
+  private int program;
 
   public Player(Synthesizer synthesizer, int deviceIndex) {
     this.synthesizer = synthesizer;
@@ -56,6 +58,14 @@ public class Player {
 
   public OutputType getOutputType() {
     return outputType;
+  }
+
+  public int getPercentVelocity() {
+    return percentVelocity;
+  }
+
+  public int getProgram() {
+    return program;
   }
 
   public void play(Action action, int midiNote) {
@@ -82,6 +92,7 @@ public class Player {
   }
 
   public void selectProgram(int program) {
+    this.program = program;
     if (program == -1) {
       synthesizer.setChannelType(playerChannel, FluidSynth.CHANNEL_TYPE_DRUM);
       synthesizer.changeProgram(playerChannel, 0); // initialize fluid_synth.c channel

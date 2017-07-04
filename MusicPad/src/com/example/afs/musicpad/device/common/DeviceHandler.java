@@ -23,6 +23,7 @@ import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnChannelUpdate;
 import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnDeviceCommand;
+import com.example.afs.musicpad.message.OnDeviceKeyDown;
 import com.example.afs.musicpad.message.OnSong;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.player.Player;
@@ -98,26 +99,50 @@ public class DeviceHandler extends BrokerTask<Message> {
       isCommand = true;
     } else if (isCommand) {
       switch (inputCode) {
-      case '0':
+      case 'N':
         publish(new OnCommand(Command.NEW_SONG));
         break;
-      case '1':
+      case 'P':
         publish(new OnCommand(Command.PLAY, ChannelNotes.ALL_CHANNELS));
         break;
-      case '2':
+      case 'S':
         publish(new OnCommand(Command.STOP, 0));
         break;
-      case '3':
+      case 'R':
+        publish(new OnCommand(Command.REDUCE_MASTER_GAIN, 0));
+        break;
+      case 'I':
+        publish(new OnCommand(Command.INCREASE_MASTER_GAIN, 0));
+        break;
+      case '0':
         publish(new OnCommand(Command.SLOWER, 0));
         break;
-      case '4':
+      case '1':
         publish(new OnCommand(Command.FASTER, 0));
         break;
+      case '2':
+        publish(new OnCommand(Command.REDUCE_BACKGROUND_VELOCITY, 0));
+        break;
+      case '3':
+        publish(new OnCommand(Command.INCREASE_BACKGROUND_VELOCITY, 0));
+        break;
+      case '4':
+        publish(new OnDeviceCommand(DeviceCommand.DECREASE_PLAYER_VELOCITY, deviceIndex, 0));
+        break;
       case '5':
-        publish(new OnCommand(Command.SOFTER, 0));
+        publish(new OnDeviceCommand(DeviceCommand.INCREASE_PLAYER_VELOCITY, deviceIndex, 0));
         break;
       case '6':
-        publish(new OnCommand(Command.LOUDER, 0));
+        publish(new OnDeviceCommand(DeviceCommand.PREVIOUS_CHANNEL, deviceIndex, 0));
+        break;
+      case '7':
+        publish(new OnDeviceCommand(DeviceCommand.NEXT_CHANNEL, deviceIndex, 0));
+        break;
+      case '8':
+        publish(new OnDeviceCommand(DeviceCommand.PREVIOUS_PROGRAM, deviceIndex, 0));
+        break;
+      case '9':
+        publish(new OnDeviceCommand(DeviceCommand.NEXT_PROGRAM, deviceIndex, 0));
         break;
       }
     } else if (keyCapMap != null) {
@@ -129,6 +154,7 @@ public class DeviceHandler extends BrokerTask<Message> {
         }
       }
     }
+    publish(new OnDeviceKeyDown(deviceIndex, Character.toString((char) inputCode)));
   }
 
   public void onUp(int inputCode) {
@@ -180,6 +206,12 @@ public class DeviceHandler extends BrokerTask<Message> {
     }
   }
 
+  private void doDecreasePlayerVelocity() {
+    int currentPlayerVelocity = player.getPercentVelocity();
+    int newPlayerVelocity = Math.max(0, currentPlayerVelocity - 5);
+    player.setPercentVelocity(newPlayerVelocity);
+  }
+
   private void doDeviceCommand(OnDeviceCommand message) {
     if (this.deviceIndex == message.getDeviceIndex()) {
       DeviceCommand deviceCommand = message.getDeviceCommand();
@@ -200,10 +232,34 @@ public class DeviceHandler extends BrokerTask<Message> {
       case VELOCITY:
         setPercentVelocity(Range.scaleMidiToPercent(parameter));
         break;
+      case DECREASE_PLAYER_VELOCITY:
+        doDecreasePlayerVelocity();
+        break;
+      case INCREASE_PLAYER_VELOCITY:
+        doIncreasePlayerVelocity();
+        break;
+      case NEXT_CHANNEL:
+        doNextChannel();
+        break;
+      case NEXT_PROGRAM:
+        doNextProgram();
+        break;
+      case PREVIOUS_CHANNEL:
+        doPreviousChannel();
+        break;
+      case PREVIOUS_PROGRAM:
+        doPreviousProgram();
+        break;
       default:
         break;
       }
     }
+  }
+
+  private void doIncreasePlayerVelocity() {
+    int currentPlayerVelocity = player.getPercentVelocity();
+    int newPlayerVelocity = Math.min(Player.MAX_PERCENT_VELOCITY, currentPlayerVelocity + 5);
+    player.setPercentVelocity(newPlayerVelocity);
   }
 
   private void doInput(int typeIndex) {
@@ -223,10 +279,54 @@ public class DeviceHandler extends BrokerTask<Message> {
     }
   }
 
+  private void doNextChannel() {
+    int activeChannel;
+    int nextActiveChannel = -1;
+    int[] activeChannels = song.getActiveChannels();
+    for (int i = activeChannels.length - 1; i >= 0 && (activeChannel = activeChannels[i]) > channel; i--) {
+      nextActiveChannel = activeChannel;
+    }
+    if (nextActiveChannel != -1) {
+      selectChannel(nextActiveChannel);
+    }
+  }
+
+  private void doNextProgram() {
+    if (channel != Midi.DRUM) {
+      int currentProgram = player.getProgram();
+      int nextProgram = currentProgram + 1;
+      if (nextProgram < Midi.PROGRAMS) {
+        selectProgram(nextProgram);
+      }
+    }
+  }
+
   private void doOutput(int typeIndex) {
     OutputType outputType = OutputType.values()[typeIndex];
     player.setOutputType(outputType);
     publishChannelUpdate();
+  }
+
+  private void doPreviousChannel() {
+    int activeChannel;
+    int previousActiveChannel = -1;
+    int[] activeChannels = song.getActiveChannels();
+    for (int i = 0; i < activeChannels.length && (activeChannel = activeChannels[i]) < channel; i++) {
+      previousActiveChannel = activeChannel;
+    }
+    if (previousActiveChannel != -1) {
+      selectChannel(previousActiveChannel);
+    }
+  }
+
+  private void doPreviousProgram() {
+    if (channel != Midi.DRUM) {
+      int currentProgram = player.getProgram();
+      int nextProgram = currentProgram - 1;
+      if (nextProgram >= 0) {
+        selectProgram(nextProgram);
+      }
+    }
   }
 
   private void doSong(OnSong message) {

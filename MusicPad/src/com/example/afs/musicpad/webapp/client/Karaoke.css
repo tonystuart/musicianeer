@@ -184,13 +184,13 @@ input {
 .detail .name, .detail .value {
 	display: table-cell;
 	padding: 5px;
-	vertical-align: middle;
 }
 
 .detail .name {
 	text-align: right;
 	width: 25%;
 	font-weight: bold;
+	vertical-align: top;
 }
 
 .detail .name::after {
@@ -198,12 +198,14 @@ input {
 }
 
 .detail .value {
+	vertical-align: bottom;
 }
 
-#song-details div {
+#song-details div, #channel-details div {
 	/* margin-top: 100px; */
 	margin: auto;
 }
+
 .controls div {
 	background-color: black;
 }
@@ -220,7 +222,8 @@ input {
  
 ::-webkit-scrollbar-thumb {
     border-radius: 10px;
-    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5); 
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5);
+    border: 1px solid black;
 }
 
 .content {

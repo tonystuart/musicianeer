@@ -30,13 +30,17 @@ public class Hypertext extends Element {
   protected Hypertext(String type, String[] properties) {
     this(type);
     for (String property : properties) {
-      char firstChar = property.charAt(0);
-      if (firstChar == '#') {
-        setId(property.substring(1));
-      } else if (firstChar == '.') {
-        addClassName(property.substring(1));
+      if (property.length() == 0) {
+        appendChild(new TextElement("&nbsp;"));
       } else {
-        appendChild(new TextElement(property));
+        char firstChar = property.charAt(0);
+        if (firstChar == '#') {
+          setId(property.substring(1));
+        } else if (firstChar == '.') {
+          addClassName(property.substring(1));
+        } else {
+          appendChild(new TextElement(property));
+        }
       }
     }
   }

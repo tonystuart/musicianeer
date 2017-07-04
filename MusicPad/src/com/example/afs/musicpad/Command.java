@@ -24,8 +24,8 @@ public enum Command {
   FASTER, //
   TEMPO, //
   VELOCITY, //
-  SOFTER, //
-  LOUDER, //
+  REDUCE_BACKGROUND_VELOCITY, //
+  INCREASE_BACKGROUND_VELOCITY, //
   GAIN, //
   SHOW_DRUM_INFO, //
   TRANSPOSE, //
@@ -35,4 +35,6 @@ public enum Command {
   DETACH, //
   REATTACH, //
   QUIT, //
+  REDUCE_MASTER_GAIN, //
+  INCREASE_MASTER_GAIN, //
 }

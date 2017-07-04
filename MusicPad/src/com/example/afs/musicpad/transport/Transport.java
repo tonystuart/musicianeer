@@ -41,6 +41,7 @@ public class Transport {
   private NoteEventSequencer sequencer;
   private TickHandler tickHandler;
   private Deque<NoteEvent> reviewQueue = new LinkedList<>();
+  private float gain;
 
   public Transport(Synthesizer synthesizer) {
     this(synthesizer, null);
@@ -49,13 +50,17 @@ public class Transport {
   public Transport(Synthesizer synthesizer, TickHandler tickHandler) {
     this.synthesizer = synthesizer;
     this.tickHandler = tickHandler;
-    synthesizer.setGain(DEFAULT_GAIN);
     this.sequencer = new NoteEventSequencer(noteEvent -> processNoteEvent(noteEvent));
+    setGain(DEFAULT_GAIN);
     sequencer.start();
   }
 
   public void allNotesOff() {
     synthesizer.allNotesOff();
+  }
+
+  public float getGain() {
+    return gain;
   }
 
   public int getPercentTempo() {
@@ -159,6 +164,7 @@ public class Transport {
   }
 
   public void setGain(float gain) {
+    this.gain = gain;
     synthesizer.setGain(gain);
   }
 

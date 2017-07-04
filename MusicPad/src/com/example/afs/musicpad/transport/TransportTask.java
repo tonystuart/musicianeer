@@ -83,14 +83,20 @@ public class TransportTask extends BrokerTask<Message> {
     case VELOCITY:
       doSetVelocity(parameter);
       break;
-    case SOFTER:
-      doSofter();
+    case REDUCE_BACKGROUND_VELOCITY:
+      doReduceBackgroundVelocity();
       break;
-    case LOUDER:
-      doLouder();
+    case INCREASE_BACKGROUND_VELOCITY:
+      doIncreaseBackgroundVelocity();
       break;
     case GAIN:
       doGain(parameter);
+      break;
+    case REDUCE_MASTER_GAIN:
+      doReduceMasterGain();
+      break;
+    case INCREASE_MASTER_GAIN:
+      doIncreaseMasterGain();
       break;
     case TRANSPOSE_TO:
       doTransposeTo(parameter);
@@ -113,8 +119,16 @@ public class TransportTask extends BrokerTask<Message> {
     transport.setGain(gain);
   }
 
-  private void doLouder() {
+  private void doIncreaseBackgroundVelocity() {
     transport.setPercentVelocity(Math.max(0, transport.getPercentVelocity() + 10));
+  }
+
+  private void doIncreaseMasterGain() {
+    float currentGain = transport.getGain();
+    float newGain = currentGain + 0.2f;
+    if (newGain <= Synthesizer.MAXIMUM_GAIN) {
+      transport.setGain(newGain);
+    }
   }
 
   private void doPlay(int channel) {
@@ -122,6 +136,18 @@ public class TransportTask extends BrokerTask<Message> {
       transport.resume();
     } else {
       transport.play(new ChannelNotes(song.getNotes(), channel));
+    }
+  }
+
+  private void doReduceBackgroundVelocity() {
+    transport.setPercentVelocity(Math.max(0, transport.getPercentVelocity() - 10));
+  }
+
+  private void doReduceMasterGain() {
+    float currentGain = transport.getGain();
+    float newGain = currentGain - 0.2f;
+    if (newGain >= 0) {
+      transport.setGain(newGain);
     }
   }
 
@@ -141,10 +167,6 @@ public class TransportTask extends BrokerTask<Message> {
 
   private void doSlower() {
     transport.setPercentTempo(Math.max(0, transport.getPercentTempo() - 10));
-  }
-
-  private void doSofter() {
-    transport.setPercentVelocity(Math.max(0, transport.getPercentVelocity() - 10));
   }
 
   private void doSong(OnSong message) {
