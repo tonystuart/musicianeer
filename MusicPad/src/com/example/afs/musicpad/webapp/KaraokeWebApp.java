@@ -16,6 +16,7 @@ import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnChannels;
 import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnPrompter;
+import com.example.afs.musicpad.message.OnSongDetails;
 import com.example.afs.musicpad.message.OnSongs;
 import com.example.afs.musicpad.message.OnTick;
 import com.example.afs.musicpad.renderer.karaoke.KaraokeRenderer;
@@ -31,9 +32,10 @@ public class KaraokeWebApp extends WebApp {
     setRenderer(new KaraokeRenderer(broker));
     subscribe(OnTick.class, message -> doMessage(message));
     subscribe(OnCommand.class, message -> doMessage(message));
-    subscribe(OnSongs.class, message -> doStatefulMessage(message));
     subscribe(OnChannels.class, message -> doMessage(message));
     subscribe(OnPrompter.class, message -> doMessage(message));
+    subscribe(OnSongDetails.class, message -> doMessage(message));
+    subscribe(OnSongs.class, message -> doStatefulMessage(message));
   }
 
 }

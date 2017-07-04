@@ -24,7 +24,10 @@ import com.example.afs.musicpad.message.OnMidiFiles;
 import com.example.afs.musicpad.message.OnPickChannel;
 import com.example.afs.musicpad.message.OnPrompter;
 import com.example.afs.musicpad.message.OnRenderSong;
+import com.example.afs.musicpad.message.OnSample;
+import com.example.afs.musicpad.message.OnSongDetails;
 import com.example.afs.musicpad.message.OnSongs;
+import com.example.afs.musicpad.song.ChannelNotes;
 import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.task.BrokerTask;
 import com.example.afs.musicpad.util.Broker;
@@ -38,6 +41,7 @@ public class KaraokeRenderer extends BrokerTask<Message> {
 
   public KaraokeRenderer(Broker<Message> broker) {
     super(broker);
+    subscribe(OnSample.class, message -> doSample(message));
     subscribe(OnCommand.class, message -> doCommand(message));
     subscribe(OnMidiFiles.class, message -> doMidiFiles(message));
     subscribe(OnRenderSong.class, message -> doRenderSong(message));
@@ -80,7 +84,9 @@ public class KaraokeRenderer extends BrokerTask<Message> {
 
   private void doDetach(int deviceIndex) {
     deviceKeyCaps.remove(deviceIndex);
-    deviceChannelAssignments.remove(deviceIndex);
+    if (deviceChannelAssignments != null) {
+      deviceChannelAssignments.remove(deviceIndex);
+    }
     renderWhenReady();
   }
 
@@ -101,6 +107,17 @@ public class KaraokeRenderer extends BrokerTask<Message> {
     song = message.getSong();
     deviceChannelAssignments = message.getDeviceChannelAssignments();
     renderWhenReady();
+  }
+
+  private void doSample(OnSample message) {
+    Song song = message.getSong();
+    int channel = message.getChannel();
+    if (channel == ChannelNotes.ALL_CHANNELS) {
+      SongDetails songDetails = new SongDetails(song);
+      String html = songDetails.render();
+      publish(new OnSongDetails(html));
+    } else {
+    }
   }
 
   private void doSong(int songIndex) {

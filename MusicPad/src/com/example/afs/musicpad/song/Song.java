@@ -228,6 +228,10 @@ public class Song {
     return channelFacets.getFacet(channel).getLowestMidiNote();
   }
 
+  public int getNoteCount() {
+    return notes.size();
+  }
+
   public TreeSet<Note> getNotes() {
     return notes;
   }

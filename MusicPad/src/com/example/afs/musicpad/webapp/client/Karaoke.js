@@ -105,6 +105,13 @@ karaoke.onSongs = function(message) {
   karaoke.onSongRoulette();
 }
 
+karaoke.onSongDetails = function(message) {
+  let songDetails = document.getElementById("song-details");
+  if (songDetails) {
+    songDetails.innerHTML = message.html;
+  }
+}
+
 karaoke.onSongSelect = function(message) {
     let songSelector = document.getElementById('songs');
     let item = songSelector.querySelector('.selected');
@@ -162,8 +169,11 @@ karaoke.onWebSocketMessage = function(json) {
         karaoke.onChannels(message);
         break;
     case 'OnSongs':
-        karaoke.onSongs(message);
-        break;
+      karaoke.onSongs(message);
+      break;
+    case 'OnSongDetails':
+      karaoke.onSongDetails(message);
+      break;
     case 'OnTick':
         karaoke.onTick(message.tick);
         break;

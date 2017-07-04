@@ -42,7 +42,7 @@ public class Songs {
   }
 
   private Element createDetails() {
-    Element division = new Division(".details");
+    Element division = new Division("#song-details", ".details");
     return division;
   }
 
