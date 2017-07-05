@@ -70,12 +70,12 @@ public class Prompter {
         deviceSustain.put(deviceIndex, keyCap);
       }
     }
-    if (s.length() == 0) {
-      division.appendChild(new TextElement("."));
-    } else if (s.length() > 0) {
+    if (s.length() > 0) {
       division.appendChild(new TextElement(s.toString()));
     } else if (sustain) {
       division.appendChild(new TextElement("-"));
+    } else {
+      division.appendChild(new TextElement("."));
     }
     return division;
   }
