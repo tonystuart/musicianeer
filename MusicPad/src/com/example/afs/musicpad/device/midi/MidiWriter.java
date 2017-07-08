@@ -163,9 +163,9 @@ public class MidiWriter extends BrokerTask<Message> implements HasSendDeviceMess
         channelState = ChannelState.SELECTED;
       } else {
         if (isChannelActive) {
-          channelState = ChannelState.INACTIVE;
-        } else {
           channelState = ChannelState.ACTIVE;
+        } else {
+          channelState = ChannelState.INACTIVE;
         }
       }
       setChannelState(channel, channelState);
