@@ -158,6 +158,9 @@ public class Prompter {
         tickDivision.appendChild(textDivision);
         textDivision.appendChild(new TextElement(text));
       }
+      if (isLastWordOnLine(words)) {
+        line = null;
+      }
     }
     return division;
   }
@@ -192,6 +195,22 @@ public class Prompter {
     for (KeyCapIterator keyCapIterator : keyCapIterators.values()) {
       if (keyCapIterator.hasNext(endTick)) {
         return true;
+      }
+    }
+    return false;
+  }
+
+  private boolean isLastWordOnLine(SortedSet<Word> words) {
+    if (words.size() > 0) {
+      Word word = song.getWords().higher(words.last());
+      if (word != null) {
+        String text = word.getText();
+        if (text.length() > 0) {
+          char firstChar = text.charAt(0);
+          if (firstChar == '/' || firstChar == '\\') {
+            return true;
+          }
+        }
       }
     }
     return false;

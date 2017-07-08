@@ -213,7 +213,13 @@ karaoke.selectTick = function(tickDivision) {
         karaoke.lastTick.classList.remove('current-tick');
     }
     tickDivision.classList.add('current-tick');
-    tickDivision.scrollIntoView();
+    //tickDivision.scrollIntoView();
+    let prompterList = document.getElementById("prompter-list");
+    let midpoint = prompterList.offsetHeight / 2;
+    let tickTop = tickDivision.offsetTop - prompterList.offsetTop;
+    let tickMidpoint = tickTop + tickDivision.offsetHeight / 2;
+    prompterList.scrollTop = tickMidpoint - midpoint;
+
     karaoke.lastTick = tickDivision;
 }
 
