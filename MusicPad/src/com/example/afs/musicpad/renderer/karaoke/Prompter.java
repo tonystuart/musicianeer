@@ -125,42 +125,45 @@ public class Prompter {
       if (text.length() > 1) {
         char firstChar = text.charAt(0);
         if (firstChar == '\\') {
-          stanza = null;
-          line = null;
+          //stanza = null;
+          //line = null;
           text = text.substring(1);
         } else if (firstChar == '/') {
-          line = null;
+          //line = null;
           text = text.substring(1);
         } else if (firstChar == '@') {
           text = "";
         }
       }
       boolean isTextPresent = text.length() > 0;
-      if (isTextPresent || isKeyCapPresent(keyCapIterators, endTick)) {
-        if (line != null && line.getChildCount() > 8) {
-          line = null;
-        }
-        if (stanza == null) {
-          stanza = new Division(".stanza");
-          division.appendChild(stanza);
-        }
-        if (line == null) {
-          line = new Division(".line");
-          stanza.appendChild(line);
-        }
-        Division tickDivision = new Division("#" + String.valueOf(tick), ".tick");
-        line.appendChild(tickDivision);
-        for (int deviceIndex : deviceKeyCaps.keySet()) {
-          tickDivision.appendChild(createChannel(keyCapIterators, endTick, deviceIndex));
-        }
-        text = text.replace(" ", "&nbsp;");
-        Division textDivision = new Division(".words");
-        tickDivision.appendChild(textDivision);
-        textDivision.appendChild(new TextElement(text));
-      }
-      if (isLastWordOnLine(words)) {
+      //if (isTextPresent || isKeyCapPresent(keyCapIterators, endTick)) {
+      if (tick % (song.getTicksPerMeasure(tick) * 2) == 0) {
         line = null;
       }
+      //if (line != null && line.getChildCount() > 8) {
+      //  line = null;
+      //}
+      if (stanza == null) {
+        stanza = new Division(".stanza");
+        division.appendChild(stanza);
+      }
+      if (line == null) {
+        line = new Division(".line");
+        stanza.appendChild(line);
+      }
+      Division tickDivision = new Division("#" + String.valueOf(tick), ".tick");
+      line.appendChild(tickDivision);
+      for (int deviceIndex : deviceKeyCaps.keySet()) {
+        tickDivision.appendChild(createChannel(keyCapIterators, endTick, deviceIndex));
+      }
+      text = text.replace(" ", "&nbsp;");
+      Division textDivision = new Division(".words");
+      tickDivision.appendChild(textDivision);
+      textDivision.appendChild(new TextElement(text));
+      //}
+      //if (isLastWordOnLine(words)) {
+      //  line = null;
+      //}
     }
     return division;
   }
