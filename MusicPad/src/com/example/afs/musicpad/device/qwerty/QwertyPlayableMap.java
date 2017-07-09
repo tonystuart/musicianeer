@@ -15,8 +15,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.example.afs.musicpad.device.common.DeviceHandler.OutputType;
-import com.example.afs.musicpad.keycap.KeyCap;
-import com.example.afs.musicpad.keycap.KeyCapMap;
+import com.example.afs.musicpad.playable.Playable;
+import com.example.afs.musicpad.playable.PlayableMap;
 import com.example.afs.musicpad.player.Sound;
 import com.example.afs.musicpad.player.Sounds;
 import com.example.afs.musicpad.player.Sounds.SoundCount;
@@ -24,7 +24,7 @@ import com.example.afs.musicpad.song.Note;
 import com.example.afs.musicpad.util.DirectList;
 import com.example.afs.musicpad.util.RandomAccessList;
 
-public class QwertyKeyCapMap implements KeyCapMap {
+public class QwertyPlayableMap implements PlayableMap {
 
   private final int noteKeyCount;
   private final int registerKeyCount;
@@ -39,7 +39,7 @@ public class QwertyKeyCapMap implements KeyCapMap {
   private Sounds sounds;
   private Sound[][] keyIndexToSounds;
 
-  public QwertyKeyCapMap(Iterable<Note> notes, OutputType outputType, String noteKeys, String registerKeys) {
+  public QwertyPlayableMap(Iterable<Note> notes, OutputType outputType, String noteKeys, String registerKeys) {
     this.noteKeys = noteKeys;
     this.registerKeys = registerKeys;
     this.noteKeyCount = noteKeys.length();
@@ -49,15 +49,15 @@ public class QwertyKeyCapMap implements KeyCapMap {
   }
 
   @Override
-  public RandomAccessList<KeyCap> getKeyCaps() {
+  public RandomAccessList<Playable> getPlayables() {
     Map<Sound, SoundCount> uniqueSoundCounts = sounds.getUniqueSoundCounts();
     SoundCount[] sortedSounds = sortByFrequency(uniqueSoundCounts);
     int maxSounds = Math.min(uniqueSoundCounts.size(), supportedSounds);
     keyIndexToSounds = assignSoundsToRegisters(sortedSounds, maxSounds);
     sortByPitch(keyIndexToSounds, maxSounds);
     Map<Sound, String> soundToLegend = assignSoundsToLegend(maxSounds);
-    RandomAccessList<KeyCap> keyCaps = getKeyCaps(soundToLegend);
-    return keyCaps;
+    RandomAccessList<Playable> playables = getPlayables(soundToLegend);
+    return playables;
   }
 
   @Override
@@ -117,17 +117,17 @@ public class QwertyKeyCapMap implements KeyCapMap {
     return keyIndexToSound;
   }
 
-  private RandomAccessList<KeyCap> getKeyCaps(Map<Sound, String> soundToLegend) {
-    RandomAccessList<KeyCap> keyCaps = new DirectList<>();
+  private RandomAccessList<Playable> getPlayables(Map<Sound, String> soundToLegend) {
+    RandomAccessList<Playable> playables = new DirectList<>();
     for (Sound sound : sounds) {
       String legend = soundToLegend.get(sound);
       if (legend == null) {
         legend = "?";
       }
-      KeyCap keyCap = new KeyCap(sound, legend);
-      keyCaps.add(keyCap);
+      Playable playable = new Playable(sound, legend);
+      playables.add(playable);
     }
-    return keyCaps;
+    return playables;
   }
 
   private String getLegend(int register, int digit) {
@@ -135,15 +135,15 @@ public class QwertyKeyCapMap implements KeyCapMap {
     if (register == 0) {
       registerString = "";
     } else {
-      char registerKeyCap = registerKeys.charAt(register);
-      if (registerKeyCap == KeyEvent.VK_SHIFT) {
+      char registerPlayable = registerKeys.charAt(register);
+      if (registerPlayable == KeyEvent.VK_SHIFT) {
         registerString = "Shift+";
-      } else if (registerKeyCap == KeyEvent.VK_CONTROL) {
+      } else if (registerPlayable == KeyEvent.VK_CONTROL) {
         registerString = "Ctrl+";
-      } else if (registerKeyCap == KeyEvent.VK_ALT) {
+      } else if (registerPlayable == KeyEvent.VK_ALT) {
         registerString = "Alt+";
       } else {
-        registerString = String.valueOf(registerKeyCap);
+        registerString = String.valueOf(registerPlayable);
       }
     }
     return registerString + String.valueOf(noteKeys.charAt(digit));

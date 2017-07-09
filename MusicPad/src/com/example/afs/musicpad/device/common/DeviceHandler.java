@@ -15,10 +15,10 @@ import java.util.Set;
 import com.example.afs.fluidsynth.Synthesizer;
 import com.example.afs.musicpad.Command;
 import com.example.afs.musicpad.DeviceCommand;
-import com.example.afs.musicpad.device.midi.MidiKeyCapMap;
-import com.example.afs.musicpad.device.qwerty.AlphaKeyCapMap;
-import com.example.afs.musicpad.device.qwerty.NumericKeyCapMap;
-import com.example.afs.musicpad.keycap.KeyCapMap;
+import com.example.afs.musicpad.device.midi.MidiPlayableMap;
+import com.example.afs.musicpad.device.qwerty.AlphaPlayableMap;
+import com.example.afs.musicpad.device.qwerty.NumericPlayableMap;
+import com.example.afs.musicpad.playable.PlayableMap;
 import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnChannelUpdate;
 import com.example.afs.musicpad.message.OnCommand;
@@ -52,7 +52,7 @@ public class DeviceHandler extends BrokerTask<Message> {
   private Player player;
   private String deviceName;
   private InputType inputType;
-  private KeyCapMap keyCapMap;
+  private PlayableMap playableMap;
   private Sound[] activeSounds = new Sound[256]; // NB: KeyEvents VK codes, not midiNotes
   private boolean isCommand;
 
@@ -145,8 +145,8 @@ public class DeviceHandler extends BrokerTask<Message> {
         publish(new OnDeviceCommand(DeviceCommand.NEXT_PROGRAM, deviceIndex, 0));
         break;
       }
-    } else if (keyCapMap != null) {
-      Sound sound = keyCapMap.onDown(inputCode);
+    } else if (playableMap != null) {
+      Sound sound = playableMap.onDown(inputCode);
       if (sound != null) {
         if (sound != null) {
           player.play(Action.PRESS, sound);
@@ -161,8 +161,8 @@ public class DeviceHandler extends BrokerTask<Message> {
     if (inputCode == '.') {
       isCommand = false;
     } else if (isCommand) {
-    } else if (keyCapMap != null) {
-      keyCapMap.onUp(inputCode);
+    } else if (playableMap != null) {
+      playableMap.onUp(inputCode);
       Sound sound = activeSounds[inputCode];
       if (sound != null) {
         player.play(Action.RELEASE, sound);
@@ -176,22 +176,22 @@ public class DeviceHandler extends BrokerTask<Message> {
     return "DeviceHandler [deviceName=" + deviceName + ", deviceIndex=" + deviceIndex + ", channel=" + channel + ", inputType=" + inputType + "]";
   }
 
-  private KeyCapMap createKeyCapMap() {
-    KeyCapMap keyCapMap;
+  private PlayableMap createPlayableMap() {
+    PlayableMap playableMap;
     switch (inputType) {
     case ALPHA:
-      keyCapMap = new AlphaKeyCapMap(song.getChannelNotes(channel), player.getOutputType());
+      playableMap = new AlphaPlayableMap(song.getChannelNotes(channel), player.getOutputType());
       break;
     case NUMERIC:
-      keyCapMap = new NumericKeyCapMap(song.getChannelNotes(channel), player.getOutputType());
+      playableMap = new NumericPlayableMap(song.getChannelNotes(channel), player.getOutputType());
       break;
     case MIDI:
-      keyCapMap = new MidiKeyCapMap(song.getChannelNotes(channel), player.getOutputType());
+      playableMap = new MidiPlayableMap(song.getChannelNotes(channel), player.getOutputType());
       break;
     default:
       throw new UnsupportedOperationException();
     }
-    return keyCapMap;
+    return playableMap;
   }
 
   private void doCommand(OnCommand message) {
@@ -334,8 +334,8 @@ public class DeviceHandler extends BrokerTask<Message> {
   }
 
   private void publishChannelUpdate() {
-    keyCapMap = createKeyCapMap();
-    getBroker().publish(new OnChannelUpdate(deviceIndex, deviceName, channel, inputType, player.getOutputType(), keyCapMap));
+    playableMap = createPlayableMap();
+    getBroker().publish(new OnChannelUpdate(deviceIndex, deviceName, channel, inputType, player.getOutputType(), playableMap));
   }
 
   private void selectChannel(int channel) {

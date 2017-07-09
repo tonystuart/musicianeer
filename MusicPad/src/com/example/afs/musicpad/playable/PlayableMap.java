@@ -7,15 +7,17 @@
 // This program is made available on an "as is" basis, without
 // warranties or conditions of any kind, either express or implied.
 
-package com.example.afs.musicpad.device.qwerty;
+package com.example.afs.musicpad.playable;
 
-import com.example.afs.musicpad.device.common.DeviceHandler.OutputType;
-import com.example.afs.musicpad.song.Note;
+import com.example.afs.musicpad.player.Sound;
+import com.example.afs.musicpad.util.RandomAccessList;
 
-public class NumericKeyCapMap extends QwertyKeyCapMap {
+public interface PlayableMap {
 
-  public NumericKeyCapMap(Iterable<Note> notes, OutputType outputType) {
-    super(notes, outputType, "123456789", " 0/*-+");
-  }
+  RandomAccessList<Playable> getPlayables();
+
+  Sound onDown(int inputCode);
+
+  void onUp(int inputCode);
 
 }

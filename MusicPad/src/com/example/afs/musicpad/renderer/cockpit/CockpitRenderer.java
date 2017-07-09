@@ -18,7 +18,7 @@ import com.example.afs.musicpad.device.common.DeviceHandler.InputType;
 import com.example.afs.musicpad.device.common.DeviceHandler.OutputType;
 import com.example.afs.musicpad.html.Option;
 import com.example.afs.musicpad.html.Template;
-import com.example.afs.musicpad.keycap.KeyCapMap;
+import com.example.afs.musicpad.playable.PlayableMap;
 import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnChannelUpdate;
 import com.example.afs.musicpad.message.OnFooter;
@@ -55,10 +55,10 @@ public class CockpitRenderer extends BrokerTask<Message> {
     int channel = message.getChannel();
     InputType inputType = message.getInputType();
     OutputType outputType = message.getOutputType();
-    KeyCapMap keyCapMap = message.getKeyCapMap();
+    PlayableMap playableMap = message.getPlayableMap();
     ChannelRenderer channelRenderer = new ChannelRenderer(deviceName, deviceIndex, song, channel, inputType, outputType);
     String channelControls = channelRenderer.render();
-    StaffRenderer staffRenderer = new StaffRenderer(song, channel, ticksPerPixel, keyCapMap);
+    StaffRenderer staffRenderer = new StaffRenderer(song, channel, ticksPerPixel, playableMap);
     String music = staffRenderer.getMusic();
     getBroker().publish(new OnStaff(deviceIndex, channelControls, music));
   }

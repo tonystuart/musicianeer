@@ -9,35 +9,35 @@
 
 package com.example.afs.musicpad.renderer.karaoke;
 
-import com.example.afs.musicpad.keycap.KeyCap;
+import com.example.afs.musicpad.playable.Playable;
 import com.example.afs.musicpad.util.RandomAccessList;
 
-public class KeyCapIterator {
+public class PlayableIterator {
 
   private int index = 0;
-  private RandomAccessList<KeyCap> keyCaps;
+  private RandomAccessList<Playable> playables;
 
-  public KeyCapIterator(RandomAccessList<KeyCap> keyCaps) {
-    this.keyCaps = keyCaps;
+  public PlayableIterator(RandomAccessList<Playable> playables) {
+    this.playables = playables;
   }
 
   public boolean hasNext(long endTick) {
-    if (index < keyCaps.size()) {
-      return keyCaps.get(index).getBeginTick() < endTick;
+    if (index < playables.size()) {
+      return playables.get(index).getBeginTick() < endTick;
     }
     return false;
   }
 
-  public KeyCap next(long endTick) {
-    KeyCap keyCap = null;
-    if (index < keyCaps.size()) {
-      KeyCap thisKeyCap = keyCaps.get(index);
-      if (thisKeyCap.getBeginTick() < endTick) {
-        keyCap = thisKeyCap;
+  public Playable next(long endTick) {
+    Playable playable = null;
+    if (index < playables.size()) {
+      Playable thisPlayable = playables.get(index);
+      if (thisPlayable.getBeginTick() < endTick) {
+        playable = thisPlayable;
         index++;
       }
     }
-    return keyCap;
+    return playable;
   }
 
 }

@@ -7,15 +7,15 @@
 // This program is made available on an "as is" basis, without
 // warranties or conditions of any kind, either express or implied.
 
-package com.example.afs.musicpad.keycap;
+package com.example.afs.musicpad.playable;
 
 import com.example.afs.musicpad.player.Sound;
 
-public class KeyCap {
+public class Playable {
   private String legend;
   private Sound sound;
 
-  public KeyCap(Sound sound, String legend) {
+  public Playable(Sound sound, String legend) {
     this.sound = sound;
     this.legend = legend;
   }
@@ -38,6 +38,6 @@ public class KeyCap {
 
   @Override
   public String toString() {
-    return "KeyCap [legend=" + legend + ", sound=" + sound + "]";
+    return "Playable [legend=" + legend + ", sound=" + sound + "]";
   }
 }

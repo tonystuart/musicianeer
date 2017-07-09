@@ -11,7 +11,7 @@ package com.example.afs.musicpad.message;
 
 import com.example.afs.musicpad.device.common.DeviceHandler.InputType;
 import com.example.afs.musicpad.device.common.DeviceHandler.OutputType;
-import com.example.afs.musicpad.keycap.KeyCapMap;
+import com.example.afs.musicpad.playable.PlayableMap;
 
 public class OnChannelUpdate extends Message {
 
@@ -20,15 +20,15 @@ public class OnChannelUpdate extends Message {
   private int channel;
   private InputType inputType;
   private OutputType outputType;
-  private KeyCapMap keyCapMap;
+  private PlayableMap playableMap;
 
-  public OnChannelUpdate(int deviceIndex, String deviceName, int channel, InputType inputType, OutputType outputType, KeyCapMap keyCapMap) {
+  public OnChannelUpdate(int deviceIndex, String deviceName, int channel, InputType inputType, OutputType outputType, PlayableMap playableMap) {
     this.deviceIndex = deviceIndex;
     this.deviceName = deviceName;
     this.channel = channel;
     this.inputType = inputType;
     this.outputType = outputType;
-    this.keyCapMap = keyCapMap;
+    this.playableMap = playableMap;
   }
 
   public int getChannel() {
@@ -47,8 +47,8 @@ public class OnChannelUpdate extends Message {
     return inputType;
   }
 
-  public KeyCapMap getKeyCapMap() {
-    return keyCapMap;
+  public PlayableMap getPlayableMap() {
+    return playableMap;
   }
 
   public OutputType getOutputType() {
@@ -57,7 +57,7 @@ public class OnChannelUpdate extends Message {
 
   @Override
   public String toString() {
-    return "OnChannelUpdate [deviceIndex=" + deviceIndex + ", deviceName=" + deviceName + ", channel=" + channel + ", inputType=" + inputType + ", outputType=" + outputType + ", keyCapMap=" + keyCapMap + "]";
+    return "OnChannelUpdate [deviceIndex=" + deviceIndex + ", deviceName=" + deviceName + ", channel=" + channel + ", inputType=" + inputType + ", outputType=" + outputType + ", playableMap=" + playableMap + "]";
   }
 
 }

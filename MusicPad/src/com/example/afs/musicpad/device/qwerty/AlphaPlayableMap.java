@@ -14,9 +14,9 @@ import java.awt.event.KeyEvent;
 import com.example.afs.musicpad.device.common.DeviceHandler.OutputType;
 import com.example.afs.musicpad.song.Note;
 
-public class AlphaKeyCapMap extends QwertyKeyCapMap {
+public class AlphaPlayableMap extends QwertyPlayableMap {
 
-  public AlphaKeyCapMap(Iterable<Note> notes, OutputType outputType) {
+  public AlphaPlayableMap(Iterable<Note> notes, OutputType outputType) {
     super(notes, outputType, "ABCDEFGHIJKLMNOPQRSTUVWXYZ", " " + (char) KeyEvent.VK_SHIFT + (char) KeyEvent.VK_CONTROL + (char) KeyEvent.VK_ALT + "123456789");
   }
 

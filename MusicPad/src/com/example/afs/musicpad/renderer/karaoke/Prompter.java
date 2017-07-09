@@ -17,7 +17,7 @@ import java.util.SortedSet;
 import com.example.afs.musicpad.html.Division;
 import com.example.afs.musicpad.html.Element;
 import com.example.afs.musicpad.html.TextElement;
-import com.example.afs.musicpad.keycap.KeyCap;
+import com.example.afs.musicpad.playable.Playable;
 import com.example.afs.musicpad.song.Default;
 import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.song.Word;
@@ -26,12 +26,12 @@ import com.example.afs.musicpad.util.RandomAccessList;
 
 public class Prompter {
   private Song song;
-  private Map<Integer, KeyCap> deviceSustain = new HashMap<>();
-  private Map<Integer, RandomAccessList<KeyCap>> deviceKeyCaps;
+  private Map<Integer, Playable> deviceSustain = new HashMap<>();
+  private Map<Integer, RandomAccessList<Playable>> devicePlayables;
 
-  public Prompter(Song song, Map<Integer, RandomAccessList<KeyCap>> deviceKeyCaps) {
+  public Prompter(Song song, Map<Integer, RandomAccessList<Playable>> devicePlayables) {
     this.song = song;
-    this.deviceKeyCaps = deviceKeyCaps;
+    this.devicePlayables = devicePlayables;
   }
 
   public String render() {
@@ -49,25 +49,25 @@ public class Prompter {
     return division;
   }
 
-  private Element createChannel(Map<Integer, KeyCapIterator> keyCapIterators, long endTick, int deviceIndex) {
+  private Element createChannel(Map<Integer, PlayableIterator> playableIterators, long endTick, int deviceIndex) {
     Division division = new Division(".player-" + deviceIndex);
     boolean sustain = false;
-    KeyCap keyCap = deviceSustain.get(deviceIndex);
-    if (keyCap != null) {
+    Playable playable = deviceSustain.get(deviceIndex);
+    if (playable != null) {
       sustain = true;
-      if (keyCap.getEndTick() < endTick) {
+      if (playable.getEndTick() < endTick) {
         deviceSustain.remove(deviceIndex);
       }
     }
     StringBuilder s = new StringBuilder();
-    KeyCapIterator keyCapIterator = keyCapIterators.get(deviceIndex);
-    while ((keyCap = keyCapIterator.next(endTick)) != null) {
+    PlayableIterator playableIterator = playableIterators.get(deviceIndex);
+    while ((playable = playableIterator.next(endTick)) != null) {
       if (s.length() > 0) {
         s.append(" ");
       }
-      s.append(keyCap.getLegend());
-      if (keyCap.getEndTick() > endTick) {
-        deviceSustain.put(deviceIndex, keyCap);
+      s.append(playable.getLegend());
+      if (playable.getEndTick() > endTick) {
+        deviceSustain.put(deviceIndex, playable);
       }
     }
     if (s.length() > 0) {
@@ -109,11 +109,11 @@ public class Prompter {
   }
 
   private Division createPrompter() {
-    Map<Integer, KeyCapIterator> keyCapIterators = new HashMap<>();
-    for (Entry<Integer, RandomAccessList<KeyCap>> entry : deviceKeyCaps.entrySet()) {
+    Map<Integer, PlayableIterator> playableIterators = new HashMap<>();
+    for (Entry<Integer, RandomAccessList<Playable>> entry : devicePlayables.entrySet()) {
       int device = entry.getKey();
-      RandomAccessList<KeyCap> keyCaps = entry.getValue();
-      keyCapIterators.put(device, new KeyCapIterator(keyCaps));
+      RandomAccessList<Playable> playables = entry.getValue();
+      playableIterators.put(device, new PlayableIterator(playables));
     }
     Division division = new Division("#prompter-list");
     Division stanza = null;
@@ -136,7 +136,7 @@ public class Prompter {
         }
       }
       boolean isTextPresent = text.length() > 0;
-      //if (isTextPresent || isKeyCapPresent(keyCapIterators, endTick)) {
+      //if (isTextPresent || isPlayablePresent(playableIterators, endTick)) {
       if (tick % (song.getTicksPerMeasure(tick) * 2) == 0) {
         line = null;
       }
@@ -153,8 +153,8 @@ public class Prompter {
       }
       Division tickDivision = new Division("#" + String.valueOf(tick), ".tick");
       line.appendChild(tickDivision);
-      for (int deviceIndex : deviceKeyCaps.keySet()) {
-        tickDivision.appendChild(createChannel(keyCapIterators, endTick, deviceIndex));
+      for (int deviceIndex : devicePlayables.keySet()) {
+        tickDivision.appendChild(createChannel(playableIterators, endTick, deviceIndex));
       }
       text = text.replace(" ", "&nbsp;");
       Division textDivision = new Division(".words");
@@ -194,9 +194,9 @@ public class Prompter {
     return s.toString();
   }
 
-  private boolean isKeyCapPresent(Map<Integer, KeyCapIterator> keyCapIterators, long endTick) {
-    for (KeyCapIterator keyCapIterator : keyCapIterators.values()) {
-      if (keyCapIterator.hasNext(endTick)) {
+  private boolean isPlayablePresent(Map<Integer, PlayableIterator> playableIterators, long endTick) {
+    for (PlayableIterator playableIterator : playableIterators.values()) {
+      if (playableIterator.hasNext(endTick)) {
         return true;
       }
     }

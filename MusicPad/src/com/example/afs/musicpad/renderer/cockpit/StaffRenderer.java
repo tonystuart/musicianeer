@@ -11,8 +11,8 @@ package com.example.afs.musicpad.renderer.cockpit;
 
 import java.util.SortedSet;
 
-import com.example.afs.musicpad.keycap.KeyCap;
-import com.example.afs.musicpad.keycap.KeyCapMap;
+import com.example.afs.musicpad.playable.Playable;
+import com.example.afs.musicpad.playable.PlayableMap;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.player.Sound;
 import com.example.afs.musicpad.song.Default;
@@ -169,13 +169,13 @@ public class StaffRenderer {
   private Song song;
   private int channel;
   private int ticksPerPixel;
-  private KeyCapMap keyCapMap;
+  private PlayableMap playableMap;
 
-  public StaffRenderer(Song song, int channel, int ticksPerPixel, KeyCapMap keyCapMap) {
+  public StaffRenderer(Song song, int channel, int ticksPerPixel, PlayableMap playableMap) {
     this.song = song;
     this.channel = channel;
     this.ticksPerPixel = ticksPerPixel;
-    this.keyCapMap = keyCapMap;
+    this.playableMap = playableMap;
   }
 
   public String getMusic() {
@@ -220,12 +220,12 @@ public class StaffRenderer {
   }
 
   private void drawNoteNames(Svg staff) {
-    RandomAccessList<KeyCap> keyCaps = keyCapMap.getKeyCaps();
-    for (KeyCap keyCap : keyCaps) {
-      int wordX = getX(keyCap.getBeginTick() - RADIUS); // align with left edge of note head
-      Sound sound = keyCap.getSound();
+    RandomAccessList<Playable> playables = playableMap.getPlayables();
+    for (Playable playable : playables) {
+      int wordX = getX(playable.getBeginTick() - RADIUS); // align with left edge of note head
+      Sound sound = playable.getSound();
       String name = sound.getName();
-      staff.add(new Text(wordX, WORDS + 3 * RADIUS, keyCap.getLegend()));
+      staff.add(new Text(wordX, WORDS + 3 * RADIUS, playable.getLegend()));
       staff.add(new Text(wordX, 3 * RADIUS, name));
     }
   }

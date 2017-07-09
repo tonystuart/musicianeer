@@ -14,8 +14,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.NavigableMap;
 
-import com.example.afs.musicpad.keycap.KeyCap;
-import com.example.afs.musicpad.keycap.KeyCapMap;
+import com.example.afs.musicpad.playable.Playable;
+import com.example.afs.musicpad.playable.PlayableMap;
 import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnChannelDetails;
 import com.example.afs.musicpad.message.OnChannelUpdate;
@@ -39,7 +39,7 @@ public class KaraokeRenderer extends BrokerTask<Message> {
 
   private Song song;
   private NavigableMap<Integer, Integer> deviceChannelAssignments;
-  private Map<Integer, RandomAccessList<KeyCap>> deviceKeyCaps = new HashMap<>();
+  private Map<Integer, RandomAccessList<Playable>> devicePlayables = new HashMap<>();
 
   public KaraokeRenderer(Broker<Message> broker) {
     super(broker);
@@ -52,12 +52,12 @@ public class KaraokeRenderer extends BrokerTask<Message> {
     subscribe(OnDeviceDetached.class, message -> doDeviceDetached(message));
   }
 
-  private boolean allDeviceKeyCapsAvailable() {
+  private boolean allDevicePlayablesAvailable() {
     if (deviceChannelAssignments == null) {
       return false;
     }
     for (Integer deviceIndex : deviceChannelAssignments.keySet()) {
-      if (!deviceKeyCaps.containsKey(deviceIndex)) {
+      if (!devicePlayables.containsKey(deviceIndex)) {
         return false;
       }
     }
@@ -66,9 +66,9 @@ public class KaraokeRenderer extends BrokerTask<Message> {
 
   private void doChannelUpdate(OnChannelUpdate message) {
     int deviceIndex = message.getDeviceIndex();
-    KeyCapMap keyCapMap = message.getKeyCapMap();
-    RandomAccessList<KeyCap> keyCaps = keyCapMap.getKeyCaps();
-    deviceKeyCaps.put(deviceIndex, keyCaps);
+    PlayableMap playableMap = message.getPlayableMap();
+    RandomAccessList<Playable> playables = playableMap.getPlayables();
+    devicePlayables.put(deviceIndex, playables);
     renderWhenReady();
   }
 
@@ -84,7 +84,7 @@ public class KaraokeRenderer extends BrokerTask<Message> {
 
   private void doDeviceDetached(OnDeviceDetached message) {
     int deviceIndex = message.getDeviceIndex();
-    deviceKeyCaps.remove(deviceIndex);
+    devicePlayables.remove(deviceIndex);
     if (deviceChannelAssignments != null) {
       deviceChannelAssignments.remove(deviceIndex);
     }
@@ -129,8 +129,8 @@ public class KaraokeRenderer extends BrokerTask<Message> {
   }
 
   private void renderWhenReady() {
-    if (song != null && allDeviceKeyCapsAvailable()) {
-      Prompter prompter = new Prompter(song, deviceKeyCaps);
+    if (song != null && allDevicePlayablesAvailable()) {
+      Prompter prompter = new Prompter(song, devicePlayables);
       String html = prompter.render();
       getBroker().publish(new OnPrompter(html));
     }
