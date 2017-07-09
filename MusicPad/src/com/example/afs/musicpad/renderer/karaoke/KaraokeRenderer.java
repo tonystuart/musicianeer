@@ -21,6 +21,7 @@ import com.example.afs.musicpad.message.OnChannelDetails;
 import com.example.afs.musicpad.message.OnChannelUpdate;
 import com.example.afs.musicpad.message.OnChannels;
 import com.example.afs.musicpad.message.OnCommand;
+import com.example.afs.musicpad.message.OnDeviceDetached;
 import com.example.afs.musicpad.message.OnMidiFiles;
 import com.example.afs.musicpad.message.OnPickChannel;
 import com.example.afs.musicpad.message.OnPrompter;
@@ -48,6 +49,7 @@ public class KaraokeRenderer extends BrokerTask<Message> {
     subscribe(OnRenderSong.class, message -> doRenderSong(message));
     subscribe(OnPickChannel.class, message -> doPickChannel(message));
     subscribe(OnChannelUpdate.class, message -> doChannelUpdate(message));
+    subscribe(OnDeviceDetached.class, message -> doDeviceDetached(message));
   }
 
   private boolean allDeviceKeyCapsAvailable() {
@@ -72,9 +74,6 @@ public class KaraokeRenderer extends BrokerTask<Message> {
 
   private void doCommand(OnCommand message) {
     switch (message.getCommand()) {
-    case DETACH:
-      doDetach(message.getParameter());
-      break;
     case SONG:
       doSong(message.getParameter());
       break;
@@ -83,7 +82,8 @@ public class KaraokeRenderer extends BrokerTask<Message> {
     }
   }
 
-  private void doDetach(int deviceIndex) {
+  private void doDeviceDetached(OnDeviceDetached message) {
+    int deviceIndex = message.getDeviceIndex();
     deviceKeyCaps.remove(deviceIndex);
     if (deviceChannelAssignments != null) {
       deviceChannelAssignments.remove(deviceIndex);
