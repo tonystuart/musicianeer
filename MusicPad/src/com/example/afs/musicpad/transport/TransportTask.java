@@ -107,7 +107,7 @@ public class TransportTask extends BrokerTask<Message> {
   }
 
   private void doFaster() {
-    transport.setPercentTempo(Math.min(100, transport.getPercentTempo() + 10));
+    transport.setPercentTempo(Math.min(200, transport.getPercentTempo() + 10));
   }
 
   private void doForward() {
