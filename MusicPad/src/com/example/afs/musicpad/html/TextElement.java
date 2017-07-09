@@ -17,6 +17,10 @@ public class TextElement extends Element {
     this.text = text;
   }
 
+  public String getText() {
+    return text;
+  }
+
   @Override
   public void render(StringBuilder s) {
     s.append(text);

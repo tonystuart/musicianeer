@@ -9,7 +9,7 @@
 
 package com.example.afs.musicpad.html;
 
-public class TableHeader extends Hypertext {
+public class TableHeader extends Parent {
 
   private TableRow tableRow;
 

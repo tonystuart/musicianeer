@@ -9,7 +9,7 @@
 
 package com.example.afs.musicpad.html;
 
-public class Paragraph extends Hypertext {
+public class Paragraph extends Parent {
 
   public Paragraph() {
     super("p");

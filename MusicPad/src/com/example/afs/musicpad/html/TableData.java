@@ -9,7 +9,7 @@
 
 package com.example.afs.musicpad.html;
 
-public class TableData extends Hypertext {
+public class TableData extends Parent {
 
   public TableData() {
     super("td");

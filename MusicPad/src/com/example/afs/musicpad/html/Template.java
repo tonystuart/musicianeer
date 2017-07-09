@@ -9,7 +9,7 @@
 
 package com.example.afs.musicpad.html;
 
-public class Template extends Hypertext {
+public class Template extends Parent {
 
   public Template() {
     super("template");

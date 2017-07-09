@@ -19,6 +19,13 @@ public abstract class Element {
 
   public abstract void render(StringBuilder s);
 
+  @Override
+  public String toString() {
+    StringBuilder s = new StringBuilder();
+    render(s);
+    return s.toString();
+  }
+
   protected String format(String template, Object... parameters) {
     return String.format(template, parameters);
   }

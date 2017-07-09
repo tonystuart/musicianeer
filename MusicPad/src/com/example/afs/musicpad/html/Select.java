@@ -9,7 +9,7 @@
 
 package com.example.afs.musicpad.html;
 
-public class Select extends Hypertext {
+public class Select extends Parent {
 
   public Select() {
     super("select");

@@ -39,7 +39,7 @@ public class Hypertext extends Element {
         } else if (firstChar == '.') {
           addClassName(property.substring(1));
         } else {
-          appendChild(new TextElement(property));
+          processArgument(property);
         }
       }
     }
@@ -116,20 +116,13 @@ public class Hypertext extends Element {
       }
     }
     s.append(">");
-    if (childElements != null) {
-      for (Element element : childElements) {
-        element.render(s);
-      }
-    }
-    s.append(format("</%s>\n", type));
   }
 
   public void setId(String id) {
     this.id = id;
   }
 
-  @Override
-  public String toString() {
-    return "Element [type=" + type + ", id=" + id + ", className=" + className + ", childElements=" + childElements + "]";
+  protected void processArgument(String text) {
+    throw new UnsupportedOperationException("Cannot process " + text);
   }
 }

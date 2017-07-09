@@ -9,7 +9,7 @@
 
 package com.example.afs.musicpad.html;
 
-public class Division extends Hypertext {
+public class Division extends Parent {
 
   public Division(String... properties) {
     super("div", properties);

@@ -29,20 +29,11 @@ input {
     overflow-y: auto;
 }
 	
-.stanza {
-    margin: 5px;
-    border: 1px solid gray;
-    background-color: #303030;
-}
-
 .line {
-    padding: 0 5px;
-    margin: 5px;
-    border: 1px solid gray;
-    background-color: black;
+    border-bottom: 1px solid gray;
 }
 
-.tick {
+.prompt {
     display: inline-block;
     vertical-align: top;
     padding-right: 10px;
@@ -128,20 +119,25 @@ input {
 .words {
 }
 
-.current-tick {
+.interlude {
+	padding: 4vh 0;
+}
+
+.current-prompt {
     color: white;
+    position: relative;
     background-color: blue;
 }
 
 .countdown {
     color: red;
-    z-index: 100;
-    background-color: blue;
+    /* z-index: 100; */
+    /* background-color: blue; */
     position: absolute;
     bottom: 1px;
     width: 100%;
-    text-align: left;
-    padding-bottom: 5px;
+    text-align: center;
+    /* padding-bottom: 5px; */
 }
 
 .tab {

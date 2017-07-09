@@ -10,6 +10,7 @@
 package com.example.afs.musicpad.renderer.karaoke;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.SortedSet;
@@ -26,12 +27,12 @@ import com.example.afs.musicpad.util.RandomAccessList;
 
 public class Prompter {
   private Song song;
+  private Map<Integer, PlayableIterator> playableIterators;
   private Map<Integer, Playable> deviceSustain = new HashMap<>();
-  private Map<Integer, RandomAccessList<Playable>> devicePlayables;
 
   public Prompter(Song song, Map<Integer, RandomAccessList<Playable>> devicePlayables) {
     this.song = song;
-    this.devicePlayables = devicePlayables;
+    this.playableIterators = getPlayableIterators(devicePlayables);
   }
 
   public String render() {
@@ -42,6 +43,17 @@ public class Prompter {
     return html;
   }
 
+  private Division convertToInterlude(Division line) {
+    if (line.getChildCount() > 0) {
+      Division prompt = (Division) line.getChild(0);
+      String id = prompt.getId();
+      long tick = Long.parseLong(id);
+      line.clear();
+      line.appendChild(createInterlude(tick));
+    }
+    return line;
+  }
+
   private Element createBackToSongsButton() {
     Division division = new Division();
     division.appendChild(new TextElement("Back to Songs"));
@@ -49,7 +61,7 @@ public class Prompter {
     return division;
   }
 
-  private Element createChannel(Map<Integer, PlayableIterator> playableIterators, long endTick, int deviceIndex) {
+  private Element createChannelPrompt(long endTick, int deviceIndex) {
     Division division = new Division(".player-" + deviceIndex);
     boolean sustain = false;
     Playable playable = deviceSustain.get(deviceIndex);
@@ -93,11 +105,31 @@ public class Prompter {
     return division;
   }
 
+  private Element createInterlude(long tick) {
+    String text;
+    if (tick == 0) {
+      text = "[ Intro ]";
+    } else {
+      text = "[ Interlude ]";
+    }
+    Division division = new Division("#" + String.valueOf(tick), ".interlude", text);
+    return division;
+  }
+
   private Element createLeft() {
     Division division = new Division(".left");
     division.appendChild(createTitle());
-    division.appendChild(createPrompter());
+    division.appendChild(createPrompterList());
     division.appendChild(createControls());
+    return division;
+  }
+
+  private Division createLine(long lineBeginTick, long lineEndTick) {
+    Division division = new Division(".line");
+    for (long promptBeginTick = lineBeginTick; promptBeginTick < lineEndTick; promptBeginTick += Default.RESOLUTION) {
+      long promptEndTick = promptBeginTick + Default.RESOLUTION;
+      division.appendChild(createPrompt(promptBeginTick, promptEndTick));
+    }
     return division;
   }
 
@@ -108,63 +140,25 @@ public class Prompter {
     return division;
   }
 
-  private Division createPrompter() {
-    Map<Integer, PlayableIterator> playableIterators = new HashMap<>();
-    for (Entry<Integer, RandomAccessList<Playable>> entry : devicePlayables.entrySet()) {
-      int device = entry.getKey();
-      RandomAccessList<Playable> playables = entry.getValue();
-      playableIterators.put(device, new PlayableIterator(playables));
+  private Division createPrompt(long promptBeginTick, long promptEndTick) {
+    Division division = new Division("#" + String.valueOf(promptBeginTick), ".prompt");
+    for (int deviceIndex : playableIterators.keySet()) {
+      division.appendChild(createChannelPrompt(promptEndTick, deviceIndex));
     }
+    division.appendChild(createTextPrompt(promptBeginTick, promptEndTick));
+    return division;
+  }
+
+  private Division createPrompterList() {
     Division division = new Division("#prompter-list");
-    Division stanza = null;
-    Division line = null;
-    for (long tick = 0; tick < song.getDuration(); tick += Default.RESOLUTION) {
-      long endTick = tick + Default.RESOLUTION;
-      SortedSet<Word> words = song.getWords().subSet(new Word(tick), new Word(endTick));
-      String text = getText(words);
-      if (text.length() > 1) {
-        char firstChar = text.charAt(0);
-        if (firstChar == '\\') {
-          //stanza = null;
-          //line = null;
-          text = text.substring(1);
-        } else if (firstChar == '/') {
-          //line = null;
-          text = text.substring(1);
-        } else if (firstChar == '@') {
-          text = "";
-        }
-      }
-      boolean isTextPresent = text.length() > 0;
-      //if (isTextPresent || isPlayablePresent(playableIterators, endTick)) {
-      if (tick % (song.getTicksPerMeasure(tick) * 2) == 0) {
-        line = null;
-      }
-      //if (line != null && line.getChildCount() > 8) {
-      //  line = null;
-      //}
-      if (stanza == null) {
-        stanza = new Division(".stanza");
-        division.appendChild(stanza);
-      }
-      if (line == null) {
-        line = new Division(".line");
-        stanza.appendChild(line);
-      }
-      Division tickDivision = new Division("#" + String.valueOf(tick), ".tick");
-      line.appendChild(tickDivision);
-      for (int deviceIndex : devicePlayables.keySet()) {
-        tickDivision.appendChild(createChannel(playableIterators, endTick, deviceIndex));
-      }
-      text = text.replace(" ", "&nbsp;");
-      Division textDivision = new Division(".words");
-      tickDivision.appendChild(textDivision);
-      textDivision.appendChild(new TextElement(text));
-      //}
-      //if (isLastWordOnLine(words)) {
-      //  line = null;
-      //}
+    long tick = 0;
+    while (tick < song.getDuration()) {
+      int beatsPerMeasure = song.getBeatsPerMeasure(tick);
+      long endTick = tick + (beatsPerMeasure * Default.TICKS_PER_BEAT);
+      division.appendChild(createLine(tick, endTick));
+      tick = endTick;
     }
+    optimize(division);
     return division;
   }
 
@@ -181,9 +175,26 @@ public class Prompter {
     return division;
   }
 
+  private Division createTextPrompt(long promptBeginTick, long promptEndTick) {
+    String text = getWords(promptBeginTick, promptEndTick);
+    Division textDivision = new Division(".words");
+    textDivision.appendChild(new TextElement(text));
+    return textDivision;
+  }
+
   private Element createTitle() {
     Division division = new Division(".title", FileUtilities.getBaseName(song.getTitle()));
     return division;
+  }
+
+  private Map<Integer, PlayableIterator> getPlayableIterators(Map<Integer, RandomAccessList<Playable>> devicePlayables) {
+    Map<Integer, PlayableIterator> playableIterators = new HashMap<>();
+    for (Entry<Integer, RandomAccessList<Playable>> entry : devicePlayables.entrySet()) {
+      int device = entry.getKey();
+      RandomAccessList<Playable> playables = entry.getValue();
+      playableIterators.put(device, new PlayableIterator(playables));
+    }
+    return playableIterators;
   }
 
   private String getText(SortedSet<Word> words) {
@@ -194,29 +205,55 @@ public class Prompter {
     return s.toString();
   }
 
-  private boolean isPlayablePresent(Map<Integer, PlayableIterator> playableIterators, long endTick) {
-    for (PlayableIterator playableIterator : playableIterators.values()) {
-      if (playableIterator.hasNext(endTick)) {
-        return true;
+  private String getWords(long promptBeginTick, long promptEndTick) {
+    SortedSet<Word> words = song.getWords().subSet(new Word(promptBeginTick), new Word(promptEndTick));
+    String text = getText(words);
+    if (text.length() > 1) {
+      char firstChar = text.charAt(0);
+      if (firstChar == '\\') {
+        text = text.substring(1);
+      } else if (firstChar == '/') {
+        text = text.substring(1);
+      } else if (firstChar == '@') {
+        text = "";
+      }
+    }
+    return text;
+  }
+
+  private boolean isSignificant(Division parent) {
+    for (Element element : parent) {
+      if (element instanceof Division) {
+        Division division = (Division) element;
+        if (isSignificant(division)) {
+          return true;
+        }
+      } else if (element instanceof TextElement) {
+        TextElement textElement = (TextElement) element;
+        String text = textElement.getText();
+        if (text.length() > 0 && !text.equals(".")) {
+          return true;
+        }
       }
     }
     return false;
   }
 
-  private boolean isLastWordOnLine(SortedSet<Word> words) {
-    if (words.size() > 0) {
-      Word word = song.getWords().higher(words.last());
-      if (word != null) {
-        String text = word.getText();
-        if (text.length() > 0) {
-          char firstChar = text.charAt(0);
-          if (firstChar == '/' || firstChar == '\\') {
-            return true;
-          }
+  private void optimize(Division division) {
+    Division interlude = null;
+    Iterator<Element> iterator = division.iterator();
+    while (iterator.hasNext()) {
+      Division line = (Division) iterator.next();
+      if (!isSignificant(line)) {
+        if (interlude == null) {
+          interlude = convertToInterlude(line);
+        } else {
+          iterator.remove();
         }
+      } else {
+        interlude = null;
       }
     }
-    return false;
   }
 
 }
