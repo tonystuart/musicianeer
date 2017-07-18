@@ -9,6 +9,7 @@
 
 package com.example.afs.fluidsynth;
 
+import com.example.afs.jni.FluidSynth;
 import com.example.afs.musicpad.player.Player;
 
 public class Synthesizer {

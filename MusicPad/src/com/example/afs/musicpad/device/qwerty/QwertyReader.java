@@ -16,21 +16,18 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Field;
 
-import com.example.afs.fluidsynth.FluidSynth;
+import com.example.afs.jni.InputHandler;
 import com.example.afs.musicpad.device.common.DeviceHandler;
-import com.example.afs.musicpad.util.ByteArray;
 
 // See /usr/include/linux/input.h
 // See https://www.kernel.org/doc/Documentation/input/input.txt
 
 public class QwertyReader {
 
-  private static final int EV_KEY = 0x01;
+  private boolean isTerminated;
 
   private Thread deviceReader;
   private DeviceHandler deviceHandler;
-
-  private boolean isTerminated;
 
   public QwertyReader(DeviceHandler deviceHandler) {
     this.deviceHandler = deviceHandler;
@@ -45,23 +42,26 @@ public class QwertyReader {
     isTerminated = true;
   }
 
-  private void capture(FileInputStream fileInputStream) {
+  private int getFileDescriptor(FileInputStream fileInputStream) {
     try {
+      Integer fd;
       Field f = FileDescriptor.class.getDeclaredField("fd");
-      if (f != null) {
+      if (f == null) {
+        throw new IllegalStateException("Expected FileDescriptor to contain fd field");
+      } else {
         f.setAccessible(true);
-        Integer fd = (Integer) f.get(fileInputStream.getFD());
-        if (fd != null) {
-          // See EVIOCGRAB in drivers/input/evdev.c
-          FluidSynth.capture(fd, 1);
+        fd = (Integer) f.get(fileInputStream.getFD());
+        if (fd == null) {
+          throw new IllegalStateException("Expected FileDescriptor fd field to be non-null");
         }
+        return fd;
       }
     } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException | IOException e) {
       throw new RuntimeException(e);
     }
   }
 
-  private void processKeyDown(short keyCode) {
+  private void processKeyDown(int keyCode) {
     if (keyCode < QwertyKeyCodes.inputCodes.length) {
       char inputCode = QwertyKeyCodes.inputCodes[keyCode];
       if (inputCode == KeyEvent.VK_ESCAPE) {
@@ -73,7 +73,7 @@ public class QwertyReader {
     }
   }
 
-  private void processKeyUp(short keyCode) {
+  private void processKeyUp(int keyCode) {
     if (keyCode < QwertyKeyCodes.inputCodes.length) {
       char inputCode = QwertyKeyCodes.inputCodes[keyCode];
       deviceHandler.onUp(inputCode);
@@ -84,22 +84,20 @@ public class QwertyReader {
 
   private void run() {
     try (FileInputStream fileInputStream = new FileInputStream(deviceHandler.getDeviceName())) {
-      capture(fileInputStream);
-      byte[] buffer = new byte[16];
+      int fd = getFileDescriptor(fileInputStream);
+      int rc = InputHandler.capture(fd, true);
+      if (rc == -1) {
+        throw new IllegalStateException("Cannot capture input stream for fd " + fd);
+      }
       while (!isTerminated) {
         try {
-          fileInputStream.read(buffer);
-          short type = ByteArray.toNativeShort(buffer, 8);
-          //System.out.printf("buffer=%s, type=%#x, code=%#x, value=%#x\n", Arrays.toString(buffer), type, code, value);
-          if (type == EV_KEY) {
-            int value = ByteArray.toNativeInteger(buffer, 12);
-            if (value == 0) {
-              short code = ByteArray.toNativeShort(buffer, 10);
-              processKeyUp(code);
-            } else if (value == 1) {
-              short code = ByteArray.toNativeShort(buffer, 10);
-              processKeyDown(code);
-            }
+          int code = InputHandler.read_key_code(fd);
+          if (code < 0) {
+            processKeyDown(-code);
+          } else if (code > 0) {
+            processKeyUp(code);
+          } else {
+            throw new IllegalStateException("Cannot read key code from fd " + fd);
           }
         } catch (RuntimeException e) {
           e.printStackTrace();

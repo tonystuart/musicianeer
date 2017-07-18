@@ -7,7 +7,7 @@
 // This program is made available on an "as is" basis, without
 // warranties or conditions of any kind, either express or implied.
 
-package com.example.afs.fluidsynth;
+package com.example.afs.jni;
 
 public class FluidSynth {
 
@@ -16,8 +16,6 @@ public class FluidSynth {
   public static final int CHANNEL_TYPE_MELODIC = 0;
 
   public static final int CHANNEL_TYPE_DRUM = 1;
-
-  public static native int capture(int fd, int value);
 
   public static native void delete_fluid_audio_driver(long driver);
 

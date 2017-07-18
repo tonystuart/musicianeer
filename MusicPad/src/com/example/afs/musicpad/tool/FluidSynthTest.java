@@ -9,7 +9,7 @@
 
 package com.example.afs.musicpad.tool;
 
-import com.example.afs.fluidsynth.FluidSynth;
+import com.example.afs.jni.FluidSynth;
 
 public class FluidSynthTest {
 
