@@ -16,7 +16,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Field;
 
-import com.example.afs.jni.InputHandler;
+import com.example.afs.jni.Input;
 import com.example.afs.musicpad.device.common.DeviceHandler;
 
 // See /usr/include/linux/input.h
@@ -85,13 +85,13 @@ public class QwertyReader {
   private void run() {
     try (FileInputStream fileInputStream = new FileInputStream(deviceHandler.getDeviceName())) {
       int fd = getFileDescriptor(fileInputStream);
-      int rc = InputHandler.capture(fd, true);
+      int rc = Input.capture(fd, true);
       if (rc == -1) {
         throw new IllegalStateException("Cannot capture input stream for fd " + fd);
       }
       while (!isTerminated) {
         try {
-          int code = InputHandler.read_key_code(fd);
+          int code = Input.read_key_code(fd);
           if (code < 0) {
             processKeyDown(-code);
           } else if (code > 0) {

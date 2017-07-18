@@ -9,9 +9,9 @@
 
 package com.example.afs.jni;
 
-public class InputHandler {
+public class Input {
 
-  public static final String NATIVE_LIBRARY_NAME = "inputhandler_jni";
+  public static final String NATIVE_LIBRARY_NAME = "input_jni";
 
   public static native int capture(int fd, boolean is_captured);
 
