@@ -25,10 +25,10 @@ import com.example.afs.musicpad.message.OnMidiFiles;
 import com.example.afs.musicpad.message.OnPickChannel;
 import com.example.afs.musicpad.message.OnRenderSong;
 import com.example.afs.musicpad.message.OnRepublishState;
-import com.example.afs.musicpad.message.OnSample;
+import com.example.afs.musicpad.message.OnSampleChannel;
+import com.example.afs.musicpad.message.OnSampleSong;
 import com.example.afs.musicpad.message.OnSong;
 import com.example.afs.musicpad.parser.SongBuilder;
-import com.example.afs.musicpad.song.ChannelNotes;
 import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.task.BrokerTask;
 import com.example.afs.musicpad.util.Broker;
@@ -81,9 +81,6 @@ public class Conductor extends BrokerTask<Message> {
     case SAMPLE_SONG:
       doSample(parameter);
       break;
-    case SAMPLE_CHANNEL:
-      doSampleChannel(parameter);
-      break;
     case SONG:
       doSelectSong(parameter);
       break;
@@ -101,9 +98,14 @@ public class Conductor extends BrokerTask<Message> {
   }
 
   private void doDeviceCommand(OnDeviceCommand message) {
+    int deviceIndex = message.getDeviceIndex();
+    int parameter = message.getParameter();
     switch (message.getDeviceCommand()) {
     case CHANNEL:
-      doChannel(message.getDeviceIndex(), message.getParameter());
+      doChannel(deviceIndex, parameter);
+      break;
+    case SAMPLE_CHANNEL:
+      doSampleChannel(deviceIndex, parameter);
       break;
     default:
       break;
@@ -125,12 +127,12 @@ public class Conductor extends BrokerTask<Message> {
     SongBuilder songBuilder = new SongBuilder();
     song = songBuilder.createSong(midiFile);
     System.out.println("Sampling song " + songIndex + " - " + song.getTitle());
-    publish(new OnSample(song, ChannelNotes.ALL_CHANNELS, TICKS_PER_PIXEL));
+    publish(new OnSampleSong(song, TICKS_PER_PIXEL));
   }
 
-  private void doSampleChannel(int channel) {
+  private void doSampleChannel(int deviceIndex, int channel) {
     System.out.println("Sampling channel " + channel);
-    publish(new OnSample(song, channel, TICKS_PER_PIXEL));
+    publish(new OnSampleChannel(song, deviceIndex, channel, TICKS_PER_PIXEL));
   }
 
   private void doSelectSong(int songIndex) {

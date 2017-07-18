@@ -15,7 +15,8 @@ import com.example.afs.musicpad.Command;
 import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnChannelCommand;
 import com.example.afs.musicpad.message.OnCommand;
-import com.example.afs.musicpad.message.OnSample;
+import com.example.afs.musicpad.message.OnSampleChannel;
+import com.example.afs.musicpad.message.OnSampleSong;
 import com.example.afs.musicpad.message.OnSong;
 import com.example.afs.musicpad.message.OnTick;
 import com.example.afs.musicpad.midi.Midi;
@@ -35,9 +36,10 @@ public class TransportTask extends BrokerTask<Message> {
   public TransportTask(Broker<Message> broker, Synthesizer synthesizer) {
     super(broker);
     this.transport = new Transport(synthesizer, tick -> publishTick(tick));
-    subscribe(OnSample.class, message -> doSample(message));
     subscribe(OnSong.class, message -> doSong(message));
     subscribe(OnCommand.class, message -> doCommand(message));
+    subscribe(OnSampleSong.class, message -> doSampleSong(message));
+    subscribe(OnSampleChannel.class, message -> doSampleChannel(message));
     subscribe(OnChannelCommand.class, message -> doChannelCommand(message));
   }
 
@@ -151,10 +153,16 @@ public class TransportTask extends BrokerTask<Message> {
     }
   }
 
-  private void doSample(OnSample message) {
+  private void doSampleChannel(OnSampleChannel message) {
     transport.stop();
     this.song = message.getSong();
     transport.play(new ChannelNotes(song.getNotes(), message.getChannel()));
+  }
+
+  private void doSampleSong(OnSampleSong message) {
+    transport.stop();
+    this.song = message.getSong();
+    transport.play(song.getNotes());
   }
 
   private void doSeek(long tick) {

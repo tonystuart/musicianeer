@@ -12,7 +12,7 @@ package com.example.afs.musicpad;
 import com.example.afs.fluidsynth.Synthesizer;
 import com.example.afs.fluidsynth.Synthesizer.Settings;
 import com.example.afs.jni.FluidSynth;
-import com.example.afs.jni.InputHandler;
+import com.example.afs.jni.Input;
 import com.example.afs.musicpad.device.common.DeviceWatcher;
 import com.example.afs.musicpad.device.midi.MidiWatcherBehavior;
 import com.example.afs.musicpad.device.qwerty.QwertyWatcherBehavior;
@@ -31,7 +31,7 @@ public class MusicPad {
       System.exit(1);
     }
     System.loadLibrary(FluidSynth.NATIVE_LIBRARY_NAME);
-    System.loadLibrary(InputHandler.NATIVE_LIBRARY_NAME);
+    System.loadLibrary(Input.NATIVE_LIBRARY_NAME);
     MusicPad musicPad = new MusicPad(args[0]);
     musicPad.start();
   }

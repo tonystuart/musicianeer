@@ -9,27 +9,29 @@
 
 package com.example.afs.musicpad.message;
 
-public class OnDeviceKeyDown extends Message {
+import com.example.afs.musicpad.song.Song;
 
-  private int deviceIndex;
-  private String key;
+public class OnSampleSong extends Message {
 
-  public OnDeviceKeyDown(int deviceIndex, String key) {
-    this.deviceIndex = deviceIndex;
-    this.key = key;
+  private Song song;
+  private int ticksPerPixel;
+
+  public OnSampleSong(Song song, int ticksPerPixel) {
+    this.song = song;
+    this.ticksPerPixel = ticksPerPixel;
   }
 
-  public int getDeviceIndex() {
-    return deviceIndex;
+  public Song getSong() {
+    return song;
   }
 
-  public String getKey() {
-    return key;
+  public int getTicksPerPixel() {
+    return ticksPerPixel;
   }
 
   @Override
   public String toString() {
-    return "OnDeviceKeyDown [deviceIndex=" + deviceIndex + ", key=" + key + "]";
+    return "OnSampleSong [song=" + song + ", ticksPerPixel=" + ticksPerPixel + "]";
   }
 
 }

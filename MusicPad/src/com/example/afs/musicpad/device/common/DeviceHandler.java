@@ -18,14 +18,14 @@ import com.example.afs.musicpad.DeviceCommand;
 import com.example.afs.musicpad.device.midi.MidiPlayableMap;
 import com.example.afs.musicpad.device.qwerty.AlphaPlayableMap;
 import com.example.afs.musicpad.device.qwerty.NumericPlayableMap;
-import com.example.afs.musicpad.playable.PlayableMap;
 import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnChannelUpdate;
 import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnDeviceCommand;
-import com.example.afs.musicpad.message.OnDeviceKeyDown;
+import com.example.afs.musicpad.message.OnSampleChannel;
 import com.example.afs.musicpad.message.OnSong;
 import com.example.afs.musicpad.midi.Midi;
+import com.example.afs.musicpad.playable.PlayableMap;
 import com.example.afs.musicpad.player.Player;
 import com.example.afs.musicpad.player.Player.Action;
 import com.example.afs.musicpad.player.Sound;
@@ -64,6 +64,7 @@ public class DeviceHandler extends BrokerTask<Message> {
     this.player = new Player(synthesizer, deviceIndex);
     subscribe(OnCommand.class, message -> doCommand(message));
     subscribe(OnSong.class, message -> doSong(message));
+    subscribe(OnSampleChannel.class, message -> doSampleChannel(message));
     subscribe(OnDeviceCommand.class, message -> doDeviceCommand(message));
   }
 
@@ -154,7 +155,6 @@ public class DeviceHandler extends BrokerTask<Message> {
         }
       }
     }
-    publish(new OnDeviceKeyDown(deviceIndex, Character.toString((char) inputCode)));
   }
 
   public void onUp(int inputCode) {
@@ -198,6 +198,12 @@ public class DeviceHandler extends BrokerTask<Message> {
     Command command = message.getCommand();
     int parameter = message.getParameter();
     switch (command) {
+    case PLAY:
+      player.setEnabled(true);
+      break;
+    case STOP:
+      player.setEnabled(true);
+      break;
     case TEMPO:
       player.setPercentTempo(Range.scaleMidiToPercent(parameter));
       break;
@@ -269,7 +275,7 @@ public class DeviceHandler extends BrokerTask<Message> {
     case MIDI:
     case NUMERIC:
       this.inputType = inputType;
-      publishChannelUpdate();
+      updateChannel();
       break;
     case DETACH:
       getBroker().publish(new OnCommand(Command.DETACH, deviceIndex));
@@ -304,7 +310,7 @@ public class DeviceHandler extends BrokerTask<Message> {
   private void doOutput(int typeIndex) {
     OutputType outputType = OutputType.values()[typeIndex];
     player.setOutputType(outputType);
-    publishChannelUpdate();
+    updateChannel();
   }
 
   private void doPreviousChannel() {
@@ -329,13 +335,17 @@ public class DeviceHandler extends BrokerTask<Message> {
     }
   }
 
-  private void doSong(OnSong message) {
-    song = message.getSong();
+  private void doSampleChannel(OnSampleChannel message) {
+    if (message.getDeviceIndex() == deviceIndex) {
+      selectChannel(message.getChannel());
+      player.setEnabled(true);
+    } else {
+      player.setEnabled(false);
+    }
   }
 
-  private void publishChannelUpdate() {
-    playableMap = createPlayableMap();
-    getBroker().publish(new OnChannelUpdate(deviceIndex, deviceName, channel, inputType, player.getOutputType(), playableMap));
+  private void doSong(OnSong message) {
+    song = message.getSong();
   }
 
   private void selectChannel(int channel) {
@@ -349,7 +359,7 @@ public class DeviceHandler extends BrokerTask<Message> {
         selectProgram(program);
       }
     }
-    publishChannelUpdate();
+    updateChannel();
   }
 
   private void selectProgram(int program) {
@@ -358,6 +368,11 @@ public class DeviceHandler extends BrokerTask<Message> {
 
   private void setPercentVelocity(int percentVelocity) {
     player.setPercentVelocity(percentVelocity);
+  }
+
+  private void updateChannel() {
+    playableMap = createPlayableMap();
+    getBroker().publish(new OnChannelUpdate(deviceIndex, deviceName, channel, inputType, player.getOutputType(), playableMap));
   }
 
 }

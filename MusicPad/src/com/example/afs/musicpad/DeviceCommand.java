@@ -21,4 +21,5 @@ public enum DeviceCommand {
   NEXT_CHANNEL, //
   PREVIOUS_PROGRAM, //
   NEXT_PROGRAM, //
+  SAMPLE_CHANNEL, //
 }

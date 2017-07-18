@@ -9,8 +9,8 @@
 
 package com.example.afs.musicpad.player;
 
-import com.example.afs.fluidsynth.FluidSynth;
 import com.example.afs.fluidsynth.Synthesizer;
+import com.example.afs.jni.FluidSynth;
 import com.example.afs.musicpad.Trace;
 import com.example.afs.musicpad.analyzer.Names;
 import com.example.afs.musicpad.device.common.DeviceHandler.OutputType;
@@ -33,15 +33,16 @@ public class Player {
   private static final int DEFAULT_PERCENT_VELOCITY = 100;
   public static final int MAX_PERCENT_VELOCITY = (100 * Midi.MAX_VALUE) / DEFAULT_VELOCITY;
 
+  private int program;
   private int playerChannel;
   private int percentTempo;
   private int percentVelocity = DEFAULT_PERCENT_VELOCITY;
+  private boolean isEnabled = true;
 
   private Synthesizer synthesizer;
   private Arpeggiator arpeggiator;
   private Sound repeatArpeggiation;
   private OutputType outputType = OutputType.NORMAL;
-  private int program;
 
   public Player(Synthesizer synthesizer, int deviceIndex) {
     this.synthesizer = synthesizer;
@@ -76,18 +77,20 @@ public class Player {
   }
 
   public void play(Action action, Sound sound) {
-    if (action == Action.PRESS && Trace.isTracePlay()) {
-      System.out.println("Player.play: soundType=" + sound);
-    }
-    switch (outputType) {
-    case ARPEGGIO:
-      sendToArpeggiator(action, sound);
-      break;
-    case NORMAL:
-      sendToSynthesizer(action, sound);
-      break;
-    default:
-      throw new UnsupportedOperationException();
+    if (isEnabled) {
+      if (action == Action.PRESS && Trace.isTracePlay()) {
+        System.out.println("Player.play: soundType=" + sound);
+      }
+      switch (outputType) {
+      case ARPEGGIO:
+        sendToArpeggiator(action, sound);
+        break;
+      case NORMAL:
+        sendToSynthesizer(action, sound);
+        break;
+      default:
+        throw new UnsupportedOperationException();
+      }
     }
   }
 
@@ -100,6 +103,10 @@ public class Player {
       synthesizer.setChannelType(playerChannel, FluidSynth.CHANNEL_TYPE_MELODIC);
       synthesizer.changeProgram(playerChannel, program);
     }
+  }
+
+  public void setEnabled(boolean isEnabled) {
+    this.isEnabled = isEnabled;
   }
 
   public void setOutputType(OutputType outputType) {

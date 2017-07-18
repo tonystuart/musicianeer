@@ -11,20 +11,26 @@ package com.example.afs.musicpad.message;
 
 import com.example.afs.musicpad.song.Song;
 
-public class OnSample extends Message {
+public class OnSampleChannel extends Message {
 
   private Song song;
+  private int deviceIndex;
   private int channel;
   private int ticksPerPixel;
 
-  public OnSample(Song song, int channel, int ticksPerPixel) {
+  public OnSampleChannel(Song song, int deviceIndex, int channel, int ticksPerPixel) {
     this.song = song;
+    this.deviceIndex = deviceIndex;
     this.channel = channel;
     this.ticksPerPixel = ticksPerPixel;
   }
 
   public int getChannel() {
     return channel;
+  }
+
+  public int getDeviceIndex() {
+    return deviceIndex;
   }
 
   public Song getSong() {
@@ -37,7 +43,7 @@ public class OnSample extends Message {
 
   @Override
   public String toString() {
-    return "OnSample [song=" + song + ", channel=" + channel + ", ticksPerPixel=" + ticksPerPixel + "]";
+    return "OnSampleChannel [song=" + song + ", deviceIndex=" + deviceIndex + ", channel=" + channel + ", ticksPerPixel=" + ticksPerPixel + "]";
   }
 
 }

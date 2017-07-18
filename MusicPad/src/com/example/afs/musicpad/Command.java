@@ -15,7 +15,6 @@ public enum Command {
   PLAY, //
   NEW_SONG, //
   SAMPLE_SONG, //
-  SAMPLE_CHANNEL, //
   SEEK, //
   STOP, //
   BACKWARD, //

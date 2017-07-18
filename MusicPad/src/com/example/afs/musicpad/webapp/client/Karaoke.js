@@ -27,8 +27,10 @@ karaoke.onCommand = function(message) {
 }
 
 karaoke.onChannelClick = function(item) {
+    let channels = document.getElementById('channels');
+    let deviceIndex = channels.dataset['deviceIndex'];
     let channelIndex = item.dataset['channelIndex'];
-    musicPad.sendCommand('SAMPLE_CHANNEL', channelIndex);
+    musicPad.sendDeviceCommand('SAMPLE_CHANNEL', deviceIndex, channelIndex);
     musicPad.selectElement(item);
 }
 
@@ -41,9 +43,10 @@ karaoke.onChannelDetails = function(message) {
 
 karaoke.onChannels = function(message) {
     let channels = musicPad.replaceTab('channels', message.html);
+    let deviceIndex = channels.dataset['deviceIndex'];
     let defaultChannel = channels.dataset['defaultChannel'];
     let item = channels.querySelector('div[data-channel-index=\'' + defaultChannel + '\']');
-    musicPad.sendCommand('SAMPLE_CHANNEL', defaultChannel);
+    musicPad.sendDeviceCommand('SAMPLE_CHANNEL', deviceIndex, defaultChannel);
     musicPad.selectElement(item);
 }
 
@@ -58,18 +61,6 @@ karaoke.onChannelSelect = function(message) {
     }
 }
 
-karaoke.onDeviceKeyDown = function(message) {
-    let channels = document.getElementById('channels');
-    if (channels) {
-        let deviceIndex = channels.dataset['deviceIndex'];
-        if (deviceIndex == message.deviceIndex) {
-            let keyboardTest = channels.querySelector(".keyboard-test");
-            if (keyboardTest) {
-                keyboardTest.innerHTML = message.key;
-            }
-        }
-    }
-}
 karaoke.onLoad = function() {
     musicPad.createWebSocketClient('ws://localhost:8080/v1/karaoke', karaoke.onWebSocketMessage, karaoke.onWebSocketClose);
 }

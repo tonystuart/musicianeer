@@ -15,7 +15,6 @@ import java.util.Set;
 
 import com.example.afs.musicpad.device.common.DeviceHandler.OutputType;
 import com.example.afs.musicpad.html.Division;
-import com.example.afs.musicpad.html.Element;
 import com.example.afs.musicpad.player.Sound;
 import com.example.afs.musicpad.player.Sounds;
 import com.example.afs.musicpad.player.Sounds.SoundCount;
@@ -43,16 +42,8 @@ public class ChannelDetails {
     division.appendChild(Utils.createPair("Percent of Time Playing", song.getOccupancy(channel) + "%"));
     division.appendChild(Utils.createPair("Average Number of Notes Playing at Once", (double) (song.getConcurrency(channel) / 100)));
     division.appendChild(Utils.createPair("Unique Sounds", getUniqueSounds()));
-    division.appendChild(createKeyboardTest());
     String html = division.render();
     return html;
-  }
-
-  private Element createKeyboardTest() {
-    Division division = new Division(".detail");
-    division.appendChild(new Division(".name", "Keyboard Test"));
-    division.appendChild(new Division(".value", ".keyboard-test", "Type keys to identifier keyboard"));
-    return division;
   }
 
   private int getPercentMeasuresPlayed() {

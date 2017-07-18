@@ -14,8 +14,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.NavigableMap;
 
-import com.example.afs.musicpad.playable.Playable;
-import com.example.afs.musicpad.playable.PlayableMap;
 import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnChannelDetails;
 import com.example.afs.musicpad.message.OnChannelUpdate;
@@ -26,10 +24,12 @@ import com.example.afs.musicpad.message.OnMidiFiles;
 import com.example.afs.musicpad.message.OnPickChannel;
 import com.example.afs.musicpad.message.OnPrompter;
 import com.example.afs.musicpad.message.OnRenderSong;
-import com.example.afs.musicpad.message.OnSample;
+import com.example.afs.musicpad.message.OnSampleChannel;
+import com.example.afs.musicpad.message.OnSampleSong;
 import com.example.afs.musicpad.message.OnSongDetails;
 import com.example.afs.musicpad.message.OnSongs;
-import com.example.afs.musicpad.song.ChannelNotes;
+import com.example.afs.musicpad.playable.Playable;
+import com.example.afs.musicpad.playable.PlayableMap;
 import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.task.BrokerTask;
 import com.example.afs.musicpad.util.Broker;
@@ -43,11 +43,12 @@ public class KaraokeRenderer extends BrokerTask<Message> {
 
   public KaraokeRenderer(Broker<Message> broker) {
     super(broker);
-    subscribe(OnSample.class, message -> doSample(message));
     subscribe(OnCommand.class, message -> doCommand(message));
     subscribe(OnMidiFiles.class, message -> doMidiFiles(message));
     subscribe(OnRenderSong.class, message -> doRenderSong(message));
+    subscribe(OnSampleSong.class, message -> doSampleSong(message));
     subscribe(OnPickChannel.class, message -> doPickChannel(message));
+    subscribe(OnSampleChannel.class, message -> doSampleChannel(message));
     subscribe(OnChannelUpdate.class, message -> doChannelUpdate(message));
     subscribe(OnDeviceDetached.class, message -> doDeviceDetached(message));
   }
@@ -110,18 +111,19 @@ public class KaraokeRenderer extends BrokerTask<Message> {
     renderWhenReady();
   }
 
-  private void doSample(OnSample message) {
+  private void doSampleChannel(OnSampleChannel message) {
     Song song = message.getSong();
     int channel = message.getChannel();
-    if (channel == ChannelNotes.ALL_CHANNELS) {
-      SongDetails songDetails = new SongDetails(song);
-      String html = songDetails.render();
-      publish(new OnSongDetails(html));
-    } else {
-      ChannelDetails channelDetails = new ChannelDetails(song, channel);
-      String html = channelDetails.render();
-      publish(new OnChannelDetails(html));
-    }
+    ChannelDetails channelDetails = new ChannelDetails(song, channel);
+    String html = channelDetails.render();
+    publish(new OnChannelDetails(html));
+  }
+
+  private void doSampleSong(OnSampleSong message) {
+    Song song = message.getSong();
+    SongDetails songDetails = new SongDetails(song);
+    String html = songDetails.render();
+    publish(new OnSongDetails(html));
   }
 
   private void doSong(int songIndex) {

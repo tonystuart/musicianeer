@@ -16,7 +16,6 @@ import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnChannelDetails;
 import com.example.afs.musicpad.message.OnChannels;
 import com.example.afs.musicpad.message.OnCommand;
-import com.example.afs.musicpad.message.OnDeviceKeyDown;
 import com.example.afs.musicpad.message.OnPrompter;
 import com.example.afs.musicpad.message.OnSongDetails;
 import com.example.afs.musicpad.message.OnSongs;
@@ -37,7 +36,6 @@ public class KaraokeWebApp extends WebApp {
     subscribe(OnChannels.class, message -> doMessage(message));
     subscribe(OnPrompter.class, message -> doMessage(message));
     subscribe(OnSongDetails.class, message -> doMessage(message));
-    subscribe(OnDeviceKeyDown.class, message -> doMessage(message));
     subscribe(OnChannelDetails.class, message -> doMessage(message));
     subscribe(OnSongs.class, message -> doStatefulMessage(message));
   }
