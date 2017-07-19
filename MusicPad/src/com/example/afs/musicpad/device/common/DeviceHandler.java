@@ -100,6 +100,12 @@ public class DeviceHandler extends BrokerTask<Message> {
       isCommand = true;
     } else if (isCommand) {
       switch (inputCode) {
+      case 'B':
+        publish(new OnCommand(Command.BACKWARD));
+        break;
+      case 'F':
+        publish(new OnCommand(Command.FORWARD));
+        break;
       case 'N':
         publish(new OnCommand(Command.NEW_SONG));
         break;
