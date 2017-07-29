@@ -36,4 +36,5 @@ public enum Command {
   QUIT, //
   REDUCE_MASTER_GAIN, //
   INCREASE_MASTER_GAIN, //
+  VIEW, //
 }

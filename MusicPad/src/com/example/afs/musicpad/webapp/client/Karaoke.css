@@ -1,4 +1,6 @@
-@CHARSET "UTF-8"; html {
+@CHARSET "UTF-8";
+
+html {
     height: 100%;
     width: 100%;
     font-family: Sans-Serif;
@@ -282,3 +284,4 @@ input {
 .hidden {
 	display: none;
 }
+

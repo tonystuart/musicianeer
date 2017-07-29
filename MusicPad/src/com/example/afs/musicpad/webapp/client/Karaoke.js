@@ -122,7 +122,20 @@ karaoke.onSongSelect = function(message) {
     }
 }
 
-karaoke.onTick = function(tick) {
+karaoke.scrollStaffPrompter = function(tick) {
+  let scroller = document.getElementById("notator-scroller");
+  let svg = scroller.querySelector("svg");
+  if (svg) {
+    let scaledTick = tick / 5; //cockpit.ticksPerPixel;
+    let screenX = musicPad.toScreen(svg, scaledTick);
+    let width = scroller.offsetWidth;
+    let midPoint = width / 2;
+    scroller.scrollLeft += screenX - midPoint;
+    console.log("x1="+scaledTick+", x2="+screenX);
+  }
+}
+
+karaoke.scrollKaraokePrompter = function(tick) {
     let prompterList = document.getElementById('prompter-list');
     if (!prompterList) {
         return;
@@ -157,6 +170,8 @@ karaoke.onTick = function(tick) {
     }
 }
 
+karaoke.onTick = karaoke.scrollKaraokePrompter;
+
 karaoke.onWebSocketClose = function() {
     karaoke.onTick(0);
 }
@@ -164,9 +179,6 @@ karaoke.onWebSocketClose = function() {
 karaoke.onWebSocketMessage = function(json) {
     let message = JSON.parse(json);
     switch (message.type) {
-    case 'OnPrompter':
-        karaoke.onPrompter(message);
-        break;
     case 'OnChannelDetails':
         karaoke.onChannelDetails(message);
         break;
@@ -176,6 +188,14 @@ karaoke.onWebSocketMessage = function(json) {
     case 'OnDeviceKeyDown':
         karaoke.onDeviceKeyDown(message);
         break;
+    case 'OnPrompter':
+      karaoke.onPrompter(message);
+      karaoke.onTick = karaoke.scrollKaraokePrompter;
+      break;
+    case 'OnStaffPrompter':
+      karaoke.onPrompter(message);
+      karaoke.onTick = karaoke.scrollStaffPrompter;
+      break;
     case 'OnSongDetails':
         karaoke.onSongDetails(message);
         break;

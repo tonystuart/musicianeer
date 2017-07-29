@@ -28,6 +28,7 @@ import com.example.afs.musicpad.message.OnSampleChannel;
 import com.example.afs.musicpad.message.OnSampleSong;
 import com.example.afs.musicpad.message.OnSongDetails;
 import com.example.afs.musicpad.message.OnSongs;
+import com.example.afs.musicpad.message.OnStaffPrompter;
 import com.example.afs.musicpad.playable.Playable;
 import com.example.afs.musicpad.playable.PlayableMap;
 import com.example.afs.musicpad.song.Song;
@@ -36,6 +37,8 @@ import com.example.afs.musicpad.util.Broker;
 import com.example.afs.musicpad.util.RandomAccessList;
 
 public class KaraokeRenderer extends BrokerTask<Message> {
+
+  private boolean isPrompter = false;
 
   private Song song;
   private NavigableMap<Integer, Integer> deviceChannelAssignments;
@@ -75,6 +78,9 @@ public class KaraokeRenderer extends BrokerTask<Message> {
 
   private void doCommand(OnCommand message) {
     switch (message.getCommand()) {
+    case VIEW:
+      doView();
+      break;
     case SONG:
       doSong(message.getParameter());
       break;
@@ -84,6 +90,10 @@ public class KaraokeRenderer extends BrokerTask<Message> {
   }
 
   private void doDeviceDetached(OnDeviceDetached message) {
+    if (devicePlayables.size() == 1) {
+      System.err.println("KaraokeRenderer: suppressing removal of last playable for testing purposes");
+      return;
+    }
     int deviceIndex = message.getDeviceIndex();
     devicePlayables.remove(deviceIndex);
     if (deviceChannelAssignments != null) {
@@ -130,11 +140,22 @@ public class KaraokeRenderer extends BrokerTask<Message> {
     deviceChannelAssignments = null;
   }
 
+  private void doView() {
+    isPrompter = !isPrompter;
+    renderWhenReady();
+  }
+
   private void renderWhenReady() {
     if (song != null && allDevicePlayablesAvailable()) {
-      Prompter prompter = new Prompter(song, devicePlayables);
-      String html = prompter.render();
-      getBroker().publish(new OnPrompter(html));
+      if (isPrompter) {
+        Prompter prompter = new Prompter(song, devicePlayables);
+        String html = prompter.render();
+        getBroker().publish(new OnPrompter(html));
+      } else {
+        StaffPrompter staffPrompter = new StaffPrompter(song, devicePlayables);
+        String html = staffPrompter.render();
+        getBroker().publish(new OnStaffPrompter(html));
+      }
     }
   }
 

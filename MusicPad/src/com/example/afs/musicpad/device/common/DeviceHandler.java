@@ -106,20 +106,23 @@ public class DeviceHandler extends BrokerTask<Message> {
       case 'F':
         publish(new OnCommand(Command.FORWARD));
         break;
+      case 'I':
+        publish(new OnCommand(Command.INCREASE_MASTER_GAIN, 0));
+        break;
       case 'N':
         publish(new OnCommand(Command.NEW_SONG));
         break;
       case 'P':
         publish(new OnCommand(Command.PLAY, ChannelNotes.ALL_CHANNELS));
         break;
-      case 'S':
-        publish(new OnCommand(Command.STOP, 0));
-        break;
       case 'R':
         publish(new OnCommand(Command.REDUCE_MASTER_GAIN, 0));
         break;
-      case 'I':
-        publish(new OnCommand(Command.INCREASE_MASTER_GAIN, 0));
+      case 'S':
+        publish(new OnCommand(Command.STOP, 0));
+        break;
+      case 'V':
+        publish(new OnCommand(Command.VIEW));
         break;
       case '0':
         publish(new OnCommand(Command.SLOWER, 0));

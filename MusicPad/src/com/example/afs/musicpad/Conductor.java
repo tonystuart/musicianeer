@@ -37,7 +37,7 @@ import com.example.afs.musicpad.util.RandomAccessList;
 
 public class Conductor extends BrokerTask<Message> {
 
-  private static final int TICKS_PER_PIXEL = 5;
+  public static final int TICKS_PER_PIXEL = 5;
 
   private Song song;
   private File directory;
