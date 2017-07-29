@@ -9,11 +9,11 @@
 
 package com.example.afs.musicpad.message;
 
-public class OnPrompter extends Message {
+public class OnKaraokePrompter extends Message {
 
   private String html;
 
-  public OnPrompter(String html) {
+  public OnKaraokePrompter(String html) {
     this.html = html;
   }
 

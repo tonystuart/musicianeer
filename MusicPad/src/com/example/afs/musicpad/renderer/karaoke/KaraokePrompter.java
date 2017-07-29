@@ -19,7 +19,7 @@ import com.example.afs.musicpad.html.Division;
 import com.example.afs.musicpad.html.Element;
 import com.example.afs.musicpad.html.TextElement;
 import com.example.afs.musicpad.message.Message;
-import com.example.afs.musicpad.message.OnPrompter;
+import com.example.afs.musicpad.message.OnKaraokePrompter;
 import com.example.afs.musicpad.playable.Playable;
 import com.example.afs.musicpad.song.Default;
 import com.example.afs.musicpad.song.Song;
@@ -40,7 +40,7 @@ public class KaraokePrompter implements PrompterFactory.Prompter {
   @Override
   public Message getMessage() {
     String html = render();
-    return new OnPrompter(html);
+    return new OnKaraokePrompter(html);
   }
 
   public String render() {

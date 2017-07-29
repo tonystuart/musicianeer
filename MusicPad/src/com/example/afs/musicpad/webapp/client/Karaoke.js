@@ -1,7 +1,9 @@
 'use strict';
 var karaoke = karaoke || {};
 
-karaoke.ticksPerPixel = 1;
+// NB: ticksPerPixel is initialized when the prompter is received
+
+karaoke.ticksPerPixel = null;
 
 karaoke.getNextPrompt = function(currentPrompt) {
     let next = currentPrompt.nextElementSibling;
@@ -123,16 +125,16 @@ karaoke.onSongSelect = function(message) {
 }
 
 karaoke.scrollStaffPrompter = function(tick) {
-  let scroller = document.getElementById("notator-scroller");
-  let svg = scroller.querySelector("svg");
-  if (svg) {
-    let scaledTick = tick / 5; //cockpit.ticksPerPixel;
-    let screenX = musicPad.toScreen(svg, scaledTick);
-    let width = scroller.offsetWidth;
-    let midPoint = width / 2;
-    scroller.scrollLeft += screenX - midPoint;
-    console.log("x1="+scaledTick+", x2="+screenX);
-  }
+    let scroller = document.getElementById("notator-scroller");
+    let svg = scroller.querySelector("svg");
+    if (svg) {
+        let scaledTick = tick / karaoke.ticksPerPixel;
+        let screenX = musicPad.toScreen(svg, scaledTick);
+        let width = scroller.offsetWidth;
+        let midPoint = width / 2;
+        scroller.scrollLeft += screenX - midPoint;
+        console.log("x1=" + scaledTick + ", x2=" + screenX);
+    }
 }
 
 karaoke.scrollKaraokePrompter = function(tick) {
@@ -170,7 +172,9 @@ karaoke.scrollKaraokePrompter = function(tick) {
     }
 }
 
-karaoke.onTick = karaoke.scrollKaraokePrompter;
+// NB: onTick is initialized when the prompter is received
+
+karaoke.onTick = function() {}
 
 karaoke.onWebSocketClose = function() {
     karaoke.onTick(0);
@@ -188,14 +192,15 @@ karaoke.onWebSocketMessage = function(json) {
     case 'OnDeviceKeyDown':
         karaoke.onDeviceKeyDown(message);
         break;
-    case 'OnPrompter':
-      karaoke.onPrompter(message);
-      karaoke.onTick = karaoke.scrollKaraokePrompter;
-      break;
+    case 'OnKaraokePrompter':
+        karaoke.onTick = karaoke.scrollKaraokePrompter;
+        karaoke.onPrompter(message);
+        break;
     case 'OnStaffPrompter':
-      karaoke.onPrompter(message);
-      karaoke.onTick = karaoke.scrollStaffPrompter;
-      break;
+        karaoke.ticksPerPixel = message.ticksPerPixel;
+        karaoke.onTick = karaoke.scrollStaffPrompter;
+        karaoke.onPrompter(message);
+        break;
     case 'OnSongDetails':
         karaoke.onSongDetails(message);
         break;
