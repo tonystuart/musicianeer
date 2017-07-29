@@ -154,7 +154,7 @@ public class KaraokeRenderer extends BrokerTask<Message> {
       } else {
         StaffPrompter staffPrompter = new StaffPrompter(song, devicePlayables);
         String html = staffPrompter.render();
-        getBroker().publish(new OnStaffPrompter(html));
+        getBroker().publish(new OnStaffPrompter(html, PlayableStaff.TICKS_PER_PIXEL));
       }
     }
   }

@@ -14,24 +14,18 @@ import com.example.afs.musicpad.song.Song;
 public class OnSong extends Message {
 
   private Song song;
-  private int ticksPerPixel;
 
-  public OnSong(Song song, int ticksPerPixel) {
+  public OnSong(Song song) {
     this.song = song;
-    this.ticksPerPixel = ticksPerPixel;
   }
 
   public Song getSong() {
     return song;
   }
 
-  public int getTicksPerPixel() {
-    return ticksPerPixel;
-  }
-
   @Override
   public String toString() {
-    return "OnSong [song=" + song + ", ticksPerPixel=" + ticksPerPixel + "]";
+    return "OnSong [song=" + song + "]";
   }
 
 }

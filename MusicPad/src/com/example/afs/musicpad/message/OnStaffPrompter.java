@@ -12,13 +12,19 @@ package com.example.afs.musicpad.message;
 public class OnStaffPrompter extends Message {
 
   private String html;
+  private int ticksPerPixel;
 
-  public OnStaffPrompter(String html) {
+  public OnStaffPrompter(String html, int ticksPerPixel) {
     this.html = html;
+    this.ticksPerPixel = ticksPerPixel;
   }
 
   public String getHtml() {
     return html;
+  }
+
+  public int getTicksPerPixel() {
+    return ticksPerPixel;
   }
 
   @Override

@@ -11,7 +11,6 @@ package com.example.afs.musicpad.renderer.karaoke;
 
 import java.util.SortedSet;
 
-import com.example.afs.musicpad.Conductor;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.playable.Playable;
 import com.example.afs.musicpad.player.Sound;
@@ -142,6 +141,8 @@ public class PlayableStaff {
   private static final String CLOSED = "closed";
   private static final String OPEN = "open";
 
+  public static final int TICKS_PER_PIXEL = 5;
+
   public static boolean isSharp(int midiNote) {
     return SHARPS[midiNote % SHARPS.length];
   }
@@ -166,10 +167,7 @@ public class PlayableStaff {
     return positions;
   }
 
-  private int ticksPerPixel = Conductor.TICKS_PER_PIXEL;
-
   private RandomAccessList<Playable> playables;
-
   private Song song;
 
   public PlayableStaff(Song song, RandomAccessList<Playable> playables) {
@@ -366,7 +364,7 @@ public class PlayableStaff {
   }
 
   private int getX(long tick) {
-    return (int) (tick / ticksPerPixel);
+    return (int) (tick / TICKS_PER_PIXEL);
   }
 
   private int getY(int midiNote) {

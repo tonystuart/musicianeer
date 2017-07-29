@@ -16,13 +16,11 @@ public class OnSampleChannel extends Message {
   private Song song;
   private int deviceIndex;
   private int channel;
-  private int ticksPerPixel;
 
-  public OnSampleChannel(Song song, int deviceIndex, int channel, int ticksPerPixel) {
+  public OnSampleChannel(Song song, int deviceIndex, int channel) {
     this.song = song;
     this.deviceIndex = deviceIndex;
     this.channel = channel;
-    this.ticksPerPixel = ticksPerPixel;
   }
 
   public int getChannel() {
@@ -37,13 +35,9 @@ public class OnSampleChannel extends Message {
     return song;
   }
 
-  public int getTicksPerPixel() {
-    return ticksPerPixel;
-  }
-
   @Override
   public String toString() {
-    return "OnSampleChannel [song=" + song + ", deviceIndex=" + deviceIndex + ", channel=" + channel + ", ticksPerPixel=" + ticksPerPixel + "]";
+    return "OnSampleChannel [song=" + song + ", deviceIndex=" + deviceIndex + ", channel=" + channel + "]";
   }
 
 }

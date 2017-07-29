@@ -37,8 +37,6 @@ import com.example.afs.musicpad.util.RandomAccessList;
 
 public class Conductor extends BrokerTask<Message> {
 
-  public static final int TICKS_PER_PIXEL = 5;
-
   private Song song;
   private File directory;
   private RandomAccessList<File> midiFiles;
@@ -127,12 +125,12 @@ public class Conductor extends BrokerTask<Message> {
     SongBuilder songBuilder = new SongBuilder();
     song = songBuilder.createSong(midiFile);
     System.out.println("Sampling song " + songIndex + " - " + song.getTitle());
-    publish(new OnSampleSong(song, TICKS_PER_PIXEL));
+    publish(new OnSampleSong(song));
   }
 
   private void doSampleChannel(int deviceIndex, int channel) {
     System.out.println("Sampling channel " + channel);
-    publish(new OnSampleChannel(song, deviceIndex, channel, TICKS_PER_PIXEL));
+    publish(new OnSampleChannel(song, deviceIndex, channel));
   }
 
   private void doSelectSong(int songIndex) {
@@ -141,7 +139,7 @@ public class Conductor extends BrokerTask<Message> {
     SongBuilder songBuilder = new SongBuilder();
     song = songBuilder.createSong(midiFile);
     System.out.println("Selecting song " + songIndex + " - " + song.getTitle());
-    publish(new OnSong(song, TICKS_PER_PIXEL));
+    publish(new OnSong(song));
     if (deviceIndexes.size() > 0) {
       publish(new OnPickChannel(song, deviceChannelAssignments, deviceIndexes.first()));
     }
@@ -149,7 +147,7 @@ public class Conductor extends BrokerTask<Message> {
 
   private void doTranspose(int distance) {
     song.transposeTo(distance);
-    publish(new OnSong(song, TICKS_PER_PIXEL));
+    publish(new OnSong(song));
   }
 
   private boolean isMidiFile(String name) {

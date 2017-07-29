@@ -18,18 +18,18 @@ import com.example.afs.musicpad.device.common.DeviceHandler.InputType;
 import com.example.afs.musicpad.device.common.DeviceHandler.OutputType;
 import com.example.afs.musicpad.html.Option;
 import com.example.afs.musicpad.html.Template;
-import com.example.afs.musicpad.playable.PlayableMap;
 import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnChannelUpdate;
 import com.example.afs.musicpad.message.OnFooter;
 import com.example.afs.musicpad.message.OnHeader;
 import com.example.afs.musicpad.message.OnMidiFiles;
-import com.example.afs.musicpad.message.OnStaff;
 import com.example.afs.musicpad.message.OnSong;
+import com.example.afs.musicpad.message.OnStaff;
 import com.example.afs.musicpad.message.OnTemplates;
 import com.example.afs.musicpad.message.OnTransport;
 import com.example.afs.musicpad.midi.Instruments;
 import com.example.afs.musicpad.midi.Midi;
+import com.example.afs.musicpad.playable.PlayableMap;
 import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.task.BrokerTask;
 import com.example.afs.musicpad.util.Broker;
@@ -37,7 +37,8 @@ import com.example.afs.musicpad.util.RandomAccessList;
 
 public class CockpitRenderer extends BrokerTask<Message> {
 
-  private int ticksPerPixel;
+  private static final int TICKS_PER_PIXEL = 5;
+  private int ticksPerPixel = TICKS_PER_PIXEL;
 
   private Song song;
   private RandomAccessList<File> midiFiles;
@@ -65,7 +66,6 @@ public class CockpitRenderer extends BrokerTask<Message> {
 
   private void doSong(OnSong message) {
     song = message.getSong();
-    ticksPerPixel = message.getTicksPerPixel();
     publish(new OnHeader(song.getTitle(), ticksPerPixel, new HeaderRenderer(midiFiles, song).render()));
     publish(new OnFooter(new FooterRenderer(song).render()));
     publish(new OnTransport(new TransportRenderer(song).render()));
