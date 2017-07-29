@@ -18,6 +18,8 @@ import java.util.SortedSet;
 import com.example.afs.musicpad.html.Division;
 import com.example.afs.musicpad.html.Element;
 import com.example.afs.musicpad.html.TextElement;
+import com.example.afs.musicpad.message.Message;
+import com.example.afs.musicpad.message.OnPrompter;
 import com.example.afs.musicpad.playable.Playable;
 import com.example.afs.musicpad.song.Default;
 import com.example.afs.musicpad.song.Song;
@@ -25,14 +27,20 @@ import com.example.afs.musicpad.song.Word;
 import com.example.afs.musicpad.util.FileUtilities;
 import com.example.afs.musicpad.util.RandomAccessList;
 
-public class Prompter {
+public class KaraokePrompter implements PrompterFactory.Prompter {
   private Song song;
   private Map<Integer, PlayableIterator> playableIterators;
   private Map<Integer, Playable> deviceSustain = new HashMap<>();
 
-  public Prompter(Song song, Map<Integer, RandomAccessList<Playable>> devicePlayables) {
+  public KaraokePrompter(Song song, Map<Integer, RandomAccessList<Playable>> devicePlayables) {
     this.song = song;
     this.playableIterators = getPlayableIterators(devicePlayables);
+  }
+
+  @Override
+  public Message getMessage() {
+    String html = render();
+    return new OnPrompter(html);
   }
 
   public String render() {

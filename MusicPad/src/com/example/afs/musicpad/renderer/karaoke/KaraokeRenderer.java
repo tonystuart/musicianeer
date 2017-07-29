@@ -22,13 +22,11 @@ import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnDeviceDetached;
 import com.example.afs.musicpad.message.OnMidiFiles;
 import com.example.afs.musicpad.message.OnPickChannel;
-import com.example.afs.musicpad.message.OnPrompter;
 import com.example.afs.musicpad.message.OnRenderSong;
 import com.example.afs.musicpad.message.OnSampleChannel;
 import com.example.afs.musicpad.message.OnSampleSong;
 import com.example.afs.musicpad.message.OnSongDetails;
 import com.example.afs.musicpad.message.OnSongs;
-import com.example.afs.musicpad.message.OnStaffPrompter;
 import com.example.afs.musicpad.playable.Playable;
 import com.example.afs.musicpad.playable.PlayableMap;
 import com.example.afs.musicpad.song.Song;
@@ -38,11 +36,10 @@ import com.example.afs.musicpad.util.RandomAccessList;
 
 public class KaraokeRenderer extends BrokerTask<Message> {
 
-  private boolean isPrompter = false;
-
   private Song song;
   private NavigableMap<Integer, Integer> deviceChannelAssignments;
   private Map<Integer, RandomAccessList<Playable>> devicePlayables = new HashMap<>();
+  private PrompterFactory prompterFactory = new PrompterFactory();
 
   public KaraokeRenderer(Broker<Message> broker) {
     super(broker);
@@ -141,21 +138,14 @@ public class KaraokeRenderer extends BrokerTask<Message> {
   }
 
   private void doView() {
-    isPrompter = !isPrompter;
+    prompterFactory.selectNext();
     renderWhenReady();
   }
 
   private void renderWhenReady() {
     if (song != null && allDevicePlayablesAvailable()) {
-      if (isPrompter) {
-        Prompter prompter = new Prompter(song, devicePlayables);
-        String html = prompter.render();
-        getBroker().publish(new OnPrompter(html));
-      } else {
-        StaffPrompter staffPrompter = new StaffPrompter(song, devicePlayables);
-        String html = staffPrompter.render();
-        getBroker().publish(new OnStaffPrompter(html, PlayableStaff.TICKS_PER_PIXEL));
-      }
+      PrompterFactory.Prompter prompter = prompterFactory.createPrompter(song, devicePlayables);
+      publish(prompter.getMessage());
     }
   }
 

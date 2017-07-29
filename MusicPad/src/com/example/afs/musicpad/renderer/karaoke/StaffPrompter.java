@@ -13,11 +13,13 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import com.example.afs.musicpad.html.Division;
+import com.example.afs.musicpad.message.Message;
+import com.example.afs.musicpad.message.OnStaffPrompter;
 import com.example.afs.musicpad.playable.Playable;
 import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.util.RandomAccessList;
 
-public class StaffPrompter {
+public class StaffPrompter implements PrompterFactory.Prompter {
 
   private Song song;
   private Map<Integer, RandomAccessList<Playable>> devicePlayables;
@@ -25,6 +27,12 @@ public class StaffPrompter {
   public StaffPrompter(Song song, Map<Integer, RandomAccessList<Playable>> devicePlayables) {
     this.song = song;
     this.devicePlayables = devicePlayables;
+  }
+
+  @Override
+  public Message getMessage() {
+    String html = render();
+    return new OnStaffPrompter(html, PlayableStaff.TICKS_PER_PIXEL);
   }
 
   public String render() {
