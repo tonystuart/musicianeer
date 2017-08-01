@@ -15,12 +15,15 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.SortedSet;
 
+import com.example.afs.musicpad.DeviceCommand;
 import com.example.afs.musicpad.html.Division;
 import com.example.afs.musicpad.html.Element;
+import com.example.afs.musicpad.html.Range;
 import com.example.afs.musicpad.html.TextElement;
 import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnKaraokePrompter;
 import com.example.afs.musicpad.playable.Playable;
+import com.example.afs.musicpad.renderer.CommandRenderer;
 import com.example.afs.musicpad.song.Default;
 import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.song.Word;
@@ -31,10 +34,18 @@ public class KaraokePrompter implements PrompterFactory.Prompter {
   private Song song;
   private Map<Integer, PlayableIterator> playableIterators;
   private Map<Integer, Playable> deviceSustain = new HashMap<>();
+  private Map<Integer, RandomAccessList<Playable>> devicePlayables;
 
   public KaraokePrompter(Song song, Map<Integer, RandomAccessList<Playable>> devicePlayables) {
     this.song = song;
-    this.playableIterators = getPlayableIterators(devicePlayables);
+    // TODO: User KaraokeRenderer.deviceChannelAssignments if order is important
+    this.devicePlayables = devicePlayables;
+    this.playableIterators = new HashMap<>();
+    for (Entry<Integer, RandomAccessList<Playable>> entry : devicePlayables.entrySet()) {
+      int device = entry.getKey();
+      RandomAccessList<Playable> playables = entry.getValue();
+      playableIterators.put(device, new PlayableIterator(playables));
+    }
   }
 
   @Override
@@ -109,7 +120,11 @@ public class KaraokePrompter implements PrompterFactory.Prompter {
   }
 
   private Element createDetails() {
-    Division division = new Division(".details");
+    Division division = new Division("#prompter-details", ".details");
+    Division verticalCenter = new Division();
+    // TODO: Consider handling like ChanneDetails, SongDetails
+    verticalCenter.appendChild(createVolumeControls());
+    division.appendChild(verticalCenter);
     return division;
   }
 
@@ -195,14 +210,25 @@ public class KaraokePrompter implements PrompterFactory.Prompter {
     return division;
   }
 
-  private Map<Integer, PlayableIterator> getPlayableIterators(Map<Integer, RandomAccessList<Playable>> devicePlayables) {
-    Map<Integer, PlayableIterator> playableIterators = new HashMap<>();
-    for (Entry<Integer, RandomAccessList<Playable>> entry : devicePlayables.entrySet()) {
-      int device = entry.getKey();
-      RandomAccessList<Playable> playables = entry.getValue();
-      playableIterators.put(device, new PlayableIterator(playables));
+  private Element createVolumeControls() {
+    Division division = new Division(".detail");
+    for (Integer deviceIndex : devicePlayables.keySet()) {
+      division.appendChild(createVolumeLabel(deviceIndex));
+      division.appendChild(createVolumeRange(deviceIndex));
     }
-    return playableIterators;
+    return division;
+  }
+
+  private Element createVolumeLabel(int deviceIndex) {
+    Division division = new Division(".name", "Volume " + deviceIndex);
+    return division;
+  }
+
+  private Element createVolumeRange(int deviceIndex) {
+    Range range = new Range("channel-volume-" + deviceIndex, 0, 127, 1, 64);
+    range.addClassName("value");
+    range.appendProperty("oninput", CommandRenderer.render(DeviceCommand.VELOCITY, deviceIndex));
+    return range;
   }
 
   private String getText(SortedSet<Word> words) {

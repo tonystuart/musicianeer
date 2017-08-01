@@ -28,7 +28,7 @@ public class PrompterFactory {
     KARAOKE, STAFF
   }
 
-  private PrompterFactory.PrompterType prompterType = PrompterType.STAFF;
+  private PrompterFactory.PrompterType prompterType = PrompterType.KARAOKE;
 
   public PrompterFactory.Prompter createPrompter(Song song, Map<Integer, RandomAccessList<Playable>> devicePlayables) {
     switch (prompterType) {
