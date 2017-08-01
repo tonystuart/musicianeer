@@ -10,9 +10,8 @@
 package com.example.afs.musicpad.renderer.karaoke;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.NavigableMap;
+import java.util.TreeMap;
 
 import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnChannelDetails;
@@ -38,7 +37,7 @@ public class KaraokeRenderer extends BrokerTask<Message> {
 
   private Song song;
   private NavigableMap<Integer, Integer> deviceChannelAssignments;
-  private Map<Integer, RandomAccessList<Playable>> devicePlayables = new HashMap<>();
+  private NavigableMap<Integer, RandomAccessList<Playable>> devicePlayables = new TreeMap<>();
   private PrompterFactory prompterFactory = new PrompterFactory();
 
   public KaraokeRenderer(Broker<Message> broker) {

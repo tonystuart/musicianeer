@@ -9,7 +9,7 @@
 
 package com.example.afs.musicpad.renderer.karaoke;
 
-import java.util.Map;
+import java.util.NavigableMap;
 
 import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.playable.Playable;
@@ -30,7 +30,7 @@ public class PrompterFactory {
 
   private PrompterFactory.PrompterType prompterType = PrompterType.KARAOKE;
 
-  public PrompterFactory.Prompter createPrompter(Song song, Map<Integer, RandomAccessList<Playable>> devicePlayables) {
+  public PrompterFactory.Prompter createPrompter(Song song, NavigableMap<Integer, RandomAccessList<Playable>> devicePlayables) {
     switch (prompterType) {
     case KARAOKE:
       return new KaraokePrompter(song, devicePlayables);

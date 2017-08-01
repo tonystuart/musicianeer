@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.NavigableMap;
 import java.util.SortedSet;
 
 import com.example.afs.musicpad.DeviceCommand;
@@ -34,11 +35,10 @@ public class KaraokePrompter implements PrompterFactory.Prompter {
   private Song song;
   private Map<Integer, PlayableIterator> playableIterators;
   private Map<Integer, Playable> deviceSustain = new HashMap<>();
-  private Map<Integer, RandomAccessList<Playable>> devicePlayables;
+  private NavigableMap<Integer, RandomAccessList<Playable>> devicePlayables;
 
-  public KaraokePrompter(Song song, Map<Integer, RandomAccessList<Playable>> devicePlayables) {
+  public KaraokePrompter(Song song, NavigableMap<Integer, RandomAccessList<Playable>> devicePlayables) {
     this.song = song;
-    // TODO: User KaraokeRenderer.deviceChannelAssignments if order is important
     this.devicePlayables = devicePlayables;
     this.playableIterators = new HashMap<>();
     for (Entry<Integer, RandomAccessList<Playable>> entry : devicePlayables.entrySet()) {
@@ -122,7 +122,6 @@ public class KaraokePrompter implements PrompterFactory.Prompter {
   private Element createDetails() {
     Division division = new Division("#prompter-details", ".details");
     Division verticalCenter = new Division();
-    // TODO: Consider handling like ChanneDetails, SongDetails
     verticalCenter.appendChild(createVolumeControls());
     division.appendChild(verticalCenter);
     return division;
@@ -212,15 +211,17 @@ public class KaraokePrompter implements PrompterFactory.Prompter {
 
   private Element createVolumeControls() {
     Division division = new Division(".detail");
+    int playerIndex = 0;
     for (Integer deviceIndex : devicePlayables.keySet()) {
-      division.appendChild(createVolumeLabel(deviceIndex));
+      division.appendChild(createVolumeLabel(playerIndex));
       division.appendChild(createVolumeRange(deviceIndex));
+      playerIndex++;
     }
     return division;
   }
 
-  private Element createVolumeLabel(int deviceIndex) {
-    Division division = new Division(".name", "Volume " + deviceIndex);
+  private Element createVolumeLabel(int playerIndex) {
+    Division division = new Division(".name", Utils.getPlayerName(playerIndex) + " Volume");
     return division;
   }
 
