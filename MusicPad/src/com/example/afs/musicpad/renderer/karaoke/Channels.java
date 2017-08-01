@@ -22,13 +22,6 @@ import com.example.afs.musicpad.util.Value;
 
 public class Channels {
 
-  private static final String[] COLORS = new String[] {
-      "Red",
-      "Green",
-      "Blue",
-      "Yellow"
-  };
-
   private int deviceIndex;
   private int playerIndex;
   private int defaultChannel;
@@ -131,7 +124,7 @@ public class Channels {
 
   private Element createTitle(int playerIndex) {
     Division division = new Division(".title");
-    String name = getPlayerName(playerIndex);
+    String name = Utils.getPlayerName(playerIndex);
     division.appendChild(new Division(name + ": Pick your Part"));
     return division;
   }
@@ -149,7 +142,7 @@ public class Channels {
         } else {
           s.append(", ");
         }
-        s.append(getPlayerName(index));
+        s.append(Utils.getPlayerName(index));
       }
       index++;
     }
@@ -170,16 +163,6 @@ public class Channels {
       }
     }
     return firstChannel;
-  }
-
-  private String getPlayerName(int playerIndex) {
-    String name;
-    if (playerIndex < COLORS.length) {
-      name = COLORS[playerIndex] + " Player";
-    } else {
-      name = "Player " + playerIndex;
-    }
-    return name;
   }
 
   private boolean isFree(int channel) {

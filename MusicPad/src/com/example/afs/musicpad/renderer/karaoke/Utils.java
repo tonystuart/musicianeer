@@ -14,11 +14,28 @@ import com.example.afs.musicpad.html.Element;
 
 public class Utils {
 
+  private static final String[] COLORS = new String[] {
+      "Red",
+      "Green",
+      "Blue",
+      "Yellow"
+  };
+
   public static Element createPair(String name, Object value) {
     Division division = new Division(".detail");
     division.appendChild(new Division(".name", name));
     division.appendChild(new Division(".value", value.toString()));
     return division;
+  }
+
+  public static String getPlayerName(int playerIndex) {
+    String name;
+    if (playerIndex < COLORS.length) {
+      name = COLORS[playerIndex] + " Player";
+    } else {
+      name = "Player " + playerIndex;
+    }
+    return name;
   }
 
   public static String normalizeProgramName(String programName) {
