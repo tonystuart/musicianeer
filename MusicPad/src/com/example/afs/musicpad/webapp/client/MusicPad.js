@@ -2,11 +2,11 @@
 var musicPad = musicPad || {};
 
 musicPad.addClassToAllBut = function(className, selector, id) {
-  let nodeList = document.querySelectorAll(selector);
-  for (let i = 0; i < nodeList.length; i++) {
-    nodeList[i].classList.add(className);
-  }
-  document.getElementById(id).classList.remove(className);
+    let nodeList = document.querySelectorAll(selector);
+    for (let i = 0; i < nodeList.length; i++) {
+        nodeList[i].classList.add(className);
+    }
+    document.getElementById(id).classList.remove(className);
 }
 
 musicPad.appendTemplate = function(containerId, templateId) {
@@ -47,20 +47,20 @@ musicPad.fragmentToElement = function(fragment) {
 }
 
 musicPad.getRandomInt = function(min, max) {
-  min = Math.ceil(min);
-  max = Math.floor(max);
-  return Math.floor(Math.random() * (max - min)) + min;
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min)) + min;
 }
 
 musicPad.replaceTab = function(id, html) {
-  let tab = document.getElementById(id);
-  if (tab != null) {
-    tab.parentElement.removeChild(tab);
-  }
-  let element = musicPad.fragmentToElement(html);
-  document.body.appendChild(element);
-  musicPad.selectTab(id);
-  return element;
+    let tab = document.getElementById(id);
+    if (tab != null) {
+        tab.parentElement.removeChild(tab);
+    }
+    let element = musicPad.fragmentToElement(html);
+    document.body.appendChild(element);
+    musicPad.selectTab(id);
+    return element;
 }
 
 musicPad.request = function(resource, callback) {
@@ -84,7 +84,7 @@ musicPad.selectElement = function(element) {
 }
 
 musicPad.selectTab = function(id) {
-  musicPad.addClassToAllBut("hidden", ".tab", id);
+    musicPad.addClassToAllBut("hidden", ".tab", id);
 }
 
 musicPad.send = function(json) {
@@ -113,7 +113,7 @@ musicPad.sendChannelCommand = function(command, channel, parameter) {
 }
 
 musicPad.sendDeviceCommand = function(command, deviceIndex, parameter) {
-    console.log("command=" + command + ", deviceIndex=" + deviceIndex + ", parameter=" + parameter);
+    console.log("xyzzza command=" + command + ", deviceIndex=" + deviceIndex + ", parameter=" + parameter);
     musicPad.send(JSON.stringify({
         type: "OnDeviceCommand",
         deviceCommand: command,
@@ -131,11 +131,10 @@ musicPad.toScreen = function(svg, x) {
 }
 
 musicPad.toSvg = function(svg, x) {
-  let screenPoint = svg.createSVGPoint();
-  screenPoint.x = x;
-  let ctm = svg.getScreenCTM();
-  let inverse = ctm.inverse();
-  let svgPoint = screenPoint.matrixTransform(inverse);
-  return svgPoint.x;
+    let screenPoint = svg.createSVGPoint();
+    screenPoint.x = x;
+    let ctm = svg.getScreenCTM();
+    let inverse = ctm.inverse();
+    let svgPoint = screenPoint.matrixTransform(inverse);
+    return svgPoint.x;
 }
-

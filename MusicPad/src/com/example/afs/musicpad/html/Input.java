@@ -11,11 +11,11 @@ package com.example.afs.musicpad.html;
 
 public class Input extends Hypertext {
 
-  public Input() {
-    super("input");
+  public Input(String... properties) {
+    super("input", properties);
   }
 
-  public void setText(String value) {
+  public void setValue(Object value) {
     appendProperty("value", value);
   }
 

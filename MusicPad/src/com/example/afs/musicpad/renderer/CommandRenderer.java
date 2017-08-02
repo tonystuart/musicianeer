@@ -33,6 +33,11 @@ public class CommandRenderer {
     return javaScript;
   }
 
+  public static String render(DeviceCommand deviceCommand, int deviceIndex, String jsGetValue) {
+    String javaScript = String.format("musicPad.sendDeviceCommand(\"%s\", %d, %s)", deviceCommand.name(), deviceIndex, jsGetValue);
+    return javaScript;
+  }
+
   public static String renderChannelChecked(ChannelCommand channelCommand, int channel) {
     String javaScript = String.format("musicPad.sendChannelCommand(\"%s\", %d, this.checked ? 1 : 0)", channelCommand.name(), channel);
     return javaScript;

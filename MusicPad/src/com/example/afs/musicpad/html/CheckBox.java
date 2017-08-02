@@ -11,13 +11,9 @@ package com.example.afs.musicpad.html;
 
 public class CheckBox extends Input {
 
-  public CheckBox() {
+  public CheckBox(String... properties) {
+    super(properties);
     appendProperty("type", "checkbox");
-  }
-
-  public CheckBox(String id) {
-    this();
-    setId(id);
   }
 
 }

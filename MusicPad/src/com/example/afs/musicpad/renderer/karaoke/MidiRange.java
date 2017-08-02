@@ -7,18 +7,16 @@
 // This program is made available on an "as is" basis, without
 // warranties or conditions of any kind, either express or implied.
 
-package com.example.afs.musicpad.html;
+package com.example.afs.musicpad.renderer.karaoke;
 
-public class Button extends Input {
+import com.example.afs.musicpad.html.Range;
 
-  public Button() {
-    appendProperty("type", "button");
+public class MidiRange extends Range {
+  public MidiRange(String properties) {
+    super(properties);
+    setMinimum(0);
+    setMaximum(127);
+    setStep(1);
+    setValue(64);
   }
-
-  public Button(String id, String value) {
-    this();
-    setId(id);
-    setValue(value);
-  }
-
 }

@@ -22,4 +22,5 @@ public enum DeviceCommand {
   PREVIOUS_PROGRAM, //
   NEXT_PROGRAM, //
   SAMPLE_CHANNEL, //
+  MUTE_BACKGROUND, //
 }

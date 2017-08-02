@@ -9,16 +9,10 @@
 
 package com.example.afs.musicpad.html;
 
-public class Button extends Input {
+public class Label extends Parent {
 
-  public Button() {
-    appendProperty("type", "button");
-  }
-
-  public Button(String id, String value) {
-    this();
-    setId(id);
-    setValue(value);
+  public Label(String... properties) {
+    super("label", properties);
   }
 
 }

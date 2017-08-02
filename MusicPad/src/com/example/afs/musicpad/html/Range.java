@@ -11,36 +11,30 @@ package com.example.afs.musicpad.html;
 
 public class Range extends Input {
 
-  public Range() {
+  public Range(String... properties) {
+    super(properties);
     appendProperty("type", "range");
   }
 
-  public Range(String id) {
-    this();
-    setId(id);
-  }
-
+  @Deprecated
   public Range(String id, int minimum, int maximum, int step, int value) {
-    this(id);
+    this("." + id);
     setMinimum(minimum);
     setMaximum(maximum);
     setStep(step);
     setValue(value);
   }
 
-  private void setMaximum(int maximum) {
+  public void setMaximum(Object maximum) {
     appendProperty("max", maximum);
   }
 
-  private void setMinimum(int minimum) {
+  public void setMinimum(Object minimum) {
     appendProperty("min", minimum);
   }
 
-  private void setStep(int step) {
+  public void setStep(Object step) {
     appendProperty("step", step);
   }
 
-  private void setValue(int value) {
-    appendProperty("value", value);
-  }
 }

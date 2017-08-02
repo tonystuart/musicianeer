@@ -16,15 +16,12 @@ import java.util.Map.Entry;
 import java.util.NavigableMap;
 import java.util.SortedSet;
 
-import com.example.afs.musicpad.DeviceCommand;
 import com.example.afs.musicpad.html.Division;
 import com.example.afs.musicpad.html.Element;
-import com.example.afs.musicpad.html.Range;
 import com.example.afs.musicpad.html.TextElement;
 import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnKaraokePrompter;
 import com.example.afs.musicpad.playable.Playable;
-import com.example.afs.musicpad.renderer.CommandRenderer;
 import com.example.afs.musicpad.song.Default;
 import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.song.Word;
@@ -119,14 +116,6 @@ public class KaraokePrompter implements PrompterFactory.Prompter {
     return division;
   }
 
-  private Element createDetails() {
-    Division division = new Division("#prompter-details", ".details");
-    Division verticalCenter = new Division();
-    verticalCenter.appendChild(createVolumeControls());
-    division.appendChild(verticalCenter);
-    return division;
-  }
-
   private Element createInterlude(long tick) {
     String text;
     if (tick == 0) {
@@ -186,7 +175,7 @@ public class KaraokePrompter implements PrompterFactory.Prompter {
 
   private Element createRight() {
     Division division = new Division(".right");
-    division.appendChild(createDetails());
+    division.appendChild(new PrompterDetails(devicePlayables));
     return division;
   }
 
@@ -207,29 +196,6 @@ public class KaraokePrompter implements PrompterFactory.Prompter {
   private Element createTitle() {
     Division division = new Division(".title", FileUtilities.getBaseName(song.getTitle()));
     return division;
-  }
-
-  private Element createVolumeControls() {
-    Division division = new Division(".detail");
-    int playerIndex = 0;
-    for (Integer deviceIndex : devicePlayables.keySet()) {
-      division.appendChild(createVolumeLabel(playerIndex));
-      division.appendChild(createVolumeRange(deviceIndex));
-      playerIndex++;
-    }
-    return division;
-  }
-
-  private Element createVolumeLabel(int playerIndex) {
-    Division division = new Division(".name", Utils.getPlayerName(playerIndex) + " Volume");
-    return division;
-  }
-
-  private Element createVolumeRange(int deviceIndex) {
-    Range range = new Range("channel-volume-" + deviceIndex, 0, 127, 1, 64);
-    range.addClassName("value");
-    range.appendProperty("oninput", CommandRenderer.render(DeviceCommand.VELOCITY, deviceIndex));
-    return range;
   }
 
   private String getText(SortedSet<Word> words) {
