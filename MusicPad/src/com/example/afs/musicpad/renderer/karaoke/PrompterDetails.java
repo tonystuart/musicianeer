@@ -32,7 +32,7 @@ public class PrompterDetails extends Division {
   }
 
   private Element createDetailGroup() {
-    Division division = new Division(".detail-group");
+    Division division = new Division(".detail-container");
     int playerIndex = 0;
     for (Integer deviceIndex : devicePlayables.keySet()) {
       division.appendChild(createVolumeDetail(playerIndex, deviceIndex));
@@ -42,7 +42,7 @@ public class PrompterDetails extends Division {
   }
 
   private Element createVolumeDetail(int playerIndex, Integer deviceIndex) {
-    Division division = new Division(".detail");
+    Division division = new Division(".detail", ".player-" + playerIndex);
     division.appendChild(createVolumeName(playerIndex));
     division.appendChild(createVolumeValue(deviceIndex));
     return division;
@@ -75,7 +75,7 @@ public class PrompterDetails extends Division {
   }
 
   private Element createVolumeValueGroup(int deviceIndex) {
-    Division division = new Division(".value-group");
+    Division division = new Division(".value-content");
     division.appendChild(createVolumeRange(deviceIndex));
     division.appendChild(createVolumeMute(deviceIndex));
     return division;

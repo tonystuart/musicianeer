@@ -100,14 +100,14 @@ public class KaraokeRenderer extends BrokerTask<Message> {
 
   private void doMidiFiles(OnMidiFiles message) {
     RandomAccessList<File> midiFiles = message.getMidiFiles();
-    Songs songs = new Songs(midiFiles);
-    String html = songs.render();
+    SongSelector songSelector = new SongSelector(midiFiles);
+    String html = songSelector.render();
     publish(new OnSongs(html));
   }
 
   private void doPickChannel(OnPickChannel message) {
-    Channels channels = new Channels(message.getSong(), message.getDeviceIndex(), message.getDeviceChannelAssignments());
-    String html = channels.render();
+    ChannelSelector channelSelector = new ChannelSelector(message.getSong(), message.getDeviceIndex(), message.getDeviceChannelAssignments());
+    String html = channelSelector.render();
     publish(new OnChannels(html));
   }
 

@@ -17,11 +17,11 @@ import com.example.afs.musicpad.html.TextElement;
 import com.example.afs.musicpad.util.FileUtilities;
 import com.example.afs.musicpad.util.RandomAccessList;
 
-public class Songs {
+public class SongSelector {
 
   private RandomAccessList<File> midiFiles;
 
-  public Songs(RandomAccessList<File> midiFiles) {
+  public SongSelector(RandomAccessList<File> midiFiles) {
     this.midiFiles = midiFiles;
   }
 

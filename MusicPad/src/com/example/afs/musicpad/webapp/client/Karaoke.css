@@ -321,18 +321,18 @@ input[type=range]:focus::-webkit-slider-runnable-track {
 	display: none;
 }
 
-.detail-group {
+.detail-container {
 	margin: auto;
 }
 
-.value-group {
+.value-content {
 	display: flex;
 	flex-direction: column;
   padding-right: 20px;
   padding-left: 20px;
 }
 
-.value-group label {
+.value-content label {
 	text-align: center;
 }
 

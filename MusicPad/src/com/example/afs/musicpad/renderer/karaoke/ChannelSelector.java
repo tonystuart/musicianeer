@@ -20,7 +20,7 @@ import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.util.Value;
 
-public class Channels {
+public class ChannelSelector {
 
   private int deviceIndex;
   private int playerIndex;
@@ -29,7 +29,7 @@ public class Channels {
   private Song song;
   private NavigableMap<Integer, Integer> deviceChannelAssignments;
 
-  public Channels(Song song, int deviceIndex, NavigableMap<Integer, Integer> deviceChannelAssignments) {
+  public ChannelSelector(Song song, int deviceIndex, NavigableMap<Integer, Integer> deviceChannelAssignments) {
     this.song = song;
     this.deviceIndex = deviceIndex;
     this.deviceChannelAssignments = deviceChannelAssignments;
