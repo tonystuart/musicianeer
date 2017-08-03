@@ -15,6 +15,7 @@ import com.example.afs.musicpad.Command;
 import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnChannelCommand;
 import com.example.afs.musicpad.message.OnCommand;
+import com.example.afs.musicpad.message.OnRenderSong;
 import com.example.afs.musicpad.message.OnSampleChannel;
 import com.example.afs.musicpad.message.OnSampleSong;
 import com.example.afs.musicpad.message.OnSong;
@@ -39,6 +40,7 @@ public class TransportTask extends BrokerTask<Message> {
     subscribe(OnSong.class, message -> doSong(message));
     subscribe(OnCommand.class, message -> doCommand(message));
     subscribe(OnSampleSong.class, message -> doSampleSong(message));
+    subscribe(OnRenderSong.class, message -> doRenderSong(message));
     subscribe(OnSampleChannel.class, message -> doSampleChannel(message));
     subscribe(OnChannelCommand.class, message -> doChannelCommand(message));
   }
@@ -137,6 +139,7 @@ public class TransportTask extends BrokerTask<Message> {
     if (transport.isPaused()) {
       transport.resume();
     } else {
+      publishTick(0);
       transport.play(new ChannelNotes(song.getNotes(), channel));
     }
   }
@@ -151,6 +154,10 @@ public class TransportTask extends BrokerTask<Message> {
     if (newGain >= 0) {
       transport.setGain(newGain);
     }
+  }
+
+  private void doRenderSong(OnRenderSong message) {
+    publishTick(0);
   }
 
   private void doSampleChannel(OnSampleChannel message) {
