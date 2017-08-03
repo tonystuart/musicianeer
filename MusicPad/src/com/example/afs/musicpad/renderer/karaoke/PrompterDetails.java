@@ -11,13 +11,10 @@ package com.example.afs.musicpad.renderer.karaoke;
 
 import java.util.NavigableMap;
 
+import com.example.afs.musicpad.Command;
 import com.example.afs.musicpad.DeviceCommand;
-import com.example.afs.musicpad.html.CheckBox;
 import com.example.afs.musicpad.html.Division;
 import com.example.afs.musicpad.html.Element;
-import com.example.afs.musicpad.html.Label;
-import com.example.afs.musicpad.html.Range;
-import com.example.afs.musicpad.html.TextElement;
 import com.example.afs.musicpad.playable.Playable;
 import com.example.afs.musicpad.renderer.CommandRenderer;
 import com.example.afs.musicpad.util.RandomAccessList;
@@ -35,49 +32,25 @@ public class PrompterDetails extends Division {
     Division division = new Division(".detail-container");
     int playerIndex = 0;
     for (Integer deviceIndex : devicePlayables.keySet()) {
-      division.appendChild(createVolumeDetail(playerIndex, deviceIndex));
+      division.add(div(".detail", ".player-" + playerIndex) // 
+          .add(div(".name", Utils.getPlayerName(playerIndex) + " Volume")) // 
+          .add(div(".value") // 
+              .add(div(".value-content") // 
+                  .add(range(".device-velocity-" + deviceIndex) //  
+                      .property("oninput", CommandRenderer.render(DeviceCommand.VELOCITY, deviceIndex))) //
+                  .add(label() // 
+                      .add(checkbox(".background-mute-" + deviceIndex) //
+                          .property("onclick", CommandRenderer.render(DeviceCommand.MUTE_BACKGROUND, deviceIndex, "this.checked ? 1 : 0"))) //
+                      .add(text("Mute background"))))));
       playerIndex++;
     }
-    return division;
-  }
+    division.add(div(".detail") //
+        .add(div(".name", "Background Volume")) //
+        .add(div(".value") //
+            .add(div(".value-content") //
+                .add(range(".backing") //
+                    .property("oninput", CommandRenderer.render(Command.VELOCITY))))));
 
-  private Element createVolumeDetail(int playerIndex, Integer deviceIndex) {
-    Division division = new Division(".detail", ".player-" + playerIndex);
-    division.appendChild(createVolumeName(playerIndex));
-    division.appendChild(createVolumeValue(deviceIndex));
-    return division;
-  }
-
-  private Element createVolumeMute(int deviceIndex) {
-    CheckBox checkbox = new CheckBox(".background-mute-" + deviceIndex);
-    checkbox.appendProperty("onclick", CommandRenderer.render(DeviceCommand.MUTE_BACKGROUND, deviceIndex, "this.checked ? 1 : 0"));
-    Label label = new Label();
-    label.appendChild(checkbox);
-    label.appendChild(new TextElement("Mute background"));
-    return label;
-  }
-
-  private Element createVolumeName(int playerIndex) {
-    Division division = new Division(".name", Utils.getPlayerName(playerIndex) + " Volume");
-    return division;
-  }
-
-  private Element createVolumeRange(int deviceIndex) {
-    Range range = new MidiRange(".device-velocity-" + deviceIndex);
-    range.appendProperty("oninput", CommandRenderer.render(DeviceCommand.VELOCITY, deviceIndex));
-    return range;
-  }
-
-  private Element createVolumeValue(int deviceIndex) {
-    Division division = new Division(".value");
-    division.appendChild(createVolumeValueGroup(deviceIndex));
-    return division;
-  }
-
-  private Element createVolumeValueGroup(int deviceIndex) {
-    Division division = new Division(".value-content");
-    division.appendChild(createVolumeRange(deviceIndex));
-    division.appendChild(createVolumeMute(deviceIndex));
     return division;
   }
 

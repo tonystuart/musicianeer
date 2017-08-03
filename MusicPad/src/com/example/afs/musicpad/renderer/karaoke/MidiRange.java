@@ -12,7 +12,7 @@ package com.example.afs.musicpad.renderer.karaoke;
 import com.example.afs.musicpad.html.Range;
 
 public class MidiRange extends Range {
-  public MidiRange(String properties) {
+  public MidiRange(String... properties) {
     super(properties);
     setMinimum(0);
     setMaximum(127);

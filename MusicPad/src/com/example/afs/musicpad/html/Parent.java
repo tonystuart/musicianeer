@@ -11,6 +11,7 @@ package com.example.afs.musicpad.html;
 
 import java.util.Iterator;
 
+import com.example.afs.musicpad.renderer.karaoke.MidiRange;
 import com.example.afs.musicpad.util.DirectList;
 import com.example.afs.musicpad.util.RandomAccessList;
 
@@ -25,6 +26,11 @@ public class Parent extends Hypertext implements Iterable<Element> {
     super(type, properties);
   }
 
+  public Parent add(Element child) {
+    appendChild(child);
+    return this;
+  }
+
   @Override
   public void appendChild(Element childElement) {
     if (childElements == null) {
@@ -33,8 +39,16 @@ public class Parent extends Hypertext implements Iterable<Element> {
     childElements.add(childElement);
   }
 
+  public CheckBox checkbox(String... properties) {
+    return new CheckBox(properties);
+  }
+
   public void clear() {
     childElements.clear();
+  }
+
+  public Division div(String... properties) {
+    return new Division(properties);
   }
 
   @Override
@@ -52,6 +66,14 @@ public class Parent extends Hypertext implements Iterable<Element> {
     return childElements.iterator();
   }
 
+  public Label label(String... properties) {
+    return new Label(properties);
+  }
+
+  public MidiRange range(String... properties) {
+    return new MidiRange(properties);
+  }
+
   @Override
   public void render(StringBuilder s) {
     super.render(s);
@@ -63,8 +85,13 @@ public class Parent extends Hypertext implements Iterable<Element> {
     s.append(format("</%s>\n", getType()));
   }
 
+  public TextElement text(String text) {
+    return new TextElement(text);
+  }
+
   @Override
   protected void processArgument(String text) {
     appendChild(new TextElement(text));
   }
+
 }

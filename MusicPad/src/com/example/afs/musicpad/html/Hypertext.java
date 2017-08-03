@@ -91,6 +91,12 @@ public class Hypertext extends Element {
     return type;
   }
 
+  @SuppressWarnings("unchecked")
+  public <T extends Hypertext> T property(String name, String value) {
+    appendProperty(name, value);
+    return (T) this;
+  }
+
   @Override
   public void render(StringBuilder s) {
     s.append(format("<%s", type));
