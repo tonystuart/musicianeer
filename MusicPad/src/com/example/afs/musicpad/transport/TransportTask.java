@@ -179,8 +179,8 @@ public class TransportTask extends BrokerTask<Message> {
 
   private void doSong(OnSong message) {
     transport.stop();
+    transport.muteAllChannels(false);
     this.song = message.getSong();
-
   }
 
   private void doStop(int parameter) {

@@ -9,6 +9,8 @@
 
 package com.example.afs.fluidsynth;
 
+import java.util.Arrays;
+
 import com.example.afs.jni.FluidSynth;
 import com.example.afs.musicpad.player.Player;
 
@@ -63,6 +65,7 @@ public class Synthesizer {
   }
 
   private long synth;
+  private boolean[] isMuted = new boolean[16];
 
   public Synthesizer() {
     this(createDefaultSettings());
@@ -101,8 +104,23 @@ public class Synthesizer {
     FluidSynth.fluid_synth_program_change(synth, channel, program);
   }
 
+  public boolean isMuted(int channel) {
+    return isMuted[channel];
+  }
+
+  public void muteAllChannels(boolean isMuted) {
+    Arrays.fill(this.isMuted, isMuted);
+  }
+
+  public void muteChannel(int channel, boolean isMuted) {
+    this.isMuted[channel] = isMuted;
+  }
+
   public void pressKey(int channel, int key, int velocity) {
-    FluidSynth.fluid_synth_noteon(synth, channel, key, velocity);
+    if (channel >= isMuted.length || !isMuted[channel]) {
+      // NB: currently only supports 16 base MIDI channels
+      FluidSynth.fluid_synth_noteon(synth, channel, key, velocity);
+    }
   }
 
   public void releaseKey(int channel, int key) {

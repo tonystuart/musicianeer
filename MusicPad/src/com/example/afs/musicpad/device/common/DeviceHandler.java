@@ -45,19 +45,21 @@ public class DeviceHandler extends BrokerTask<Message> {
     NORMAL, ARPEGGIO
   }
 
-  private int deviceIndex;
   private int channel;
+  private int deviceIndex;
+  private boolean isCommand;
 
   private Song song;
   private Player player;
   private String deviceName;
   private InputType inputType;
+  private Synthesizer synthesizer;
   private PlayableMap playableMap;
   private Sound[] activeSounds = new Sound[256]; // NB: KeyEvents VK codes, not midiNotes
-  private boolean isCommand;
 
   public DeviceHandler(Broker<Message> broker, Synthesizer synthesizer, String deviceName, int deviceIndex, InputType inputType) {
     super(broker);
+    this.synthesizer = synthesizer;
     this.deviceName = deviceName;
     this.deviceIndex = deviceIndex;
     this.inputType = inputType;
@@ -265,6 +267,9 @@ public class DeviceHandler extends BrokerTask<Message> {
       case PREVIOUS_PROGRAM:
         doPreviousProgram();
         break;
+      case MUTE_BACKGROUND:
+        doMuteBackground();
+        break;
       default:
         break;
       }
@@ -292,6 +297,10 @@ public class DeviceHandler extends BrokerTask<Message> {
     default:
       throw new UnsupportedOperationException();
     }
+  }
+
+  private void doMuteBackground() {
+    synthesizer.muteChannel(channel, !synthesizer.isMuted(channel));
   }
 
   private void doNextChannel() {

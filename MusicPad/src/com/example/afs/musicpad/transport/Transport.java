@@ -79,6 +79,10 @@ public class Transport {
     return sequencer.isPaused();
   }
 
+  public void muteAllChannels(boolean isMuted) {
+    synthesizer.muteAllChannels(isMuted);
+  }
+
   public void pause() {
     sequencer.setPaused(true);
     synthesizer.allNotesOff();
