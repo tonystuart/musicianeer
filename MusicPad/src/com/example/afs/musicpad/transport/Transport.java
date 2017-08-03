@@ -34,6 +34,7 @@ public class Transport {
   private static final int DEFAULT_PERCENT_VELOCITY = 25;
   private static final float DEFAULT_GAIN = 5 * Synthesizer.DEFAULT_GAIN;
 
+  private float gain;
   private int percentVelocity = DEFAULT_PERCENT_VELOCITY;
   private int[] currentPrograms = new int[Midi.CHANNELS];
 
@@ -41,15 +42,9 @@ public class Transport {
   private NoteEventSequencer sequencer;
   private TickHandler tickHandler;
   private Deque<NoteEvent> reviewQueue = new LinkedList<>();
-  private float gain;
 
   public Transport(Synthesizer synthesizer) {
-    this(synthesizer, null);
-  }
-
-  public Transport(Synthesizer synthesizer, TickHandler tickHandler) {
     this.synthesizer = synthesizer;
-    this.tickHandler = tickHandler;
     this.sequencer = new NoteEventSequencer(noteEvent -> processNoteEvent(noteEvent));
     setGain(DEFAULT_GAIN);
     sequencer.start();
@@ -89,6 +84,11 @@ public class Transport {
   }
 
   public void play(Iterable<Note> notes) {
+    play(notes, null);
+  }
+
+  public void play(Iterable<Note> notes, TickHandler tickHandler) {
+    this.tickHandler = tickHandler;
     reset();
     long firstTick = -1;
     long lastTick = -1;

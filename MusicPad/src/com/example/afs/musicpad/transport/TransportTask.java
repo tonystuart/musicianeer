@@ -36,7 +36,7 @@ public class TransportTask extends BrokerTask<Message> {
 
   public TransportTask(Broker<Message> broker, Synthesizer synthesizer) {
     super(broker);
-    this.transport = new Transport(synthesizer, tick -> publishTick(tick));
+    this.transport = new Transport(synthesizer);
     subscribe(OnSong.class, message -> doSong(message));
     subscribe(OnCommand.class, message -> doCommand(message));
     subscribe(OnSampleSong.class, message -> doSampleSong(message));
@@ -140,7 +140,7 @@ public class TransportTask extends BrokerTask<Message> {
       transport.resume();
     } else {
       publishTick(0);
-      transport.play(new ChannelNotes(song.getNotes(), channel));
+      transport.play(new ChannelNotes(song.getNotes(), channel), tick -> publishTick(tick));
     }
   }
 
