@@ -32,12 +32,12 @@ public class Utils {
     return division;
   }
 
-  public static String getPlayerName(int playerIndex) {
+  public static String getPlayerName(int deviceIndex) {
     String name;
-    if (playerIndex < COLORS.length) {
-      name = COLORS[playerIndex] + " Player";
+    if (deviceIndex < COLORS.length) {
+      name = COLORS[deviceIndex] + " Player";
     } else {
-      name = "Player " + playerIndex;
+      name = "Player " + deviceIndex;
     }
     return name;
   }

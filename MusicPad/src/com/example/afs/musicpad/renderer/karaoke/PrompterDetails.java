@@ -30,10 +30,9 @@ public class PrompterDetails extends Division {
 
   private Element createDetailGroup() {
     Division division = new Division(".detail-container");
-    int playerIndex = 0;
     for (Integer deviceIndex : devicePlayables.keySet()) {
-      division.add(div(".detail", ".player-" + playerIndex) // 
-          .add(div(".name", Utils.getPlayerName(playerIndex) + " Volume")) // 
+      division.add(div(".detail", ".device-" + deviceIndex) // 
+          .add(div(".name", Utils.getPlayerName(deviceIndex) + " Volume")) // 
           .add(div(".value") // 
               .add(div(".value-content") // 
                   .add(range(".device-velocity-" + deviceIndex) //  
@@ -42,7 +41,6 @@ public class PrompterDetails extends Division {
                       .add(checkbox(".background-mute-" + deviceIndex) //
                           .property("onclick", CommandRenderer.render(DeviceCommand.MUTE_BACKGROUND, deviceIndex, "this.checked ? 1 : 0"))) //
                       .add(text("Mute background"))))));
-      playerIndex++;
     }
     division.add(div(".detail") //
         .add(div(".name", "Background Volume")) //

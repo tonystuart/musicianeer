@@ -78,7 +78,7 @@ public class KaraokePrompter implements PrompterFactory.Prompter {
   }
 
   private Element createChannelPrompt(long endTick, int deviceIndex) {
-    Division division = new Division(".player-" + deviceIndex);
+    Division division = new Division(".device-" + deviceIndex);
     boolean sustain = false;
     Playable playable = deviceSustain.get(deviceIndex);
     if (playable != null) {

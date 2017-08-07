@@ -10,11 +10,14 @@
 package com.example.afs.musicpad.util;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonIOException;
 import com.google.gson.stream.JsonReader;
 
 public class JsonUtilities {
@@ -39,6 +42,14 @@ public class JsonUtilities {
   public static String toJson(Object object) {
     String json = GSON.toJson(object);
     return json;
+  }
+
+  public static <T> void toJsonFile(String filename, T value) {
+    try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(filename))) {
+      GSON.toJson(value, bufferedWriter);
+    } catch (JsonIOException | IOException e) {
+      throw new RuntimeException(e);
+    }
   }
 
 }

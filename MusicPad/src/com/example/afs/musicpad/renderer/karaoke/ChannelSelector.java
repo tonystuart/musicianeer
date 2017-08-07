@@ -23,7 +23,6 @@ import com.example.afs.musicpad.util.Value;
 public class ChannelSelector {
 
   private int deviceIndex;
-  private int playerIndex;
   private int defaultChannel;
 
   private Song song;
@@ -33,14 +32,12 @@ public class ChannelSelector {
     this.song = song;
     this.deviceIndex = deviceIndex;
     this.deviceChannelAssignments = deviceChannelAssignments;
-    this.playerIndex = deviceChannelAssignments.size();
     defaultChannel = getDefaultChannel();
   }
 
   public String render() {
-    Division division = new Division("#channels", ".tab", ".player-" + playerIndex);
+    Division division = new Division("#channels", ".tab", ".device-" + deviceIndex);
     division.appendProperty("data-device-index", deviceIndex);
-    division.appendProperty("data-player-index", playerIndex);
     division.appendProperty("data-default-channel", defaultChannel);
     division.appendChild(createContent());
     String html = division.render();
@@ -96,7 +93,7 @@ public class ChannelSelector {
 
   private Element createLeft() {
     Division division = new Division(".left");
-    division.appendChild(createTitle(playerIndex));
+    division.appendChild(createTitle(deviceIndex));
     division.appendChild(createChannelList());
     division.appendChild(createControls());
     return division;
@@ -122,9 +119,9 @@ public class ChannelSelector {
     return division;
   }
 
-  private Element createTitle(int playerIndex) {
+  private Element createTitle(int deviceIndex) {
     Division division = new Division(".title");
-    String name = Utils.getPlayerName(playerIndex);
+    String name = Utils.getPlayerName(deviceIndex);
     division.appendChild(new Division(name + ": Pick your Part"));
     return division;
   }

@@ -43,74 +43,74 @@ input {
     position: relative;
 }
 
-.player-0 {
+.device-0 {
 	color: red;
 }
 
-.player-0 .selected {
+.device-0 .selected {
 	color: black;
 	background-color: red;
 }
 
-.player-1 {
+.device-1 {
 	color: lime;
 }
 
-.player-1 .selected {
+.device-1 .selected {
 	color: black;
 	background-color: lime;
 }
 
-.player-2 {
+.device-2 {
 	color: cyan;
 }
 
-.player-2 .selected {
+.device-2 .selected {
   color: black;
   background-color: cyan;
 }
 
-.player-3 {
+.device-3 {
 	color: yellow;
 }
 
-.player-3 .selected {
+.device-3 .selected {
   color: black;
   background-color: yellow;
 }
 
-.player-4 {
+.device-4 {
 	color: salmon;
 }
 
-.player-4 .selected {
+.device-4 .selected {
   color: black;
   background-color: salmon;
 }
 
-.player-5 {
+.device-5 {
 	color: chartreuse;
 }
 
-.player-5 .selected {
+.device-5 .selected {
   color: black;
   background-color: chartreuse;
 }
 
-.player-6 {
+.device-6 {
 	color: aqua;
 }
 
-.player-6 .selected {
+.device-6 .selected {
   color: black;
   background-color: aqua;
 }
 
-.player-7 {
+.device-7 {
 	color: darkorange;
 }
 
-.player-7 .selected {
+.device-7 .selected {
   color: black;
   background-color: darkorange;
 }

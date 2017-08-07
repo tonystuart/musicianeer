@@ -92,6 +92,7 @@ public class DeviceHandler extends BrokerTask<Message> {
   }
 
   public void onDown(int inputCode) {
+    System.out.println("deviceName=" + deviceName + ", deviceIndex=" + deviceIndex + ", inputCode=" + inputCode);
     if (inputCode == KeyEvent.VK_NUM_LOCK) {
       if (inputType == InputType.ALPHA) {
         publish(new OnDeviceCommand(DeviceCommand.INPUT, deviceIndex, InputType.NUMERIC.ordinal()));
