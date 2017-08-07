@@ -9,14 +9,30 @@
 
 package com.example.afs.musicpad.util;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.stream.JsonReader;
 
 public class JsonUtilities {
   private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
   public static <T> T fromJson(String json, Class<T> classOfT) {
     T object = GSON.fromJson(json, classOfT);
+    return object;
+
+  }
+
+  public static <T> T fromJsonFile(String filename, Class<T> classOfT) {
+    T object;
+    try (JsonReader jsonReader = new JsonReader(new BufferedReader(new FileReader(filename)))) {
+      object = GSON.fromJson(jsonReader, classOfT);
+    } catch (IOException e) {
+      object = null;
+    }
     return object;
   }
 
