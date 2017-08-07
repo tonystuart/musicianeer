@@ -44,9 +44,9 @@ public class StaffPrompter implements PrompterFactory.Prompter {
     return html;
   }
 
-  private Division getNotator(Entry<Integer, RandomAccessList<Playable>> entry) {
-    Division division = new Division(".notator");
-    PlayableStaff playableStaff = new PlayableStaff(song, entry.getValue());
+  private Division getNotator(int deviceIndex, RandomAccessList<Playable> playables) {
+    Division division = new Division(".notator", ".device-" + deviceIndex);
+    PlayableStaff playableStaff = new PlayableStaff(song, playables);
     division.appendChild(playableStaff.getStaff());
     return division;
   }
@@ -54,7 +54,7 @@ public class StaffPrompter implements PrompterFactory.Prompter {
   private Division getNotatorScroller() {
     Division division = new Division("#notator-scroller");
     for (Entry<Integer, RandomAccessList<Playable>> entry : devicePlayables.entrySet()) {
-      division.appendChild(getNotator(entry));
+      division.appendChild(getNotator(entry.getKey(), entry.getValue()));
     }
     return division;
   }

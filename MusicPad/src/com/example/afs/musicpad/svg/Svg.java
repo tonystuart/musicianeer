@@ -9,37 +9,14 @@
 
 package com.example.afs.musicpad.svg;
 
-import java.util.LinkedList;
-import java.util.List;
+import com.example.afs.musicpad.html.Parent;
 
-import com.example.afs.musicpad.html.Element;
+public class Svg extends Parent {
 
-public class Svg extends Element {
-
-  private int left;
-  private int top;
-  private int width;
-  private int height;
-  private List<Element> elements = new LinkedList<>();
-
-  public Svg(int left, int top, int width, int height) {
-    this.left = left;
-    this.top = top;
-    this.width = width;
-    this.height = height;
-  }
-
-  public void add(Element child) {
-    elements.add(child);
-  }
-
-  @Override
-  public void render(StringBuilder s) {
-    s.append(format("<svg viewBox='%d %d %d %d' preserveAspectRatio='xMinYMin meet'>", left, top, width, height));
-    for (Element element : elements) {
-      element.render(s);
-    }
-    s.append(format("</svg>"));
+  public Svg(int left, int top, int width, int height, String... properties) {
+    super("svg", properties);
+    appendProperty("viewBox", left + " " + top + " " + width + " " + height);
+    appendProperty("preserveAspectRatio", "xMinYMin meet");
   }
 
 }
