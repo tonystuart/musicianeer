@@ -18,7 +18,11 @@ public class Utils {
       "Red",
       "Green",
       "Blue",
-      "Yellow"
+      "Yellow",
+      "Salmon",
+      "Chartreuse",
+      "Aqua",
+      "Orange"
   };
 
   public static Element createPair(String name, Object value) {
