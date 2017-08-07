@@ -32,8 +32,10 @@ karaoke.onChannelClick = function(item) {
     let channels = document.getElementById('channels');
     let deviceIndex = channels.dataset['deviceIndex'];
     let channelIndex = item.dataset['channelIndex'];
-    musicPad.sendDeviceCommand('SAMPLE_CHANNEL', deviceIndex, channelIndex);
-    musicPad.selectElement(item);
+    if (channelIndex) {
+        musicPad.sendDeviceCommand('SAMPLE_CHANNEL', deviceIndex, channelIndex);
+        musicPad.selectElement(item);
+    }
 }
 
 karaoke.onChannelDetails = function(message) {
