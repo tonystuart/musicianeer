@@ -70,6 +70,10 @@ public class Transport {
     return sequencer.getTick();
   }
 
+  public boolean isEmpty() {
+    return sequencer.getInputQueue().size() == 0;
+  }
+
   public boolean isPaused() {
     return sequencer.isPaused();
   }

@@ -83,6 +83,17 @@ karaoke.onPrompter = function(message) {
     karaoke.onTick(0);
 }
 
+karaoke.onPrompterClick = function(event) {
+    let target = event.target;
+    let prompt = target.closest(".prompt") || target.closest(".interlude");
+    if (prompt) {
+        let tick = prompt.id;
+        if (tick) {
+            musicPad.sendCommand("SEEK", tick);
+        }
+    }
+}
+
 karaoke.onSongRoulette = function() {
     let songList = document.getElementById("song-list");
     let songCount = songList.childElementCount;

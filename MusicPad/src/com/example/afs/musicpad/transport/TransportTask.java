@@ -33,6 +33,7 @@ public class TransportTask extends BrokerTask<Message> {
 
   private Song song;
   private Transport transport;
+  private long seekPosition;
 
   public TransportTask(Broker<Message> broker, Synthesizer synthesizer) {
     super(broker);
@@ -142,6 +143,10 @@ public class TransportTask extends BrokerTask<Message> {
       publishTick(0);
       transport.play(new ChannelNotes(song.getNotes(), channel), tick -> publishTick(tick));
     }
+    if (seekPosition != 0) {
+      transport.seek(seekPosition, Whence.ABSOLUTE);
+      seekPosition = 0;
+    }
   }
 
   private void doReduceBackgroundVelocity() {
@@ -173,7 +178,13 @@ public class TransportTask extends BrokerTask<Message> {
   }
 
   private void doSeek(long tick) {
-    //play(tick);
+    if (transport.isEmpty()) {
+      publishTick(tick);
+      seekPosition = tick;
+    } else {
+      publishTick(tick); // sets previous tick for interlude
+      transport.seek(tick, Whence.ABSOLUTE);
+    }
   }
 
   private void doSetVelocity(int velocity) {
@@ -187,7 +198,8 @@ public class TransportTask extends BrokerTask<Message> {
   private void doSong(OnSong message) {
     transport.stop();
     transport.muteAllChannels(false);
-    this.song = message.getSong();
+    song = message.getSong();
+    seekPosition = 0;
   }
 
   private void doStop(int parameter) {

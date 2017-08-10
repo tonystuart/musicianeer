@@ -162,6 +162,7 @@ public class KaraokePrompter implements PrompterFactory.Prompter {
 
   private Division createPrompterList() {
     Division division = new Division("#prompter-list");
+    division.appendProperty("onclick", "karaoke.onPrompterClick(event)");
     long tick = 0;
     while (tick < song.getDuration()) {
       int beatsPerMeasure = song.getBeatsPerMeasure(tick);
