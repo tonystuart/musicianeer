@@ -113,13 +113,26 @@ musicPad.sendChannelCommand = function(command, channel, parameter) {
 }
 
 musicPad.sendDeviceCommand = function(command, deviceIndex, parameter) {
-    console.log("xyzzza command=" + command + ", deviceIndex=" + deviceIndex + ", parameter=" + parameter);
+    console.log("command=" + command + ", deviceIndex=" + deviceIndex + ", parameter=" + parameter);
     musicPad.send(JSON.stringify({
         type: "OnDeviceCommand",
         deviceCommand: command,
         deviceIndex: deviceIndex,
         parameter: parameter
     }));
+}
+
+musicPad.setElementProperty = function(selector, property, value) {
+    let elements = document.querySelectorAll(selector);
+    for (const element of elements) {
+        if (!element.matches(':active')) {
+            element[property] = value;
+        }
+    }
+}
+
+musicPad.setElementValue = function(selector, value) {
+    musicPad.setElementProperty(selector, 'value', value);
 }
 
 musicPad.toScreen = function(svg, x) {

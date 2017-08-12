@@ -16,6 +16,7 @@ import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnChannelCommand;
 import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnRenderSong;
+import com.example.afs.musicpad.message.OnReport;
 import com.example.afs.musicpad.message.OnSampleChannel;
 import com.example.afs.musicpad.message.OnSampleSong;
 import com.example.afs.musicpad.message.OnSong;
@@ -46,10 +47,6 @@ public class TransportTask extends BrokerTask<Message> {
     subscribe(OnChannelCommand.class, message -> doChannelCommand(message));
   }
 
-  private void doBackward() {
-    transport.seek(-Default.TICKS_PER_BEAT * Default.BEATS_PER_MEASURE, Whence.RELATIVE);
-  }
-
   private void doChannelCommand(OnChannelCommand message) {
     ChannelCommand command = message.getChannelCommand();
     int channel = message.getChannel();
@@ -61,47 +58,50 @@ public class TransportTask extends BrokerTask<Message> {
     Command command = message.getCommand();
     int parameter = message.getParameter();
     switch (command) {
-    case PLAY:
-      doPlay(parameter);
+    case DECREASE_BACKGROUND_VELOCITY:
+      doDecreaseBackgroundVelocity();
       break;
-    case STOP:
-      doStop(parameter);
+    case DECREASE_MASTER_GAIN:
+      doDecreaseMasterGain();
       break;
-    case BACKWARD:
-      doBackward();
-      break;
-    case FORWARD:
-      doForward();
-      break;
-    case SEEK:
-      doSeek(parameter);
-      break;
-    case SLOWER:
-      doSlower();
-      break;
-    case FASTER:
-      doFaster();
-      break;
-    case TEMPO:
-      doTempo(parameter);
-      break;
-    case VELOCITY:
-      doSetVelocity(parameter);
-      break;
-    case REDUCE_BACKGROUND_VELOCITY:
-      doReduceBackgroundVelocity();
+    case DECREASE_TEMPO:
+      doDecreaseTempo();
       break;
     case INCREASE_BACKGROUND_VELOCITY:
       doIncreaseBackgroundVelocity();
       break;
-    case GAIN:
-      doGain(parameter);
-      break;
-    case REDUCE_MASTER_GAIN:
-      doReduceMasterGain();
-      break;
     case INCREASE_MASTER_GAIN:
       doIncreaseMasterGain();
+      break;
+    case INCREASE_TEMPO:
+      doIncreaseTempo();
+      break;
+    case MOVE_BACKWARD:
+      doMoveBackward();
+      break;
+    case MOVE_FORWARD:
+      doMoveForward();
+      break;
+    case PLAY:
+      doPlay(parameter);
+      break;
+    case REPORT:
+      doReport();
+      break;
+    case SEEK:
+      doSeek(parameter);
+      break;
+    case SET_BACKGROUND_VELOCITY:
+      doSetBackgroundVelocity(parameter);
+      break;
+    case SET_MASTER_GAIN:
+      doMasterGain(parameter);
+      break;
+    case SET_TEMPO:
+      doSetTempo(parameter);
+      break;
+    case STOP:
+      doStop(parameter);
       break;
     case TRANSPOSE_TO:
       doTransposeTo(parameter);
@@ -111,29 +111,49 @@ public class TransportTask extends BrokerTask<Message> {
     }
   }
 
-  private void doFaster() {
-    transport.setPercentTempo(Math.min(200, transport.getPercentTempo() + 10));
+  private void doDecreaseBackgroundVelocity() {
+    setBackgroundVelocity(Math.max(0, transport.getPercentVelocity() - 10));
   }
 
-  private void doForward() {
-    transport.seek(Default.TICKS_PER_BEAT * Default.BEATS_PER_MEASURE, Whence.RELATIVE);
+  private void doDecreaseMasterGain() {
+    float currentGain = transport.getGain();
+    float newGain = currentGain - 0.2f;
+    if (newGain >= 0) {
+      setMasterGain(newGain);
+    }
   }
 
-  private void doGain(int masterGain) {
-    float gain = Range.scale(0f, 2f, Midi.MIN_VALUE, Midi.MAX_VALUE, masterGain);
-    transport.setGain(gain);
+  private void doDecreaseTempo() {
+    setPercentTempo(Math.max(0, transport.getPercentTempo() - 10));
   }
 
   private void doIncreaseBackgroundVelocity() {
-    transport.setPercentVelocity(Math.max(0, transport.getPercentVelocity() + 10));
+    setBackgroundVelocity(Math.max(0, transport.getPercentVelocity() + 10));
   }
 
   private void doIncreaseMasterGain() {
     float currentGain = transport.getGain();
     float newGain = currentGain + 0.2f;
     if (newGain <= Synthesizer.MAXIMUM_GAIN) {
-      transport.setGain(newGain);
+      setMasterGain(newGain);
     }
+  }
+
+  private void doIncreaseTempo() {
+    setPercentTempo(Math.min(200, transport.getPercentTempo() + 10));
+  }
+
+  private void doMasterGain(int masterGain) {
+    float gain = Range.scale(0f, 2f, Midi.MIN_VALUE, Midi.MAX_VALUE, masterGain);
+    setMasterGain(gain);
+  }
+
+  private void doMoveBackward() {
+    transport.seek(-Default.TICKS_PER_BEAT * Default.BEATS_PER_MEASURE, Whence.RELATIVE);
+  }
+
+  private void doMoveForward() {
+    transport.seek(Default.TICKS_PER_BEAT * Default.BEATS_PER_MEASURE, Whence.RELATIVE);
   }
 
   private void doPlay(int channel) {
@@ -149,20 +169,14 @@ public class TransportTask extends BrokerTask<Message> {
     }
   }
 
-  private void doReduceBackgroundVelocity() {
-    transport.setPercentVelocity(Math.max(0, transport.getPercentVelocity() - 10));
-  }
-
-  private void doReduceMasterGain() {
-    float currentGain = transport.getGain();
-    float newGain = currentGain - 0.2f;
-    if (newGain >= 0) {
-      transport.setGain(newGain);
-    }
-  }
-
   private void doRenderSong(OnRenderSong message) {
     publishTick(0);
+  }
+
+  private void doReport() {
+    reportBackgroundVelocity();
+    reportMasterGain();
+    reportTempo();
   }
 
   private void doSampleChannel(OnSampleChannel message) {
@@ -187,17 +201,17 @@ public class TransportTask extends BrokerTask<Message> {
     }
   }
 
-  private void doSetVelocity(int velocity) {
-    transport.setPercentVelocity(Range.scaleMidiToPercent(velocity));
+  private void doSetBackgroundVelocity(int velocity) {
+    setBackgroundVelocity(velocity);
   }
 
-  private void doSlower() {
-    transport.setPercentTempo(Math.max(0, transport.getPercentTempo() - 10));
+  private void doSetTempo(int tempo) {
+    setPercentTempo(Range.scaleMidiToPercent(tempo));
   }
 
   private void doSong(OnSong message) {
     transport.stop();
-    transport.muteAllChannels(false);
+    //transport.muteAllChannels(false);
     song = message.getSong();
     seekPosition = 0;
   }
@@ -211,10 +225,6 @@ public class TransportTask extends BrokerTask<Message> {
     }
   }
 
-  private void doTempo(int tempo) {
-    transport.setPercentTempo(Range.scaleMidiToPercent(tempo));
-  }
-
   private void doTransposeTo(int midiTransposition) {
     // Dynamic transposition for use with rotary control... does not update display
     int transposition = Range.scale(-24, 24, Midi.MIN_VALUE, Midi.MAX_VALUE, midiTransposition);
@@ -224,6 +234,39 @@ public class TransportTask extends BrokerTask<Message> {
 
   private void publishTick(long tick) {
     getBroker().publish(new OnTick(tick));
+  }
+
+  private void reportBackgroundVelocity() {
+    int percentVelocity = transport.getPercentVelocity();
+    int backgroundVelocity = Range.scalePercentToMidi(percentVelocity);
+    publish(new OnReport(Command.SET_BACKGROUND_VELOCITY, backgroundVelocity));
+  }
+
+  private void reportMasterGain() {
+    float gain = transport.getGain();
+    int masterGain = (int) Range.scale(Midi.MIN_VALUE, Midi.MAX_VALUE, 0f, 2f, gain);
+    publish(new OnReport(Command.SET_MASTER_GAIN, masterGain));
+  }
+
+  private void reportTempo() {
+    int percentTempo = transport.getPercentTempo();
+    int tempo = Range.scalePercentToMidi(percentTempo);
+    publish(new OnReport(Command.SET_TEMPO, tempo));
+  }
+
+  private void setBackgroundVelocity(int velocity) {
+    transport.setPercentVelocity(Range.scaleMidiToPercent(velocity));
+    reportBackgroundVelocity();
+  }
+
+  private void setMasterGain(float gain) {
+    transport.setGain(gain);
+    reportMasterGain();
+  }
+
+  private void setPercentTempo(int percentTempo) {
+    transport.setPercentTempo(percentTempo);
+    reportTempo();
   }
 
 }

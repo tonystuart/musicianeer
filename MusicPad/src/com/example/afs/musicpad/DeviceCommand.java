@@ -11,16 +11,16 @@ package com.example.afs.musicpad;
 
 public enum DeviceCommand {
   CHANNEL, //
-  PROGRAM, //
-  INPUT, //
-  OUTPUT, //
-  VELOCITY, //
   DECREASE_PLAYER_VELOCITY, //
   INCREASE_PLAYER_VELOCITY, //
-  PREVIOUS_CHANNEL, //
-  NEXT_CHANNEL, //
-  PREVIOUS_PROGRAM, //
-  NEXT_PROGRAM, //
-  SAMPLE_CHANNEL, //
+  INPUT, //
   MUTE_BACKGROUND, //
+  NEXT_CHANNEL, //
+  NEXT_PROGRAM, //
+  OUTPUT, //
+  PROGRAM, //
+  PREVIOUS_CHANNEL, //
+  PREVIOUS_PROGRAM, //
+  SAMPLE_CHANNEL, //
+  VELOCITY, //
 }

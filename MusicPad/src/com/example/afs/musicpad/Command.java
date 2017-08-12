@@ -10,31 +10,30 @@
 package com.example.afs.musicpad;
 
 public enum Command {
+  DECREASE_BACKGROUND_VELOCITY, //
+  DECREASE_MASTER_GAIN, //
+  DECREASE_TEMPO, //
+  DETACH, //
   HELP, //
-  SONG, //
+  INCREASE_BACKGROUND_VELOCITY, //
+  INCREASE_MASTER_GAIN, //
+  INCREASE_TEMPO, //
+  MOVE_BACKWARD, //
+  MOVE_FORWARD, //
   PLAY, //
-  NEW_SONG, //
+  QUIT, //
+  REATTACH, //
+  REPORT, //
   SAMPLE_SONG, //
   SEEK, //
+  SELECT_SONG, //
+  SET_BACKGROUND_VELOCITY, //
+  SET_MASTER_GAIN, //
+  SET_TEMPO, //
   STOP, //
-  BACKWARD, //
-  FORWARD, //
-  SLOWER, //
-  FASTER, //
-  TEMPO, //
-  VELOCITY, //
-  REDUCE_BACKGROUND_VELOCITY, //
-  INCREASE_BACKGROUND_VELOCITY, //
-  GAIN, //
-  SHOW_DRUM_INFO, //
   TRANSPOSE, //
   TRANSPOSE_TO, //
-  TRON, //
   TROFF, //
-  DETACH, //
-  REATTACH, //
-  QUIT, //
-  REDUCE_MASTER_GAIN, //
-  INCREASE_MASTER_GAIN, //
+  TRON, //
   VIEW, //
 }

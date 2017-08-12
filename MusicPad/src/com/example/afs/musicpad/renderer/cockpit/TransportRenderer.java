@@ -43,19 +43,19 @@ public class TransportRenderer {
 
   private Range getBackingRange() {
     Range range = new Range("backing", 0, 127, 1, 64);
-    range.appendProperty("oninput", CommandRenderer.render(Command.VELOCITY));
+    range.appendProperty("oninput", CommandRenderer.render(Command.SET_BACKGROUND_VELOCITY));
     return range;
   }
 
   private Button getBackward() {
     Button button = new Button("backward", "Backward");
-    button.appendProperty("onclick", CommandRenderer.render(Command.BACKWARD, 0));
+    button.appendProperty("onclick", CommandRenderer.render(Command.MOVE_BACKWARD, 0));
     return button;
   }
 
   private Button getForward() {
     Button button = new Button("forward", "Forward");
-    button.appendProperty("onclick", CommandRenderer.render(Command.FORWARD, 0));
+    button.appendProperty("onclick", CommandRenderer.render(Command.MOVE_FORWARD, 0));
     return button;
   }
 
@@ -68,7 +68,7 @@ public class TransportRenderer {
 
   private Range getGainRange() {
     Range range = new Range("gain", 0, 127, 1, 64);
-    range.appendProperty("oninput", CommandRenderer.render(Command.GAIN));
+    range.appendProperty("oninput", CommandRenderer.render(Command.SET_MASTER_GAIN));
     return range;
   }
 
@@ -117,7 +117,7 @@ public class TransportRenderer {
 
   private Range getTempoRange() {
     Range range = new Range("tempo", 0, 127, 1, 64);
-    range.appendProperty("oninput", CommandRenderer.render(Command.TEMPO));
+    range.appendProperty("oninput", CommandRenderer.render(Command.SET_TEMPO));
     return range;
   }
 

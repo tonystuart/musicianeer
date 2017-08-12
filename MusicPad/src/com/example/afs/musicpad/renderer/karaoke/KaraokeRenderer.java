@@ -77,8 +77,8 @@ public class KaraokeRenderer extends BrokerTask<Message> {
     case VIEW:
       doView();
       break;
-    case SONG:
-      doSong(message.getParameter());
+    case SELECT_SONG:
+      doSelectSong(message.getParameter());
       break;
     default:
       break;
@@ -132,7 +132,7 @@ public class KaraokeRenderer extends BrokerTask<Message> {
     publish(new OnSongDetails(html));
   }
 
-  private void doSong(int songIndex) {
+  private void doSelectSong(int songIndex) {
     deviceChannelAssignments = null;
   }
 

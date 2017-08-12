@@ -107,7 +107,7 @@ public class HeaderRenderer {
   private Select getTitleSelect() {
     Select select = new Select("title");
     select.appendProperty("value", mapTitleToIndex(song.getTitle()));
-    select.appendProperty("onchange", CommandRenderer.render(Command.SONG));
+    select.appendProperty("onchange", CommandRenderer.render(Command.SELECT_SONG));
     return select;
   }
 

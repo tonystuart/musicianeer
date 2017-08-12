@@ -117,19 +117,6 @@ public class QwertyPlayableMap implements PlayableMap {
     return keyIndexToSound;
   }
 
-  private RandomAccessList<Playable> getPlayables(Map<Sound, String> soundToLegend) {
-    RandomAccessList<Playable> playables = new DirectList<>();
-    for (Sound sound : sounds) {
-      String legend = soundToLegend.get(sound);
-      if (legend == null) {
-        legend = "?";
-      }
-      Playable playable = new Playable(sound, legend);
-      playables.add(playable);
-    }
-    return playables;
-  }
-
   private String getLegend(int register, int digit) {
     String registerString;
     if (register == 0) {
@@ -147,6 +134,19 @@ public class QwertyPlayableMap implements PlayableMap {
       }
     }
     return registerString + String.valueOf(noteKeys.charAt(digit));
+  }
+
+  private RandomAccessList<Playable> getPlayables(Map<Sound, String> soundToLegend) {
+    RandomAccessList<Playable> playables = new DirectList<>();
+    for (Sound sound : sounds) {
+      String legend = soundToLegend.get(sound);
+      if (legend == null) {
+        legend = "?";
+      }
+      Playable playable = new Playable(sound, legend);
+      playables.add(playable);
+    }
+    return playables;
   }
 
   private SoundCount[] sortByFrequency(Map<Sound, SoundCount> sounds) {

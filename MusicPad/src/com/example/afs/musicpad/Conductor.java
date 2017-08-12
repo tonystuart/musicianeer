@@ -77,9 +77,9 @@ public class Conductor extends BrokerTask<Message> {
     int parameter = message.getParameter();
     switch (command) {
     case SAMPLE_SONG:
-      doSample(parameter);
+      doSampleSong(parameter);
       break;
-    case SONG:
+    case SELECT_SONG:
       doSelectSong(parameter);
       break;
     case TRANSPOSE:
@@ -120,17 +120,17 @@ public class Conductor extends BrokerTask<Message> {
     publish(new OnMidiFiles(midiFiles));
   }
 
-  private void doSample(int songIndex) {
+  private void doSampleChannel(int deviceIndex, int channel) {
+    System.out.println("Sampling channel " + channel);
+    publish(new OnSampleChannel(song, deviceIndex, channel));
+  }
+
+  private void doSampleSong(int songIndex) {
     File midiFile = midiFiles.get(songIndex);
     SongBuilder songBuilder = new SongBuilder();
     song = songBuilder.createSong(midiFile);
     System.out.println("Sampling song " + songIndex + " - " + song.getTitle());
     publish(new OnSampleSong(song));
-  }
-
-  private void doSampleChannel(int deviceIndex, int channel) {
-    System.out.println("Sampling channel " + channel);
-    publish(new OnSampleChannel(song, deviceIndex, channel));
   }
 
   private void doSelectSong(int songIndex) {

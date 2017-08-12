@@ -46,20 +46,20 @@ public class PrompterDetails extends Division {
         .add(div(".name", "Background Volume")) //
         .add(div(".value") //
             .add(div(".value-content") //
-                .add(range(".velocity") //
-                    .property("oninput", CommandRenderer.render(Command.VELOCITY))))));
+                .add(range(".background-velocity") //
+                    .property("oninput", CommandRenderer.render(Command.SET_BACKGROUND_VELOCITY))))));
     division.add(div(".detail") //
         .add(div(".name", "Master Volume")) //
         .add(div(".value") //
             .add(div(".value-content") //
-                .add(range(".gain") //
-                    .property("oninput", CommandRenderer.render(Command.GAIN))))));
+                .add(range(".master-gain") //
+                    .property("oninput", CommandRenderer.render(Command.SET_MASTER_GAIN))))));
     division.add(div(".detail") //
         .add(div(".name", "Tempo")) //
         .add(div(".value") //
             .add(div(".value-content") //
                 .add(range(".tempo") //
-                    .property("oninput", CommandRenderer.render(Command.TEMPO))))));
+                    .property("oninput", CommandRenderer.render(Command.SET_TEMPO))))));
 
     return division;
   }

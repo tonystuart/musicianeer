@@ -22,6 +22,7 @@ import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnChannelUpdate;
 import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnDeviceCommand;
+import com.example.afs.musicpad.message.OnDeviceReport;
 import com.example.afs.musicpad.message.OnSampleChannel;
 import com.example.afs.musicpad.message.OnSong;
 import com.example.afs.musicpad.midi.Midi;
@@ -56,6 +57,11 @@ public class DeviceHandler extends BrokerTask<Message> {
   private Synthesizer synthesizer;
   private PlayableMap playableMap;
   private Sound[] activeSounds = new Sound[256]; // NB: KeyEvents VK codes, not midiNotes
+
+  private Song oldSong;
+  private InputType oldInputType;
+  private int oldChannel;
+  private OutputType oldOutputType;
 
   public DeviceHandler(Broker<Message> broker, Synthesizer synthesizer, String deviceName, int deviceIndex, InputType inputType) {
     super(broker);
@@ -104,22 +110,19 @@ public class DeviceHandler extends BrokerTask<Message> {
     } else if (isCommand) {
       switch (inputCode) {
       case 'B':
-        publish(new OnCommand(Command.BACKWARD));
+        publish(new OnCommand(Command.MOVE_BACKWARD));
         break;
       case 'F':
-        publish(new OnCommand(Command.FORWARD));
+        publish(new OnCommand(Command.MOVE_FORWARD));
         break;
       case 'I':
         publish(new OnCommand(Command.INCREASE_MASTER_GAIN, 0));
-        break;
-      case 'N':
-        publish(new OnCommand(Command.NEW_SONG));
         break;
       case 'P':
         publish(new OnCommand(Command.PLAY, ChannelNotes.ALL_CHANNELS));
         break;
       case 'R':
-        publish(new OnCommand(Command.REDUCE_MASTER_GAIN, 0));
+        publish(new OnCommand(Command.DECREASE_MASTER_GAIN, 0));
         break;
       case 'S':
         publish(new OnCommand(Command.STOP, 0));
@@ -128,13 +131,13 @@ public class DeviceHandler extends BrokerTask<Message> {
         publish(new OnCommand(Command.VIEW));
         break;
       case '0':
-        publish(new OnCommand(Command.SLOWER, 0));
+        publish(new OnCommand(Command.DECREASE_TEMPO, 0));
         break;
       case '1':
-        publish(new OnCommand(Command.FASTER, 0));
+        publish(new OnCommand(Command.INCREASE_TEMPO, 0));
         break;
       case '2':
-        publish(new OnCommand(Command.REDUCE_BACKGROUND_VELOCITY, 0));
+        publish(new OnCommand(Command.DECREASE_BACKGROUND_VELOCITY, 0));
         break;
       case '3':
         publish(new OnCommand(Command.INCREASE_BACKGROUND_VELOCITY, 0));
@@ -213,10 +216,13 @@ public class DeviceHandler extends BrokerTask<Message> {
     case PLAY:
       player.setEnabled(true);
       break;
+    case REPORT:
+      doReport();
+      break;
     case STOP:
       player.setEnabled(true);
       break;
-    case TEMPO:
+    case SET_TEMPO:
       player.setPercentTempo(Range.scaleMidiToPercent(parameter));
       break;
     default:
@@ -225,9 +231,9 @@ public class DeviceHandler extends BrokerTask<Message> {
   }
 
   private void doDecreasePlayerVelocity() {
-    int currentPlayerVelocity = player.getPercentVelocity();
+    int currentPlayerVelocity = player.getVelocity();
     int newPlayerVelocity = Math.max(0, currentPlayerVelocity - 5);
-    player.setPercentVelocity(newPlayerVelocity);
+    setVelocity(newPlayerVelocity);
   }
 
   private void doDeviceCommand(OnDeviceCommand message) {
@@ -238,8 +244,11 @@ public class DeviceHandler extends BrokerTask<Message> {
       case CHANNEL:
         selectChannel(parameter);
         break;
-      case PROGRAM:
-        selectProgram(parameter);
+      case DECREASE_PLAYER_VELOCITY:
+        doDecreasePlayerVelocity();
+        break;
+      case INCREASE_PLAYER_VELOCITY:
+        doIncreasePlayerVelocity();
         break;
       case INPUT:
         doInput(parameter);
@@ -247,14 +256,8 @@ public class DeviceHandler extends BrokerTask<Message> {
       case OUTPUT:
         doOutput(parameter);
         break;
-      case VELOCITY:
-        setPercentVelocity(Range.scaleMidiToPercent(parameter));
-        break;
-      case DECREASE_PLAYER_VELOCITY:
-        doDecreasePlayerVelocity();
-        break;
-      case INCREASE_PLAYER_VELOCITY:
-        doIncreasePlayerVelocity();
+      case MUTE_BACKGROUND:
+        doMuteBackground();
         break;
       case NEXT_CHANNEL:
         doNextChannel();
@@ -268,8 +271,11 @@ public class DeviceHandler extends BrokerTask<Message> {
       case PREVIOUS_PROGRAM:
         doPreviousProgram();
         break;
-      case MUTE_BACKGROUND:
-        doMuteBackground();
+      case PROGRAM:
+        selectProgram(parameter);
+        break;
+      case VELOCITY:
+        setVelocity(parameter);
         break;
       default:
         break;
@@ -278,9 +284,9 @@ public class DeviceHandler extends BrokerTask<Message> {
   }
 
   private void doIncreasePlayerVelocity() {
-    int currentPlayerVelocity = player.getPercentVelocity();
-    int newPlayerVelocity = Math.min(Player.MAX_PERCENT_VELOCITY, currentPlayerVelocity + 5);
-    player.setPercentVelocity(newPlayerVelocity);
+    int currentPlayerVelocity = player.getVelocity();
+    int newPlayerVelocity = Math.min(Midi.MAX_VALUE, currentPlayerVelocity + 5);
+    setVelocity(newPlayerVelocity);
   }
 
   private void doInput(int typeIndex) {
@@ -302,6 +308,7 @@ public class DeviceHandler extends BrokerTask<Message> {
 
   private void doMuteBackground() {
     synthesizer.muteChannel(channel, !synthesizer.isMuted(channel));
+    reportMuteBackground();
   }
 
   private void doNextChannel() {
@@ -354,6 +361,11 @@ public class DeviceHandler extends BrokerTask<Message> {
     }
   }
 
+  private void doReport() {
+    reportVelocity();
+    reportMuteBackground();
+  }
+
   private void doSampleChannel(OnSampleChannel message) {
     if (message.getDeviceIndex() == deviceIndex) {
       selectChannel(message.getChannel());
@@ -365,6 +377,14 @@ public class DeviceHandler extends BrokerTask<Message> {
 
   private void doSong(OnSong message) {
     song = message.getSong();
+  }
+
+  private void reportMuteBackground() {
+    publish(new OnDeviceReport(DeviceCommand.MUTE_BACKGROUND, deviceIndex, synthesizer.isMuted(channel) ? 1 : 0));
+  }
+
+  private void reportVelocity() {
+    publish(new OnDeviceReport(DeviceCommand.VELOCITY, deviceIndex, player.getVelocity()));
   }
 
   private void selectChannel(int channel) {
@@ -385,13 +405,23 @@ public class DeviceHandler extends BrokerTask<Message> {
     player.selectProgram(program);
   }
 
-  private void setPercentVelocity(int percentVelocity) {
-    player.setPercentVelocity(percentVelocity);
+  private void setVelocity(int velocity) {
+    player.setVelocity(velocity);
+    reportVelocity();
   }
 
   private void updateChannel() {
-    playableMap = createPlayableMap();
-    getBroker().publish(new OnChannelUpdate(deviceIndex, deviceName, channel, inputType, player.getOutputType(), playableMap));
+    // Suppress identical messages (e.g. due to sample channel and select channel) to make life simpler downstream (e.g. karaoke renderer)
+    if (song != oldSong || inputType != oldInputType || channel != oldChannel || player.getOutputType() != oldOutputType) {
+      playableMap = createPlayableMap();
+      getBroker().publish(new OnChannelUpdate(deviceIndex, deviceName, channel, inputType, player.getOutputType(), playableMap));
+      oldSong = song;
+      oldInputType = inputType;
+      oldChannel = channel;
+      oldOutputType = player.getOutputType();
+    } else {
+      System.out.println("Suppressing extraneous channel update");
+    }
   }
 
 }

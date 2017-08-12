@@ -49,23 +49,6 @@ public class IntervalSet {
     chromaticNotes[midiNote % Midi.SEMITONES_PER_OCTAVE] = true;
   }
 
-  public SoundType getSoundType() {
-    RootIntervals[] rootIntervals = getRootIntervals();
-    for (int i = 0; i < Intervals.INTERVALS.length; i++) {
-      Intervals targetIntervals = Intervals.INTERVALS[i];
-      for (int j = 0; j < rootIntervals.length; j++) {
-        RootIntervals sourceIntervals = rootIntervals[j];
-        if (targetIntervals.matches(sourceIntervals.getIntervals())) {
-          SoundType soundType = new SoundType(sourceIntervals.getRoot(), targetIntervals);
-          return soundType;
-        }
-      }
-    }
-    RootIntervals lowestIntervals = findLowestIntervals(rootIntervals);
-    SoundType soundType = createSoundType(lowestIntervals);
-    return soundType;
-  }
-
   public int[][] getIntervals() {
     int[][] inversions = getInversions();
     int inversionCount = inversions.length;
@@ -119,6 +102,23 @@ public class IntervalSet {
       rootIntervals[i] = new RootIntervals(root, intervals);
     }
     return rootIntervals;
+  }
+
+  public SoundType getSoundType() {
+    RootIntervals[] rootIntervals = getRootIntervals();
+    for (int i = 0; i < Intervals.INTERVALS.length; i++) {
+      Intervals targetIntervals = Intervals.INTERVALS[i];
+      for (int j = 0; j < rootIntervals.length; j++) {
+        RootIntervals sourceIntervals = rootIntervals[j];
+        if (targetIntervals.matches(sourceIntervals.getIntervals())) {
+          SoundType soundType = new SoundType(sourceIntervals.getRoot(), targetIntervals);
+          return soundType;
+        }
+      }
+    }
+    RootIntervals lowestIntervals = findLowestIntervals(rootIntervals);
+    SoundType soundType = createSoundType(lowestIntervals);
+    return soundType;
   }
 
   private SoundType createSoundType(RootIntervals rootIntervals) {

@@ -59,4 +59,8 @@ public class Range {
     return scale(0, 200, Midi.MIN_VALUE, Midi.MAX_VALUE, midiValue);
   }
 
+  public static int scalePercentToMidi(int percentValue) {
+    return scale(Midi.MIN_VALUE, Midi.MAX_VALUE, 0, 200, percentValue);
+  }
+
 }

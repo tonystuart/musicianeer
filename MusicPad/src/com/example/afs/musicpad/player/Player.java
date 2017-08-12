@@ -17,7 +17,6 @@ import com.example.afs.musicpad.device.common.DeviceHandler.OutputType;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.song.Note;
 import com.example.afs.musicpad.transport.NoteEvent;
-import com.example.afs.musicpad.util.Velocity;
 
 public class Player {
 
@@ -30,13 +29,11 @@ public class Player {
   public static final int TOTAL_CHANNELS = PLAYER_BASE + PLAYER_CHANNELS;
 
   private static final int DEFAULT_VELOCITY = 96;
-  private static final int DEFAULT_PERCENT_VELOCITY = 100;
-  public static final int MAX_PERCENT_VELOCITY = (100 * Midi.MAX_VALUE) / DEFAULT_VELOCITY;
 
   private int program;
   private int playerChannel;
   private int percentTempo;
-  private int percentVelocity = DEFAULT_PERCENT_VELOCITY;
+  private int velocity = DEFAULT_VELOCITY;
   private boolean isEnabled = true;
 
   private Synthesizer synthesizer;
@@ -61,12 +58,12 @@ public class Player {
     return outputType;
   }
 
-  public int getPercentVelocity() {
-    return percentVelocity;
-  }
-
   public int getProgram() {
     return program;
+  }
+
+  public int getVelocity() {
+    return velocity;
   }
 
   public void play(Action action, int midiNote) {
@@ -120,12 +117,13 @@ public class Player {
     }
   }
 
-  public void setPercentVelocity(int percentVelocity) {
-    this.percentVelocity = percentVelocity;
+  public void setVelocity(int velocity) {
+    this.velocity = velocity;
   }
 
   private void press(int midiNote) {
-    synthesizer.pressKey(playerChannel, midiNote, Velocity.scale(DEFAULT_VELOCITY, percentVelocity));
+    System.out.println("velocity=" + velocity);
+    synthesizer.pressKey(playerChannel, midiNote, velocity);
   }
 
   private void processNoteEvent(NoteEvent noteEvent) {

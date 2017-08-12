@@ -47,12 +47,12 @@ public class OnChannelUpdate extends Message {
     return inputType;
   }
 
-  public PlayableMap getPlayableMap() {
-    return playableMap;
-  }
-
   public OutputType getOutputType() {
     return outputType;
+  }
+
+  public PlayableMap getPlayableMap() {
+    return playableMap;
   }
 
   @Override
