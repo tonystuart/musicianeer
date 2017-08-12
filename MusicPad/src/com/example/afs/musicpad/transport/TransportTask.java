@@ -112,7 +112,7 @@ public class TransportTask extends BrokerTask<Message> {
   }
 
   private void doDecreaseBackgroundVelocity() {
-    setBackgroundVelocity(Math.max(0, transport.getPercentVelocity() - 10));
+    setBackgroundPercentVelocity(Math.max(0, transport.getPercentVelocity() - 10));
   }
 
   private void doDecreaseMasterGain() {
@@ -128,7 +128,7 @@ public class TransportTask extends BrokerTask<Message> {
   }
 
   private void doIncreaseBackgroundVelocity() {
-    setBackgroundVelocity(Math.max(0, transport.getPercentVelocity() + 10));
+    setBackgroundPercentVelocity(Math.max(0, transport.getPercentVelocity() + 10));
   }
 
   private void doIncreaseMasterGain() {
@@ -202,7 +202,7 @@ public class TransportTask extends BrokerTask<Message> {
   }
 
   private void doSetBackgroundVelocity(int velocity) {
-    setBackgroundVelocity(velocity);
+    setBackgroundPercentVelocity(Range.scaleMidiToPercent(velocity));
   }
 
   private void doSetTempo(int tempo) {
@@ -254,8 +254,8 @@ public class TransportTask extends BrokerTask<Message> {
     publish(new OnReport(Command.SET_TEMPO, tempo));
   }
 
-  private void setBackgroundVelocity(int velocity) {
-    transport.setPercentVelocity(Range.scaleMidiToPercent(velocity));
+  private void setBackgroundPercentVelocity(int percentVelocity) {
+    transport.setPercentVelocity(percentVelocity);
     reportBackgroundVelocity();
   }
 
