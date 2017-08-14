@@ -327,9 +327,10 @@ public class DeviceHandler extends BrokerTask<Message> {
     if (channel != Midi.DRUM) {
       int currentProgram = player.getProgram();
       int nextProgram = currentProgram + 1;
-      if (nextProgram < Midi.PROGRAMS) {
-        selectProgram(nextProgram);
+      if (nextProgram == Midi.PROGRAMS) {
+        nextProgram = 0;
       }
+      selectProgram(nextProgram);
     }
   }
 
@@ -355,13 +356,16 @@ public class DeviceHandler extends BrokerTask<Message> {
     if (channel != Midi.DRUM) {
       int currentProgram = player.getProgram();
       int nextProgram = currentProgram - 1;
-      if (nextProgram >= 0) {
-        selectProgram(nextProgram);
+      if (nextProgram < 0) {
+        nextProgram = Midi.PROGRAMS - 1;
       }
+      selectProgram(nextProgram);
     }
   }
 
   private void doReport() {
+    reportChannel();
+    reportProgram();
     reportVelocity();
     reportMuteBackground();
   }
@@ -379,8 +383,16 @@ public class DeviceHandler extends BrokerTask<Message> {
     song = message.getSong();
   }
 
+  private void reportChannel() {
+    publish(new OnDeviceReport(DeviceCommand.CHANNEL, deviceIndex, channel));
+  }
+
   private void reportMuteBackground() {
     publish(new OnDeviceReport(DeviceCommand.MUTE_BACKGROUND, deviceIndex, synthesizer.isMuted(channel) ? 1 : 0));
+  }
+
+  private void reportProgram() {
+    publish(new OnDeviceReport(DeviceCommand.PROGRAM, deviceIndex, player.getProgram()));
   }
 
   private void reportVelocity() {
@@ -403,6 +415,7 @@ public class DeviceHandler extends BrokerTask<Message> {
 
   private void selectProgram(int program) {
     player.selectProgram(program);
+    reportProgram();
   }
 
   private void setVelocity(int velocity) {
@@ -419,8 +432,7 @@ public class DeviceHandler extends BrokerTask<Message> {
       oldInputType = inputType;
       oldChannel = channel;
       oldOutputType = player.getOutputType();
-    } else {
-      System.out.println("Suppressing extraneous channel update");
+      reportChannel();
     }
   }
 

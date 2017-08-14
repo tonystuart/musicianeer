@@ -10,9 +10,13 @@
 package com.example.afs.musicpad.renderer.karaoke;
 
 import java.io.File;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.NavigableMap;
 import java.util.TreeMap;
 
+import com.example.afs.musicpad.html.Option;
+import com.example.afs.musicpad.html.Template;
 import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnChannelDetails;
 import com.example.afs.musicpad.message.OnChannelUpdate;
@@ -26,6 +30,9 @@ import com.example.afs.musicpad.message.OnSampleChannel;
 import com.example.afs.musicpad.message.OnSampleSong;
 import com.example.afs.musicpad.message.OnSongDetails;
 import com.example.afs.musicpad.message.OnSongs;
+import com.example.afs.musicpad.message.OnTemplates;
+import com.example.afs.musicpad.midi.Instruments;
+import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.playable.Playable;
 import com.example.afs.musicpad.playable.PlayableMap;
 import com.example.afs.musicpad.song.Song;
@@ -50,6 +57,12 @@ public class KaraokeRenderer extends BrokerTask<Message> {
     subscribe(OnSampleChannel.class, message -> doSampleChannel(message));
     subscribe(OnChannelUpdate.class, message -> doChannelUpdate(message));
     subscribe(OnDeviceDetached.class, message -> doDeviceDetached(message));
+  }
+
+  @Override
+  public void start() {
+    super.start();
+    publishTemplates();
   }
 
   private boolean allDevicePlayablesAvailable() {
@@ -139,6 +152,22 @@ public class KaraokeRenderer extends BrokerTask<Message> {
   private void doView() {
     prompterFactory.selectNext();
     renderWhenReady();
+  }
+
+  private String getProgramOptions() {
+    Template template = new Template("#program-options");
+    for (int i = 0; i < Midi.PROGRAMS; i++) {
+      Option option = new Option(Instruments.getProgramName(i), i);
+      template.appendChild(option);
+    }
+    String programOptions = template.render();
+    return programOptions;
+  }
+
+  private void publishTemplates() {
+    List<String> templates = new LinkedList<>();
+    templates.add(getProgramOptions());
+    getBroker().publish(new OnTemplates(templates));
   }
 
   private void renderWhenReady() {

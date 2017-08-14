@@ -34,13 +34,16 @@ public class PrompterDetails extends Division {
       division.add(div(".detail", ".device-" + deviceIndex) // 
           .add(div(".name", Utils.getPlayerName(deviceIndex) + " Volume")) // 
           .add(div(".value") // 
-              .add(div(".value-content") // 
+              .add(div(".value-content") //
                   .add(range(".device-velocity-" + deviceIndex) //  
                       .property("oninput", CommandRenderer.render(DeviceCommand.VELOCITY, deviceIndex))) //
+                  .add(div(".channel-program") //
+                      .add(div(".device-channel-" + deviceIndex)) //
+                      .add(div(".device-program-" + deviceIndex))) //
                   .add(label() // 
                       .add(checkbox(".background-mute-" + deviceIndex) //
                           .property("onclick", CommandRenderer.render(DeviceCommand.MUTE_BACKGROUND, deviceIndex, "this.checked ? 1 : 0"))) //
-                      .add(text("Mute background"))))));
+                      .add(text("&nbsp;Mute background"))))));
     }
     division.add(div(".detail") //
         .add(div(".name", "Background Volume")) //

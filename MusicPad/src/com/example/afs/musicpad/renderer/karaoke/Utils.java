@@ -42,13 +42,12 @@ public class Utils {
     return name;
   }
 
-  public static String normalizeProgramName(String programName) {
-    boolean ignore = false;
+  public static String toMixedCase(String text) {
     boolean capitalize = true;
     StringBuilder s = new StringBuilder();
-    int length = programName.length();
+    int length = text.length();
     for (int i = 0; i < length; i++) {
-      char c = programName.charAt(i);
+      char c = text.charAt(i);
       if (capitalize) {
         c = Character.toUpperCase(c);
         capitalize = false;
@@ -56,15 +55,8 @@ public class Utils {
       if (c == '-') {
         c = ' ';
         capitalize = true;
-      } else if (c == '(') {
-        ignore = true;
       }
-      if (!ignore) {
-        s.append(c);
-      }
-      if (c == ')') {
-        ignore = false;
-      }
+      s.append(c);
     }
     return s.toString().trim();
   }

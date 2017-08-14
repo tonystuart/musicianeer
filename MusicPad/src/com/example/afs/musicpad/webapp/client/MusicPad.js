@@ -122,6 +122,13 @@ musicPad.sendDeviceCommand = function(command, deviceIndex, parameter) {
     }));
 }
 
+musicPad.setElementHtml = function(selector, value) {
+    let elements = document.querySelectorAll(selector);
+    for (const element of elements) {
+        element.innerHTML = value;
+    }
+}
+
 musicPad.setElementProperty = function(selector, property, value) {
     let elements = document.querySelectorAll(selector);
     for (const element of elements) {
@@ -150,4 +157,8 @@ musicPad.toSvg = function(svg, x) {
     let inverse = ctm.inverse();
     let svgPoint = screenPoint.matrixTransform(inverse);
     return svgPoint.x;
+}
+
+musicPad.toValue = function(index) {
+    return index + 1;
 }

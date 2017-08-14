@@ -11,13 +11,8 @@ package com.example.afs.musicpad.html;
 
 public class Template extends Parent {
 
-  public Template() {
-    super("template");
-  }
-
-  public Template(String id) {
-    this();
-    setId(id);
+  public Template(String... properties) {
+    super("template", properties);
   }
 
 }

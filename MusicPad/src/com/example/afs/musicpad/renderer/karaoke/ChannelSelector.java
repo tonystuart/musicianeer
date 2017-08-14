@@ -131,7 +131,7 @@ public class ChannelSelector {
     int count = 0;
     StringBuilder s = new StringBuilder();
     s.append("Channel " + Value.toNumber(channel) + ": ");
-    s.append(Utils.normalizeProgramName(programNames.get(0)));
+    s.append(programNames.get(0));
     for (Entry<Integer, Integer> entry : deviceChannelAssignments.entrySet()) {
       if (entry.getValue() == channel) {
         if (count++ == 0) {

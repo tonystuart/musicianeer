@@ -9,7 +9,6 @@
 
 package com.example.afs.musicpad.song;
 
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.NavigableSet;
@@ -20,17 +19,28 @@ import com.example.afs.musicpad.analyzer.TranspositionFinder;
 import com.example.afs.musicpad.midi.Instruments;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.song.Note.NoteBuilder;
-import com.example.afs.musicpad.util.Value;
 
 public class Song {
+
+  public interface DrumFormatter {
+    String format(int drum);
+  }
+
+  public interface ProgramFormatter {
+    String format(int program);
+  }
 
   private String title;
   private long duration;
   private int transposition;
+
+  private Integer distanceToWhiteKeys;
   private TreeSet<Note> notes = new TreeSet<>();
   private TreeSet<Word> words = new TreeSet<>();
   private ChannelFacets channelFacets = new ChannelFacets();
-  private Integer distanceToWhiteKeys;
+
+  private DrumFormatter drumFormatter = drum -> Instruments.getDrumName(drum);
+  private ProgramFormatter programFormatter = program -> Instruments.getProgramName(program);
 
   public Song() {
   }
@@ -258,19 +268,23 @@ public class Song {
   }
 
   public List<String> getProgramNames(int channel) {
+    return getProgramNames(channel, programFormatter, drumFormatter);
+  }
+
+  public List<String> getProgramNames(int channel, ProgramFormatter programFormatter, DrumFormatter drumFormatter) {
     List<String> programNames = new LinkedList<>();
     if (channel == Midi.DRUM) {
       int[] noteCounts = channelFacets.getFacet(channel).getDistinctNoteCounts();
       for (int midiNote = 0; midiNote < Midi.NOTES; midiNote++) {
         if (noteCounts[midiNote] > 0) {
-          String programName = Instruments.getDrumName(midiNote) + " (" + Value.toNumber(midiNote) + ")";
+          String programName = drumFormatter.format(midiNote);
           programNames.add(programName);
         }
       }
     } else {
       Set<Integer> programs = channelFacets.getFacet(channel).getPrograms();
       for (Integer program : programs) {
-        String programName = Instruments.getProgramName(program) + " (" + Value.toNumber(program) + ")";
+        String programName = programFormatter.format(program);
         programNames.add(programName);
       }
     }
@@ -279,11 +293,7 @@ public class Song {
 
   public Set<Integer> getPrograms(int channel) {
     Set<Integer> programs;
-    if (channel == Midi.MELODIC) {
-      programs = Collections.emptySet();
-    } else {
-      programs = channelFacets.getFacet(channel).getPrograms();
-    }
+    programs = channelFacets.getFacet(channel).getPrograms();
     return programs;
   }
 

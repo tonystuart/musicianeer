@@ -60,13 +60,31 @@ karaoke.onChannelSelect = function(message) {
 karaoke.onDeviceReport = function(message) {
     console.log('message.deviceCommand=' + message.deviceCommand + ', deviceIndex=' + message.deviceIndex + ', parameter=' + message.parameter);
     switch (message.deviceCommand) {
+    case 'CHANNEL':
+        musicPad.setElementHtml('.device-channel-' + message.deviceIndex, 'Channel ' + musicPad.toValue(message.parameter) + ':&nbsp;');
+        break;
     case 'MUTE_BACKGROUND':
         musicPad.setElementProperty('.background-mute-' + message.deviceIndex, 'checked', message.parameter ? true : false);
+        break;
+    case 'PROGRAM':
+        musicPad.setElementHtml('.device-program-' + message.deviceIndex, karaoke.getProgramName(message.parameter));
         break;
     case 'VELOCITY':
         musicPad.setElementValue('.device-velocity-' + message.deviceIndex, message.parameter);
         break;
     }
+}
+
+karaoke.getProgramName = function(program) {
+    let programName = 'Instrument ' + program;
+    let programOptions = document.getElementById('program-options');
+    if (programOptions) {
+        let option = programOptions.content.querySelector('option[value=\'' + program + '\']');
+        if (option) {
+            programName = option.label;
+        }
+    }
+    return programName;
 }
 
 karaoke.onLoad = function() {
@@ -157,6 +175,17 @@ karaoke.onSongSelect = function(message) {
     }
 }
 
+karaoke.onTemplates = function(response) {
+    for (const templateHtml of response.templates) {
+        let template = musicPad.fragmentToElement(templateHtml);
+        let existingTemplate = document.getElementById(template.id);
+        if (existingTemplate) {
+            existingTemplate.parentNode.removeChild(existingTemplate);
+        }
+        document.body.appendChild(template);
+    }
+}
+
 karaoke.scrollStaffPrompter = function(tick) {
     let scroller = document.getElementById('notator-scroller');
     let svg = scroller.querySelector('svg');
@@ -242,6 +271,9 @@ karaoke.onWebSocketMessage = function(json) {
         break;
     case 'OnSongs':
         karaoke.onSongs(message);
+        break;
+    case 'OnTemplates':
+        karaoke.onTemplates(message);
         break;
     case 'OnTick':
         karaoke.onTick(message.tick);

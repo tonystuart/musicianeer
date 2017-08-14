@@ -62,134 +62,134 @@ public class Instruments {
   };
 
   private static String[] INSTRUMENTS = new String[] { //
-      "acoustic-grand-piano", //
-      "bright-acoustic-piano", //
-      "electric-grand-piano", //
-      "honky-tonk-piano", //
-      "electric-piano-1", //
-      "electric-piano-2", //
-      "harpsichord", //
-      "clavinet", //
-      "celesta", //
-      "glockenspiel", //
-      "music-box", //
-      "vibraphone", //
-      "marimba", //
-      "xylophone", //
-      "tubular-bells", //
-      "dulcimer", //
-      "drawbar-organ", //
-      "percussive-organ", //
-      "rock-organ", //
-      "church-organ", //
-      "reed-organ", //
-      "accordion", //
-      "harmonica", //
-      "tango-accordion", //
-      "acoustic-guitar-nylon", //
-      "acoustic-guitar-steel", //
-      "electric-guitar-jazz", //
-      "electric-guitar-clean", //
-      "electric-guitar-muted", //
-      "overdriven-guitar", //
-      "distortion-guitar", //
-      "guitar-harmonics", //
-      "acoustic-bass", //
-      "electric-bass-finger", //
-      "electric-bass-pick", //
-      "fretless-bass", //
-      "slap-bass-1", //
-      "slap-bass-2", //
-      "synth-bass-1", //
-      "synth-bass-2", //
-      "violin", //
-      "viola", //
-      "cello", //
-      "contrabass", //
-      "tremolo-strings", //
-      "pizzicato-strings", //
-      "orchestral-harp", //
-      "timpani", //
-      "string-ensemble-1", //
-      "string-ensemble-2", //
-      "synth-strings-1", //
-      "synth-strings-2", //
-      "choir-aahs", //
-      "voice-oohs", //
-      "synth-choir", //
-      "orchestra-hit", //
-      "trumpet", //
-      "trombone", //
-      "tuba", //
-      "muted-trumpet", //
-      "french-horn", //
-      "brass-section", //
-      "synth-brass-1", //
-      "synth-brass-2", //
-      "soprano-sax", //
-      "alto-sax", //
-      "tenor-sax", //
-      "baritone-sax", //
-      "oboe", //
-      "english-horn", //
-      "bassoon", //
-      "clarinet", //
-      "piccolo", //
-      "flute", //
-      "recorder", //
-      "pan-flute", //
-      "blown-bottle", //
-      "shakuhachi", //
-      "whistle", //
-      "ocarina", //
-      "lead-1-square", //
-      "lead-2-sawtooth", //
-      "lead-3-calliope", //
-      "lead-4-chiff", //
-      "lead-5-charang", //
-      "lead-6-voice", //
-      "lead-7-fifths", //
-      "lead-8-bass-+-lead", //
-      "pad-1-new-age", //
-      "pad-2-warm", //
-      "pad-3-polysynth", //
-      "pad-4-choir", //
-      "pad-5-bowed", //
-      "pad-6-metallic", //
-      "pad-7-halo", //
-      "pad-8-sweep", //
-      "fx-1-rain", //
-      "fx-2-soundtrack", //
-      "fx-3-crystal", //
-      "fx-4-atmosphere", //
-      "fx-5-brightness", //
-      "fx-6-goblins", //
-      "fx-7-echoes", //
-      "fx-8-sci-fi", //
-      "sitar", //
-      "banjo", //
-      "shamisen", //
-      "koto", //
-      "kalimba", //
-      "bagpipe", //
-      "fiddle", //
-      "shanai", //
-      "tinkle-bell", //
-      "agogo", //
-      "steel-drums", //
-      "woodblock", //
-      "taiko-drum", //
-      "melodic-tom", //
-      "synth-drum", //
-      "reverse-cymbal", //
-      "guitar-fret-noise", //
-      "breath-noise", //
-      "seashore", //
-      "bird-tweet", //
-      "telephone-ring", //
-      "helicopter", //
-      "applause", //
-      "gunshot", //
+      "Acoustic Grand Piano", //
+      "Bright Acoustic Piano", //
+      "Electric Grand Piano", //
+      "Honky Tonk Piano", //
+      "Electric Piano 1", //
+      "Electric Piano 2", //
+      "Harpsichord", //
+      "Clavinet", //
+      "Celesta", //
+      "Glockenspiel", //
+      "Music Box", //
+      "Vibraphone", //
+      "Marimba", //
+      "Xylophone", //
+      "Tubular Bells", //
+      "Dulcimer", //
+      "Drawbar Organ", //
+      "Percussive Organ", //
+      "Rock Organ", //
+      "Church Organ", //
+      "Reed Organ", //
+      "Accordion", //
+      "Harmonica", //
+      "Tango Accordion", //
+      "Acoustic Guitar Nylon", //
+      "Acoustic Guitar Steel", //
+      "Electric Guitar Jazz", //
+      "Electric Guitar Clean", //
+      "Electric Guitar Muted", //
+      "Overdriven Guitar", //
+      "Distortion Guitar", //
+      "Guitar Harmonics", //
+      "Acoustic Bass", //
+      "Electric Bass Finger", //
+      "Electric Bass Pick", //
+      "Fretless Bass", //
+      "Slap Bass 1", //
+      "Slap Bass 2", //
+      "Synth Bass 1", //
+      "Synth Bass 2", //
+      "Violin", //
+      "Viola", //
+      "Cello", //
+      "Contrabass", //
+      "Tremolo Strings", //
+      "Pizzicato Strings", //
+      "Orchestral Harp", //
+      "Timpani", //
+      "String Ensemble 1", //
+      "String Ensemble 2", //
+      "Synth Strings 1", //
+      "Synth Strings 2", //
+      "Choir Aahs", //
+      "Voice Oohs", //
+      "Synth Choir", //
+      "Orchestra Hit", //
+      "Trumpet", //
+      "Trombone", //
+      "Tuba", //
+      "Muted Trumpet", //
+      "French Horn", //
+      "Brass Section", //
+      "Synth Brass 1", //
+      "Synth Brass 2", //
+      "Soprano Sax", //
+      "Alto Sax", //
+      "Tenor Sax", //
+      "Baritone Sax", //
+      "Oboe", //
+      "English Horn", //
+      "Bassoon", //
+      "Clarinet", //
+      "Piccolo", //
+      "Flute", //
+      "Recorder", //
+      "Pan Flute", //
+      "Blown Bottle", //
+      "Shakuhachi", //
+      "Whistle", //
+      "Ocarina", //
+      "Lead 1 Square", //
+      "Lead 2 Sawtooth", //
+      "Lead 3 Calliope", //
+      "Lead 4 Chiff", //
+      "Lead 5 Charang", //
+      "Lead 6 Voice", //
+      "Lead 7 Fifths", //
+      "Lead 8 Bass + Lead", //
+      "Pad 1 New Age", //
+      "Pad 2 Warm", //
+      "Pad 3 Polysynth", //
+      "Pad 4 Choir", //
+      "Pad 5 Bowed", //
+      "Pad 6 Metallic", //
+      "Pad 7 Halo", //
+      "Pad 8 Sweep", //
+      "Fx 1 Rain", //
+      "Fx 2 Soundtrack", //
+      "Fx 3 Crystal", //
+      "Fx 4 Atmosphere", //
+      "Fx 5 Brightness", //
+      "Fx 6 Goblins", //
+      "Fx 7 Echoes", //
+      "Fx 8 Sci Fi", //
+      "Sitar", //
+      "Banjo", //
+      "Shamisen", //
+      "Koto", //
+      "Kalimba", //
+      "Bagpipe", //
+      "Fiddle", //
+      "Shanai", //
+      "Tinkle Bell", //
+      "Agogo", //
+      "Steel Drums", //
+      "Woodblock", //
+      "Taiko Drum", //
+      "Melodic Tom", //
+      "Synth Drum", //
+      "Reverse Cymbal", //
+      "Guitar Fret Noise", //
+      "Breath Noise", //
+      "Seashore", //
+      "Bird Tweet", //
+      "Telephone Ring", //
+      "Helicopter", //
+      "Applause", //
+      "Gunshot", //
   };
 
   public static int getDrum(String name) {

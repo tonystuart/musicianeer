@@ -66,7 +66,7 @@ public class ChannelDetails {
       if (s.length() > 0) {
         s.append(", ");
       }
-      s.append(Utils.normalizeProgramName(programName));
+      s.append(programName);
     }
     return s.toString();
   }
