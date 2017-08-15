@@ -31,7 +31,7 @@ public class Transport {
     RELATIVE, ABSOLUTE
   }
 
-  private static final int DEFAULT_PERCENT_VELOCITY = 25;
+  private static final int DEFAULT_PERCENT_VELOCITY = 12;
   private static final float DEFAULT_GAIN = 5 * Synthesizer.DEFAULT_GAIN;
 
   private float gain;

@@ -28,7 +28,7 @@ public class Player {
   private static final int PLAYER_CHANNELS = Midi.CHANNELS;
   public static final int TOTAL_CHANNELS = PLAYER_BASE + PLAYER_CHANNELS;
 
-  private static final int DEFAULT_VELOCITY = 96;
+  private static final int DEFAULT_VELOCITY = 64;
 
   private int program;
   private int playerChannel;
