@@ -76,13 +76,17 @@ karaoke.onDeviceReport = function(message) {
 }
 
 karaoke.getProgramName = function(program) {
-    let programName = 'Instrument ' + program;
+    let programName = null;
     let programOptions = document.getElementById('program-options');
     if (programOptions) {
         let option = programOptions.content.querySelector('option[value=\'' + program + '\']');
         if (option) {
             programName = option.label;
+        } else if (program == -1) {
+          programName = 'Drums';
         }
+    } else {
+      programName = 'Instrument ' + program;
     }
     return programName;
 }

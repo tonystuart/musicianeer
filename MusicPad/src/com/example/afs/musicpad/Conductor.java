@@ -152,7 +152,7 @@ public class Conductor extends BrokerTask<Message> {
 
   private boolean isMidiFile(String name) {
     String lowerCaseName = name.toLowerCase();
-    boolean isMidi = lowerCaseName.endsWith(".mid") || lowerCaseName.endsWith(".kar");
+    boolean isMidi = lowerCaseName.endsWith(".mid") || lowerCaseName.endsWith(".midi") || lowerCaseName.endsWith(".kar");
     return isMidi;
   }
 

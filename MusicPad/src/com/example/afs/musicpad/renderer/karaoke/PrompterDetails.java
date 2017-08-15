@@ -38,8 +38,10 @@ public class PrompterDetails extends Division {
                   .add(range(".device-velocity-" + deviceIndex) //  
                       .property("oninput", CommandRenderer.render(DeviceCommand.VELOCITY, deviceIndex))) //
                   .add(div(".channel-program") //
-                      .add(div(".device-channel-" + deviceIndex)) //
-                      .add(div(".device-program-" + deviceIndex))) //
+                      .add(div(".device-channel-" + deviceIndex) //
+                          .add(text("Channel"))) //
+                      .add(div(".device-program-" + deviceIndex) //
+                          .add(text("Instrument")))) //
                   .add(label() // 
                       .add(checkbox(".background-mute-" + deviceIndex) //
                           .property("onclick", CommandRenderer.render(DeviceCommand.MUTE_BACKGROUND, deviceIndex, "this.checked ? 1 : 0"))) //
