@@ -122,7 +122,6 @@ public class Player {
   }
 
   private void press(int midiNote) {
-    System.out.println("velocity=" + velocity);
     synthesizer.pressKey(playerChannel, midiNote, velocity);
   }
 
