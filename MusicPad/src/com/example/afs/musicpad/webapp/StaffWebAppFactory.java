@@ -7,23 +7,19 @@
 // This program is made available on an "as is" basis, without
 // warranties or conditions of any kind, either express or implied.
 
-package com.example.afs.musicpad.message;
+package com.example.afs.musicpad.webapp;
 
-public class OnFooter extends Message {
+import com.example.afs.musicpad.message.Message;
+import com.example.afs.musicpad.util.Broker;
 
-  private String html;
+public class StaffWebAppFactory extends WebAppFactory {
 
-  public OnFooter(String html) {
-    this.html = html;
-  }
-
-  public String getHtml() {
-    return html;
+  public StaffWebAppFactory(Broker<Message> broker) {
+    super(broker);
   }
 
   @Override
-  public String toString() {
-    return "OnFooter [html=" + html + "]";
+  protected WebApp createWebApp(Broker<Message> broker, WebAppFactory webAppFactory) {
+    return new StaffWebApp(broker, this);
   }
-
 }

@@ -35,5 +35,4 @@ public enum Command {
   TRANSPOSE_TO, //
   TROFF, //
   TRON, //
-  VIEW, //
 }

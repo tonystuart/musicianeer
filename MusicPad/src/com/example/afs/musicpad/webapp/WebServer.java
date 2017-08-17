@@ -31,12 +31,12 @@ public class WebServer extends BrokerTask<Message> {
   private static final int PORT = 8080;
 
   private Server server;
-  private CockpitWebAppFactory cockpitWebAppFactory;
+  private StaffWebAppFactory staffWebAppFactory;
   private KaraokeWebAppFactory karaokeWebAppFactory;
 
   public WebServer(Broker<Message> broker) {
     super(broker);
-    cockpitWebAppFactory = new CockpitWebAppFactory(getBroker());
+    staffWebAppFactory = new StaffWebAppFactory(getBroker());
     karaokeWebAppFactory = new KaraokeWebAppFactory(getBroker());
     createServer();
   }
@@ -51,9 +51,9 @@ public class WebServer extends BrokerTask<Message> {
     }
   }
 
-  private ServletHolder createCockpitServlet() {
-    WebAppServlet cockpitServlet = new WebAppServlet(cockpitWebAppFactory);
-    ServletHolder servletHolder = new ServletHolder("CockpitServlet", cockpitServlet);
+  private ServletHolder createStaffServlet() {
+    WebAppServlet staffServlet = new WebAppServlet(staffWebAppFactory);
+    ServletHolder servletHolder = new ServletHolder("StaffServlet", staffServlet);
     return servletHolder;
   }
 
@@ -85,7 +85,7 @@ public class WebServer extends BrokerTask<Message> {
     context.addServlet(createDefaultServlet(), "/");
     context.addServlet(CurrentFrameServlet.class, "/currentFrame.jpg");
     context.addServlet(createRestServlet(), "/v1/rest/*");
-    context.addServlet(createCockpitServlet(), "/v1/cockpit/*");
+    context.addServlet(createStaffServlet(), "/v1/staff/*");
     context.addServlet(createKaraokeServlet(), "/v1/karaoke/*");
     HandlerCollection handlers = new HandlerCollection();
     handlers.setHandlers(new Handler[] {

@@ -7,13 +7,12 @@
 // This program is made available on an "as is" basis, without
 // warranties or conditions of any kind, either express or implied.
 
-package com.example.afs.musicpad.renderer.cockpit;
+package com.example.afs.musicpad.renderer.staff;
 
 import java.util.SortedSet;
 
-import com.example.afs.musicpad.playable.Playable;
-import com.example.afs.musicpad.playable.PlayableMap;
 import com.example.afs.musicpad.midi.Midi;
+import com.example.afs.musicpad.playable.Playable;
 import com.example.afs.musicpad.player.Sound;
 import com.example.afs.musicpad.song.Default;
 import com.example.afs.musicpad.song.Note;
@@ -26,7 +25,7 @@ import com.example.afs.musicpad.svg.Text;
 import com.example.afs.musicpad.util.DirectList;
 import com.example.afs.musicpad.util.RandomAccessList;
 
-public class StaffRenderer {
+public class PlayableStaff {
 
   private static class Context {
     private NoteType noteType;
@@ -142,6 +141,8 @@ public class StaffRenderer {
   private static final String CLOSED = "closed";
   private static final String OPEN = "open";
 
+  public static final int TICKS_PER_PIXEL = 5;
+
   public static boolean isSharp(int midiNote) {
     return SHARPS[midiNote % SHARPS.length];
   }
@@ -166,30 +167,22 @@ public class StaffRenderer {
     return positions;
   }
 
+  private RandomAccessList<Playable> playables;
   private Song song;
-  private int channel;
-  private int ticksPerPixel;
-  private PlayableMap playableMap;
 
-  public StaffRenderer(Song song, int channel, int ticksPerPixel, PlayableMap playableMap) {
+  public PlayableStaff(Song song, RandomAccessList<Playable> playables) {
     this.song = song;
-    this.channel = channel;
-    this.ticksPerPixel = ticksPerPixel;
-    this.playableMap = playableMap;
+    this.playables = playables;
   }
 
-  public String getMusic() {
-    String music = "";
-    if (song.getChannelNoteCount(channel) > 0) {
-      long duration = song.getDuration();
-      Svg staff = drawStaff(duration);
-      drawMeasures(staff, duration);
-      drawNotes(staff);
-      drawNoteNames(staff);
-      drawWords(staff);
-      music = staff.render();
-    }
-    return music;
+  public Svg getStaff() {
+    long duration = song.getDuration();
+    Svg staff = drawStaff(duration);
+    drawMeasures(staff, duration);
+    drawNotes(staff);
+    drawNoteNames(staff);
+    drawWords(staff);
+    return staff;
   }
 
   private void drawHead(Svg staff, Context context, int noteX, int noteY) {
@@ -220,7 +213,6 @@ public class StaffRenderer {
   }
 
   private void drawNoteNames(Svg staff) {
-    RandomAccessList<Playable> playables = playableMap.getPlayables();
     for (Playable playable : playables) {
       int wordX = getX(playable.getBeginTick() - RADIUS); // align with left edge of note head
       Sound sound = playable.getSound();
@@ -231,22 +223,9 @@ public class StaffRenderer {
   }
 
   private void drawNotes(Svg staff) {
-    int lastStartIndex = -1;
-    Sound sound = null;
-    for (Note note : song.getNotes()) {
-      if (note.getChannel() == channel) {
-        int startIndex = note.getStartIndex();
-        if (startIndex != lastStartIndex) {
-          lastStartIndex = startIndex;
-          if (sound != null) {
-            drawSound(staff, sound);
-          }
-          sound = new Sound();
-        }
-        sound.add(note);
-      }
+    for (Playable playable : playables) {
+      drawSound(staff, playable.getSound());
     }
-    drawSound(staff, sound);
   }
 
   private void drawNotes(Svg staff, long firstTick, RandomAccessList<Note> notes, int midPoint) {
@@ -385,7 +364,7 @@ public class StaffRenderer {
   }
 
   private int getX(long tick) {
-    return (int) (tick / ticksPerPixel);
+    return (int) (tick / TICKS_PER_PIXEL);
   }
 
   private int getY(int midiNote) {

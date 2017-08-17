@@ -127,9 +127,6 @@ public class DeviceHandler extends BrokerTask<Message> {
       case 'S':
         publish(new OnCommand(Command.STOP, 0));
         break;
-      case 'V':
-        publish(new OnCommand(Command.VIEW));
-        break;
       case '0':
         publish(new OnCommand(Command.DECREASE_TEMPO, 0));
         break;

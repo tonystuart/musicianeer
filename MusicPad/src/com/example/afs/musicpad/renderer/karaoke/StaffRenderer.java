@@ -36,18 +36,23 @@ import com.example.afs.musicpad.midi.Instruments;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.playable.Playable;
 import com.example.afs.musicpad.playable.PlayableMap;
+import com.example.afs.musicpad.renderer.karaoke.ChannelDetails;
+import com.example.afs.musicpad.renderer.karaoke.ChannelSelector;
+import com.example.afs.musicpad.renderer.karaoke.KaraokePrompter;
+import com.example.afs.musicpad.renderer.karaoke.SongDetails;
+import com.example.afs.musicpad.renderer.karaoke.SongSelector;
 import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.task.BrokerTask;
 import com.example.afs.musicpad.util.Broker;
 import com.example.afs.musicpad.util.RandomAccessList;
 
-public class KaraokeRenderer extends BrokerTask<Message> {
+public class StaffRenderer extends BrokerTask<Message> {
 
   private Song song;
   private NavigableMap<Integer, Integer> deviceChannelAssignments;
   private NavigableMap<Integer, RandomAccessList<Playable>> devicePlayables = new TreeMap<>();
 
-  public KaraokeRenderer(Broker<Message> broker) {
+  public StaffRenderer(Broker<Message> broker) {
     super(broker);
     subscribe(OnCommand.class, message -> doCommand(message));
     subscribe(OnMidiFiles.class, message -> doMidiFiles(message));
