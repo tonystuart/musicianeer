@@ -21,7 +21,6 @@ import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnChannelCommand;
 import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnDeviceCommand;
-import com.example.afs.musicpad.message.OnRepublishState;
 import com.example.afs.musicpad.task.BrokerTask;
 import com.example.afs.musicpad.util.Broker;
 import com.example.afs.musicpad.util.JsonUtilities;
@@ -73,7 +72,6 @@ public class WebApp extends BrokerTask<Message> {
   public void start() {
     super.start();
     rendererTask.start();
-    getBroker().publish(new OnRepublishState());
   }
 
   @Override
