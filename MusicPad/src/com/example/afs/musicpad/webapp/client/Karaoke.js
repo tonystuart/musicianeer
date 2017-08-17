@@ -190,20 +190,7 @@ karaoke.onTemplates = function(response) {
     }
 }
 
-karaoke.scrollStaffPrompter = function(tick) {
-    let scroller = document.getElementById('notator-scroller');
-    let svg = scroller.querySelector('svg');
-    if (svg) {
-        let scaledTick = tick / karaoke.ticksPerPixel;
-        let screenX = musicPad.toScreen(svg, scaledTick);
-        let width = scroller.offsetWidth;
-        let midPoint = width / 2;
-        scroller.scrollLeft += screenX - midPoint;
-        console.log('x1=' + scaledTick + ', x2=' + screenX);
-    }
-}
-
-karaoke.scrollKaraokePrompter = function(tick) {
+karaoke.onTick = function(tick) {
     let prompterList = document.getElementById('prompter-list');
     if (!prompterList) {
         return;
@@ -238,10 +225,6 @@ karaoke.scrollKaraokePrompter = function(tick) {
     }
 }
 
-// NB: onTick is initialized when the prompter is received
-
-karaoke.onTick = function() {}
-
 karaoke.onWebSocketClose = function() {
     karaoke.onTick(0);
 }
@@ -259,16 +242,10 @@ karaoke.onWebSocketMessage = function(json) {
         karaoke.onDeviceReport(message);
         break;
     case 'OnKaraokePrompter':
-        karaoke.onTick = karaoke.scrollKaraokePrompter;
         karaoke.onPrompter(message);
         break;
     case 'OnReport':
         karaoke.onReport(message);
-        break;
-    case 'OnStaffPrompter':
-        karaoke.ticksPerPixel = message.ticksPerPixel;
-        karaoke.onTick = karaoke.scrollStaffPrompter;
-        karaoke.onPrompter(message);
         break;
     case 'OnSongDetails':
         karaoke.onSongDetails(message);

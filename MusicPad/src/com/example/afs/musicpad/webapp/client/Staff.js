@@ -16,14 +16,16 @@ staff.onPrompter = function(message) {
 
 staff.onTick = function(tick) {
     let scroller = document.getElementById('notator-scroller');
-    let svg = scroller.querySelector('svg');
-    if (svg) {
-        let scaledTick = tick / staff.ticksPerPixel;
-        let screenX = musicPad.toScreen(svg, scaledTick);
-        let width = scroller.offsetWidth;
-        let midPoint = width / 2;
-        scroller.scrollLeft += screenX - midPoint;
-        console.log('x1=' + scaledTick + ', x2=' + screenX);
+    if (scroller) {
+        let svg = scroller.querySelector('svg');
+        if (svg) {
+            let scaledTick = tick / staff.ticksPerPixel;
+            let screenX = musicPad.toScreen(svg, scaledTick);
+            let width = scroller.offsetWidth;
+            let midPoint = width / 2;
+            scroller.scrollLeft += screenX - midPoint;
+            console.log('x1=' + scaledTick + ', x2=' + screenX);
+        }
     }
 }
 
@@ -43,4 +45,3 @@ staff.onWebSocketMessage = function(json) {
         break;
     }
 }
-
