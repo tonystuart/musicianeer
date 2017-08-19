@@ -72,10 +72,11 @@ public class PlayableStaff {
   }
 
   private static final int LOWEST = 24;
-
   private static final int HIGHEST = 96;
   private static final int MIDDLE = 60;
+
   // http://www.theoreticallycorrect.com/Helmholtz-Pitch-Numbering/
+
   private static final int[] TREBLE_MIDI_NOTES = new int[] {
       64,
       67,
@@ -91,27 +92,29 @@ public class PlayableStaff {
       53,
       57
   };
-  private static final int[] LEDGER_MIDI_NOTES = new int[] {
-      26,
-      27,
-      29,
-      30,
-      33,
-      34,
-      36,
-      37,
+
+  // NB: when descending draw ledger line for sharp of next lowest note
+  private static final int[] BASS_LEDGER_MIDI_NOTES = new int[] {
       40,
-      60,
-      61,
+      37,
+      34,
+      30,
+      27,
+  };
+
+  private static final int[] TREBLE_LEDGER_MIDI_NOTES = new int[] {
       81,
-      82,
       84,
-      85,
       88,
       91,
-      92,
-      95
+      95,
   };
+
+  private static final int[] MIDDLE_LEDGER_MIDI_NOTES = new int[] {
+      61,
+      60,
+  };
+
   private static final boolean[] SHARPS = new boolean[] {
       false,
       true,
@@ -128,7 +131,6 @@ public class PlayableStaff {
   };
 
   private static final int[] POSITION = createPosition();
-  private static final boolean[] LEDGER = createLedger();
   private static final int RADIUS = 10; // spacing is r, diameter is 2r
   private static final int LEDGER_WIDTH = RADIUS * 2;
   private static final int INTER_CLEF = RADIUS * 6;
@@ -145,14 +147,6 @@ public class PlayableStaff {
 
   public static boolean isSharp(int midiNote) {
     return SHARPS[midiNote % SHARPS.length];
-  }
-
-  private static boolean[] createLedger() {
-    boolean[] ledger = new boolean[Midi.NOTES];
-    for (int ledgerNote = 0; ledgerNote < LEDGER_MIDI_NOTES.length; ledgerNote++) {
-      ledger[LEDGER_MIDI_NOTES[ledgerNote]] = true;
-    }
-    return ledger;
   }
 
   private static int[] createPosition() {
@@ -200,6 +194,28 @@ public class PlayableStaff {
     }
   }
 
+  private void drawLedgerLine(Svg staff, int noteX, int ledgerY) {
+    staff.add(new Line(noteX - LEDGER_WIDTH, ledgerY, noteX + LEDGER_WIDTH, ledgerY));
+  }
+
+  private void drawLedgerLines(int[] ledgerMidiNotes, Svg staff, int midiNote, int noteX) {
+    boolean isDescending = ledgerMidiNotes[0] > ledgerMidiNotes[ledgerMidiNotes.length - 1];
+    for (int i = 0; i < ledgerMidiNotes.length; i++) {
+      int ledgerNote = ledgerMidiNotes[i];
+      if (isDescending) {
+        if (ledgerNote < midiNote) {
+          return;
+        }
+      } else {
+        if (ledgerNote > midiNote) {
+          return;
+        }
+      }
+      int ledgerY = getY(ledgerNote);
+      drawLedgerLine(staff, noteX, ledgerY);
+    }
+  }
+
   private void drawMeasures(Svg staff, long duration) {
     long tick = 0;
     while (tick < duration) {
@@ -235,8 +251,12 @@ public class PlayableStaff {
         int midiNote = note.getMidiNote();
         int noteX = getX(firstTick);
         int noteY = getY(midiNote);
-        if (LEDGER[midiNote]) {
-          staff.add(new Line(noteX - LEDGER_WIDTH, noteY, noteX + LEDGER_WIDTH, noteY));
+        if (midiNote < BASS_MIDI_NOTES[0]) {
+          drawLedgerLines(BASS_LEDGER_MIDI_NOTES, staff, midiNote, noteX);
+        } else if (midiNote == MIDDLE_LEDGER_MIDI_NOTES[0] || midiNote == MIDDLE_LEDGER_MIDI_NOTES[1]) {
+          drawLedgerLine(staff, noteX, noteY);
+        } else if (midiNote > TREBLE_MIDI_NOTES[TREBLE_MIDI_NOTES.length - 1]) {
+          drawLedgerLines(TREBLE_LEDGER_MIDI_NOTES, staff, midiNote, noteX);
         }
         boolean isSharp = isSharp(midiNote);
         if (isSharp) {
@@ -370,9 +390,9 @@ public class PlayableStaff {
   private int getY(int midiNote) {
     int y;
     if (midiNote < MIDDLE) {
-      y = BOTTOM - (POSITION[midiNote] * RADIUS);
+      y = BOTTOM - (POSITION[Math.max(midiNote, LOWEST)] * RADIUS);
     } else {
-      y = TOP + ((POSITION[HIGHEST] - POSITION[midiNote]) * RADIUS);
+      y = TOP + ((POSITION[HIGHEST] - POSITION[Math.min(midiNote, HIGHEST)]) * RADIUS);
     }
     return y;
   }
