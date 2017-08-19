@@ -422,7 +422,7 @@ public class DeviceHandler extends BrokerTask<Message> {
 
   private void updateChannel() {
     // Suppress identical messages (e.g. due to sample channel and select channel) to make life simpler downstream (e.g. karaoke renderer)
-    if (song != oldSong || inputType != oldInputType || channel != oldChannel || player.getOutputType() != oldOutputType) {
+    if (!song.equals(oldSong) || inputType != oldInputType || channel != oldChannel || player.getOutputType() != oldOutputType) {
       playableMap = createPlayableMap();
       getBroker().publish(new OnChannelUpdate(deviceIndex, deviceName, channel, inputType, player.getOutputType(), playableMap));
       oldSong = song;
