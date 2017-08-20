@@ -11,99 +11,39 @@ body {
     margin: 0px;
     width: 100%;
     font-size: 3vh;
-    color: magenta;
+    color: black;
     cursor: default;
     user-select: none;
-    background-color: rgb(32, 32, 32);
-    background-image: linear-gradient(45deg, black 25%, transparent 25%, transparent 75%, black 75%, black), linear-gradient(45deg, black 25%, transparent 25%, transparent 75%, black 75%, black), linear-gradient(to bottom, rgb(8, 8, 8), rgb(32, 32, 32));
-    background-size: 10px 10px, 10px 10px, 10px 5px;
-    background-position: 0px 0px, 5px 5px, 0px 0px;
-}
-
-::-webkit-scrollbar {
-    width: 12px;
-    background-color: magenta;
-}
- 
-::-webkit-scrollbar-track {
-    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3); 
-    border-radius: 10px;
-}
- 
-::-webkit-scrollbar-thumb {
-    border-radius: 10px;
-    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5);
-    border: 1px solid black;
+    background-color: white;
 }
 
 line {
-  stroke: magenta;
+  stroke: black;
   stroke-width: 1;
 }
 
 circle {
-  stroke: magenta;
+  stroke: black;
   stroke-width: 1;
 }
 
 text {
   font-size: 10pt;
-  stroke: magenta;
-  fill: magenta;
-}
-
-.open {
+  stroke: black;
   fill: black;
 }
 
+.open {
+  fill: white;
+}
+
 .closed {
-  fill: magenta;
-}
-
-
-.device-0 line, .device-0 circle, .device-0 text, .device-0 closed {
-	stroke: red;
-	fill: red;
-}
-
-.device-1 line, .device-1 circle, .device-1 text, .device-1 closed {
-  stroke: lime;
-  fill: lime;
-}
-
-.device-2 line, .device-2 circle, .device-2 text, .device-2 closed {
-  stroke: cyan;
-  fill: cyan;
-}
-
-.device-3 line, .device-3 circle, .device-3 text, .device-3 closed {
-  stroke: yellow;
-  fill: yellow;
-}
-
-.device-4 line, .device-4 circle, .device-4 text, .device-4 closed {
-  stroke: salmon;
-  fill: salmon;
-}
-
-.device-5 line, .device-5 circle, .device-5 text, .device-5 closed {
-  stroke: chartreuse;
-  fill: chartreuse;
-}
-
-.device-6 line, .device-6 circle, .device-6 text, .device-6 closed {
-  stroke: aqua;
-  fill: aqua;
-}
-
-.device-7 line, .device-6 circle, .device-6 text, .device-7 closed {
-  stroke: darkorange;
-  fill: darkorange;
+  fill: black;
 }
 
 
 .channel-notators {
-  background-color: black;
+  background-color: white;
   display: flex;
   flex-direction: column;
   flex-grow: 1;
