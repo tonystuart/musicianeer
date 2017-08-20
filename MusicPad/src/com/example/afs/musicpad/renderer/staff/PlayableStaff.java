@@ -216,6 +216,18 @@ public class PlayableStaff {
     }
   }
 
+  private void drawLedgerLines(Svg staff, long firstTick, Context context) {
+    int noteX = getX(firstTick);
+    int lowestMidiNote = context.getLowestMidiNote();
+    if (lowestMidiNote < BASS_MIDI_NOTES[0]) {
+      drawLedgerLines(BASS_LEDGER_MIDI_NOTES, staff, lowestMidiNote, noteX);
+    }
+    int highestMidiNote = context.getHighestMidiNote();
+    if (highestMidiNote > TREBLE_MIDI_NOTES[TREBLE_MIDI_NOTES.length - 1]) {
+      drawLedgerLines(TREBLE_LEDGER_MIDI_NOTES, staff, highestMidiNote, noteX);
+    }
+  }
+
   private void drawMeasures(Svg staff, long duration) {
     long tick = 0;
     while (tick < duration) {
@@ -247,16 +259,13 @@ public class PlayableStaff {
   private void drawNotes(Svg staff, long firstTick, RandomAccessList<Note> notes, int midPoint) {
     if (notes.size() > 0) {
       Context context = getContext(notes, midPoint);
+      drawLedgerLines(staff, firstTick, context);
       for (Note note : notes) {
         int midiNote = note.getMidiNote();
         int noteX = getX(firstTick);
         int noteY = getY(midiNote);
-        if (midiNote < BASS_MIDI_NOTES[0]) {
-          drawLedgerLines(BASS_LEDGER_MIDI_NOTES, staff, midiNote, noteX);
-        } else if (midiNote == MIDDLE_LEDGER_MIDI_NOTES[0] || midiNote == MIDDLE_LEDGER_MIDI_NOTES[1]) {
+        if (midiNote == MIDDLE_LEDGER_MIDI_NOTES[0] || midiNote == MIDDLE_LEDGER_MIDI_NOTES[1]) {
           drawLedgerLine(staff, noteX, noteY);
-        } else if (midiNote > TREBLE_MIDI_NOTES[TREBLE_MIDI_NOTES.length - 1]) {
-          drawLedgerLines(TREBLE_LEDGER_MIDI_NOTES, staff, midiNote, noteX);
         }
         boolean isSharp = isSharp(midiNote);
         if (isSharp) {
