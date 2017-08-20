@@ -9,8 +9,11 @@
 
 package com.example.afs.musicpad.renderer.staff;
 
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.SortedSet;
 
+import com.example.afs.musicpad.html.Division;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.playable.Playable;
 import com.example.afs.musicpad.player.Sound;
@@ -25,7 +28,7 @@ import com.example.afs.musicpad.svg.Text;
 import com.example.afs.musicpad.util.DirectList;
 import com.example.afs.musicpad.util.RandomAccessList;
 
-public class PlayableStaff {
+public class StaffNotator {
 
   private static class Context {
     private NoteType noteType;
@@ -161,22 +164,30 @@ public class PlayableStaff {
     return positions;
   }
 
-  private RandomAccessList<Playable> playables;
   private Song song;
+  private Map<Integer, RandomAccessList<Playable>> devicePlayables;
 
-  public PlayableStaff(Song song, RandomAccessList<Playable> playables) {
+  public StaffNotator(Song song, Map<Integer, RandomAccessList<Playable>> devicePlayables) {
     this.song = song;
-    this.playables = playables;
+    this.devicePlayables = devicePlayables;
   }
 
-  public Svg getStaff() {
+  public Svg getStaff(RandomAccessList<Playable> playables) {
     long duration = song.getDuration();
     Svg staff = drawStaff(duration);
     drawMeasures(staff, duration);
-    drawNotes(staff);
-    drawNoteNames(staff);
+    drawNotes(staff, playables);
+    drawNoteNames(staff, playables);
     drawWords(staff);
     return staff;
+  }
+
+  public String render() {
+    Division division = new Division("#prompter", ".content", ".tab", ".channel-notators");
+    division.appendChild(new Division("#notator-cursor"));
+    division.appendChild(getNotatorScroller());
+    String html = division.render();
+    return html;
   }
 
   private void drawHead(Svg staff, Context context, int noteX, int noteY) {
@@ -240,19 +251,13 @@ public class PlayableStaff {
     }
   }
 
-  private void drawNoteNames(Svg staff) {
+  private void drawNoteNames(Svg staff, RandomAccessList<Playable> playables) {
     for (Playable playable : playables) {
       int wordX = getX(playable.getBeginTick() - RADIUS); // align with left edge of note head
       Sound sound = playable.getSound();
       String name = sound.getName();
       staff.add(new Text(wordX, WORDS + 3 * RADIUS, playable.getLegend()));
       staff.add(new Text(wordX, 3 * RADIUS, name));
-    }
-  }
-
-  private void drawNotes(Svg staff) {
-    for (Playable playable : playables) {
-      drawSound(staff, playable.getSound());
     }
   }
 
@@ -274,6 +279,12 @@ public class PlayableStaff {
         drawHead(staff, context, noteX, noteY);
       }
       drawStem(staff, firstTick, context);
+    }
+  }
+
+  private void drawNotes(Svg staff, RandomAccessList<Playable> playables) {
+    for (Playable playable : playables) {
+      drawSound(staff, playable.getSound());
     }
   }
 
@@ -390,6 +401,20 @@ public class PlayableStaff {
     }
     Context context = new Context(noteType, stem, lowestMidiNote, highestMidiNote);
     return context;
+  }
+
+  private Division getNotator(int deviceIndex, RandomAccessList<Playable> playables) {
+    Division division = new Division(".notator", ".device-" + deviceIndex);
+    division.appendChild(getStaff(playables));
+    return division;
+  }
+
+  private Division getNotatorScroller() {
+    Division division = new Division("#notator-scroller");
+    for (Entry<Integer, RandomAccessList<Playable>> entry : devicePlayables.entrySet()) {
+      division.appendChild(getNotator(entry.getKey(), entry.getValue()));
+    }
+    return division;
   }
 
   private int getX(long tick) {

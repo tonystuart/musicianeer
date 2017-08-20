@@ -26,13 +26,13 @@ import com.example.afs.musicpad.song.Word;
 import com.example.afs.musicpad.util.FileUtilities;
 import com.example.afs.musicpad.util.RandomAccessList;
 
-public class KaraokePrompter {
+public class KarokeNotator {
   private Song song;
   private Map<Integer, PlayableIterator> playableIterators;
   private Map<Integer, Playable> deviceSustain = new HashMap<>();
   private NavigableMap<Integer, RandomAccessList<Playable>> devicePlayables;
 
-  public KaraokePrompter(Song song, NavigableMap<Integer, RandomAccessList<Playable>> devicePlayables) {
+  public KarokeNotator(Song song, NavigableMap<Integer, RandomAccessList<Playable>> devicePlayables) {
     this.song = song;
     this.devicePlayables = devicePlayables;
     this.playableIterators = new HashMap<>();

@@ -166,8 +166,8 @@ public class KaraokeRenderer extends BrokerTask<Message> {
 
   private void renderWhenReady() {
     if (song != null && allDevicePlayablesAvailable()) {
-      KaraokePrompter karaokePrompter = new KaraokePrompter(song, devicePlayables);
-      String html = karaokePrompter.render();
+      KarokeNotator karokeNotator = new KarokeNotator(song, devicePlayables);
+      String html = karokeNotator.render();
       publish(new OnKaraokePrompter(html));
     }
   }
