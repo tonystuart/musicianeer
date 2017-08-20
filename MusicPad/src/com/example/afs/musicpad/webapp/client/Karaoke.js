@@ -83,10 +83,10 @@ karaoke.getProgramName = function(program) {
         if (option) {
             programName = option.label;
         } else if (program == -1) {
-          programName = 'Drums';
+            programName = 'Drums';
         }
     } else {
-      programName = 'Instrument ' + program;
+        programName = 'Instrument ' + program;
     }
     return programName;
 }
@@ -154,8 +154,10 @@ karaoke.onStop = function() {
 
 karaoke.onSongClick = function(item) {
     let songIndex = item.dataset['songIndex'];
-    musicPad.sendCommand('SAMPLE_SONG', songIndex);
-    musicPad.selectElement(item);
+    if (songIndex) {
+        musicPad.sendCommand('SAMPLE_SONG', songIndex);
+        musicPad.selectElement(item);
+    }
 }
 
 karaoke.onSongDetails = function(message) {
