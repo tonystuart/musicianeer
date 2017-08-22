@@ -276,6 +276,7 @@ input[type=range]:focus::-webkit-slider-runnable-track {
     /* flex-direction: column; */
     flex-shrink: 0;
     text-align: center;
+    position: relative;
 }
 
 .controls {
@@ -302,6 +303,16 @@ input[type=range]:focus::-webkit-slider-runnable-track {
 .controls div:active {
 	color: black;
 	background-color: magenta;
+}
+
+#song-list-filter {
+	position: absolute;
+	bottom: 0;
+	right: 0;
+	font-size: 50%;
+	border: 1px solid magenta;
+	color: magenta;
+	background: black;
 }
 
 #song-list, #channel-list, #prompter-list {

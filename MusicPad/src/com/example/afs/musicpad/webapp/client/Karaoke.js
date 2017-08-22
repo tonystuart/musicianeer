@@ -1,10 +1,6 @@
 'use strict';
 var karaoke = karaoke || {};
 
-// NB: ticksPerPixel is initialized when the prompter is received
-
-karaoke.ticksPerPixel = null;
-
 karaoke.getNextPrompt = function(currentPrompt) {
     let next = currentPrompt.nextElementSibling;
     if (next) {
@@ -96,8 +92,9 @@ karaoke.onLoad = function() {
 }
 
 karaoke.onNewSong = function() {
-    musicPad.sendCommand('STOP', 1);
     musicPad.selectTab('songs');
+    musicPad.sendCommand('STOP', 1);
+    musicPad.sendCommand('FILTER_TITLES', 1);
 }
 
 karaoke.onPlay = function() {
@@ -170,6 +167,7 @@ karaoke.onSongDetails = function(message) {
 karaoke.onSongs = function(message) {
     musicPad.replaceTab('songs', message.html);
     karaoke.onSongRoulette();
+    musicPad.sendCommand('FILTER_TITLES', 1);
 }
 
 karaoke.onSongSelect = function(message) {
@@ -227,6 +225,51 @@ karaoke.onTick = function(tick) {
     }
 }
 
+karaoke.onTitleFilter = function(message) {
+    let filter = document.getElementById('song-list-filter');
+    if (filter) {
+        let inputCode = message.inputCode;
+        if (inputCode == 27) {
+            filter.innerHTML = '';
+        } else if (inputCode == 8 || inputCode == 127) {
+            if (filter.innerHTML.length > 0) {
+                filter.innerHTML = filter.innerHTML.substring(0, filter.innerHTML.length - 1);
+            }
+        } else if (inputCode >= 32 && inputCode < 127) {
+            let character = String.fromCharCode(inputCode).toLowerCase();
+            filter.innerHTML += character
+        }
+        console.log("filter=" + filter.innerHTML);
+        let pattern = '.*';
+        for (let i = 0; i < filter.innerHTML.length; i++) {
+            const c = filter.innerHTML.charAt(i);
+            if (c == ' ') {
+                pattern += '\\b.*';
+            } else {
+                pattern += c;
+            }
+        }
+        console.log('pattern=' + pattern);
+        const regexp = new RegExp(pattern,'i');
+        let songList = document.getElementById('song-list');
+        if (songList) {
+            let songs = songList.children;
+            for (const song of songs) {
+                if (regexp.test(song.innerHTML)) {
+                    song.classList.remove('hidden');
+                } else {
+                    song.classList.add('hidden');
+                }
+            }
+        }
+        if (filter.innerHTML.length == 0) {
+          filter.classList.add('hidden');
+        } else {
+          filter.classList.remove('hidden');
+        }
+    }
+}
+
 karaoke.onWebSocketClose = function() {
     karaoke.onTick(0);
 }
@@ -260,6 +303,9 @@ karaoke.onWebSocketMessage = function(json) {
         break;
     case 'OnTick':
         karaoke.onTick(message.tick);
+        break;
+    case 'OnTitleFilter':
+        karaoke.onTitleFilter(message);
         break;
     }
 }

@@ -96,6 +96,7 @@ public class SongSelector {
 
   private Element createTitle() {
     Division division = new Division(".title", "Pick a Song");
+    division.add(new Division("#song-list-filter", ".hidden"));
     return division;
   }
 

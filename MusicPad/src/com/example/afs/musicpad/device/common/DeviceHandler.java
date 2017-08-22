@@ -25,6 +25,7 @@ import com.example.afs.musicpad.message.OnDeviceCommand;
 import com.example.afs.musicpad.message.OnDeviceReport;
 import com.example.afs.musicpad.message.OnSampleChannel;
 import com.example.afs.musicpad.message.OnSong;
+import com.example.afs.musicpad.message.OnTitleFilter;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.playable.PlayableMap;
 import com.example.afs.musicpad.player.Player;
@@ -49,6 +50,7 @@ public class DeviceHandler extends BrokerTask<Message> {
   private int channel;
   private int deviceIndex;
   private boolean isCommand;
+  private boolean isTitleFilter;
 
   private Song song;
   private Player player;
@@ -99,71 +101,79 @@ public class DeviceHandler extends BrokerTask<Message> {
 
   public void onDown(int inputCode) {
     System.out.println("deviceName=" + deviceName + ", deviceIndex=" + deviceIndex + ", inputCode=" + inputCode);
-    if (inputCode == KeyEvent.VK_NUM_LOCK) {
-      if (inputType == InputType.ALPHA) {
-        publish(new OnDeviceCommand(DeviceCommand.INPUT, deviceIndex, InputType.NUMERIC.ordinal()));
-      } else {
-        publish(new OnDeviceCommand(DeviceCommand.INPUT, deviceIndex, InputType.ALPHA.ordinal()));
-      }
-    } else if (inputCode == '.') {
-      isCommand = true;
-    } else if (isCommand) {
-      switch (inputCode) {
-      case 'B':
-        publish(new OnCommand(Command.MOVE_BACKWARD));
-        break;
-      case 'F':
-        publish(new OnCommand(Command.MOVE_FORWARD));
-        break;
-      case 'I':
-        publish(new OnCommand(Command.INCREASE_MASTER_GAIN, 0));
-        break;
-      case 'P':
-        publish(new OnCommand(Command.PLAY, ChannelNotes.ALL_CHANNELS));
-        break;
-      case 'R':
-        publish(new OnCommand(Command.DECREASE_MASTER_GAIN, 0));
-        break;
-      case 'S':
-        publish(new OnCommand(Command.STOP, 0));
-        break;
-      case '0':
-        publish(new OnCommand(Command.DECREASE_TEMPO, 0));
-        break;
-      case '1':
-        publish(new OnCommand(Command.INCREASE_TEMPO, 0));
-        break;
-      case '2':
-        publish(new OnCommand(Command.DECREASE_BACKGROUND_VELOCITY, 0));
-        break;
-      case '3':
-        publish(new OnCommand(Command.INCREASE_BACKGROUND_VELOCITY, 0));
-        break;
-      case '4':
-        publish(new OnDeviceCommand(DeviceCommand.DECREASE_PLAYER_VELOCITY, deviceIndex, 0));
-        break;
-      case '5':
-        publish(new OnDeviceCommand(DeviceCommand.INCREASE_PLAYER_VELOCITY, deviceIndex, 0));
-        break;
-      case '6':
-        publish(new OnDeviceCommand(DeviceCommand.PREVIOUS_CHANNEL, deviceIndex, 0));
-        break;
-      case '7':
-        publish(new OnDeviceCommand(DeviceCommand.NEXT_CHANNEL, deviceIndex, 0));
-        break;
-      case '8':
-        publish(new OnDeviceCommand(DeviceCommand.PREVIOUS_PROGRAM, deviceIndex, 0));
-        break;
-      case '9':
-        publish(new OnDeviceCommand(DeviceCommand.NEXT_PROGRAM, deviceIndex, 0));
-        break;
-      }
-    } else if (playableMap != null) {
-      Sound sound = playableMap.onDown(inputCode);
-      if (sound != null) {
+    if (isTitleFilter) {
+      System.out.println("addToFilter: inputCode=" + inputCode);
+      publish(new OnTitleFilter(inputCode));
+    } else {
+      if (inputCode == KeyEvent.VK_ESCAPE) {
+        detach();
+      } else if (inputCode == KeyEvent.VK_NUM_LOCK) {
+        // TODO: Handle this, even if isTitleFilter
+        if (inputType == InputType.ALPHA) {
+          publish(new OnDeviceCommand(DeviceCommand.INPUT, deviceIndex, InputType.NUMERIC.ordinal()));
+        } else {
+          publish(new OnDeviceCommand(DeviceCommand.INPUT, deviceIndex, InputType.ALPHA.ordinal()));
+        }
+      } else if (inputCode == '.') {
+        isCommand = true;
+      } else if (isCommand) {
+        switch (inputCode) {
+        case 'B':
+          publish(new OnCommand(Command.MOVE_BACKWARD));
+          break;
+        case 'F':
+          publish(new OnCommand(Command.MOVE_FORWARD));
+          break;
+        case 'I':
+          publish(new OnCommand(Command.INCREASE_MASTER_GAIN, 0));
+          break;
+        case 'P':
+          publish(new OnCommand(Command.PLAY, ChannelNotes.ALL_CHANNELS));
+          break;
+        case 'R':
+          publish(new OnCommand(Command.DECREASE_MASTER_GAIN, 0));
+          break;
+        case 'S':
+          publish(new OnCommand(Command.STOP, 0));
+          break;
+        case '0':
+          publish(new OnCommand(Command.DECREASE_TEMPO, 0));
+          break;
+        case '1':
+          publish(new OnCommand(Command.INCREASE_TEMPO, 0));
+          break;
+        case '2':
+          publish(new OnCommand(Command.DECREASE_BACKGROUND_VELOCITY, 0));
+          break;
+        case '3':
+          publish(new OnCommand(Command.INCREASE_BACKGROUND_VELOCITY, 0));
+          break;
+        case '4':
+          publish(new OnDeviceCommand(DeviceCommand.DECREASE_PLAYER_VELOCITY, deviceIndex, 0));
+          break;
+        case '5':
+          publish(new OnDeviceCommand(DeviceCommand.INCREASE_PLAYER_VELOCITY, deviceIndex, 0));
+          break;
+        case '6':
+          publish(new OnDeviceCommand(DeviceCommand.PREVIOUS_CHANNEL, deviceIndex, 0));
+          break;
+        case '7':
+          publish(new OnDeviceCommand(DeviceCommand.NEXT_CHANNEL, deviceIndex, 0));
+          break;
+        case '8':
+          publish(new OnDeviceCommand(DeviceCommand.PREVIOUS_PROGRAM, deviceIndex, 0));
+          break;
+        case '9':
+          publish(new OnDeviceCommand(DeviceCommand.NEXT_PROGRAM, deviceIndex, 0));
+          break;
+        }
+      } else if (playableMap != null) {
+        Sound sound = playableMap.onDown(inputCode);
         if (sound != null) {
-          player.play(Action.PRESS, sound);
-          activeSounds[inputCode] = sound;
+          if (sound != null) {
+            player.play(Action.PRESS, sound);
+            activeSounds[inputCode] = sound;
+          }
         }
       }
     }
@@ -210,17 +220,25 @@ public class DeviceHandler extends BrokerTask<Message> {
     Command command = message.getCommand();
     int parameter = message.getParameter();
     switch (command) {
+    case FILTER_TITLES:
+      isTitleFilter = true;
+      break;
     case PLAY:
       player.setEnabled(true);
       break;
     case REPORT:
       doReport();
       break;
-    case STOP:
-      player.setEnabled(true);
+    case SELECT_SONG:
+      // TODO: Consider making explicit (e.g. FILTER_TITLES, 0)
+      isTitleFilter = false;
       break;
     case SET_TEMPO:
       player.setPercentTempo(Range.scaleMidiToPercent(parameter));
+      break;
+    case STOP:
+      // TODO: Consider making explicit
+      player.setEnabled(true);
       break;
     default:
       break;
