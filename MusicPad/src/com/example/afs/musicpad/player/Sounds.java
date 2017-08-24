@@ -14,6 +14,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 import com.example.afs.musicpad.device.common.DeviceHandler.OutputType;
+import com.example.afs.musicpad.song.Default;
 import com.example.afs.musicpad.song.Note;
 import com.example.afs.musicpad.util.Count;
 import com.example.afs.musicpad.util.DirectList;
@@ -46,12 +47,18 @@ public class Sounds implements Iterable<Sound> {
       }
       if (index != lastIndex) {
         lastIndex = index;
-        if (sound != null) {
+        if (sound != null && sound.getNotes().size() > 0) {
           sounds.add(sound);
         }
         sound = new Sound();
       }
-      sound.add(note);
+      // Suppress short grace notes / passing / non-chord tones
+      if (note.getDuration() > Default.TICKS_PER_BEAT / 5) {
+        sound.add(note);
+      }
+    }
+    if (sound != null && sound.getNotes().size() > 0) {
+      sounds.add(sound);
     }
   }
 
