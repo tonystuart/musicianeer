@@ -13,33 +13,18 @@ import com.example.afs.musicpad.device.common.DeviceHandler.OutputType;
 import com.example.afs.musicpad.playable.Playable;
 import com.example.afs.musicpad.playable.PlayableMap;
 import com.example.afs.musicpad.player.Sound;
+import com.example.afs.musicpad.player.Sounds;
 import com.example.afs.musicpad.song.Note;
 import com.example.afs.musicpad.util.DirectList;
 import com.example.afs.musicpad.util.RandomAccessList;
 
 public class MidiPlayableMap implements PlayableMap {
 
-  private RandomAccessList<Sound> sounds = new DirectList<>();
+  private Sounds sounds;
 
   public MidiPlayableMap(Iterable<Note> notes, OutputType outputType) {
-    int index;
-    int lastIndex = -1;
-    Sound sound = null;
-    for (Note note : notes) {
-      if (outputType == OutputType.NORMAL) {
-        index = note.getStartIndex();
-      } else {
-        index = note.getEndIndex();
-      }
-      if (index != lastIndex) {
-        lastIndex = index;
-        if (sound != null) {
-          sounds.add(sound);
-        }
-        sound = new Sound();
-      }
-      sound.add(note);
-    }
+    // These are used for notation, not for playing
+    sounds = new Sounds(outputType, notes);
   }
 
   @Override
