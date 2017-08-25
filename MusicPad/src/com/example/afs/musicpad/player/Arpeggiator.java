@@ -15,6 +15,7 @@ import com.example.afs.musicpad.song.Note;
 import com.example.afs.musicpad.transport.NoteEvent;
 import com.example.afs.musicpad.transport.NoteEvent.Type;
 import com.example.afs.musicpad.transport.NoteEventSequencer;
+import com.example.afs.musicpad.util.RandomAccessList;
 
 public class Arpeggiator extends NoteEventSequencer {
 
@@ -24,17 +25,23 @@ public class Arpeggiator extends NoteEventSequencer {
 
   public void play(Sound sound) {
     reset();
-    boolean firstNote = true;
     BlockingQueue<NoteEvent> inputQueue = getInputQueue();
-    for (Note note : sound.getNotes()) {
+    RandomAccessList<Note> notes = sound.getNotes();
+    int noteCount = notes.size();
+    int lastNoteIndex = noteCount - 1;
+    for (int i = 0; i < noteCount; i++) {
+      Note note = notes.get(i);
       long tick = note.getTick();
       long duration = note.getDuration();
-      if (firstNote) {
-        firstNote = false;
+      if (i == 0) {
         getScheduler().setBaseTick(tick);
       }
       inputQueue.add(new NoteEvent(Type.NOTE_ON, tick, note));
       inputQueue.add(new NoteEvent(Type.NOTE_OFF, tick + duration, note));
+      if (i == lastNoteIndex) {
+        long tickOfNextMeasure = note.getTickOfNextMeasure();
+        inputQueue.add(new NoteEvent(Type.TICK, tickOfNextMeasure, note.getBeatsPerMinute()));
+      }
     }
   }
 

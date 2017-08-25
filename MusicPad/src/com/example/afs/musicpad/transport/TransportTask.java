@@ -124,7 +124,7 @@ public class TransportTask extends BrokerTask<Message> {
   }
 
   private void doDecreaseTempo() {
-    setPercentTempo(Math.max(0, transport.getPercentTempo() - 10));
+    publish(new OnCommand(Command.SET_TEMPO, Range.scalePercentToMidi(Math.max(0, transport.getPercentTempo() - 10))));
   }
 
   private void doIncreaseBackgroundVelocity() {
@@ -140,7 +140,7 @@ public class TransportTask extends BrokerTask<Message> {
   }
 
   private void doIncreaseTempo() {
-    setPercentTempo(Math.min(200, transport.getPercentTempo() + 10));
+    publish(new OnCommand(Command.SET_TEMPO, Range.scalePercentToMidi(Math.min(200, transport.getPercentTempo() + 10))));
   }
 
   private void doMasterGain(int masterGain) {

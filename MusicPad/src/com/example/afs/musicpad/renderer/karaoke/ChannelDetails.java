@@ -73,7 +73,7 @@ public class ChannelDetails {
 
   private int getUniqueSounds() {
     ChannelNotes notes = new ChannelNotes(song.getNotes(), channel);
-    Sounds sounds = new Sounds(OutputType.NORMAL, notes);
+    Sounds sounds = new Sounds(OutputType.TICK, notes);
     Map<Sound, SoundCount> uniqueSoundCounts = sounds.getUniqueSoundCounts();
     return uniqueSoundCounts.size();
   }

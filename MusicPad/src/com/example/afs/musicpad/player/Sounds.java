@@ -14,6 +14,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 import com.example.afs.musicpad.device.common.DeviceHandler.OutputType;
+import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.song.Default;
 import com.example.afs.musicpad.song.Note;
 import com.example.afs.musicpad.util.Count;
@@ -40,10 +41,15 @@ public class Sounds implements Iterable<Sound> {
     int lastIndex = -1;
     for (Note note : notes) {
       int index;
-      if (outputType == OutputType.NORMAL) {
+      switch (outputType) {
+      case TICK:
         index = note.getStartIndex();
-      } else {
-        index = note.getEndIndex();
+        break;
+      case MEASURE:
+        index = note.getMeasure();
+        break;
+      default:
+        throw new UnsupportedOperationException();
       }
       if (index != lastIndex) {
         lastIndex = index;
@@ -53,7 +59,7 @@ public class Sounds implements Iterable<Sound> {
         sound = new Sound();
       }
       // Suppress short grace notes / passing / non-chord tones
-      if (note.getDuration() > Default.TICKS_PER_BEAT / 5) {
+      if ((note.getDuration() > Default.TICKS_PER_BEAT / 5) || note.getChannel() == Midi.DRUM) {
         sound.add(note);
       }
     }

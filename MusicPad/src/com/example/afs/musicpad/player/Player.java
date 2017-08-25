@@ -39,7 +39,7 @@ public class Player {
   private Synthesizer synthesizer;
   private Arpeggiator arpeggiator;
   private Sound repeatArpeggiation;
-  private OutputType outputType = OutputType.NORMAL;
+  private OutputType outputType = OutputType.TICK;
 
   public Player(Synthesizer synthesizer, int deviceIndex) {
     this.synthesizer = synthesizer;
@@ -79,11 +79,11 @@ public class Player {
         System.out.println("Player.play: soundType=" + sound);
       }
       switch (outputType) {
-      case ARPEGGIO:
-        sendToArpeggiator(action, sound);
-        break;
-      case NORMAL:
+      case TICK:
         sendToSynthesizer(action, sound);
+        break;
+      case MEASURE:
+        sendToArpeggiator(action, sound);
         break;
       default:
         throw new UnsupportedOperationException();
@@ -133,6 +133,9 @@ public class Player {
     case NOTE_ON:
       press(noteEvent.getNote().getMidiNote());
       break;
+    case TICK:
+      // TICK fills to end-of-measure
+      break;
     default:
       throw new UnsupportedOperationException();
     }
@@ -154,8 +157,7 @@ public class Player {
           arpeggiator.setPercentTempo(percentTempo);
         }
       }
-      // repeatArpeggiation = sound;
-      synthesizer.allNotesOff();
+      repeatArpeggiation = sound;
       arpeggiator.play(sound);
     } else {
       repeatArpeggiation = null;

@@ -44,7 +44,7 @@ public class DeviceHandler extends BrokerTask<Message> {
   }
 
   public static enum OutputType {
-    NORMAL, ARPEGGIO
+    TICK, MEASURE
   }
 
   private int channel;
@@ -397,6 +397,12 @@ public class DeviceHandler extends BrokerTask<Message> {
       break;
     case '*':
       publish(new OnDeviceCommand(DeviceCommand.INPUT, deviceIndex, InputType.ALPHA.ordinal()));
+      break;
+    case '-':
+      publish(new OnDeviceCommand(DeviceCommand.OUTPUT, deviceIndex, OutputType.MEASURE.ordinal()));
+      break;
+    case '+':
+      publish(new OnDeviceCommand(DeviceCommand.OUTPUT, deviceIndex, OutputType.TICK.ordinal()));
       break;
     }
   }
