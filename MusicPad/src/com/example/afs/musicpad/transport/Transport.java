@@ -31,16 +31,16 @@ public class Transport {
     RELATIVE, ABSOLUTE
   }
 
+  private static final int DEFAULT_PERCENT_TEMPO = 100;
   private static final int DEFAULT_PERCENT_VELOCITY = 12;
   private static final float DEFAULT_GAIN = 5 * Synthesizer.DEFAULT_GAIN;
 
-  private float gain;
   private int percentVelocity = DEFAULT_PERCENT_VELOCITY;
   private int[] currentPrograms = new int[Midi.CHANNELS];
 
   private Synthesizer synthesizer;
-  private NoteEventSequencer sequencer;
   private TickHandler tickHandler;
+  private NoteEventSequencer sequencer;
   private Deque<NoteEvent> reviewQueue = new LinkedList<>();
 
   public Transport(Synthesizer synthesizer) {
@@ -55,7 +55,7 @@ public class Transport {
   }
 
   public float getGain() {
-    return gain;
+    return synthesizer.getGain();
   }
 
   public int getPercentTempo() {
@@ -93,7 +93,7 @@ public class Transport {
 
   public void play(Iterable<Note> notes, TickHandler tickHandler) {
     this.tickHandler = tickHandler;
-    reset();
+    clear();
     long firstTick = -1;
     long lastTick = -1;
     long metronomeTick = -1;
@@ -122,6 +122,12 @@ public class Transport {
       metronomeTick = ((metronomeTick + Default.RESOLUTION + 1) / Default.RESOLUTION) * Default.RESOLUTION;
       inputQueue.add(new NoteEvent(Type.TICK, metronomeTick, beatsPerMinute));
     }
+  }
+
+  public void reset() {
+    synthesizer.setGain(DEFAULT_GAIN);
+    setPercentTempo(DEFAULT_PERCENT_TEMPO);
+    setPercentVelocity(DEFAULT_PERCENT_VELOCITY);
   }
 
   public void resume() {
@@ -172,7 +178,6 @@ public class Transport {
   }
 
   public void setGain(float gain) {
-    this.gain = gain;
     synthesizer.setGain(gain);
   }
 
@@ -185,7 +190,13 @@ public class Transport {
   }
 
   public void stop() {
-    reset();
+    clear();
+  }
+
+  private void clear() {
+    sequencer.clear();
+    synthesizer.allNotesOff();
+    reviewQueue.clear();
   }
 
   private void fireTick(long tick) {
@@ -224,12 +235,6 @@ public class Transport {
       throw new UnsupportedOperationException();
     }
     reviewQueue.add(noteEvent);
-  }
-
-  private void reset() {
-    sequencer.reset();
-    synthesizer.allNotesOff();
-    reviewQueue.clear();
   }
 
   private void setBaseTick(long baseTick) {

@@ -51,12 +51,6 @@ public class WebServer extends BrokerTask<Message> {
     }
   }
 
-  private ServletHolder createStaffServlet() {
-    WebAppServlet staffServlet = new WebAppServlet(staffWebAppFactory);
-    ServletHolder servletHolder = new ServletHolder("StaffServlet", staffServlet);
-    return servletHolder;
-  }
-
   private ServletHolder createDefaultServlet() {
     DefaultServlet defaultServlet = new DefaultServlet();
     ServletHolder defaultServletHolder = new ServletHolder(defaultServlet);
@@ -80,7 +74,7 @@ public class WebServer extends BrokerTask<Message> {
   private void createServer() {
     ServletContextHandler context = new ServletContextHandler();
     context.setWelcomeFiles(new String[] {
-      "MusicPad.html"
+        "MusicPad.html"
     });
     context.addServlet(createDefaultServlet(), "/");
     context.addServlet(CurrentFrameServlet.class, "/currentFrame.jpg");
@@ -94,6 +88,12 @@ public class WebServer extends BrokerTask<Message> {
     });
     server = new Server(PORT);
     server.setHandler(handlers);
+  }
+
+  private ServletHolder createStaffServlet() {
+    WebAppServlet staffServlet = new WebAppServlet(staffWebAppFactory);
+    ServletHolder servletHolder = new ServletHolder("StaffServlet", staffServlet);
+    return servletHolder;
   }
 
   private String getResourceBase() {

@@ -65,6 +65,7 @@ public class Synthesizer {
   }
 
   private long synth;
+  private float gain = DEFAULT_GAIN;
   private boolean[] isMuted = new boolean[16];
 
   public Synthesizer() {
@@ -102,6 +103,10 @@ public class Synthesizer {
 
   public void changeProgram(int channel, int program) {
     FluidSynth.fluid_synth_program_change(synth, channel, program);
+  }
+
+  public float getGain() {
+    return gain;
   }
 
   public boolean isMuted(int channel) {
@@ -146,6 +151,7 @@ public class Synthesizer {
    *          value in the range 0.0 to 10.0
    */
   public void setGain(float gain) {
+    this.gain = gain;
     FluidSynth.fluid_synth_set_gain(synth, gain);
   }
 }

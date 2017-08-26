@@ -43,12 +43,12 @@ public class KeySignatures {
       new KeySignature("110101101010", 10, 1, false, -5), // Bb min/Db Maj (Bb, Db, Eb, Gb, Ab)
       new KeySignature("010101101011", 6, 3, true, 6), // F# Maj/D# min (C#, D#, E#, F#, G#, A#)
       new KeySignature("010101101011", 3, 6, false, 6), // D# min/F# Maj (C#, D#, E#, F#, G#, A#)
-  //new KeySignature("010101101011", 6, 3, true, -6), // Gb Maj/Eb min (Bb, Cb, Db, Eb, Gb, Ab)
-  //new KeySignature("010101101011", 3, 6, false, -6), // Eb min/Gb Maj (Bb, Cb, Db, Eb, Gb, Ab)
-  //new KeySignature("110101101010", 1, 10, true, 7), // C# Maj/A# min (C#, D#, E#, F#, G#, A#, B#)
-  //new KeySignature("110101101010", 10, 1, false, 7), // A# min/C# Maj (C#, D#, E#, F#, G#, A#, B#)
-  //new KeySignature("010110101011", 11, 8, true, -7), // Cb Maj/Ab min (Bb, Cb, Db, Eb, Fb, Gb, Ab)
-  //new KeySignature("010110101011", 8, 11, false, -7), // Ab min/Cb Maj (Bb, Cb, Db, Eb, Fb, Gb, Ab)
+      //new KeySignature("010101101011", 6, 3, true, -6), // Gb Maj/Eb min (Bb, Cb, Db, Eb, Gb, Ab)
+      //new KeySignature("010101101011", 3, 6, false, -6), // Eb min/Gb Maj (Bb, Cb, Db, Eb, Gb, Ab)
+      //new KeySignature("110101101010", 1, 10, true, 7), // C# Maj/A# min (C#, D#, E#, F#, G#, A#, B#)
+      //new KeySignature("110101101010", 10, 1, false, 7), // A# min/C# Maj (C#, D#, E#, F#, G#, A#, B#)
+      //new KeySignature("010110101011", 11, 8, true, -7), // Cb Maj/Ab min (Bb, Cb, Db, Eb, Fb, Gb, Ab)
+      //new KeySignature("010110101011", 8, 11, false, -7), // Ab min/Cb Maj (Bb, Cb, Db, Eb, Fb, Gb, Ab)
   };
 
   public static KeyScore[] getKeyScores(int[] chromaticCounts) {

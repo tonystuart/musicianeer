@@ -25,6 +25,7 @@ public enum Command {
   QUIT, //
   REATTACH, //
   REPORT, //
+  RESET, //
   SAMPLE_SONG, //
   SEEK, //
   SELECT_SONG, //

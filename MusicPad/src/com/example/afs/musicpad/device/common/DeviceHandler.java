@@ -170,6 +170,9 @@ public class DeviceHandler extends BrokerTask<Message> {
     case REPORT:
       doReport();
       break;
+    case RESET:
+      doReset();
+      break;
     case SELECT_SONG:
       // TODO: Consider making explicit (e.g. FILTER_TITLES, 0)
       isTitleFilter = false;
@@ -326,6 +329,12 @@ public class DeviceHandler extends BrokerTask<Message> {
     reportMuteBackground();
   }
 
+  private void doReset() {
+    player.reset();
+    synthesizer.muteChannel(channel, false);
+    doReport();
+  }
+
   private void doSampleChannel(OnSampleChannel message) {
     if (message.getDeviceIndex() == deviceIndex) {
       selectChannel(message.getChannel());
@@ -343,6 +352,9 @@ public class DeviceHandler extends BrokerTask<Message> {
     switch (inputCode) {
     case KeyEvent.VK_ESCAPE:
       detach();
+      break;
+    case KeyEvent.VK_BACK_SPACE:
+      publish(new OnCommand(Command.RESET));
       break;
     case 'B':
       publish(new OnCommand(Command.MOVE_BACKWARD));

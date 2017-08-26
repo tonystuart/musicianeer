@@ -88,6 +88,9 @@ public class TransportTask extends BrokerTask<Message> {
     case REPORT:
       doReport();
       break;
+    case RESET:
+      doReset();
+      break;
     case SEEK:
       doSeek(parameter);
       break;
@@ -177,6 +180,11 @@ public class TransportTask extends BrokerTask<Message> {
     reportBackgroundVelocity();
     reportMasterGain();
     reportTempo();
+  }
+
+  private void doReset() {
+    transport.reset();
+    doReport();
   }
 
   private void doSampleChannel(OnSampleChannel message) {

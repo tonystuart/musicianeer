@@ -91,6 +91,10 @@ public class Player {
     }
   }
 
+  public void reset() {
+    velocity = DEFAULT_VELOCITY;
+  }
+
   public void selectProgram(int program) {
     this.program = program;
     if (program == -1) {

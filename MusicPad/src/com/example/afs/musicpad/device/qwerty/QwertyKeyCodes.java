@@ -89,7 +89,7 @@ public class QwertyKeyCodes {
       '8', // KeyEvent.VK_UP, // 8
       '9', //KeyEvent.VK_PAGE_UP, // 9
       '-', //
-      '4',//KeyEvent.VK_LEFT, // 4
+      '4', //KeyEvent.VK_LEFT, // 4
       '5', //
       '6', //KeyEvent.VK_RIGHT, // 6
       '+', //

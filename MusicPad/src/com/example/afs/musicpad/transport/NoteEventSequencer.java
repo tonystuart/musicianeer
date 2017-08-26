@@ -23,6 +23,12 @@ public class NoteEventSequencer extends PausibleSequencerTask<NoteEvent> {
     subscribe(NoteEvent.class, noteEvent -> noteEventProcessor.processNoteEvent(noteEvent));
   }
 
+  public void clear() {
+    getInputQueue().clear();
+    setPaused(false);
+    getScheduler().resetAll();
+  }
+
   public int getPercentTempo() {
     return getScheduler().getPercentTempo();
   }
@@ -34,12 +40,6 @@ public class NoteEventSequencer extends PausibleSequencerTask<NoteEvent> {
 
   public long getTick() {
     return getScheduler().getTick();
-  }
-
-  public void reset() {
-    getInputQueue().clear();
-    setPaused(false);
-    getScheduler().resetAll();
   }
 
   @Override
