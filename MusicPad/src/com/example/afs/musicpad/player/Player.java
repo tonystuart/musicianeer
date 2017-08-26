@@ -93,6 +93,9 @@ public class Player {
 
   public void reset() {
     velocity = DEFAULT_VELOCITY;
+    if (arpeggiator != null) {
+      arpeggiator.setPercentTempo(100);
+    }
   }
 
   public void selectProgram(int program) {
