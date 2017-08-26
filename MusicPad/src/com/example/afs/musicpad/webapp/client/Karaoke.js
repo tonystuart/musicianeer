@@ -134,15 +134,10 @@ karaoke.onReport = function(message) {
 }
 
 karaoke.onSongRoulette = function() {
-    let songList = document.getElementById('song-list');
-    let songCount = songList.childElementCount;
-    let songIndex = musicPad.getRandomInt(0, songCount);
-    let item = songList.children[songIndex];
-    musicPad.sendCommand('SAMPLE_SONG', songIndex);
-    musicPad.selectElement(item);
-    let midpoint = songList.offsetHeight / 2;
-    let itemTop = item.offsetTop - songList.offsetTop;
-    songList.scrollTop = itemTop - midpoint;
+    karaoke.onTitleFilter({
+        inputCode: 27
+    });
+    karaoke.selectRandomSong();
 }
 
 karaoke.onStop = function() {
@@ -166,7 +161,7 @@ karaoke.onSongDetails = function(message) {
 
 karaoke.onSongs = function(message) {
     musicPad.replaceTab('songs', message.html);
-    karaoke.onSongRoulette();
+    karaoke.selectRandomSong();
     musicPad.sendCommand('FILTER_TITLES', 1);
 }
 
@@ -263,9 +258,9 @@ karaoke.onTitleFilter = function(message) {
             }
         }
         if (filter.innerHTML.length == 0) {
-          filter.classList.add('hidden');
+            filter.classList.add('hidden');
         } else {
-          filter.classList.remove('hidden');
+            filter.classList.remove('hidden');
         }
     }
 }
@@ -323,6 +318,18 @@ karaoke.selectPrompt = function(promptDivision) {
     prompterList.scrollTop = promptMidpoint - midpoint;
 
     karaoke.lastPrompt = promptDivision;
+}
+
+karaoke.selectRandomSong = function() {
+    let songList = document.getElementById('song-list');
+    let songCount = songList.childElementCount;
+    let songIndex = musicPad.getRandomInt(0, songCount);
+    let item = songList.children[songIndex];
+    musicPad.sendCommand('SAMPLE_SONG', songIndex);
+    musicPad.selectElement(item);
+    let midpoint = songList.offsetHeight / 2;
+    let itemTop = item.offsetTop - songList.offsetTop;
+    songList.scrollTop = itemTop - midpoint;
 }
 
 karaoke.showTickCountdown = function(tick) {
