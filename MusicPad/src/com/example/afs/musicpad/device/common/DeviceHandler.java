@@ -100,13 +100,12 @@ public class DeviceHandler extends BrokerTask<Message> {
   }
 
   public void onDown(int inputCode) {
-    System.out.println("deviceName=" + deviceName + ", deviceIndex=" + deviceIndex + ", inputCode=" + inputCode);
     if (inputCode == KeyEvent.VK_NUM_LOCK) {
+      System.out.println("deviceName=" + deviceName + ", deviceIndex=" + deviceIndex + ", inputCode=" + inputCode);
       isCommand = true;
     } else if (isCommand) {
       processKeyboardCommand(inputCode);
     } else if (isTitleFilter) {
-      System.out.println("addToFilter: inputCode=" + inputCode);
       publish(new OnTitleFilter(inputCode));
     } else if (playableMap != null) {
       Sound sound = playableMap.onDown(inputCode);

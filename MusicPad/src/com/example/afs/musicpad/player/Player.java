@@ -40,6 +40,7 @@ public class Player {
   private Arpeggiator arpeggiator;
   private Sound repeatArpeggiation;
   private OutputType outputType = OutputType.TICK;
+  private Sound queuedArpeggiation;
 
   public Player(Synthesizer synthesizer, int deviceIndex) {
     this.synthesizer = synthesizer;
@@ -132,7 +133,7 @@ public class Player {
     synthesizer.pressKey(playerChannel, midiNote, velocity);
   }
 
-  private void processNoteEvent(NoteEvent noteEvent) {
+  private synchronized void processNoteEvent(NoteEvent noteEvent) {
     switch (noteEvent.getType()) {
     case NOTE_OFF:
       release(noteEvent.getNote().getMidiNote());
@@ -146,8 +147,13 @@ public class Player {
     default:
       throw new UnsupportedOperationException();
     }
-    if (!arpeggiator.isPlaying() && repeatArpeggiation != null) {
-      arpeggiator.play(repeatArpeggiation);
+    if (!arpeggiator.isPlaying()) {
+      if (repeatArpeggiation != null) {
+        arpeggiator.play(repeatArpeggiation);
+      } else if (queuedArpeggiation != null) {
+        arpeggiator.play(queuedArpeggiation);
+        queuedArpeggiation = null;
+      }
     }
   }
 
@@ -155,7 +161,7 @@ public class Player {
     synthesizer.releaseKey(playerChannel, midiNote);
   }
 
-  private void sendToArpeggiator(Action action, Sound sound) {
+  private synchronized void sendToArpeggiator(Action action, Sound sound) {
     if (action == Action.PRESS) {
       if (arpeggiator == null) {
         arpeggiator = new Arpeggiator(noteEvent -> processNoteEvent(noteEvent));
@@ -165,7 +171,11 @@ public class Player {
         }
       }
       repeatArpeggiation = sound;
-      arpeggiator.play(sound);
+      if (arpeggiator.isPlaying()) {
+        queuedArpeggiation = sound;
+      } else {
+        arpeggiator.play(sound);
+      }
     } else {
       repeatArpeggiation = null;
     }
