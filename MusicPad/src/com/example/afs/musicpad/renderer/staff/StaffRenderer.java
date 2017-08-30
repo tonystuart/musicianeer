@@ -87,7 +87,7 @@ public class StaffRenderer extends BrokerTask<Message> {
 
   private void renderWhenReady() {
     if (song != null && allDevicePlayablesAvailable()) {
-      StaffNotator staffNotator = new StaffNotator(song, devicePlayables);
+      StaffNotator staffNotator = new StaffNotator(song, deviceChannelAssignments, devicePlayables);
       String html = staffNotator.render();
       publish(new OnStaffPrompter(html, StaffNotator.TICKS_PER_PIXEL));
     }

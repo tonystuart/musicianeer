@@ -11,6 +11,7 @@ package com.example.afs.musicpad.renderer.staff;
 
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.NavigableMap;
 import java.util.SortedSet;
 
 import com.example.afs.musicpad.html.Division;
@@ -165,10 +166,12 @@ public class StaffNotator {
   }
 
   private Song song;
+  private NavigableMap<Integer, Integer> deviceChannelAssignments;
   private Map<Integer, RandomAccessList<Playable>> devicePlayables;
 
-  public StaffNotator(Song song, Map<Integer, RandomAccessList<Playable>> devicePlayables) {
+  public StaffNotator(Song song, NavigableMap<Integer, Integer> deviceChannelAssignments, Map<Integer, RandomAccessList<Playable>> devicePlayables) {
     this.song = song;
+    this.deviceChannelAssignments = deviceChannelAssignments;
     this.devicePlayables = devicePlayables;
   }
 
@@ -412,7 +415,10 @@ public class StaffNotator {
   private Division getNotatorScroller() {
     Division division = new Division("#notator-scroller");
     for (Entry<Integer, RandomAccessList<Playable>> entry : devicePlayables.entrySet()) {
-      division.appendChild(getNotator(entry.getKey(), entry.getValue()));
+      Integer deviceIndex = entry.getKey();
+      if (deviceChannelAssignments.get(deviceIndex) != Midi.DRUM) {
+        division.appendChild(getNotator(deviceIndex, entry.getValue()));
+      }
     }
     return division;
   }
