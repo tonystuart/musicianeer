@@ -88,7 +88,8 @@ karaoke.getProgramName = function(program) {
 }
 
 karaoke.onLoad = function() {
-    musicPad.createWebSocketClient('ws://localhost:8080/v1/karaoke', karaoke.onWebSocketMessage, karaoke.onWebSocketClose);
+    let url = 'ws://' + location.host + '/v1/karaoke';
+    musicPad.createWebSocketClient(url, karaoke.onWebSocketMessage, karaoke.onWebSocketClose);
 }
 
 karaoke.onNewSong = function() {

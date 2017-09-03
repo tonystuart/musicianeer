@@ -6,7 +6,8 @@ var staff = staff || {};
 staff.ticksPerPixel = null;
 
 staff.onLoad = function() {
-    musicPad.createWebSocketClient('ws://localhost:8080/v1/staff', staff.onWebSocketMessage, staff.onWebSocketClose);
+    let url = 'ws://' + location.host + '/v1/staff';
+    musicPad.createWebSocketClient(url, staff.onWebSocketMessage, staff.onWebSocketClose);
 }
 
 staff.onPrompter = function(message) {
