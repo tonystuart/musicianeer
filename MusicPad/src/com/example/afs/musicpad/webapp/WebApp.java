@@ -21,6 +21,7 @@ import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnChannelCommand;
 import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnDeviceCommand;
+import com.example.afs.musicpad.message.OnSynchronize;
 import com.example.afs.musicpad.task.BrokerTask;
 import com.example.afs.musicpad.util.Broker;
 import com.example.afs.musicpad.util.JsonUtilities;
@@ -51,15 +52,22 @@ public class WebApp extends BrokerTask<Message> {
   public void onWebSocketText(WebSocket webSocket, String json) {
     System.out.println("Received " + json);
     Message message = JsonUtilities.fromJson(json, Message.class);
-    if ("OnCommand".equals(message.getType())) {
+    String messageType = message.getType();
+    if (messageType == null) {
+      throw new IllegalArgumentException("Missing messageType");
+    }
+    if (messageType.equals(OnCommand.class.getSimpleName())) {
       OnCommand onCommand = JsonUtilities.fromJson(json, OnCommand.class);
       getBroker().publish(onCommand);
-    } else if ("OnChannelCommand".equals(message.getType())) {
+    } else if (messageType.equals(OnChannelCommand.class.getSimpleName())) {
       OnChannelCommand onChannelCommand = JsonUtilities.fromJson(json, OnChannelCommand.class);
       getBroker().publish(onChannelCommand);
-    } else if ("OnDeviceCommand".equals(message.getType())) {
+    } else if (messageType.equals(OnDeviceCommand.class.getSimpleName())) {
       OnDeviceCommand onDeviceCommand = JsonUtilities.fromJson(json, OnDeviceCommand.class);
       getBroker().publish(onDeviceCommand);
+    } else if (messageType.equals(OnSynchronize.class.getSimpleName())) {
+      OnSynchronize onSynchronize = JsonUtilities.fromJson(json, OnSynchronize.class);
+      doSynchronize(onSynchronize, webSocket);
     }
   }
 
@@ -89,6 +97,14 @@ public class WebApp extends BrokerTask<Message> {
   protected void doStatefulMessage(Message message) {
     state.put(message.getClass(), message);
     doMessage(message);
+  }
+
+  protected void doSynchronize(OnSynchronize onSynchronize, WebSocket source) {
+    for (WebSocket webSocket : webSockets) {
+      if (webSocket != source) {
+        webSocket.write(onSynchronize);
+      }
+    }
   }
 
   @Override

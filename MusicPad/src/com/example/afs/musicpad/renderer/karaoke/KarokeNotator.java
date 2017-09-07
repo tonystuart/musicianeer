@@ -65,7 +65,7 @@ public class KarokeNotator {
   private Element createBackToSongsButton() {
     Division division = new Division();
     division.appendChild(new TextElement("Back to Songs"));
-    division.appendProperty("onclick", "karaoke.onNewSong()");
+    division.appendProperty("onclick", "karaoke.onBackToSongs()");
     return division;
   }
 

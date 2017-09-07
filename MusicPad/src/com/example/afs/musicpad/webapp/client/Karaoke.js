@@ -1,6 +1,12 @@
 'use strict';
 var karaoke = karaoke || {};
 
+karaoke.clearTitleFilter = function() {
+    karaoke.onTitleFilter({
+        inputCode: 27
+    });
+}
+
 karaoke.getNextPrompt = function(currentPrompt) {
     let next = currentPrompt.nextElementSibling;
     if (next) {
@@ -14,6 +20,31 @@ karaoke.getNextPrompt = function(currentPrompt) {
         }
     }
     return null;
+}
+
+karaoke.getProgramName = function(program) {
+    let programName = null;
+    let programOptions = document.getElementById('program-options');
+    if (programOptions) {
+        let option = programOptions.content.querySelector('option[value=\'' + program + '\']');
+        if (option) {
+            programName = option.label;
+        } else if (program == -1) {
+            programName = 'Drums';
+        }
+    } else {
+        programName = 'Instrument ' + program;
+    }
+    return programName;
+}
+
+karaoke.onBackToSongs = function() {
+    musicPad.selectTab('songs');
+    musicPad.sendCommand('STOP', 1);
+    musicPad.sendCommand('FILTER_TITLES', 1);
+    musicPad.synchronize({
+        state: 'BACK_TO_SONGS'
+    });
 }
 
 karaoke.onChannelClick = function(item) {
@@ -71,31 +102,9 @@ karaoke.onDeviceReport = function(message) {
     }
 }
 
-karaoke.getProgramName = function(program) {
-    let programName = null;
-    let programOptions = document.getElementById('program-options');
-    if (programOptions) {
-        let option = programOptions.content.querySelector('option[value=\'' + program + '\']');
-        if (option) {
-            programName = option.label;
-        } else if (program == -1) {
-            programName = 'Drums';
-        }
-    } else {
-        programName = 'Instrument ' + program;
-    }
-    return programName;
-}
-
 karaoke.onLoad = function() {
     let url = 'ws://' + location.host + '/v1/karaoke';
     musicPad.createWebSocketClient(url, karaoke.onWebSocketMessage, karaoke.onWebSocketClose);
-}
-
-karaoke.onNewSong = function() {
-    musicPad.selectTab('songs');
-    musicPad.sendCommand('STOP', 1);
-    musicPad.sendCommand('FILTER_TITLES', 1);
 }
 
 karaoke.onPlay = function() {
@@ -134,20 +143,13 @@ karaoke.onReport = function(message) {
     }
 }
 
-karaoke.onSongRoulette = function() {
-    karaoke.onTitleFilter({
-        inputCode: 27
-    });
-    karaoke.selectRandomSong();
-}
-
-karaoke.onStop = function() {
-    musicPad.sendCommand('STOP', 0);
-}
-
 karaoke.onSongClick = function(item) {
     let songIndex = item.dataset['songIndex'];
     if (songIndex) {
+        musicPad.synchronize({
+            state: 'SONG_CLICK',
+            songIndex: songIndex
+        });
         musicPad.sendCommand('SAMPLE_SONG', songIndex);
         musicPad.selectElement(item);
     }
@@ -158,6 +160,11 @@ karaoke.onSongDetails = function(message) {
     if (songDetails) {
         songDetails.innerHTML = message.html;
     }
+}
+
+karaoke.onSongRoulette = function() {
+    karaoke.clearTitleFilter();
+    karaoke.selectRandomSong();
 }
 
 karaoke.onSongs = function(message) {
@@ -172,6 +179,19 @@ karaoke.onSongSelect = function(message) {
     if (item) {
         let songIndex = item.dataset['songIndex'];
         musicPad.sendCommand('SELECT_SONG', songIndex);
+    }
+}
+
+karaoke.onStop = function() {
+    musicPad.sendCommand('STOP', 0);
+}
+
+karaoke.onSynchronize = function(message) {
+    let properties = message.properties;
+    if (properties.state == 'BACK_TO_SONGS') {
+        karaoke.synchronizeBackToSongs(properties);
+    } else if (properties.state == 'SONG_CLICK' || properties.state == 'RANDOM_SONG') {
+        karaoke.synchronizeSongClick(properties);
     }
 }
 
@@ -294,6 +314,9 @@ karaoke.onWebSocketMessage = function(json) {
     case 'OnSongs':
         karaoke.onSongs(message);
         break;
+    case 'OnSynchronize':
+        karaoke.onSynchronize(message);
+        break;
     case 'OnTemplates':
         karaoke.onTemplates(message);
         break;
@@ -326,6 +349,10 @@ karaoke.selectRandomSong = function() {
     let songCount = songList.childElementCount;
     let songIndex = musicPad.getRandomInt(0, songCount);
     let item = songList.children[songIndex];
+    musicPad.synchronize({
+        state: 'RANDOM_SONG',
+        songIndex: songIndex
+    });
     musicPad.sendCommand('SAMPLE_SONG', songIndex);
     musicPad.selectElement(item);
     let midpoint = songList.offsetHeight / 2;
@@ -344,6 +371,29 @@ karaoke.showTickCountdown = function(tick) {
             karaoke.countdown.innerHTML = Math.floor((next.id - tick) / 512);
             // next.appendChild(karaoke.countdown);
             currentPrompt.appendChild(karaoke.countdown);
+        }
+    }
+}
+
+karaoke.synchronizeBackToSongs = function(properties) {
+    musicPad.selectTab('songs');
+}
+
+karaoke.synchronizeSongClick = function(properties) {
+    let songList = document.getElementById('song-list');
+    if (songList) {
+        let songIndex = properties.songIndex;
+        let item = songList.querySelector('[data-song-index=\'' + songIndex + '\']')
+        if (item) {
+            if (!item.matches(".selected")) {
+                if (item.matches(".hidden")) {
+                    karaoke.clearTitleFilter();
+                }
+                musicPad.selectElement(item);
+                let midpoint = songList.offsetHeight / 2;
+                let itemTop = item.offsetTop - songList.offsetTop;
+                songList.scrollTop = itemTop - midpoint;
+            }
         }
     }
 }

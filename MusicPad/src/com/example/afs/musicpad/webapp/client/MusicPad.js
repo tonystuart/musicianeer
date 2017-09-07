@@ -142,6 +142,14 @@ musicPad.setElementValue = function(selector, value) {
     musicPad.setElementProperty(selector, 'value', value);
 }
 
+musicPad.synchronize = function(properties) {
+    console.log('synchronize: properties=' + JSON.stringify(properties));
+    musicPad.send(JSON.stringify({
+        type: "OnSynchronize",
+        properties: properties
+    }));
+}
+
 musicPad.toScreen = function(svg, x) {
     let svgPoint = svg.createSVGPoint();
     svgPoint.x = x;
