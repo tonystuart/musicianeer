@@ -358,6 +358,9 @@ public class DeviceHandler extends BrokerTask<Message> {
     case 'B':
       publish(new OnCommand(Command.MOVE_BACKWARD));
       break;
+    case 'D':
+      publish(new OnCommand(Command.DECREASE_MASTER_GAIN, 0));
+      break;
     case 'F':
       publish(new OnCommand(Command.MOVE_FORWARD));
       break;
@@ -366,9 +369,6 @@ public class DeviceHandler extends BrokerTask<Message> {
       break;
     case 'P':
       publish(new OnCommand(Command.PLAY, ChannelNotes.ALL_CHANNELS));
-      break;
-    case 'R':
-      publish(new OnCommand(Command.DECREASE_MASTER_GAIN, 0));
       break;
     case 'S':
       publish(new OnCommand(Command.STOP, 0));

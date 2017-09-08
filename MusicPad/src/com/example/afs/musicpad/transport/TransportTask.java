@@ -147,7 +147,7 @@ public class TransportTask extends BrokerTask<Message> {
   }
 
   private void doMasterGain(int masterGain) {
-    float gain = Range.scale(0f, 2f, Midi.MIN_VALUE, Midi.MAX_VALUE, masterGain);
+    float gain = Range.scale(0f, Synthesizer.MAXIMUM_GAIN, Midi.MIN_VALUE, Midi.MAX_VALUE, masterGain);
     setMasterGain(gain);
   }
 
@@ -252,7 +252,7 @@ public class TransportTask extends BrokerTask<Message> {
 
   private void reportMasterGain() {
     float gain = transport.getGain();
-    int masterGain = (int) Range.scale(Midi.MIN_VALUE, Midi.MAX_VALUE, 0f, 2f, gain);
+    int masterGain = (int) Range.scale(Midi.MIN_VALUE, Midi.MAX_VALUE, 0f, Synthesizer.MAXIMUM_GAIN, gain);
     publish(new OnReport(Command.SET_MASTER_GAIN, masterGain));
   }
 
