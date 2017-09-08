@@ -36,13 +36,13 @@ public class MusicPad {
     musicPad.start();
   }
 
-  private Broker<Message> broker;
   private Conductor conductor;
-  private DeviceWatcher qwertyWatcher;
+  private WebServer webServer;
+  private Broker<Message> broker;
   private DeviceWatcher midiWatcher;
+  private DeviceWatcher qwertyWatcher;
   private TransportTask transportTask;
   private CommandProcessor commandProcessor;
-  private WebServer webServer;
   private Synthesizer synthesizer = createSynthesizer();
 
   public MusicPad(String libraryPath) {

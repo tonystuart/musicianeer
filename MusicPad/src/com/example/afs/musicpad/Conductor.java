@@ -24,7 +24,6 @@ import com.example.afs.musicpad.message.OnDeviceDetached;
 import com.example.afs.musicpad.message.OnMidiFiles;
 import com.example.afs.musicpad.message.OnPickChannel;
 import com.example.afs.musicpad.message.OnRenderSong;
-import com.example.afs.musicpad.message.OnRepublishState;
 import com.example.afs.musicpad.message.OnSampleChannel;
 import com.example.afs.musicpad.message.OnSampleSong;
 import com.example.afs.musicpad.message.OnSong;
@@ -51,15 +50,13 @@ public class Conductor extends BrokerTask<Message> {
     midiFiles.sort((o1, o2) -> o1.getPath().compareTo(o2.getPath()));
     subscribe(OnCommand.class, message -> doCommand(message));
     subscribe(OnAllTasksStarted.class, message -> doAllTasksStarted());
-    subscribe(OnRepublishState.class, message -> doRepublishState());
     subscribe(OnDeviceCommand.class, message -> doDeviceCommand(message));
     subscribe(OnDeviceAttached.class, message -> doDeviceAttached(message));
     subscribe(OnDeviceDetached.class, message -> doDeviceDetached(message));
   }
 
   private void doAllTasksStarted() {
-    System.out.println("Conductor.doAllTasksStarted: deferring initialization until OnRepublishState");
-    //publish(new OnMidiFiles(midiFiles));
+    publish(new OnMidiFiles(midiFiles));
   }
 
   private void doChannel(int deviceIndex, int channel) {
@@ -114,10 +111,6 @@ public class Conductor extends BrokerTask<Message> {
     Integer deviceIndex = message.getDeviceIndex();
     deviceIndexes.remove(deviceIndex);
     deviceChannelAssignments.remove(deviceIndex);
-  }
-
-  private void doRepublishState() {
-    publish(new OnMidiFiles(midiFiles));
   }
 
   private void doSampleChannel(int deviceIndex, int channel) {

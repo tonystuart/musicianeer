@@ -32,14 +32,12 @@ public class WebApp extends BrokerTask<Message> {
   private static final long PING_INTERVAL_MS = 5000;
   private static final ByteBuffer PING = ByteBuffer.wrap("PING".getBytes());
 
-  private WebAppFactory webAppFactory;
   private Map<Class<? extends Message>, Message> state = new LinkedHashMap<>();
   private BlockingQueue<WebSocket> webSockets = new LinkedBlockingQueue<>(CLIENTS);
   private BrokerTask<Message> rendererTask;
 
-  protected WebApp(Broker<Message> broker, WebAppFactory webAppFactory) {
+  protected WebApp(Broker<Message> broker) {
     super(broker, PING_INTERVAL_MS);
-    this.webAppFactory = webAppFactory;
   }
 
   public void onWebSocketConnection(WebSocket webSocket) {
@@ -50,7 +48,7 @@ public class WebApp extends BrokerTask<Message> {
   }
 
   public void onWebSocketText(WebSocket webSocket, String json) {
-    System.out.println("Received " + json);
+    //System.out.println("Received " + json);
     Message message = JsonUtilities.fromJson(json, Message.class);
     String messageType = message.getType();
     if (messageType == null) {
@@ -73,7 +71,6 @@ public class WebApp extends BrokerTask<Message> {
 
   public void removeMessageWebSocket(WebSocket webSocket) {
     webSockets.remove(webSocket);
-    webAppFactory.releaseWebApp();
   }
 
   @Override

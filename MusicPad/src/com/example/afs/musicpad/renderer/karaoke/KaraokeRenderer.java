@@ -27,7 +27,6 @@ import com.example.afs.musicpad.message.OnKaraokePrompter;
 import com.example.afs.musicpad.message.OnMidiFiles;
 import com.example.afs.musicpad.message.OnPickChannel;
 import com.example.afs.musicpad.message.OnRenderSong;
-import com.example.afs.musicpad.message.OnRepublishState;
 import com.example.afs.musicpad.message.OnSampleChannel;
 import com.example.afs.musicpad.message.OnSampleSong;
 import com.example.afs.musicpad.message.OnSongDetails;
@@ -64,7 +63,6 @@ public class KaraokeRenderer extends BrokerTask<Message> {
   public void start() {
     super.start();
     publishTemplates();
-    publish(new OnRepublishState());
   }
 
   private boolean allDevicePlayablesAvailable() {
