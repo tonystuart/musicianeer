@@ -80,7 +80,7 @@ public class DeviceWatcher extends BrokerTask<Message> {
     case DETACH:
       doDetach(parameter);
       break;
-    case REATTACH:
+    case RESET:
       doReattach();
       break;
     default:

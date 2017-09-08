@@ -23,7 +23,6 @@ public enum Command {
   MOVE_FORWARD, //
   PLAY, //
   QUIT, //
-  REATTACH, //
   REPORT, //
   RESET, //
   SAMPLE_SONG, //
