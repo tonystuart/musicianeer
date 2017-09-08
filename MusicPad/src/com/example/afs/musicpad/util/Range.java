@@ -37,7 +37,7 @@ public class Range {
     } else if (scaledValue > dataMaximum) {
       scaledValue = dataMaximum;
     }
-    System.out.println("control=" + controlValue + " in " + controlMinimum + " to " + controlMaximum + " is " + scaledValue + " in range " + dataMinimum + " to " + dataMaximum);
+    //System.out.println("control=" + controlValue + " in " + controlMinimum + " to " + controlMaximum + " is " + scaledValue + " in range " + dataMinimum + " to " + dataMaximum);
     return scaledValue;
   }
 
@@ -51,7 +51,7 @@ public class Range {
     } else if (scaledValue > dataMaximum) {
       scaledValue = dataMaximum;
     }
-    System.out.println("control=" + controlValue + " in " + controlMinimum + " to " + controlMaximum + " is " + scaledValue + " in range " + dataMinimum + " to " + dataMaximum);
+    //System.out.println("control=" + controlValue + " in " + controlMinimum + " to " + controlMaximum + " is " + scaledValue + " in range " + dataMinimum + " to " + dataMaximum);
     return scaledValue;
   }
 

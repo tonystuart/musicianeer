@@ -26,6 +26,9 @@ import com.example.afs.musicpad.util.RandomAccessList;
 
 public class QwertyPlayableMap implements PlayableMap {
 
+  private int autoRegister;
+  private int registerDown;
+
   private final int noteKeyCount;
   private final int registerKeyCount;
   private final int supportedSounds;
@@ -33,11 +36,9 @@ public class QwertyPlayableMap implements PlayableMap {
   private final String noteKeys;
   private final String registerKeys;
 
-  private int autoRegister;
-  private int registerDown;
-
-  private Sounds sounds;
-  private Sound[][] keyIndexToSounds;
+  private final Sounds sounds;
+  private final Sound[][] keyIndexToSounds;
+  private final RandomAccessList<Playable> playables;
 
   public QwertyPlayableMap(Iterable<Note> notes, OutputType outputType, String noteKeys, String registerKeys) {
     this.noteKeys = noteKeys;
@@ -46,17 +47,17 @@ public class QwertyPlayableMap implements PlayableMap {
     this.registerKeyCount = registerKeys.length();
     this.supportedSounds = noteKeyCount * registerKeyCount;
     this.sounds = new Sounds(outputType, notes);
-  }
-
-  @Override
-  public RandomAccessList<Playable> getPlayables() {
     Map<Sound, SoundCount> uniqueSoundCounts = sounds.getUniqueSoundCounts();
     SoundCount[] sortedSounds = sortByFrequency(uniqueSoundCounts);
     int maxSounds = Math.min(uniqueSoundCounts.size(), supportedSounds);
     keyIndexToSounds = assignSoundsToRegisters(sortedSounds, maxSounds);
     sortByPitch(keyIndexToSounds, maxSounds);
     Map<Sound, String> soundToLegend = assignSoundsToLegend(maxSounds);
-    RandomAccessList<Playable> playables = getPlayables(soundToLegend);
+    playables = getPlayables(soundToLegend);
+  }
+
+  @Override
+  public RandomAccessList<Playable> getPlayables() {
     return playables;
   }
 
@@ -142,6 +143,11 @@ public class QwertyPlayableMap implements PlayableMap {
       String legend = soundToLegend.get(sound);
       if (legend == null) {
         legend = "?";
+        System.out.println("soundToLegend.size()=" + soundToLegend.size() + ", target sound=" + sound);
+        for (Sound key : soundToLegend.keySet()) {
+          System.out.println("key=" + key);
+        }
+        System.out.println("Set BP here");
       }
       Playable playable = new Playable(sound, legend);
       playables.add(playable);
