@@ -44,7 +44,7 @@ import com.example.afs.musicpad.util.RandomAccessList;
 public class KaraokeRenderer extends BrokerTask<Message> {
 
   private Song song;
-  private NavigableMap<Integer, Integer> deviceChannelAssignments;
+  private NavigableMap<Integer, Integer> deviceChannelAssignments = new TreeMap<>();
   private NavigableMap<Integer, RandomAccessList<Playable>> devicePlayables = new TreeMap<>();
 
   public KaraokeRenderer(Broker<Message> broker) {
@@ -66,7 +66,7 @@ public class KaraokeRenderer extends BrokerTask<Message> {
   }
 
   private boolean allDevicePlayablesAvailable() {
-    if (deviceChannelAssignments == null) {
+    if (deviceChannelAssignments.size() == 0) {
       return false;
     }
     for (Integer deviceIndex : deviceChannelAssignments.keySet()) {
@@ -102,9 +102,7 @@ public class KaraokeRenderer extends BrokerTask<Message> {
     }
     int deviceIndex = message.getDeviceIndex();
     devicePlayables.remove(deviceIndex);
-    if (deviceChannelAssignments != null) {
-      deviceChannelAssignments.remove(deviceIndex);
-    }
+    deviceChannelAssignments.remove(deviceIndex);
     renderWhenReady();
   }
 
@@ -123,7 +121,8 @@ public class KaraokeRenderer extends BrokerTask<Message> {
 
   private void doRenderSong(OnRenderSong message) {
     song = message.getSong();
-    deviceChannelAssignments = message.getDeviceChannelAssignments();
+    deviceChannelAssignments.clear();
+    deviceChannelAssignments.putAll(message.getDeviceChannelAssignments());
     renderWhenReady();
   }
 
@@ -143,7 +142,7 @@ public class KaraokeRenderer extends BrokerTask<Message> {
   }
 
   private void doSelectSong(int songIndex) {
-    deviceChannelAssignments = null;
+    deviceChannelAssignments.clear();
   }
 
   private String getProgramOptions() {
