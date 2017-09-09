@@ -38,7 +38,7 @@ public class ChannelDetails {
     division.appendChild(Utils.createPair("Title", song.getTitle()));
     division.appendChild(Utils.createPair("Instruments", getProgramNames()));
     division.appendChild(Utils.createPair("Percent of Measures Played", getPercentMeasuresPlayed() + "%"));
-    division.appendChild(Utils.createPair("Percent of Time Tracking Melody", ""));
+    division.appendChild(Utils.createPair("Percent of Time Tracking Melody", song.getPercentMelody(channel) + "%"));
     division.appendChild(Utils.createPair("Percent of Time Playing", song.getOccupancy(channel) + "%"));
     division.appendChild(Utils.createPair("Average Number of Notes Playing at Once", (double) (song.getConcurrency(channel) / 100)));
     division.appendChild(Utils.createPair("Unique Sounds", getUniqueSounds()));

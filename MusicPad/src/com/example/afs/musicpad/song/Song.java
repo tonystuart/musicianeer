@@ -13,6 +13,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.NavigableSet;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.TreeSet;
 
 import com.example.afs.musicpad.analyzer.TranspositionFinder;
@@ -287,6 +288,24 @@ public class Song {
 
   public int getOccupancy(int channel) {
     return channelFacets.getFacet(channel).getOccupancy();
+  }
+
+  public int getPercentMelody(int channel) {
+    int melodyNoteCount = 0;
+    for (Word word : words) {
+      long tick = word.getTick();
+      Note fromNote = new Note(tick - Default.GAP_BEAT_UNIT);
+      Note toNote = new Note(tick + Default.GAP_BEAT_UNIT);
+      SortedSet<Note> slice = notes.subSet(fromNote, toNote);
+      for (Note note : slice) {
+        if (note.getChannel() == channel) {
+          melodyNoteCount++;
+        }
+      }
+    }
+    int channelNoteCount = getChannelNoteCount(channel);
+    int percentMelody = (100 * melodyNoteCount) / channelNoteCount;
+    return percentMelody;
   }
 
   public List<String> getProgramNames(int channel) {

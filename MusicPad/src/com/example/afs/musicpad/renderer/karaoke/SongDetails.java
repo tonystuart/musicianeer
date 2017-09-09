@@ -40,10 +40,11 @@ public class SongDetails {
 
   private double getComplexity() {
     double complexity = 0;
-    int activeChannelCount = song.getActiveChannelCount();
     long duration = song.getDuration();
-    if (activeChannelCount > 0 && duration > 0) {
-      complexity = song.getNoteCount() / activeChannelCount;
+    long measures = duration / song.getTicksPerMeasure(0);
+    if (measures > 0) {
+      int noteCount = song.getNoteCount();
+      complexity = noteCount / measures;
     }
     return complexity;
   }
