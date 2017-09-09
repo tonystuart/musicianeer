@@ -143,11 +143,6 @@ public class QwertyPlayableMap implements PlayableMap {
       String legend = soundToLegend.get(sound);
       if (legend == null) {
         legend = "?";
-        System.out.println("soundToLegend.size()=" + soundToLegend.size() + ", target sound=" + sound);
-        for (Sound key : soundToLegend.keySet()) {
-          System.out.println("key=" + key);
-        }
-        System.out.println("Set BP here");
       }
       Playable playable = new Playable(sound, legend);
       playables.add(playable);
