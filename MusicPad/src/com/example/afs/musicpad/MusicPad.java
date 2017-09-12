@@ -18,6 +18,7 @@ import com.example.afs.musicpad.device.midi.MidiWatcherBehavior;
 import com.example.afs.musicpad.device.qwerty.QwertyWatcherBehavior;
 import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnAllTasksStarted;
+import com.example.afs.musicpad.mqtt.MqttPublisher;
 import com.example.afs.musicpad.player.Player;
 import com.example.afs.musicpad.transport.TransportTask;
 import com.example.afs.musicpad.util.Broker;
@@ -42,6 +43,7 @@ public class MusicPad {
   private DeviceWatcher midiWatcher;
   private DeviceWatcher qwertyWatcher;
   private TransportTask transportTask;
+  private MqttPublisher mqttPublisher;
   private CommandProcessor commandProcessor;
   private Synthesizer synthesizer = createSynthesizer();
 
@@ -53,6 +55,7 @@ public class MusicPad {
     this.midiWatcher = new DeviceWatcher(broker, synthesizer, new MidiWatcherBehavior());
     this.transportTask = new TransportTask(broker, synthesizer);
     this.webServer = new WebServer(broker);
+    this.mqttPublisher = new MqttPublisher(broker);
   }
 
   private Synthesizer createSynthesizer() {
@@ -69,6 +72,7 @@ public class MusicPad {
     transportTask.start();
     commandProcessor.start();
     webServer.start();
+    mqttPublisher.start();
     broker.publish(new OnAllTasksStarted());
   }
 

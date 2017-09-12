@@ -37,7 +37,7 @@ public class DeviceWatcher extends BrokerTask<Message> {
     super(broker, 1000);
     this.synthesizer = synthesizer;
     this.watcherBehavior = watcherBehavior;
-    subscribe(OnCommand.class, message -> doCommand(message.getCommand(), message.getParameter()));
+    subscribe(OnCommand.class, message -> doCommand(message));
   }
 
   @Override
@@ -75,10 +75,11 @@ public class DeviceWatcher extends BrokerTask<Message> {
     publish(new OnDeviceDetached(controller.getDevice()));
   }
 
-  private void doCommand(Command command, int parameter) {
+  private void doCommand(OnCommand message) {
+    Command command = message.getCommand();
     switch (command) {
     case DETACH:
-      doDetach(parameter);
+      doDetach(message.getParameter());
       break;
     case RESET:
       doReattach();

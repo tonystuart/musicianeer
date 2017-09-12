@@ -23,6 +23,8 @@ import com.example.afs.musicpad.message.OnChannelUpdate;
 import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnDeviceCommand;
 import com.example.afs.musicpad.message.OnDeviceReport;
+import com.example.afs.musicpad.message.OnKeyDown;
+import com.example.afs.musicpad.message.OnKeyUp;
 import com.example.afs.musicpad.message.OnSampleChannel;
 import com.example.afs.musicpad.message.OnSong;
 import com.example.afs.musicpad.message.OnTitleFilter;
@@ -113,6 +115,7 @@ public class DeviceHandler extends BrokerTask<Message> {
         if (sound != null) {
           player.play(Action.PRESS, sound);
           activeSounds[inputCode] = sound;
+          publish(new OnKeyDown(deviceIndex, sound));
         }
       }
     }
@@ -129,6 +132,7 @@ public class DeviceHandler extends BrokerTask<Message> {
       if (sound != null) {
         player.play(Action.RELEASE, sound);
         activeSounds[inputCode] = null;
+        publish(new OnKeyUp(deviceIndex, sound));
       }
     }
   }
