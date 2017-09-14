@@ -59,8 +59,11 @@ public class MusicPad {
   }
 
   private Synthesizer createSynthesizer() {
+    int processors = Runtime.getRuntime().availableProcessors();
+    System.out.println("MusicPad.createSynthesizer: processors=" + processors);
     Settings settings = Synthesizer.createDefaultSettings();
     settings.set("synth.midi-channels", Player.TOTAL_CHANNELS);
+    settings.set("synth.cpu-cores", processors);
     Synthesizer synthesizer = new Synthesizer(settings);
     return synthesizer;
   }
