@@ -89,6 +89,7 @@ public class MqttPublisher extends BrokerTask<Message> {
 
   private MqttClient connect(String brokerUri, String clientId) {
     try {
+      System.out.println("MqttPublisher.connect: brokerUri=" + brokerUri + ", clientId=" + clientId);
       MqttClient client = new MqttClient(brokerUri, clientId);
       MqttConnectOptions connectOptions = new MqttConnectOptions();
       connectOptions.setAutomaticReconnect(true);
