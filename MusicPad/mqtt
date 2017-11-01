@@ -1,4 +1,0 @@
-{
-  "brokerUri" : "tcp://10.0.0.17:1883",
-  "clientId" : "kb"
-}

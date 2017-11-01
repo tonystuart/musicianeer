@@ -9,6 +9,8 @@
 
 package com.example.afs.musicpad;
 
+import java.util.Optional;
+
 import com.example.afs.fluidsynth.Synthesizer;
 import com.example.afs.fluidsynth.Synthesizer.Settings;
 import com.example.afs.jni.FluidSynth;
@@ -18,6 +20,7 @@ import com.example.afs.musicpad.device.midi.MidiWatcherBehavior;
 import com.example.afs.musicpad.device.qwerty.QwertyWatcherBehavior;
 import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnAllTasksStarted;
+import com.example.afs.musicpad.mqtt.MqttBuilder;
 import com.example.afs.musicpad.mqtt.MqttPublisher;
 import com.example.afs.musicpad.player.Player;
 import com.example.afs.musicpad.transport.TransportTask;
@@ -43,19 +46,19 @@ public class MusicPad {
   private DeviceWatcher midiWatcher;
   private DeviceWatcher qwertyWatcher;
   private TransportTask transportTask;
-  private MqttPublisher mqttPublisher;
+  private Optional<MqttPublisher> optionalMqttPublisher;
   private CommandProcessor commandProcessor;
   private Synthesizer synthesizer = createSynthesizer();
 
   public MusicPad(String libraryPath) {
     this.broker = new Broker<>();
+    this.optionalMqttPublisher = new MqttBuilder(broker).create();
     this.conductor = new Conductor(broker, libraryPath);
+    this.transportTask = new TransportTask(broker, synthesizer);
     this.commandProcessor = new CommandProcessor(broker);
+    this.webServer = new WebServer(broker);
     this.qwertyWatcher = new DeviceWatcher(broker, synthesizer, new QwertyWatcherBehavior());
     this.midiWatcher = new DeviceWatcher(broker, synthesizer, new MidiWatcherBehavior());
-    this.transportTask = new TransportTask(broker, synthesizer);
-    this.webServer = new WebServer(broker);
-    this.mqttPublisher = new MqttPublisher(broker);
   }
 
   private Synthesizer createSynthesizer() {
@@ -69,13 +72,15 @@ public class MusicPad {
   }
 
   private void start() {
+    if (optionalMqttPublisher.isPresent()) {
+      optionalMqttPublisher.get().start();
+    }
     conductor.start();
-    qwertyWatcher.start();
-    midiWatcher.start();
     transportTask.start();
     commandProcessor.start();
     webServer.start();
-    mqttPublisher.start();
+    midiWatcher.start();
+    qwertyWatcher.start();
     broker.publish(new OnAllTasksStarted());
   }
 
