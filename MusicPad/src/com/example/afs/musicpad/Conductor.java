@@ -14,6 +14,7 @@ import java.util.NavigableMap;
 import java.util.NavigableSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.concurrent.SynchronousQueue;
 
 import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnAllTasksStarted;
@@ -36,6 +37,33 @@ import com.example.afs.musicpad.util.RandomAccessList;
 
 public class Conductor extends BrokerTask<Message> {
 
+  public static class MidiFiles {
+
+    private RandomAccessList<File> midiFiles;
+
+    public MidiFiles(RandomAccessList<File> midiFiles) {
+      this.midiFiles = midiFiles;
+    }
+
+    public RandomAccessList<File> getMidiFiles() {
+      return midiFiles;
+    }
+
+  }
+
+  public class OnServiceRequested extends Message {
+    private SynchronousQueue<MidiFiles> rendezvous;
+
+    public OnServiceRequested(SynchronousQueue<MidiFiles> rendezvous) {
+      this.rendezvous = rendezvous;
+    }
+
+    public SynchronousQueue<MidiFiles> getRendezvous() {
+      return rendezvous;
+    }
+
+  }
+
   private Song song;
   private File directory;
   private RandomAccessList<File> midiFiles;
@@ -53,6 +81,14 @@ public class Conductor extends BrokerTask<Message> {
     subscribe(OnDeviceCommand.class, message -> doDeviceCommand(message));
     subscribe(OnDeviceAttached.class, message -> doDeviceAttached(message));
     subscribe(OnDeviceDetached.class, message -> doDeviceDetached(message));
+    subscribe(OnServiceRequested.class, message -> doServiceRequested(message));
+  }
+
+  public MidiFiles getMidiFiles() {
+    SynchronousQueue<MidiFiles> rendezvous = new SynchronousQueue<>();
+    OnServiceRequested onServiceRequested = new OnServiceRequested(rendezvous);
+    publish(onServiceRequested);
+    return rendezvous.poll();
   }
 
   private void doAllTasksStarted() {
@@ -136,6 +172,10 @@ public class Conductor extends BrokerTask<Message> {
     if (deviceIndexes.size() > 0) {
       publish(new OnPickChannel(song, deviceChannelAssignments, deviceIndexes.first()));
     }
+  }
+
+  private void doServiceRequested(OnServiceRequested message) {
+    message.getRendezvous().add(new MidiFiles(midiFiles));
   }
 
   private void doTranspose(int distance) {
