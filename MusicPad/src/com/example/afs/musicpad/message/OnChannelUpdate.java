@@ -13,7 +13,7 @@ import com.example.afs.musicpad.device.common.DeviceHandler.InputType;
 import com.example.afs.musicpad.device.common.DeviceHandler.OutputType;
 import com.example.afs.musicpad.playable.PlayableMap;
 
-public class OnChannelUpdate extends Message {
+public class OnChannelUpdate extends TypedMessage {
 
   private int deviceIndex;
   private String deviceName;

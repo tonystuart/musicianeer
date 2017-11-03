@@ -9,7 +9,7 @@
 
 package com.example.afs.musicpad.message;
 
-public class OnSongs extends Message {
+public class OnSongs extends TypedMessage {
 
   private String html;
 

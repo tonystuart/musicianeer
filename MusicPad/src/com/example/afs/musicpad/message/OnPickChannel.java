@@ -13,7 +13,7 @@ import java.util.NavigableMap;
 
 import com.example.afs.musicpad.song.Song;
 
-public class OnPickChannel extends Message {
+public class OnPickChannel extends TypedMessage {
 
   private Song song;
   private Integer deviceIndex;

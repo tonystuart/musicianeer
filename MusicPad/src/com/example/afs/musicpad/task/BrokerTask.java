@@ -12,8 +12,7 @@ package com.example.afs.musicpad.task;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.example.afs.musicpad.util.Broker;
-import com.example.afs.musicpad.util.Broker.Subscriber;
+import com.example.afs.musicpad.task.Broker.Subscriber;
 
 public abstract class BrokerTask<M> extends SimpleTask<M> {
 

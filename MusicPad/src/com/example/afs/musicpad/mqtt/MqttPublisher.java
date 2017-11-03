@@ -13,18 +13,17 @@ import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
-import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnKeyDown;
 import com.example.afs.musicpad.message.OnKeyUp;
-import com.example.afs.musicpad.task.BrokerTask;
-import com.example.afs.musicpad.util.Broker;
+import com.example.afs.musicpad.task.MessageBroker;
+import com.example.afs.musicpad.task.MessageTask;
 import com.example.afs.musicpad.util.JsonUtilities;
 
-public class MqttPublisher extends BrokerTask<Message> {
+public class MqttPublisher extends MessageTask {
 
   private MqttClient client;
 
-  public MqttPublisher(Broker<Message> broker, MqttClient client) {
+  public MqttPublisher(MessageBroker broker, MqttClient client) {
     super(broker);
     this.client = client;
     subscribe(OnKeyUp.class, message -> doKeyUp(message));

@@ -9,7 +9,7 @@
 
 package com.example.afs.musicpad.message;
 
-public class OnDeviceDetached extends Message {
+public class OnDeviceDetached extends TypedMessage {
 
   private int deviceIndex;
 

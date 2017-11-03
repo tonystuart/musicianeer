@@ -7,13 +7,8 @@
 // This program is made available on an "as is" basis, without
 // warranties or conditions of any kind, either express or implied.
 
-package com.example.afs.musicpad.message;
+package com.example.afs.musicpad.task;
 
-public class Message {
+public class MessageBroker extends Broker<Message> {
 
-  private String type = getClass().getSimpleName();
-
-  public String getType() {
-    return type;
-  }
 }

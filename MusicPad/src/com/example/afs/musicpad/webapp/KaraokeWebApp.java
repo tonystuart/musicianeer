@@ -12,7 +12,6 @@ package com.example.afs.musicpad.webapp;
 import org.eclipse.jetty.util.log.Log;
 import org.eclipse.jetty.util.log.Logger;
 
-import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnChannelDetails;
 import com.example.afs.musicpad.message.OnChannels;
 import com.example.afs.musicpad.message.OnDeviceReport;
@@ -24,14 +23,14 @@ import com.example.afs.musicpad.message.OnTemplates;
 import com.example.afs.musicpad.message.OnTick;
 import com.example.afs.musicpad.message.OnTitleFilter;
 import com.example.afs.musicpad.renderer.karaoke.KaraokeRenderer;
-import com.example.afs.musicpad.util.Broker;
+import com.example.afs.musicpad.task.MessageBroker;
 
 public class KaraokeWebApp extends WebApp {
 
   @SuppressWarnings("unused")
   private static final Logger LOG = Log.getLogger(KaraokeWebApp.class);
 
-  public KaraokeWebApp(Broker<Message> broker) {
+  public KaraokeWebApp(MessageBroker broker) {
     super(broker);
     setRenderer(new KaraokeRenderer(broker));
     subscribe(OnTick.class, message -> doMessage(message));

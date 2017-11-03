@@ -12,7 +12,7 @@ package com.example.afs.musicpad.message;
 import java.util.HashMap;
 import java.util.Map;
 
-public class OnSynchronize extends Message {
+public class OnSynchronize extends TypedMessage {
 
   private Map<String, String> properties = new HashMap<>();
 

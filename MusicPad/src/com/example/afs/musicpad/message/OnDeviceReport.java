@@ -11,7 +11,7 @@ package com.example.afs.musicpad.message;
 
 import com.example.afs.musicpad.DeviceCommand;
 
-public class OnDeviceReport extends Message {
+public class OnDeviceReport extends TypedMessage {
 
   private DeviceCommand deviceCommand;
   private int deviceIndex;

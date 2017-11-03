@@ -9,7 +9,7 @@
 
 package com.example.afs.musicpad.message;
 
-public class OnAllTasksStarted extends Message {
+public class OnAllTasksStarted extends TypedMessage {
 
   @Override
   public String toString() {

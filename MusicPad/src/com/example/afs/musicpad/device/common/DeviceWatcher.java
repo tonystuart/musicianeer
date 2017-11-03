@@ -19,21 +19,20 @@ import java.util.Set;
 import com.example.afs.fluidsynth.Synthesizer;
 import com.example.afs.musicpad.Command;
 import com.example.afs.musicpad.device.common.DeviceHandler.InputType;
-import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnDeviceAttached;
 import com.example.afs.musicpad.message.OnDeviceDetached;
-import com.example.afs.musicpad.task.BrokerTask;
-import com.example.afs.musicpad.util.Broker;
+import com.example.afs.musicpad.task.MessageBroker;
+import com.example.afs.musicpad.task.MessageTask;
 
-public class DeviceWatcher extends BrokerTask<Message> {
+public class DeviceWatcher extends MessageTask {
 
   private Synthesizer synthesizer;
   private WatcherBehavior watcherBehavior;
   private Map<String, Controller> oldDevices = new HashMap<>();
   private Set<String> detachedDevices = new HashSet<>();
 
-  public DeviceWatcher(Broker<Message> broker, Synthesizer synthesizer, WatcherBehavior watcherBehavior) {
+  public DeviceWatcher(MessageBroker broker, Synthesizer synthesizer, WatcherBehavior watcherBehavior) {
     super(broker, 1000);
     this.synthesizer = synthesizer;
     this.watcherBehavior = watcherBehavior;

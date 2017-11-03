@@ -10,10 +10,9 @@
 package com.example.afs.musicpad;
 
 import com.example.afs.musicpad.Trace.TraceOption;
-import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnCommand;
-import com.example.afs.musicpad.task.BrokerTask;
-import com.example.afs.musicpad.util.Broker;
+import com.example.afs.musicpad.task.MessageBroker;
+import com.example.afs.musicpad.task.MessageTask;
 
 // new things
 // zero/enter when not in command mode are modulation down/up1550000550
@@ -58,9 +57,9 @@ import com.example.afs.musicpad.util.Broker;
 // 600 to 699 - set track program
 // 700 to 799 - set track velocity
 
-public class CommandProcessor extends BrokerTask<Message> {
+public class CommandProcessor extends MessageTask {
 
-  public CommandProcessor(Broker<Message> broker) {
+  public CommandProcessor(MessageBroker broker) {
     super(broker);
     subscribe(OnCommand.class, message -> doCommand(message.getCommand(), message.getParameter()));
   }

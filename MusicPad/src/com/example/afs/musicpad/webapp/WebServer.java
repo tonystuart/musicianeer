@@ -21,11 +21,10 @@ import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.log.Log;
 import org.eclipse.jetty.util.log.Logger;
 
-import com.example.afs.musicpad.message.Message;
-import com.example.afs.musicpad.task.BrokerTask;
-import com.example.afs.musicpad.util.Broker;
+import com.example.afs.musicpad.task.MessageBroker;
+import com.example.afs.musicpad.task.MessageTask;
 
-public class WebServer extends BrokerTask<Message> {
+public class WebServer extends MessageTask {
 
   private static final Logger LOG = Log.getLogger(WebServer.class);
   private static final int PORT = 8080;
@@ -36,7 +35,7 @@ public class WebServer extends BrokerTask<Message> {
   private StaffWebAppFactory staffWebAppFactory;
   private KaraokeWebAppFactory karaokeWebAppFactory;
 
-  public WebServer(Broker<Message> broker) {
+  public WebServer(MessageBroker broker) {
     super(broker);
     karaokeWebApp = new KaraokeWebApp(broker);
     staffWebApp = new StaffWebApp(broker);

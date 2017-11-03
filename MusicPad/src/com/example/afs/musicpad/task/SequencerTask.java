@@ -12,8 +12,6 @@ package com.example.afs.musicpad.task;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.PriorityBlockingQueue;
 
-import com.example.afs.musicpad.util.Broker;
-
 public class SequencerTask<T> extends BrokerTask<T> {
 
   private Scheduler<T> scheduler;

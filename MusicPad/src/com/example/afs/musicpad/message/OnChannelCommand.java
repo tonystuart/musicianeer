@@ -11,7 +11,7 @@ package com.example.afs.musicpad.message;
 
 import com.example.afs.musicpad.ChannelCommand;
 
-public class OnChannelCommand extends Message {
+public class OnChannelCommand extends TypedMessage {
 
   private ChannelCommand channelCommand;
   private int channel;

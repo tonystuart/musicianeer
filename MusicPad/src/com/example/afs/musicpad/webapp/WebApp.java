@@ -17,16 +17,17 @@ import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnChannelCommand;
 import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnDeviceCommand;
 import com.example.afs.musicpad.message.OnSynchronize;
-import com.example.afs.musicpad.task.BrokerTask;
-import com.example.afs.musicpad.util.Broker;
+import com.example.afs.musicpad.message.TypedMessage;
+import com.example.afs.musicpad.task.Message;
+import com.example.afs.musicpad.task.MessageBroker;
+import com.example.afs.musicpad.task.MessageTask;
 import com.example.afs.musicpad.util.JsonUtilities;
 
-public class WebApp extends BrokerTask<Message> {
+public class WebApp extends MessageTask {
 
   private static final int CLIENTS = 10;
   private static final long PING_INTERVAL_MS = 5000;
@@ -34,9 +35,9 @@ public class WebApp extends BrokerTask<Message> {
 
   private Map<Class<? extends Message>, Message> state = new LinkedHashMap<>();
   private BlockingQueue<WebSocket> webSockets = new LinkedBlockingQueue<>(CLIENTS);
-  private BrokerTask<Message> rendererTask;
+  private MessageTask rendererTask;
 
-  protected WebApp(Broker<Message> broker) {
+  protected WebApp(MessageBroker broker) {
     super(broker, PING_INTERVAL_MS);
   }
 
@@ -49,7 +50,7 @@ public class WebApp extends BrokerTask<Message> {
 
   public void onWebSocketText(WebSocket webSocket, String json) {
     //System.out.println("Received " + json);
-    Message message = JsonUtilities.fromJson(json, Message.class);
+    TypedMessage message = JsonUtilities.fromJson(json, TypedMessage.class);
     String messageType = message.getType();
     if (messageType == null) {
       throw new IllegalArgumentException("Missing messageType");
@@ -120,7 +121,7 @@ public class WebApp extends BrokerTask<Message> {
 
   }
 
-  protected void setRenderer(BrokerTask<Message> rendererTask) {
+  protected void setRenderer(MessageTask rendererTask) {
     this.rendererTask = rendererTask;
   }
 

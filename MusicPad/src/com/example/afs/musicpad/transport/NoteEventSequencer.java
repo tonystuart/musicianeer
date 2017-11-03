@@ -9,8 +9,8 @@
 
 package com.example.afs.musicpad.transport;
 
+import com.example.afs.musicpad.task.Broker;
 import com.example.afs.musicpad.task.PausibleSequencerTask;
-import com.example.afs.musicpad.util.Broker;
 
 public class NoteEventSequencer extends PausibleSequencerTask<NoteEvent> {
 

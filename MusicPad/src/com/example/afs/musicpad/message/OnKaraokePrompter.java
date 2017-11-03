@@ -9,7 +9,7 @@
 
 package com.example.afs.musicpad.message;
 
-public class OnKaraokePrompter extends Message {
+public class OnKaraokePrompter extends TypedMessage {
 
   private String html;
 

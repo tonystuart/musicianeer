@@ -9,7 +9,7 @@
 
 package com.example.afs.musicpad.message;
 
-public class OnStaffPrompter extends Message {
+public class OnStaffPrompter extends TypedMessage {
 
   private String html;
   private int ticksPerPixel;

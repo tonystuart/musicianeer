@@ -11,7 +11,7 @@ package com.example.afs.musicpad.message;
 
 import com.example.afs.musicpad.song.Song;
 
-public class OnSampleSong extends Message {
+public class OnSampleSong extends TypedMessage {
 
   private Song song;
 

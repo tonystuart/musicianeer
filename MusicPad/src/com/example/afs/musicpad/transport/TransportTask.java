@@ -12,7 +12,6 @@ package com.example.afs.musicpad.transport;
 import com.example.afs.fluidsynth.Synthesizer;
 import com.example.afs.musicpad.ChannelCommand;
 import com.example.afs.musicpad.Command;
-import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnChannelCommand;
 import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnRenderSong;
@@ -25,18 +24,18 @@ import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.song.ChannelNotes;
 import com.example.afs.musicpad.song.Default;
 import com.example.afs.musicpad.song.Song;
-import com.example.afs.musicpad.task.BrokerTask;
+import com.example.afs.musicpad.task.MessageBroker;
+import com.example.afs.musicpad.task.MessageTask;
 import com.example.afs.musicpad.transport.Transport.Whence;
-import com.example.afs.musicpad.util.Broker;
 import com.example.afs.musicpad.util.Range;
 
-public class TransportTask extends BrokerTask<Message> {
+public class TransportTask extends MessageTask {
 
   private Song song;
   private Transport transport;
   private long seekPosition;
 
-  public TransportTask(Broker<Message> broker, Synthesizer synthesizer) {
+  public TransportTask(MessageBroker broker, Synthesizer synthesizer) {
     super(broker);
     this.transport = new Transport(synthesizer);
     subscribe(OnSong.class, message -> doSong(message));

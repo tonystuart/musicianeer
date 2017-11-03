@@ -13,7 +13,7 @@ import java.io.File;
 
 import com.example.afs.musicpad.util.RandomAccessList;
 
-public class OnMidiFiles extends Message {
+public class OnMidiFiles extends TypedMessage {
 
   private RandomAccessList<File> midiFiles;
 

@@ -11,7 +11,7 @@ package com.example.afs.musicpad.message;
 
 import com.example.afs.musicpad.Command;
 
-public class OnCommand extends Message {
+public class OnCommand extends TypedMessage {
 
   private Command command;
   private int parameter;

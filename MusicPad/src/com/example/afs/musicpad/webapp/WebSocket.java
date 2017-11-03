@@ -3,7 +3,7 @@ package com.example.afs.musicpad.webapp;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.WebSocketAdapter;
 
-import com.example.afs.musicpad.message.Message;
+import com.example.afs.musicpad.task.Message;
 import com.example.afs.musicpad.util.JsonUtilities;
 
 public class WebSocket extends WebSocketAdapter {

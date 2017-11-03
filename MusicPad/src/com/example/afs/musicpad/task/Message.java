@@ -7,23 +7,8 @@
 // This program is made available on an "as is" basis, without
 // warranties or conditions of any kind, either express or implied.
 
-package com.example.afs.musicpad.message;
+package com.example.afs.musicpad.task;
 
-public class OnTitleFilter extends TypedMessage {
-
-  private int inputCode;
-
-  public OnTitleFilter(int inputCode) {
-    this.inputCode = inputCode;
-  }
-
-  public int getInputCode() {
-    return inputCode;
-  }
-
-  @Override
-  public String toString() {
-    return "OnTitleFilter [inputCode=" + inputCode + "]";
-  }
+public interface Message {
 
 }

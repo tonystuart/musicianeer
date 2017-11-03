@@ -11,7 +11,7 @@ package com.example.afs.musicpad.message;
 
 import com.example.afs.musicpad.player.Sound;
 
-public class OnKeyDown extends Message {
+public class OnKeyDown extends TypedMessage {
 
   private int deviceIndex;
 

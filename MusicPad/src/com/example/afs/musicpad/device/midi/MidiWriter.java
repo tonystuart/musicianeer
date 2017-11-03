@@ -20,7 +20,6 @@ import com.example.afs.musicpad.device.midi.configuration.Context;
 import com.example.afs.musicpad.device.midi.configuration.Context.HasSendDeviceMessage;
 import com.example.afs.musicpad.device.midi.configuration.MidiConfiguration;
 import com.example.afs.musicpad.device.midi.configuration.On;
-import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnDeviceCommand;
 import com.example.afs.musicpad.message.OnDeviceMessage;
@@ -28,13 +27,13 @@ import com.example.afs.musicpad.message.OnSong;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.song.ChannelNotes;
 import com.example.afs.musicpad.song.Song;
-import com.example.afs.musicpad.task.BrokerTask;
-import com.example.afs.musicpad.util.Broker;
+import com.example.afs.musicpad.task.MessageBroker;
+import com.example.afs.musicpad.task.MessageTask;
 import com.example.afs.musicpad.util.DirectList;
 import com.example.afs.musicpad.util.RandomAccessList;
 import com.example.afs.musicpad.util.Value;
 
-public class MidiWriter extends BrokerTask<Message> implements HasSendDeviceMessage {
+public class MidiWriter extends MessageTask implements HasSendDeviceMessage {
 
   private int deviceIndex;
   private Context context;
@@ -43,7 +42,7 @@ public class MidiWriter extends BrokerTask<Message> implements HasSendDeviceMess
   private RandomAccessList<Receiver> receivers = new DirectList<>();
   private Song song;
 
-  public MidiWriter(Broker<Message> broker, MidiDeviceBundle deviceBundle, MidiConfiguration configuration, int deviceIndex) {
+  public MidiWriter(MessageBroker broker, MidiDeviceBundle deviceBundle, MidiConfiguration configuration, int deviceIndex) {
     super(broker);
     this.deviceBundle = deviceBundle;
     this.configuration = configuration;

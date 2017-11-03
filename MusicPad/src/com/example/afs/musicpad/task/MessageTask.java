@@ -7,18 +7,21 @@
 // This program is made available on an "as is" basis, without
 // warranties or conditions of any kind, either express or implied.
 
-package com.example.afs.musicpad.message;
+package com.example.afs.musicpad.task;
 
-public class ChannelCheck extends Message {
+public class MessageTask extends BrokerTask<Message> {
 
-  private boolean value;
-
-  public boolean isValue() {
-    return value;
+  public MessageTask(MessageBroker broker, long timeoutMillis) {
+    super(broker, timeoutMillis);
   }
 
-  public void setValue(boolean value) {
-    this.value = value;
+  protected MessageTask(MessageBroker broker) {
+    super(broker);
+  }
+
+  @Override
+  public MessageBroker getBroker() {
+    return (MessageBroker) super.getBroker();
   }
 
 }

@@ -12,18 +12,17 @@ package com.example.afs.musicpad.webapp;
 import org.eclipse.jetty.util.log.Log;
 import org.eclipse.jetty.util.log.Logger;
 
-import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnStaffPrompter;
 import com.example.afs.musicpad.message.OnTick;
 import com.example.afs.musicpad.renderer.staff.StaffRenderer;
-import com.example.afs.musicpad.util.Broker;
+import com.example.afs.musicpad.task.MessageBroker;
 
 public class StaffWebApp extends WebApp {
 
   @SuppressWarnings("unused")
   private static final Logger LOG = Log.getLogger(StaffWebApp.class);
 
-  public StaffWebApp(Broker<Message> broker) {
+  public StaffWebApp(MessageBroker broker) {
     super(broker);
     setRenderer(new StaffRenderer(broker));
     subscribe(OnTick.class, message -> doMessage(message));

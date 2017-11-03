@@ -9,23 +9,13 @@
 
 package com.example.afs.musicpad.message;
 
-import java.util.List;
+import com.example.afs.musicpad.task.Message;
 
-public class OnTemplates extends TypedMessage {
+public class TypedMessage implements Message {
 
-  private List<String> templates;
+  private String type = getClass().getSimpleName();
 
-  public OnTemplates(List<String> templates) {
-    this.templates = templates;
+  public String getType() {
+    return type;
   }
-
-  public List<String> getTemplates() {
-    return templates;
-  }
-
-  @Override
-  public String toString() {
-    return "OnTemplates [templates=" + templates + "]";
-  }
-
 }

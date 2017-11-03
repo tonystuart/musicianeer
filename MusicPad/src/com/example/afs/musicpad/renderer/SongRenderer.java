@@ -12,7 +12,6 @@ package com.example.afs.musicpad.renderer;
 import java.util.NavigableMap;
 import java.util.TreeMap;
 
-import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnChannelUpdate;
 import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnDeviceDetached;
@@ -20,17 +19,17 @@ import com.example.afs.musicpad.message.OnRenderSong;
 import com.example.afs.musicpad.playable.Playable;
 import com.example.afs.musicpad.playable.PlayableMap;
 import com.example.afs.musicpad.song.Song;
-import com.example.afs.musicpad.task.BrokerTask;
-import com.example.afs.musicpad.util.Broker;
+import com.example.afs.musicpad.task.MessageBroker;
+import com.example.afs.musicpad.task.MessageTask;
 import com.example.afs.musicpad.util.RandomAccessList;
 
-public abstract class SongRenderer extends BrokerTask<Message> {
+public abstract class SongRenderer extends MessageTask {
 
   private Song song;
   private NavigableMap<Integer, Integer> deviceChannelAssignments = new TreeMap<>();
   private NavigableMap<Integer, RandomAccessList<Playable>> devicePlayables = new TreeMap<>();
 
-  public SongRenderer(Broker<Message> broker) {
+  public SongRenderer(MessageBroker broker) {
     super(broker);
     subscribe(OnCommand.class, message -> doCommand(message));
     subscribe(OnRenderSong.class, message -> doRenderSong(message));

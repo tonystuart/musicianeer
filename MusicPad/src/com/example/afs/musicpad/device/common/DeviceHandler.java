@@ -18,7 +18,6 @@ import com.example.afs.musicpad.DeviceCommand;
 import com.example.afs.musicpad.device.midi.MidiPlayableMap;
 import com.example.afs.musicpad.device.qwerty.AlphaPlayableMap;
 import com.example.afs.musicpad.device.qwerty.NumericPlayableMap;
-import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnChannelUpdate;
 import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnDeviceCommand;
@@ -35,11 +34,11 @@ import com.example.afs.musicpad.player.Player.Action;
 import com.example.afs.musicpad.player.Sound;
 import com.example.afs.musicpad.song.ChannelNotes;
 import com.example.afs.musicpad.song.Song;
-import com.example.afs.musicpad.task.BrokerTask;
-import com.example.afs.musicpad.util.Broker;
+import com.example.afs.musicpad.task.MessageBroker;
+import com.example.afs.musicpad.task.MessageTask;
 import com.example.afs.musicpad.util.Range;
 
-public class DeviceHandler extends BrokerTask<Message> {
+public class DeviceHandler extends MessageTask {
 
   public static enum InputType {
     ALPHA, NUMERIC, MIDI, DETACH
@@ -67,7 +66,7 @@ public class DeviceHandler extends BrokerTask<Message> {
   private int oldChannel;
   private OutputType oldOutputType;
 
-  public DeviceHandler(Broker<Message> broker, Synthesizer synthesizer, String deviceName, int deviceIndex, InputType inputType) {
+  public DeviceHandler(MessageBroker broker, Synthesizer synthesizer, String deviceName, int deviceIndex, InputType inputType) {
     super(broker);
     this.synthesizer = synthesizer;
     this.deviceName = deviceName;
@@ -82,11 +81,6 @@ public class DeviceHandler extends BrokerTask<Message> {
 
   public void detach() {
     getBroker().publish(new OnDeviceCommand(DeviceCommand.INPUT, deviceIndex, InputType.DETACH.ordinal()));
-  }
-
-  @Override
-  public Broker<Message> getBroker() {
-    return super.getBroker();
   }
 
   public int getDeviceIndex() {

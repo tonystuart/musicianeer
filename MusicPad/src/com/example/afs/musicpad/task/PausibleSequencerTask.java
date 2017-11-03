@@ -9,8 +9,6 @@
 
 package com.example.afs.musicpad.task;
 
-import com.example.afs.musicpad.util.Broker;
-
 public class PausibleSequencerTask<T> extends SequencerTask<T> {
 
   private boolean isPaused;

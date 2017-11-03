@@ -15,15 +15,14 @@ import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 
-import com.example.afs.musicpad.message.Message;
-import com.example.afs.musicpad.util.Broker;
+import com.example.afs.musicpad.task.MessageBroker;
 import com.example.afs.musicpad.util.JsonUtilities;
 
 public class MqttBuilder {
 
-  private Broker<Message> broker;
+  private MessageBroker broker;
 
-  public MqttBuilder(Broker<Message> broker) {
+  public MqttBuilder(MessageBroker broker) {
     this.broker = broker;
   }
 

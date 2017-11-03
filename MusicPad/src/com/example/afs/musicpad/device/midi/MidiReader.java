@@ -25,13 +25,12 @@ import com.example.afs.musicpad.device.midi.configuration.Context.HasSendHandler
 import com.example.afs.musicpad.device.midi.configuration.MidiConfiguration;
 import com.example.afs.musicpad.device.midi.configuration.Node.ReturnState;
 import com.example.afs.musicpad.device.midi.configuration.On;
-import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnDeviceCommand;
 import com.example.afs.musicpad.message.OnDeviceMessage;
 import com.example.afs.musicpad.player.Player;
 import com.example.afs.musicpad.player.Player.Action;
-import com.example.afs.musicpad.util.Broker;
+import com.example.afs.musicpad.task.MessageBroker;
 
 public class MidiReader implements HasSendCommand, HasSendDeviceMessage, HasSendHandlerMessage, HasSendDeviceCommand {
 
@@ -53,14 +52,14 @@ public class MidiReader implements HasSendCommand, HasSendDeviceMessage, HasSend
     }
   }
 
-  private Broker<Message> broker;
+  private MessageBroker broker;
   private MidiDeviceBundle deviceBundle;
   private MidiConfiguration configuration;
   private Context context;
   private Player player;
   private int deviceIndex;
 
-  public MidiReader(Broker<Message> broker, Player player, int deviceIndex, MidiDeviceBundle deviceBundle, MidiConfiguration configuration) {
+  public MidiReader(MessageBroker broker, Player player, int deviceIndex, MidiDeviceBundle deviceBundle, MidiConfiguration configuration) {
     this.broker = broker;
     this.player = player;
     this.deviceIndex = deviceIndex;

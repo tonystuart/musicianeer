@@ -16,7 +16,6 @@ import java.util.NavigableMap;
 
 import com.example.afs.musicpad.html.Option;
 import com.example.afs.musicpad.html.Template;
-import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnChannelDetails;
 import com.example.afs.musicpad.message.OnChannels;
 import com.example.afs.musicpad.message.OnKaraokePrompter;
@@ -32,12 +31,12 @@ import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.playable.Playable;
 import com.example.afs.musicpad.renderer.SongRenderer;
 import com.example.afs.musicpad.song.Song;
-import com.example.afs.musicpad.util.Broker;
+import com.example.afs.musicpad.task.MessageBroker;
 import com.example.afs.musicpad.util.RandomAccessList;
 
 public class KaraokeRenderer extends SongRenderer {
 
-  public KaraokeRenderer(Broker<Message> broker) {
+  public KaraokeRenderer(MessageBroker broker) {
     super(broker);
     subscribe(OnMidiFiles.class, message -> doMidiFiles(message));
     subscribe(OnSampleSong.class, message -> doSampleSong(message));

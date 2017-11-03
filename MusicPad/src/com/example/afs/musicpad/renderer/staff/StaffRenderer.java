@@ -11,17 +11,16 @@ package com.example.afs.musicpad.renderer.staff;
 
 import java.util.NavigableMap;
 
-import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnStaffPrompter;
 import com.example.afs.musicpad.playable.Playable;
 import com.example.afs.musicpad.renderer.SongRenderer;
 import com.example.afs.musicpad.song.Song;
-import com.example.afs.musicpad.util.Broker;
+import com.example.afs.musicpad.task.MessageBroker;
 import com.example.afs.musicpad.util.RandomAccessList;
 
 public class StaffRenderer extends SongRenderer {
 
-  public StaffRenderer(Broker<Message> broker) {
+  public StaffRenderer(MessageBroker broker) {
     super(broker);
   }
 

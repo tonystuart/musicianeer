@@ -16,7 +16,6 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.concurrent.SynchronousQueue;
 
-import com.example.afs.musicpad.message.Message;
 import com.example.afs.musicpad.message.OnAllTasksStarted;
 import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnDeviceAttached;
@@ -30,12 +29,12 @@ import com.example.afs.musicpad.message.OnSampleSong;
 import com.example.afs.musicpad.message.OnSong;
 import com.example.afs.musicpad.parser.SongBuilder;
 import com.example.afs.musicpad.song.Song;
-import com.example.afs.musicpad.task.BrokerTask;
-import com.example.afs.musicpad.util.Broker;
+import com.example.afs.musicpad.task.MessageBroker;
+import com.example.afs.musicpad.task.ServiceTask;
 import com.example.afs.musicpad.util.DirectList;
 import com.example.afs.musicpad.util.RandomAccessList;
 
-public class Conductor extends BrokerTask<Message> {
+public class Conductor extends ServiceTask {
 
   public static class MidiFiles {
 
@@ -51,26 +50,13 @@ public class Conductor extends BrokerTask<Message> {
 
   }
 
-  public class OnServiceRequested extends Message {
-    private SynchronousQueue<MidiFiles> rendezvous;
-
-    public OnServiceRequested(SynchronousQueue<MidiFiles> rendezvous) {
-      this.rendezvous = rendezvous;
-    }
-
-    public SynchronousQueue<MidiFiles> getRendezvous() {
-      return rendezvous;
-    }
-
-  }
-
   private Song song;
   private File directory;
   private RandomAccessList<File> midiFiles;
   private NavigableSet<Integer> deviceIndexes = new TreeSet<>();
   private NavigableMap<Integer, Integer> deviceChannelAssignments = new TreeMap<>();
 
-  public Conductor(Broker<Message> broker, String path) {
+  public Conductor(MessageBroker broker, String path) {
     super(broker);
     this.directory = new File(path);
     this.midiFiles = new DirectList<>();
