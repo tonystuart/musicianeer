@@ -70,6 +70,12 @@ public class Conductor extends ServiceTask {
   }
 
   private void doAllTasksStarted() {
+    // While we're in the process of moving to an on-demand model, we have a web app that starts after this, but no republish state message, so just wait five seconds
+    try {
+      Thread.sleep(5000);
+    } catch (InterruptedException e) {
+      throw new RuntimeException(e);
+    }
     publish(new OnMidiFiles(midiFiles));
   }
 
@@ -157,6 +163,10 @@ public class Conductor extends ServiceTask {
     publish(new OnSong(song));
   }
 
+  private MidiFiles getMidiFiles() {
+    return new MidiFiles(midiFiles);
+  }
+
   private boolean isMidiFile(String name) {
     String lowerCaseName = name.toLowerCase();
     boolean isMidi = lowerCaseName.endsWith(".mid") || lowerCaseName.endsWith(".midi") || lowerCaseName.endsWith(".kar");
@@ -175,10 +185,6 @@ public class Conductor extends ServiceTask {
         listMidiFiles(midiFiles, file);
       }
     }
-  }
-
-  private MidiFiles getMidiFiles() {
-    return new MidiFiles(midiFiles);
   }
 
 }

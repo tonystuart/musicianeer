@@ -30,17 +30,13 @@ public class WebServer extends MessageTask {
   private static final int PORT = 8080;
 
   private Server server;
-  private StaffWebApp staffWebApp;
-  private KaraokeWebApp karaokeWebApp;
   private StaffWebAppFactory staffWebAppFactory;
   private KaraokeWebAppFactory karaokeWebAppFactory;
 
   public WebServer(MessageBroker broker) {
     super(broker);
-    karaokeWebApp = new KaraokeWebApp(broker);
-    staffWebApp = new StaffWebApp(broker);
-    karaokeWebAppFactory = new KaraokeWebAppFactory(karaokeWebApp);
-    staffWebAppFactory = new StaffWebAppFactory(staffWebApp);
+    karaokeWebAppFactory = new KaraokeWebAppFactory(getBroker());
+    staffWebAppFactory = new StaffWebAppFactory(getBroker());
     createServer();
   }
 
@@ -48,8 +44,6 @@ public class WebServer extends MessageTask {
   public void start() {
     super.start();
     try {
-      karaokeWebApp.start();
-      staffWebApp.start();
       server.start();
     } catch (Exception e) {
       throw new RuntimeException(e);

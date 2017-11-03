@@ -33,12 +33,14 @@ public class WebApp extends MessageTask {
   private static final long PING_INTERVAL_MS = 5000;
   private static final ByteBuffer PING = ByteBuffer.wrap("PING".getBytes());
 
+  private WebAppFactory webAppFactory;
   private Map<Class<? extends Message>, Message> state = new LinkedHashMap<>();
   private BlockingQueue<WebSocket> webSockets = new LinkedBlockingQueue<>(CLIENTS);
   private MessageTask rendererTask;
 
-  protected WebApp(MessageBroker broker) {
+  protected WebApp(MessageBroker broker, WebAppFactory webAppFactory) {
     super(broker, PING_INTERVAL_MS);
+    this.webAppFactory = webAppFactory;
   }
 
   public void onWebSocketConnection(WebSocket webSocket) {
@@ -72,6 +74,7 @@ public class WebApp extends MessageTask {
 
   public void removeMessageWebSocket(WebSocket webSocket) {
     webSockets.remove(webSocket);
+    webAppFactory.releaseWebApp();
   }
 
   @Override

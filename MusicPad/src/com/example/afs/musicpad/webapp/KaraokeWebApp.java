@@ -30,8 +30,8 @@ public class KaraokeWebApp extends WebApp {
   @SuppressWarnings("unused")
   private static final Logger LOG = Log.getLogger(KaraokeWebApp.class);
 
-  public KaraokeWebApp(MessageBroker broker) {
-    super(broker);
+  public KaraokeWebApp(MessageBroker broker, KaraokeWebAppFactory karaokeWebAppFactory) {
+    super(broker, karaokeWebAppFactory);
     setRenderer(new KaraokeRenderer(broker));
     subscribe(OnTick.class, message -> doMessage(message));
     subscribe(OnReport.class, message -> doMessage(message));

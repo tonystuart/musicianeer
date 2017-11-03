@@ -9,16 +9,16 @@
 
 package com.example.afs.musicpad.webapp;
 
-public class KaraokeWebAppFactory implements WebAppFactory {
+import com.example.afs.musicpad.task.MessageBroker;
 
-  private KaraokeWebApp karaokeWebApp;
+public class KaraokeWebAppFactory extends WebAppFactory {
 
-  public KaraokeWebAppFactory(KaraokeWebApp karaokeWebApp) {
-    this.karaokeWebApp = karaokeWebApp;
+  public KaraokeWebAppFactory(MessageBroker broker) {
+    super(broker);
   }
 
   @Override
-  public WebApp getWebApp() {
-    return karaokeWebApp;
+  protected WebApp createWebApp(MessageBroker broker, WebAppFactory webAppFactory) {
+    return new KaraokeWebApp(broker, this);
   }
 }

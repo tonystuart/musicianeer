@@ -22,8 +22,8 @@ public class StaffWebApp extends WebApp {
   @SuppressWarnings("unused")
   private static final Logger LOG = Log.getLogger(StaffWebApp.class);
 
-  public StaffWebApp(MessageBroker broker) {
-    super(broker);
+  public StaffWebApp(MessageBroker broker, StaffWebAppFactory staffWebAppFactory) {
+    super(broker, staffWebAppFactory);
     setRenderer(new StaffRenderer(broker));
     subscribe(OnTick.class, message -> doMessage(message));
     subscribe(OnStaffPrompter.class, message -> doMessage(message));
