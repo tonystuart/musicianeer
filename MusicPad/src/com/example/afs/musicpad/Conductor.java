@@ -14,7 +14,6 @@ import java.util.NavigableMap;
 import java.util.NavigableSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.concurrent.SynchronousQueue;
 
 import com.example.afs.musicpad.message.OnAllTasksStarted;
 import com.example.afs.musicpad.message.OnCommand;
@@ -36,7 +35,7 @@ import com.example.afs.musicpad.util.RandomAccessList;
 
 public class Conductor extends ServiceTask {
 
-  public static class MidiFiles {
+  public static class MidiFiles implements Response {
 
     private RandomAccessList<File> midiFiles;
 
@@ -67,14 +66,7 @@ public class Conductor extends ServiceTask {
     subscribe(OnDeviceCommand.class, message -> doDeviceCommand(message));
     subscribe(OnDeviceAttached.class, message -> doDeviceAttached(message));
     subscribe(OnDeviceDetached.class, message -> doDeviceDetached(message));
-    subscribe(OnServiceRequested.class, message -> doServiceRequested(message));
-  }
-
-  public MidiFiles getMidiFiles() {
-    SynchronousQueue<MidiFiles> rendezvous = new SynchronousQueue<>();
-    OnServiceRequested onServiceRequested = new OnServiceRequested(rendezvous);
-    publish(onServiceRequested);
-    return rendezvous.poll();
+    provide(MidiFiles.class, () -> getMidiFiles());
   }
 
   private void doAllTasksStarted() {
@@ -160,10 +152,6 @@ public class Conductor extends ServiceTask {
     }
   }
 
-  private void doServiceRequested(OnServiceRequested message) {
-    message.getRendezvous().add(new MidiFiles(midiFiles));
-  }
-
   private void doTranspose(int distance) {
     song.transposeTo(distance);
     publish(new OnSong(song));
@@ -187,6 +175,10 @@ public class Conductor extends ServiceTask {
         listMidiFiles(midiFiles, file);
       }
     }
+  }
+
+  private MidiFiles getMidiFiles() {
+    return new MidiFiles(midiFiles);
   }
 
 }
