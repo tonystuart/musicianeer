@@ -7,9 +7,11 @@
 // This program is made available on an "as is" basis, without
 // warranties or conditions of any kind, either express or implied.
 
-package com.example.afs.musicpad.webapp;
+package com.example.afs.musicpad.renderer.karaoke;
 
 import com.example.afs.musicpad.task.MessageBroker;
+import com.example.afs.musicpad.webapp.WebApp;
+import com.example.afs.musicpad.webapp.WebAppFactory;
 
 public class KaraokeWebAppFactory extends WebAppFactory {
 

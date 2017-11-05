@@ -7,28 +7,33 @@
 // This program is made available on an "as is" basis, without
 // warranties or conditions of any kind, either express or implied.
 
-package com.example.afs.musicpad.html;
+package com.example.afs.musicpad.message;
 
-public class TextElement extends Node {
+public class OnKaraokeBandEvent extends TypedMessage {
 
-  private String text;
-
-  public TextElement(Object value) {
-    this.text = value.toString();
+  public enum Action {
+    CLICK
   }
 
-  public String getText() {
-    return text;
+  private Action action;
+  private String id;
+
+  public OnKaraokeBandEvent(Action action, String id) {
+    this.action = action;
+    this.id = id;
   }
 
-  @Override
-  public void render(StringBuilder s) {
-    s.append(text);
+  public Action getAction() {
+    return action;
+  }
+
+  public String getId() {
+    return id;
   }
 
   @Override
   public String toString() {
-    return "TextElement [text=" + text + "]";
+    return "OnKaraokeBandEvent [action=" + action + ", id=" + id + "]";
   }
 
 }

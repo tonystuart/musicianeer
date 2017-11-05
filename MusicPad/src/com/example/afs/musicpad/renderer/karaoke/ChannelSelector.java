@@ -14,7 +14,7 @@ import java.util.Map.Entry;
 import java.util.NavigableMap;
 
 import com.example.afs.musicpad.html.Division;
-import com.example.afs.musicpad.html.Element;
+import com.example.afs.musicpad.html.Node;
 import com.example.afs.musicpad.html.TextElement;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.song.Song;
@@ -44,14 +44,14 @@ public class ChannelSelector {
     return html;
   }
 
-  private Element createBackToSongsButton() {
+  private Node createBackToSongsButton() {
     Division division = new Division();
     division.appendChild(new TextElement("Back to Songs"));
     division.appendProperty("onclick", "karaoke.onBackToSongs()");
     return division;
   }
 
-  private Element createChannelList() {
+  private Node createChannelList() {
     Division division = new Division("#channel-list");
     division.appendProperty("onclick", "karaoke.onChannelClick(event.target)");
     for (int channel = 0; channel < Midi.CHANNELS; channel++) {
@@ -63,7 +63,7 @@ public class ChannelSelector {
     return division;
   }
 
-  private Element createChannelListItem(int channel) {
+  private Node createChannelListItem(int channel) {
     List<String> programNames = song.getProgramNames(channel);
     Division division = new Division();
     division.appendProperty("data-channel-index", channel);
@@ -71,14 +71,14 @@ public class ChannelSelector {
     return division;
   }
 
-  private Element createContent() {
+  private Node createContent() {
     Division division = new Division(".content");
     division.appendChild(createLeft());
     division.appendChild(createRight());
     return division;
   }
 
-  private Element createControls() {
+  private Node createControls() {
     Division division = new Division(".controls");
     division.appendChild(createBackToSongsButton());
     division.appendChild(createStopButton());
@@ -86,12 +86,12 @@ public class ChannelSelector {
     return division;
   }
 
-  private Element createDetails() {
+  private Node createDetails() {
     Division division = new Division("#channel-details", ".details");
     return division;
   }
 
-  private Element createLeft() {
+  private Node createLeft() {
     Division division = new Division(".left");
     division.appendChild(createTitle(deviceIndex));
     division.appendChild(createChannelList());
@@ -99,27 +99,27 @@ public class ChannelSelector {
     return division;
   }
 
-  private Element createRight() {
+  private Node createRight() {
     Division division = new Division(".right");
     division.appendChild(createDetails());
     return division;
   }
 
-  private Element createSelectButton() {
+  private Node createSelectButton() {
     Division division = new Division();
     division.appendChild(new TextElement("Select this Part"));
     division.appendProperty("onclick", "karaoke.onChannelSelect()");
     return division;
   }
 
-  private Element createStopButton() {
+  private Node createStopButton() {
     Division division = new Division();
     division.appendChild(new TextElement("Stop"));
     division.appendProperty("onclick", "karaoke.onStop()");
     return division;
   }
 
-  private Element createTitle(int deviceIndex) {
+  private Node createTitle(int deviceIndex) {
     Division division = new Division(".title");
     String name = Utils.getPlayerName(deviceIndex);
     division.appendChild(new Division(name + ": Pick your Part"));

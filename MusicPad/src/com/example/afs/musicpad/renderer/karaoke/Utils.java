@@ -10,7 +10,7 @@
 package com.example.afs.musicpad.renderer.karaoke;
 
 import com.example.afs.musicpad.html.Division;
-import com.example.afs.musicpad.html.Element;
+import com.example.afs.musicpad.html.Node;
 
 public class Utils {
 
@@ -25,7 +25,7 @@ public class Utils {
       "Orange"
   };
 
-  public static Element createPair(String name, Object value) {
+  public static Node createPair(String name, Object value) {
     Division division = new Division(".detail");
     division.appendChild(new Division(".name", name));
     division.appendChild(new Division(".value", value.toString()));

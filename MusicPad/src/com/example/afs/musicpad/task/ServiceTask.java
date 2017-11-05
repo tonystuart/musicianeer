@@ -57,7 +57,11 @@ public class ServiceTask extends MessageTask {
     }
 
     public <T extends Response> void transfer(T value) {
-      queue.add(value);
+      try {
+        queue.put(value);
+      } catch (InterruptedException e) {
+        throw new RuntimeException(e);
+      }
     }
 
   }
@@ -67,9 +71,13 @@ public class ServiceTask extends MessageTask {
   public Rendezvous rendezvous = new Rendezvous();
   private Map<Class<? extends Response>, Provider<? extends Response>> localProviders = new HashMap<>();
 
-  protected ServiceTask(MessageBroker broker) {
-    super(broker);
+  public ServiceTask(MessageBroker broker, long timeoutMillis) {
+    super(broker, timeoutMillis);
     subscribe(OnServiceRequested.class, (message) -> doServiceRequested(message));
+  }
+
+  protected ServiceTask(MessageBroker broker) {
+    this(broker, NO_TIMEOUT);
   }
 
   public <T extends Response> void provide(Class<T> type, Provider<T> provider) {
@@ -78,11 +86,18 @@ public class ServiceTask extends MessageTask {
       if (serviceTask != null) {
         throw new IllegalStateException("Class " + type.getName() + " already has provider " + serviceTask.getClass().getName());
       }
+      globalProviders.put(type, this);
       localProviders.put(type, provider);
     }
   }
 
   public <T extends Response> T request(Class<T> type) {
+    synchronized (globalProviders) {
+      ServiceTask serviceTask = globalProviders.get(type);
+      if (serviceTask == null) {
+        throw new IllegalStateException("Class " + type.getName() + " does not have a provider");
+      }
+    }
     OnServiceRequested onServiceRequested = new OnServiceRequested(type, rendezvous);
     publish(onServiceRequested);
     return rendezvous.receive();

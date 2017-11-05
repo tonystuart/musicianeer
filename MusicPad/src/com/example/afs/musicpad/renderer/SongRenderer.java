@@ -20,10 +20,10 @@ import com.example.afs.musicpad.playable.Playable;
 import com.example.afs.musicpad.playable.PlayableMap;
 import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.task.MessageBroker;
-import com.example.afs.musicpad.task.MessageTask;
+import com.example.afs.musicpad.task.ServiceTask;
 import com.example.afs.musicpad.util.RandomAccessList;
 
-public abstract class SongRenderer extends MessageTask {
+public abstract class SongRenderer extends ServiceTask {
 
   private Song song;
   private NavigableMap<Integer, Integer> deviceChannelAssignments = new TreeMap<>();

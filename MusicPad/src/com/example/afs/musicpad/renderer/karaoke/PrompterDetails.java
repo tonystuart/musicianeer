@@ -14,7 +14,7 @@ import java.util.NavigableMap;
 import com.example.afs.musicpad.Command;
 import com.example.afs.musicpad.DeviceCommand;
 import com.example.afs.musicpad.html.Division;
-import com.example.afs.musicpad.html.Element;
+import com.example.afs.musicpad.html.Node;
 import com.example.afs.musicpad.playable.Playable;
 import com.example.afs.musicpad.renderer.CommandRenderer;
 import com.example.afs.musicpad.util.RandomAccessList;
@@ -28,7 +28,7 @@ public class PrompterDetails extends Division {
     appendChild(createDetailGroup());
   }
 
-  private Element createDetailGroup() {
+  private Node createDetailGroup() {
     Division division = new Division(".detail-container");
     for (Integer deviceIndex : devicePlayables.keySet()) {
       division.add(div(".detail", ".device-" + deviceIndex) // 

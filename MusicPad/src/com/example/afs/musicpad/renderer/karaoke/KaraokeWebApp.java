@@ -7,7 +7,7 @@
 // This program is made available on an "as is" basis, without
 // warranties or conditions of any kind, either express or implied.
 
-package com.example.afs.musicpad.webapp;
+package com.example.afs.musicpad.renderer.karaoke;
 
 import org.eclipse.jetty.util.log.Log;
 import org.eclipse.jetty.util.log.Logger;
@@ -15,6 +15,8 @@ import org.eclipse.jetty.util.log.Logger;
 import com.example.afs.musicpad.message.OnChannelDetails;
 import com.example.afs.musicpad.message.OnChannels;
 import com.example.afs.musicpad.message.OnDeviceReport;
+import com.example.afs.musicpad.message.OnKaraokeBandHtml;
+import com.example.afs.musicpad.message.OnKaraokeBandHtml.Action;
 import com.example.afs.musicpad.message.OnKaraokePrompter;
 import com.example.afs.musicpad.message.OnReport;
 import com.example.afs.musicpad.message.OnSongDetails;
@@ -22,8 +24,9 @@ import com.example.afs.musicpad.message.OnSongs;
 import com.example.afs.musicpad.message.OnTemplates;
 import com.example.afs.musicpad.message.OnTick;
 import com.example.afs.musicpad.message.OnTitleFilter;
-import com.example.afs.musicpad.renderer.karaoke.KaraokeRenderer;
 import com.example.afs.musicpad.task.MessageBroker;
+import com.example.afs.musicpad.webapp.WebApp;
+import com.example.afs.musicpad.webapp.WebSocket;
 
 public class KaraokeWebApp extends WebApp {
 
@@ -43,6 +46,13 @@ public class KaraokeWebApp extends WebApp {
     subscribe(OnChannelDetails.class, message -> doMessage(message));
     subscribe(OnKaraokePrompter.class, message -> doMessage(message));
     subscribe(OnTemplates.class, message -> doStatefulMessage(message));
+  }
+
+  @Override
+  public void onWebSocketConnection(WebSocket webSocket) {
+    super.onWebSocketConnection(webSocket);
+    KaraokeBand karaokeBand = request(KaraokeBand.class);
+    webSocket.write(new OnKaraokeBandHtml(Action.REPLACE_CHILDREN, "body", karaokeBand.render()));
   }
 
 }

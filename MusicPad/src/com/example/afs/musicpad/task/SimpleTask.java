@@ -15,6 +15,8 @@ import java.util.concurrent.TimeUnit;
 
 public abstract class SimpleTask<M> {
 
+  public static int NO_TIMEOUT = 0;
+
   private long timeoutMillis;
   private boolean isTerminated;
   private String name;
@@ -22,7 +24,7 @@ public abstract class SimpleTask<M> {
   private BlockingQueue<M> inputQueue = createInputQueue();
 
   protected SimpleTask() {
-    this(0);
+    this(NO_TIMEOUT);
   }
 
   protected SimpleTask(long timeoutMillis) {
@@ -64,7 +66,7 @@ public abstract class SimpleTask<M> {
   protected void run() {
     while (!isTerminated) {
       try {
-        if (timeoutMillis == 0) {
+        if (timeoutMillis == NO_TIMEOUT) {
           M message = inputQueue.take();
           processMessage(message);
         } else {

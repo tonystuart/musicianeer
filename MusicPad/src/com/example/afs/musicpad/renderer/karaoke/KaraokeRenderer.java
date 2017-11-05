@@ -14,6 +14,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.NavigableMap;
 
+import com.example.afs.musicpad.CurrentSong;
+import com.example.afs.musicpad.MidiFiles;
 import com.example.afs.musicpad.html.Option;
 import com.example.afs.musicpad.html.Template;
 import com.example.afs.musicpad.message.OnChannelDetails;
@@ -36,18 +38,26 @@ import com.example.afs.musicpad.util.RandomAccessList;
 
 public class KaraokeRenderer extends SongRenderer {
 
+  private KaraokeBand karaokeBand;
+
   public KaraokeRenderer(MessageBroker broker) {
     super(broker);
+    karaokeBand = new KaraokeBand(broker);
     subscribe(OnMidiFiles.class, message -> doMidiFiles(message));
     subscribe(OnSampleSong.class, message -> doSampleSong(message));
     subscribe(OnPickChannel.class, message -> doPickChannel(message));
     subscribe(OnSampleChannel.class, message -> doSampleChannel(message));
+    provide(KaraokeBand.class, () -> karaokeBand);
   }
 
   @Override
   public void start() {
     super.start();
     publishTemplates();
+    MidiFiles midiFiles = request(MidiFiles.class);
+    karaokeBand.setSongList(midiFiles.getMidiFiles());
+    CurrentSong currentSong = request(CurrentSong.class);
+    karaokeBand.setCurrentSong(currentSong.getSong(), currentSong.getIndex());
   }
 
   @Override

@@ -25,9 +25,10 @@ import com.example.afs.musicpad.message.TypedMessage;
 import com.example.afs.musicpad.task.Message;
 import com.example.afs.musicpad.task.MessageBroker;
 import com.example.afs.musicpad.task.MessageTask;
+import com.example.afs.musicpad.task.ServiceTask;
 import com.example.afs.musicpad.util.JsonUtilities;
 
-public class WebApp extends MessageTask {
+public class WebApp extends ServiceTask {
 
   private static final int CLIENTS = 10;
   private static final long PING_INTERVAL_MS = 5000;

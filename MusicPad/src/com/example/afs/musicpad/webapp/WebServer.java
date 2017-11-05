@@ -21,6 +21,7 @@ import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.log.Log;
 import org.eclipse.jetty.util.log.Logger;
 
+import com.example.afs.musicpad.renderer.karaoke.KaraokeWebAppFactory;
 import com.example.afs.musicpad.task.MessageBroker;
 import com.example.afs.musicpad.task.MessageTask;
 

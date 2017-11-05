@@ -9,7 +9,7 @@
 
 package com.example.afs.musicpad.html;
 
-public class Input extends Hypertext {
+public class Input extends Element {
 
   public Input(String... properties) {
     super("input", properties);

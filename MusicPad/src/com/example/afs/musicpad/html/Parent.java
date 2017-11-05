@@ -15,8 +15,9 @@ import com.example.afs.musicpad.renderer.karaoke.MidiRange;
 import com.example.afs.musicpad.util.DirectList;
 import com.example.afs.musicpad.util.RandomAccessList;
 
-public class Parent extends Hypertext implements Iterable<Element> {
-  private RandomAccessList<Element> childElements;
+public class Parent extends Element implements Iterable<Node> {
+
+  private RandomAccessList<Node> childNodes = new DirectList<>();
 
   protected Parent(String type) {
     super(type);
@@ -26,17 +27,21 @@ public class Parent extends Hypertext implements Iterable<Element> {
     super(type, properties);
   }
 
-  public Parent add(Element child) {
+  public Parent add(Node child) {
     appendChild(child);
     return this;
   }
 
-  @Override
-  public void appendChild(Element childElement) {
-    if (childElements == null) {
-      childElements = new DirectList<>();
+  public Parent addClickHandler() {
+    if (getId() == null) {
+      throw new IllegalStateException();
     }
-    childElements.add(childElement);
+    appendProperty("onclick", "karaoke.onClick(event)");
+    return this;
+  }
+
+  public void appendChild(Node childElement) {
+    childNodes.add(childElement);
   }
 
   public CheckBox checkbox(String... properties) {
@@ -44,30 +49,39 @@ public class Parent extends Hypertext implements Iterable<Element> {
   }
 
   public void clear() {
-    childElements.clear();
+    childNodes.clear();
   }
 
   public Division div(String... properties) {
     return new Division(properties);
   }
 
-  @Override
-  public Element getChild(int childIndex) {
-    return childElements.get(childIndex);
+  @SuppressWarnings("unchecked")
+  public <T> T getChild(int childIndex) {
+    return (T) childNodes.get(childIndex);
   }
 
-  @Override
   public int getChildCount() {
-    return childElements.size();
+    return childNodes.size();
   }
 
   @Override
-  public Iterator<Element> iterator() {
-    return childElements.iterator();
+  public Iterator<Node> iterator() {
+    return childNodes.iterator();
   }
 
   public Label label(String... properties) {
     return new Label(properties);
+  }
+
+  public Parent onClick(String handler) {
+    appendProperty("onclick", handler);
+    return this;
+  }
+
+  @Override
+  public Parent property(String name, Object value) {
+    return (Parent) super.property(name, value);
   }
 
   public MidiRange range(String... properties) {
@@ -77,12 +91,17 @@ public class Parent extends Hypertext implements Iterable<Element> {
   @Override
   public void render(StringBuilder s) {
     super.render(s);
-    if (childElements != null) {
-      for (Element element : childElements) {
-        element.render(s);
+    if (childNodes != null) {
+      for (Node node : childNodes) {
+        node.render(s);
       }
     }
     s.append(format("</%s>\n", getType()));
+  }
+
+  public void replaceChildren(Node node) {
+    clear();
+    appendChild(node);
   }
 
   public TextElement text(String text) {

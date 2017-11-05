@@ -9,26 +9,24 @@
 
 package com.example.afs.musicpad.html;
 
-public class TextElement extends Node {
+public abstract class Node {
 
-  private String text;
-
-  public TextElement(Object value) {
-    this.text = value.toString();
+  public String render() {
+    StringBuilder s = new StringBuilder();
+    render(s);
+    return s.toString();
   }
 
-  public String getText() {
-    return text;
-  }
-
-  @Override
-  public void render(StringBuilder s) {
-    s.append(text);
-  }
+  public abstract void render(StringBuilder s);
 
   @Override
   public String toString() {
-    return "TextElement [text=" + text + "]";
+    StringBuilder s = new StringBuilder();
+    render(s);
+    return s.toString();
   }
 
+  protected String format(String template, Object... parameters) {
+    return String.format(template, parameters);
+  }
 }

@@ -15,9 +15,9 @@ public class TableRow extends Parent {
     super("tr");
   }
 
-  public Element append(Element element) {
+  public Node append(Node node) {
     TableData tableData = new TableData();
-    tableData.appendChild(element);
+    tableData.appendChild(node);
     appendChild(tableData);
     return tableData;
   }

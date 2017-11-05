@@ -9,7 +9,7 @@
 
 package com.example.afs.musicpad.html;
 
-public class ThematicBreak extends Hypertext {
+public class ThematicBreak extends Element {
 
   public ThematicBreak() {
     super("hr");

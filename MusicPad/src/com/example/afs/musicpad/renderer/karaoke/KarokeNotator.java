@@ -17,7 +17,7 @@ import java.util.NavigableMap;
 import java.util.SortedSet;
 
 import com.example.afs.musicpad.html.Division;
-import com.example.afs.musicpad.html.Element;
+import com.example.afs.musicpad.html.Node;
 import com.example.afs.musicpad.html.TextElement;
 import com.example.afs.musicpad.playable.Playable;
 import com.example.afs.musicpad.song.Default;
@@ -62,14 +62,14 @@ public class KarokeNotator {
     return line;
   }
 
-  private Element createBackToSongsButton() {
+  private Node createBackToSongsButton() {
     Division division = new Division();
     division.appendChild(new TextElement("Back to Songs"));
     division.appendProperty("onclick", "karaoke.onBackToSongs()");
     return division;
   }
 
-  private Element createChannelPrompt(long endTick, int deviceIndex) {
+  private Node createChannelPrompt(long endTick, int deviceIndex) {
     Division division = new Division(".device-" + deviceIndex);
     boolean sustain = false;
     Playable playable = deviceSustain.get(deviceIndex);
@@ -100,7 +100,7 @@ public class KarokeNotator {
     return division;
   }
 
-  private Element createControls() {
+  private Node createControls() {
     Division division = new Division(".controls");
     division.appendChild(createBackToSongsButton());
     division.appendChild(createStopButton());
@@ -108,7 +108,7 @@ public class KarokeNotator {
     return division;
   }
 
-  private Element createInterlude(long tick) {
+  private Node createInterlude(long tick) {
     String text;
     if (tick == 0) {
       text = "[ Intro ]";
@@ -119,7 +119,7 @@ public class KarokeNotator {
     return division;
   }
 
-  private Element createLeft() {
+  private Node createLeft() {
     Division division = new Division(".left");
     division.appendChild(createTitle());
     division.appendChild(createPrompterList());
@@ -136,7 +136,7 @@ public class KarokeNotator {
     return division;
   }
 
-  private Element createPlayButton() {
+  private Node createPlayButton() {
     Division division = new Division();
     division.appendChild(new TextElement("Play"));
     division.appendProperty("onclick", "karaoke.onPlay()");
@@ -166,13 +166,13 @@ public class KarokeNotator {
     return division;
   }
 
-  private Element createRight() {
+  private Node createRight() {
     Division division = new Division(".right");
     division.appendChild(new PrompterDetails(devicePlayables));
     return division;
   }
 
-  private Element createStopButton() {
+  private Node createStopButton() {
     Division division = new Division();
     division.appendChild(new TextElement("Stop"));
     division.appendProperty("onclick", "karaoke.onStop()");
@@ -186,7 +186,7 @@ public class KarokeNotator {
     return textDivision;
   }
 
-  private Element createTitle() {
+  private Node createTitle() {
     Division division = new Division(".title", FileUtilities.getBaseName(song.getTitle()));
     return division;
   }
@@ -216,14 +216,14 @@ public class KarokeNotator {
   }
 
   private boolean isSignificant(Division parent) {
-    for (Element element : parent) {
-      if (element instanceof Division) {
-        Division division = (Division) element;
+    for (Node node : parent) {
+      if (node instanceof Division) {
+        Division division = (Division) node;
         if (isSignificant(division)) {
           return true;
         }
-      } else if (element instanceof TextElement) {
-        TextElement textElement = (TextElement) element;
+      } else if (node instanceof TextElement) {
+        TextElement textElement = (TextElement) node;
         String text = textElement.getText();
         if (text.length() > 0 && !text.equals(".")) {
           return true;
@@ -235,7 +235,7 @@ public class KarokeNotator {
 
   private void optimize(Division division) {
     Division interlude = null;
-    Iterator<Element> iterator = division.iterator();
+    Iterator<Node> iterator = division.iterator();
     while (iterator.hasNext()) {
       Division line = (Division) iterator.next();
       if (!isSignificant(line)) {

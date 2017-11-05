@@ -324,7 +324,7 @@ input[type=range]:focus::-webkit-slider-runnable-track {
     background-color: black;
 }
 
-.selected {
+.selected, .selected-song {
     color: black;
     background-color: magenta;
 }

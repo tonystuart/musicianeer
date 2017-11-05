@@ -1,6 +1,40 @@
 'use strict';
 var karaoke = karaoke || {};
 
+karaoke.onClick = function(event) {
+    const id = event.target.id;
+    console.log("onClick=" + id);
+    musicPad.send(JSON.stringify({
+        type: "OnKaraokeBandEvent",
+        action: "CLICK",
+        id: id
+    }));
+}
+
+karaoke.onKaraokeBandHtml = function(message) {
+    let matches;
+    switch (message.action) {
+    case 'REPLACE_CHILDREN':
+        musicPad.setElementHtml(message.selector, message.html);
+        break;
+    case 'ADD_CLASS':
+        matches = document.querySelectorAll(selector);
+        for (const match of matches) {
+            match.classlist.add(message.html);
+        }
+        break;
+    case 'REMOVE_CLASS':
+        matches = document.querySelectorAll(selector);
+        for (const match of matches) {
+            match.classlist.remove(message.html);
+        }
+        break;
+    }
+}
+
+
+// Legacy Implementation
+
 karaoke.clearTitleFilter = function() {
     karaoke.onTitleFilter({
         inputCode: 27
@@ -293,6 +327,9 @@ karaoke.onWebSocketClose = function() {
 karaoke.onWebSocketMessage = function(json) {
     let message = JSON.parse(json);
     switch (message.type) {
+    case 'OnKaraokeBandHtml':
+        karaoke.onKaraokeBandHtml(message);
+        break;
     case 'OnChannelDetails':
         karaoke.onChannelDetails(message);
         break;

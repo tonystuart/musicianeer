@@ -12,7 +12,7 @@ package com.example.afs.musicpad.renderer.karaoke;
 import java.io.File;
 
 import com.example.afs.musicpad.html.Division;
-import com.example.afs.musicpad.html.Element;
+import com.example.afs.musicpad.html.Node;
 import com.example.afs.musicpad.html.TextElement;
 import com.example.afs.musicpad.util.FileUtilities;
 import com.example.afs.musicpad.util.RandomAccessList;
@@ -33,7 +33,7 @@ public class SongSelector {
     return html;
   }
 
-  private Element createControls() {
+  private Node createControls() {
     Division division = new Division(".controls");
     division.appendChild(createRouletteButton());
     division.appendChild(createStopButton());
@@ -41,12 +41,12 @@ public class SongSelector {
     return division;
   }
 
-  private Element createDetails() {
-    Element division = new Division("#song-details", ".details");
+  private Node createDetails() {
+    Node division = new Division("#song-details", ".details");
     return division;
   }
 
-  private Element createLeft() {
+  private Node createLeft() {
     Division division = new Division(".left");
     division.appendChild(createTitle());
     division.appendChild(createSongList());
@@ -54,25 +54,25 @@ public class SongSelector {
     return division;
   }
 
-  private Element createRight() {
+  private Node createRight() {
     Division division = new Division(".right");
     division.appendChild(createDetails());
     return division;
   }
 
-  private Element createRouletteButton() {
+  private Node createRouletteButton() {
     Division division = new Division("Roulette");
     division.appendProperty("onclick", "karaoke.onSongRoulette()");
     return division;
   }
 
-  private Element createSelectButton() {
+  private Node createSelectButton() {
     Division division = new Division("Select this Song");
     division.appendProperty("onclick", "karaoke.onSongSelect()");
     return division;
   }
 
-  private Element createSongList() {
+  private Node createSongList() {
     Division division = new Division("#song-list");
     division.appendProperty("onclick", "karaoke.onSongClick(event.target)");
     int midiFileCount = midiFiles.size();
@@ -87,14 +87,14 @@ public class SongSelector {
     return division;
   }
 
-  private Element createStopButton() {
+  private Node createStopButton() {
     Division division = new Division();
     division.appendChild(new TextElement("Stop"));
     division.appendProperty("onclick", "karaoke.onStop()");
     return division;
   }
 
-  private Element createTitle() {
+  private Node createTitle() {
     Division division = new Division(".title", "Pick a Song");
     division.add(new Division("#song-list-filter", ".hidden"));
     return division;

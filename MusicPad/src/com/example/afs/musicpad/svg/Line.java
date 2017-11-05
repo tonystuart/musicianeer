@@ -9,9 +9,9 @@
 
 package com.example.afs.musicpad.svg;
 
-import com.example.afs.musicpad.html.Element;
+import com.example.afs.musicpad.html.Node;
 
-public class Line extends Element {
+public class Line extends Node {
 
   private int x1;
   private int y1;
