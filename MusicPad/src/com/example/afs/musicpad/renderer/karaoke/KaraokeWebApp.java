@@ -12,18 +12,10 @@ package com.example.afs.musicpad.renderer.karaoke;
 import org.eclipse.jetty.util.log.Log;
 import org.eclipse.jetty.util.log.Logger;
 
-import com.example.afs.musicpad.message.OnChannelDetails;
-import com.example.afs.musicpad.message.OnChannels;
-import com.example.afs.musicpad.message.OnDeviceReport;
+import com.example.afs.musicpad.message.OnKaraokeBandEvent;
+import com.example.afs.musicpad.message.OnKaraokeBandEvent.Action;
 import com.example.afs.musicpad.message.OnKaraokeBandHtml;
-import com.example.afs.musicpad.message.OnKaraokeBandHtml.Action;
-import com.example.afs.musicpad.message.OnKaraokePrompter;
-import com.example.afs.musicpad.message.OnReport;
-import com.example.afs.musicpad.message.OnSongDetails;
-import com.example.afs.musicpad.message.OnSongs;
-import com.example.afs.musicpad.message.OnTemplates;
 import com.example.afs.musicpad.message.OnTick;
-import com.example.afs.musicpad.message.OnTitleFilter;
 import com.example.afs.musicpad.task.MessageBroker;
 import com.example.afs.musicpad.webapp.WebApp;
 import com.example.afs.musicpad.webapp.WebSocket;
@@ -37,22 +29,13 @@ public class KaraokeWebApp extends WebApp {
     super(broker, karaokeWebAppFactory);
     setRenderer(new KaraokeRenderer(broker));
     subscribe(OnTick.class, message -> doMessage(message));
-    subscribe(OnReport.class, message -> doMessage(message));
-    subscribe(OnChannels.class, message -> doMessage(message));
-    subscribe(OnSongDetails.class, message -> doMessage(message));
-    subscribe(OnTitleFilter.class, message -> doMessage(message));
-    subscribe(OnDeviceReport.class, message -> doMessage(message));
-    subscribe(OnSongs.class, message -> doStatefulMessage(message));
-    subscribe(OnChannelDetails.class, message -> doMessage(message));
-    subscribe(OnKaraokePrompter.class, message -> doMessage(message));
-    subscribe(OnTemplates.class, message -> doStatefulMessage(message));
+    subscribe(OnKaraokeBandHtml.class, message -> doMessage(message));
   }
 
   @Override
   public void onWebSocketConnection(WebSocket webSocket) {
     super.onWebSocketConnection(webSocket);
-    KaraokeBand karaokeBand = request(KaraokeBand.class);
-    webSocket.write(new OnKaraokeBandHtml(Action.REPLACE_CHILDREN, "body", karaokeBand.render()));
+    publish(new OnKaraokeBandEvent(Action.LOAD, null));
   }
 
 }

@@ -12,8 +12,6 @@ package com.example.afs.musicpad.webapp;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -35,7 +33,6 @@ public class WebApp extends ServiceTask {
   private static final ByteBuffer PING = ByteBuffer.wrap("PING".getBytes());
 
   private WebAppFactory webAppFactory;
-  private Map<Class<? extends Message>, Message> state = new LinkedHashMap<>();
   private BlockingQueue<WebSocket> webSockets = new LinkedBlockingQueue<>(CLIENTS);
   private MessageTask rendererTask;
 
@@ -46,9 +43,6 @@ public class WebApp extends ServiceTask {
 
   public void onWebSocketConnection(WebSocket webSocket) {
     webSockets.add(webSocket);
-    for (Message stateMessage : state.values()) {
-      webSocket.write(stateMessage);
-    }
   }
 
   public void onWebSocketText(WebSocket webSocket, String json) {
@@ -94,11 +88,6 @@ public class WebApp extends ServiceTask {
     for (WebSocket webSocket : webSockets) {
       webSocket.write(message);
     }
-  }
-
-  protected void doStatefulMessage(Message message) {
-    state.put(message.getClass(), message);
-    doMessage(message);
   }
 
   protected void doSynchronize(OnSynchronize onSynchronize, WebSocket source) {

@@ -12,7 +12,7 @@ package com.example.afs.musicpad.message;
 public class OnKaraokeBandHtml extends TypedMessage {
 
   public enum Action {
-    REPLACE_CHILDREN, ADD_CLASS, REMOVE_CLASS
+    REPLACE_CHILDREN, ADD_CLASS, REMOVE_CLASS, ENSURE_VISIBLE
   }
 
   private String html;

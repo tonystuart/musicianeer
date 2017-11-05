@@ -21,12 +21,10 @@ import com.example.afs.musicpad.device.qwerty.NumericPlayableMap;
 import com.example.afs.musicpad.message.OnChannelUpdate;
 import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnDeviceCommand;
-import com.example.afs.musicpad.message.OnDeviceReport;
 import com.example.afs.musicpad.message.OnKeyDown;
 import com.example.afs.musicpad.message.OnKeyUp;
 import com.example.afs.musicpad.message.OnSampleChannel;
 import com.example.afs.musicpad.message.OnSong;
-import com.example.afs.musicpad.message.OnTitleFilter;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.playable.PlayableMap;
 import com.example.afs.musicpad.player.Player;
@@ -51,7 +49,6 @@ public class DeviceHandler extends MessageTask {
   private int channel;
   private int deviceIndex;
   private boolean isCommand;
-  private boolean isTitleFilter;
 
   private Song song;
   private Player player;
@@ -101,8 +98,6 @@ public class DeviceHandler extends MessageTask {
       isCommand = true;
     } else if (isCommand) {
       processKeyboardCommand(inputCode);
-    } else if (isTitleFilter) {
-      publish(new OnTitleFilter(inputCode));
     } else if (playableMap != null) {
       Sound sound = playableMap.onDown(inputCode);
       if (sound != null) {
@@ -119,7 +114,6 @@ public class DeviceHandler extends MessageTask {
     if (inputCode == KeyEvent.VK_NUM_LOCK) {
       isCommand = false;
     } else if (isCommand) {
-    } else if (isTitleFilter) {
     } else if (playableMap != null) {
       playableMap.onUp(inputCode);
       Sound sound = activeSounds[inputCode];
@@ -158,21 +152,11 @@ public class DeviceHandler extends MessageTask {
     Command command = message.getCommand();
     int parameter = message.getParameter();
     switch (command) {
-    case FILTER_TITLES:
-      isTitleFilter = true;
-      break;
     case PLAY:
       player.setEnabled(true);
       break;
-    case REPORT:
-      doReport();
-      break;
     case RESET:
       doReset();
-      break;
-    case SELECT_SONG:
-      // TODO: Consider making explicit (e.g. FILTER_TITLES, 0)
-      isTitleFilter = false;
       break;
     case SET_TEMPO:
       player.setPercentTempo(Range.scaleMidiToPercent(parameter));
@@ -197,9 +181,6 @@ public class DeviceHandler extends MessageTask {
       DeviceCommand deviceCommand = message.getDeviceCommand();
       int parameter = message.getParameter();
       switch (deviceCommand) {
-      case CHANNEL:
-        selectChannel(parameter);
-        break;
       case DECREASE_PLAYER_VELOCITY:
         doDecreasePlayerVelocity();
         break;
@@ -229,6 +210,9 @@ public class DeviceHandler extends MessageTask {
         break;
       case PROGRAM:
         selectProgram(parameter);
+        break;
+      case SELECT_CHANNEL:
+        selectChannel(parameter);
         break;
       case VELOCITY:
         setVelocity(parameter);
@@ -264,7 +248,6 @@ public class DeviceHandler extends MessageTask {
 
   private void doMuteBackground() {
     synthesizer.muteChannel(channel, !synthesizer.isMuted(channel));
-    reportMuteBackground();
   }
 
   private void doNextChannel() {
@@ -319,17 +302,9 @@ public class DeviceHandler extends MessageTask {
     }
   }
 
-  private void doReport() {
-    reportChannel();
-    reportProgram();
-    reportVelocity();
-    reportMuteBackground();
-  }
-
   private void doReset() {
     player.reset();
     synthesizer.muteChannel(channel, false);
-    doReport();
   }
 
   private void doSampleChannel(OnSampleChannel message) {
@@ -416,22 +391,6 @@ public class DeviceHandler extends MessageTask {
     }
   }
 
-  private void reportChannel() {
-    publish(new OnDeviceReport(DeviceCommand.CHANNEL, deviceIndex, channel));
-  }
-
-  private void reportMuteBackground() {
-    publish(new OnDeviceReport(DeviceCommand.MUTE_BACKGROUND, deviceIndex, synthesizer.isMuted(channel) ? 1 : 0));
-  }
-
-  private void reportProgram() {
-    publish(new OnDeviceReport(DeviceCommand.PROGRAM, deviceIndex, player.getProgram()));
-  }
-
-  private void reportVelocity() {
-    publish(new OnDeviceReport(DeviceCommand.VELOCITY, deviceIndex, player.getVelocity()));
-  }
-
   private void selectChannel(int channel) {
     this.channel = channel;
     if (channel == Midi.DRUM) {
@@ -448,12 +407,10 @@ public class DeviceHandler extends MessageTask {
 
   private void selectProgram(int program) {
     player.selectProgram(program);
-    reportProgram();
   }
 
   private void setVelocity(int velocity) {
     player.setVelocity(velocity);
-    reportVelocity();
   }
 
   private void updateChannel() {
@@ -465,7 +422,6 @@ public class DeviceHandler extends MessageTask {
       oldInputType = inputType;
       oldChannel = channel;
       oldOutputType = player.getOutputType();
-      reportChannel();
     }
   }
 

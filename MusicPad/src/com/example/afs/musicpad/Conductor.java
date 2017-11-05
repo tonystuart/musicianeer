@@ -16,15 +16,14 @@ import java.util.Random;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import com.example.afs.musicpad.message.OnAllTasksStarted;
 import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnDeviceAttached;
 import com.example.afs.musicpad.message.OnDeviceCommand;
 import com.example.afs.musicpad.message.OnDeviceDetached;
-import com.example.afs.musicpad.message.OnPickChannel;
 import com.example.afs.musicpad.message.OnRenderSong;
 import com.example.afs.musicpad.message.OnSampleChannel;
 import com.example.afs.musicpad.message.OnSampleSong;
+import com.example.afs.musicpad.message.OnSelectChannel;
 import com.example.afs.musicpad.message.OnSong;
 import com.example.afs.musicpad.parser.SongBuilder;
 import com.example.afs.musicpad.task.MessageBroker;
@@ -47,12 +46,8 @@ public class Conductor extends ServiceTask {
     this.midiFiles = new DirectList<>();
     listMidiFiles(midiFiles, directory);
     midiFiles.sort((o1, o2) -> o1.getPath().compareTo(o2.getPath()));
-    if (midiFiles.size() > 0) {
-      int songIndex = random.nextInt(midiFiles.size());
-      doSelectSong(songIndex);
-    }
+    doPickRandomSong();
     subscribe(OnCommand.class, message -> doCommand(message));
-    subscribe(OnAllTasksStarted.class, message -> doAllTasksStarted());
     subscribe(OnDeviceCommand.class, message -> doDeviceCommand(message));
     subscribe(OnDeviceAttached.class, message -> doDeviceAttached(message));
     subscribe(OnDeviceDetached.class, message -> doDeviceDetached(message));
@@ -60,30 +55,13 @@ public class Conductor extends ServiceTask {
     provide(CurrentSong.class, () -> currentSong);
   }
 
-  private void doAllTasksStarted() {
-    // While we're in the process of moving to an on-demand model, we have a web app that starts after this, but no republish state message, so just wait five seconds
-    //    try {
-    //      Thread.sleep(5000);
-    //    } catch (InterruptedException e) {
-    //      throw new RuntimeException(e);
-    //    }
-    //publish(new OnMidiFiles(midiFiles));
-  }
-
-  private void doChannel(int deviceIndex, int channel) {
-    deviceChannelAssignments.put(deviceIndex, channel);
-    Integer next = deviceIndexes.higher(deviceIndex);
-    if (next == null) {
-      publish(new OnRenderSong(currentSong.getSong(), deviceChannelAssignments));
-    } else {
-      publish(new OnPickChannel(currentSong.getSong(), deviceChannelAssignments, next));
-    }
-  }
-
   private void doCommand(OnCommand message) {
     Command command = message.getCommand();
     int parameter = message.getParameter();
     switch (command) {
+    case PICK_RANDOM_SONG:
+      doPickRandomSong();
+      break;
     case SAMPLE_SONG:
       doSampleSong(parameter);
       break;
@@ -107,11 +85,11 @@ public class Conductor extends ServiceTask {
     int deviceIndex = message.getDeviceIndex();
     int parameter = message.getParameter();
     switch (message.getDeviceCommand()) {
-    case CHANNEL:
-      doChannel(deviceIndex, parameter);
-      break;
     case SAMPLE_CHANNEL:
       doSampleChannel(deviceIndex, parameter);
+      break;
+    case SELECT_CHANNEL:
+      doSelectChannel(deviceIndex, parameter);
       break;
     default:
       break;
@@ -124,6 +102,13 @@ public class Conductor extends ServiceTask {
     deviceChannelAssignments.remove(deviceIndex);
   }
 
+  private void doPickRandomSong() {
+    if (midiFiles.size() > 0) {
+      int songIndex = random.nextInt(midiFiles.size());
+      doSelectSong(songIndex);
+    }
+  }
+
   private void doSampleChannel(int deviceIndex, int channel) {
     System.out.println("Sampling channel " + channel);
     publish(new OnSampleChannel(currentSong.getSong(), deviceIndex, channel));
@@ -134,7 +119,17 @@ public class Conductor extends ServiceTask {
     SongBuilder songBuilder = new SongBuilder();
     currentSong = new CurrentSong(songBuilder.createSong(midiFile), songIndex);
     System.out.println("Sampling song " + songIndex + " - " + currentSong.getSong().getTitle());
-    publish(new OnSampleSong(currentSong.getSong()));
+    publish(new OnSampleSong(currentSong));
+  }
+
+  private void doSelectChannel(int deviceIndex, int channel) {
+    deviceChannelAssignments.put(deviceIndex, channel);
+    Integer next = deviceIndexes.higher(deviceIndex);
+    if (next == null) {
+      publish(new OnRenderSong(currentSong.getSong(), deviceChannelAssignments));
+    } else {
+      publish(new OnSelectChannel(currentSong.getSong(), deviceChannelAssignments, next));
+    }
   }
 
   private void doSelectSong(int songIndex) {
@@ -145,7 +140,7 @@ public class Conductor extends ServiceTask {
     System.out.println("Selecting song " + songIndex + " - " + currentSong.getSong().getTitle());
     publish(new OnSong(currentSong.getSong()));
     if (deviceIndexes.size() > 0) {
-      publish(new OnPickChannel(currentSong.getSong(), deviceChannelAssignments, deviceIndexes.first()));
+      publish(new OnSelectChannel(currentSong.getSong(), deviceChannelAssignments, deviceIndexes.first()));
     }
   }
 

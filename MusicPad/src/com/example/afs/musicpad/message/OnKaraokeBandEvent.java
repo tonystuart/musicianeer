@@ -12,7 +12,7 @@ package com.example.afs.musicpad.message;
 public class OnKaraokeBandEvent extends TypedMessage {
 
   public enum Action {
-    CLICK
+    LOAD, CLICK
   }
 
   private Action action;

@@ -114,7 +114,7 @@ public class MidiWriter extends MessageTask implements HasSendDeviceMessage {
   private void doDeviceCommand(OnDeviceCommand message) {
     if (message.getDeviceIndex() == deviceIndex) {
       switch (message.getDeviceCommand()) {
-      case CHANNEL:
+      case SELECT_CHANNEL:
         updateChannelState(message.getParameter());
         break;
       default:

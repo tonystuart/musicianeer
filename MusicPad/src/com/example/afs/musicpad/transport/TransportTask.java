@@ -15,7 +15,6 @@ import com.example.afs.musicpad.Command;
 import com.example.afs.musicpad.message.OnChannelCommand;
 import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnRenderSong;
-import com.example.afs.musicpad.message.OnReport;
 import com.example.afs.musicpad.message.OnSampleChannel;
 import com.example.afs.musicpad.message.OnSampleSong;
 import com.example.afs.musicpad.message.OnSong;
@@ -83,9 +82,6 @@ public class TransportTask extends MessageTask {
       break;
     case PLAY:
       doPlay(parameter);
-      break;
-    case REPORT:
-      doReport();
       break;
     case RESET:
       doReset();
@@ -175,15 +171,8 @@ public class TransportTask extends MessageTask {
     publishTick(0);
   }
 
-  private void doReport() {
-    reportBackgroundVelocity();
-    reportMasterGain();
-    reportTempo();
-  }
-
   private void doReset() {
     transport.reset();
-    doReport();
   }
 
   private void doSampleChannel(OnSampleChannel message) {
@@ -194,7 +183,7 @@ public class TransportTask extends MessageTask {
 
   private void doSampleSong(OnSampleSong message) {
     transport.stop();
-    this.song = message.getSong();
+    this.song = message.getCurrentSong().getSong();
     transport.play(song.getNotes());
   }
 
@@ -243,37 +232,16 @@ public class TransportTask extends MessageTask {
     getBroker().publish(new OnTick(tick));
   }
 
-  private void reportBackgroundVelocity() {
-    int percentVelocity = transport.getPercentVelocity();
-    int backgroundVelocity = Range.scalePercentToMidi(percentVelocity);
-    publish(new OnReport(Command.SET_BACKGROUND_VELOCITY, backgroundVelocity));
-  }
-
-  private void reportMasterGain() {
-    float gain = transport.getGain();
-    int masterGain = (int) Range.scale(Midi.MIN_VALUE, Midi.MAX_VALUE, 0f, Synthesizer.MAXIMUM_GAIN, gain);
-    publish(new OnReport(Command.SET_MASTER_GAIN, masterGain));
-  }
-
-  private void reportTempo() {
-    int percentTempo = transport.getPercentTempo();
-    int tempo = Range.scalePercentToMidi(percentTempo);
-    publish(new OnReport(Command.SET_TEMPO, tempo));
-  }
-
   private void setBackgroundPercentVelocity(int percentVelocity) {
     transport.setPercentVelocity(percentVelocity);
-    reportBackgroundVelocity();
   }
 
   private void setMasterGain(float gain) {
     transport.setGain(gain);
-    reportMasterGain();
   }
 
   private void setPercentTempo(int percentTempo) {
     transport.setPercentTempo(percentTempo);
-    reportTempo();
   }
 
 }

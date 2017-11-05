@@ -144,8 +144,9 @@ input {
 }
 
 .tab {
-    display: flex;
-    flex-direction: column;
+    display: none;
+  flex-direction: row;
+  flex-grow: 1;
     position: fixed;
     top: 0;
     bottom: 0;
@@ -167,6 +168,10 @@ input {
 	/* border: 1px solid magenta; */
 	display:  flex;
 	flex-direction: column;
+}
+
+.tab-selected {
+	display: flex;
 }
 
 .details {
@@ -259,12 +264,6 @@ input[type=range]::-webkit-slider-thumb {
 
 input[type=range]:focus::-webkit-slider-runnable-track {
   background: #367ebd;
-}
-
-.content {
-	display: flex;
-	flex-direction: row;
-	flex-grow: 1;
 }
 
 .title {

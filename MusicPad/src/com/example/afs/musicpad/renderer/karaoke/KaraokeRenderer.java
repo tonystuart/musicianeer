@@ -9,25 +9,15 @@
 
 package com.example.afs.musicpad.renderer.karaoke;
 
-import java.io.File;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.NavigableMap;
 
 import com.example.afs.musicpad.CurrentSong;
 import com.example.afs.musicpad.MidiFiles;
 import com.example.afs.musicpad.html.Option;
 import com.example.afs.musicpad.html.Template;
-import com.example.afs.musicpad.message.OnChannelDetails;
-import com.example.afs.musicpad.message.OnChannels;
-import com.example.afs.musicpad.message.OnKaraokePrompter;
-import com.example.afs.musicpad.message.OnMidiFiles;
-import com.example.afs.musicpad.message.OnPickChannel;
-import com.example.afs.musicpad.message.OnSampleChannel;
-import com.example.afs.musicpad.message.OnSampleSong;
-import com.example.afs.musicpad.message.OnSongDetails;
-import com.example.afs.musicpad.message.OnSongs;
-import com.example.afs.musicpad.message.OnTemplates;
+import com.example.afs.musicpad.message.OnKaraokeBandEvent;
+import com.example.afs.musicpad.message.OnKaraokeBandHtml;
+import com.example.afs.musicpad.message.OnKaraokeBandHtml.Action;
 import com.example.afs.musicpad.midi.Instruments;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.playable.Playable;
@@ -43,56 +33,66 @@ public class KaraokeRenderer extends SongRenderer {
   public KaraokeRenderer(MessageBroker broker) {
     super(broker);
     karaokeBand = new KaraokeBand(broker);
-    subscribe(OnMidiFiles.class, message -> doMidiFiles(message));
-    subscribe(OnSampleSong.class, message -> doSampleSong(message));
-    subscribe(OnPickChannel.class, message -> doPickChannel(message));
-    subscribe(OnSampleChannel.class, message -> doSampleChannel(message));
-    provide(KaraokeBand.class, () -> karaokeBand);
+    subscribe(OnKaraokeBandEvent.class, message -> doKaraokeBandEvent(message));
   }
 
   @Override
   public void start() {
     super.start();
-    publishTemplates();
     MidiFiles midiFiles = request(MidiFiles.class);
-    karaokeBand.setSongList(midiFiles.getMidiFiles());
+    karaokeBand.renderSongList(midiFiles.getMidiFiles());
     CurrentSong currentSong = request(CurrentSong.class);
-    karaokeBand.setCurrentSong(currentSong.getSong(), currentSong.getIndex());
+    karaokeBand.selectSong(currentSong.getSong(), currentSong.getIndex());
   }
 
   @Override
   protected void render(Song song, NavigableMap<Integer, RandomAccessList<Playable>> devicePlayables, NavigableMap<Integer, Integer> deviceChannelAssignments) {
-    KarokeNotator karokeNotator = new KarokeNotator(song, devicePlayables);
-    String html = karokeNotator.render();
-    publish(new OnKaraokePrompter(html));
   }
 
-  private void doMidiFiles(OnMidiFiles message) {
-    RandomAccessList<File> midiFiles = message.getMidiFiles();
-    SongSelector songSelector = new SongSelector(midiFiles);
-    String html = songSelector.render();
-    publish(new OnSongs(html));
+  private void backToSongs() {
   }
 
-  private void doPickChannel(OnPickChannel message) {
-    ChannelSelector channelSelector = new ChannelSelector(message.getSong(), message.getDeviceIndex(), message.getDeviceChannelAssignments());
-    String html = channelSelector.render();
-    publish(new OnChannels(html));
+  private void doClick(String id) {
+    if (id.startsWith("song-index-")) {
+      sampleSong(Integer.parseInt(id.substring("song-index-".length())));
+    } else if (id.startsWith("channel-index-")) {
+      sampleChannel(Integer.parseInt(id.substring("channel-index-".length())));
+    } else {
+      switch (id) {
+      case "roulette":
+        pickRandomSong();
+        break;
+      case "stop":
+        stop();
+        break;
+      case "select-song":
+        selectSong();
+        break;
+      case "select-channel":
+        selectChannel();
+        break;
+      case "back-to-songs":
+        backToSongs();
+        break;
+      }
+    }
   }
 
-  private void doSampleChannel(OnSampleChannel message) {
-    Song song = message.getSong();
-    int channel = message.getChannel();
-    ChannelDetails channelDetails = new ChannelDetails(song, channel);
-    String html = channelDetails.render();
-    publish(new OnChannelDetails(html));
+  private void doKaraokeBandEvent(OnKaraokeBandEvent message) {
+    switch (message.getAction()) {
+    case LOAD:
+      doLoad();
+      break;
+    case CLICK:
+      doClick(message.getId());
+      break;
+    default:
+      break;
+    }
   }
 
-  private void doSampleSong(OnSampleSong message) {
-    Song song = message.getSong();
-    SongDetails songDetails = new SongDetails(song);
-    String html = songDetails.render();
-    publish(new OnSongDetails(html));
+  private void doLoad() {
+    publish(new OnKaraokeBandHtml(Action.REPLACE_CHILDREN, "body", karaokeBand.render()));
   }
 
   private String getProgramOptions() {
@@ -105,10 +105,22 @@ public class KaraokeRenderer extends SongRenderer {
     return programOptions;
   }
 
-  private void publishTemplates() {
-    List<String> templates = new LinkedList<>();
-    templates.add(getProgramOptions());
-    getBroker().publish(new OnTemplates(templates));
+  private void pickRandomSong() {
+  }
+
+  private void sampleChannel(int channelIndex) {
+  }
+
+  private void sampleSong(int songIndex) {
+  }
+
+  private void selectChannel() {
+  }
+
+  private void selectSong() {
+  }
+
+  private void stop() {
   }
 
 }

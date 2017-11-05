@@ -26,7 +26,12 @@ public class ShadowDom {
 
   private Map<String, Element> ids = new HashMap<>();
   private Map<String, Set<Element>> classes = new HashMap<>();
-  private Element root;
+  private Division root = new Division();
+
+  public Parent add(Parent parent) {
+    root.appendChild(parent);
+    return root;
+  }
 
   public void addClass(Element element, String className) {
     element.realizeClassList().add(className);
@@ -47,6 +52,10 @@ public class ShadowDom {
       }
     }
     return division;
+  }
+
+  public void ensureVisible(Element element) {
+    onEnsureVisible(element);
   }
 
   public Element getElementByClassName(String className) {
@@ -91,15 +100,14 @@ public class ShadowDom {
     }
   }
 
-  public void setRoot(Element root) {
-    this.root = root;
-  }
-
   public TextElement text(Object value) {
     return new TextElement(value);
   }
 
   protected void onAddClassName(Element element, String className) {
+  }
+
+  protected void onEnsureVisible(Element element) {
   }
 
   protected void onRemoveClassName(Element element, String className) {
