@@ -12,7 +12,6 @@ package com.example.afs.musicpad;
 import java.io.File;
 import java.util.NavigableMap;
 import java.util.NavigableSet;
-import java.util.Random;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -26,6 +25,7 @@ import com.example.afs.musicpad.message.OnSampleSong;
 import com.example.afs.musicpad.message.OnSelectChannel;
 import com.example.afs.musicpad.message.OnSong;
 import com.example.afs.musicpad.parser.SongBuilder;
+import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.task.MessageBroker;
 import com.example.afs.musicpad.task.ServiceTask;
 import com.example.afs.musicpad.util.DirectList;
@@ -34,8 +34,7 @@ import com.example.afs.musicpad.util.RandomAccessList;
 public class Conductor extends ServiceTask {
 
   private File directory;
-  private CurrentSong currentSong;
-  private Random random = new Random();
+  private Song song;
   private RandomAccessList<File> midiFiles;
   private NavigableSet<Integer> deviceIndexes = new TreeSet<>();
   private NavigableMap<Integer, Integer> deviceChannelAssignments = new TreeMap<>();
@@ -46,22 +45,18 @@ public class Conductor extends ServiceTask {
     this.midiFiles = new DirectList<>();
     listMidiFiles(midiFiles, directory);
     midiFiles.sort((o1, o2) -> o1.getPath().compareTo(o2.getPath()));
-    doPickRandomSong();
     subscribe(OnCommand.class, message -> doCommand(message));
     subscribe(OnDeviceCommand.class, message -> doDeviceCommand(message));
     subscribe(OnDeviceAttached.class, message -> doDeviceAttached(message));
     subscribe(OnDeviceDetached.class, message -> doDeviceDetached(message));
     provide(MidiFiles.class, () -> getMidiFiles());
-    provide(CurrentSong.class, () -> currentSong);
+    provide(CurrentSong.class, () -> new CurrentSong(song));
   }
 
   private void doCommand(OnCommand message) {
     Command command = message.getCommand();
     int parameter = message.getParameter();
     switch (command) {
-    case PICK_RANDOM_SONG:
-      doPickRandomSong();
-      break;
     case SAMPLE_SONG:
       doSampleSong(parameter);
       break;
@@ -102,33 +97,26 @@ public class Conductor extends ServiceTask {
     deviceChannelAssignments.remove(deviceIndex);
   }
 
-  private void doPickRandomSong() {
-    if (midiFiles.size() > 0) {
-      int songIndex = random.nextInt(midiFiles.size());
-      doSelectSong(songIndex);
-    }
-  }
-
   private void doSampleChannel(int deviceIndex, int channel) {
     System.out.println("Sampling channel " + channel);
-    publish(new OnSampleChannel(currentSong.getSong(), deviceIndex, channel));
+    publish(new OnSampleChannel(song, deviceIndex, channel));
   }
 
   private void doSampleSong(int songIndex) {
     File midiFile = midiFiles.get(songIndex);
     SongBuilder songBuilder = new SongBuilder();
-    currentSong = new CurrentSong(songBuilder.createSong(midiFile), songIndex);
-    System.out.println("Sampling song " + songIndex + " - " + currentSong.getSong().getTitle());
-    publish(new OnSampleSong(currentSong));
+    song = songBuilder.createSong(midiFile);
+    System.out.println("Sampling song " + songIndex + " - " + song.getTitle());
+    publish(new OnSampleSong(song));
   }
 
   private void doSelectChannel(int deviceIndex, int channel) {
     deviceChannelAssignments.put(deviceIndex, channel);
     Integer next = deviceIndexes.higher(deviceIndex);
     if (next == null) {
-      publish(new OnRenderSong(currentSong.getSong(), deviceChannelAssignments));
+      publish(new OnRenderSong(song, deviceChannelAssignments));
     } else {
-      publish(new OnSelectChannel(currentSong.getSong(), deviceChannelAssignments, next));
+      publish(new OnSelectChannel(song, deviceChannelAssignments, next));
     }
   }
 
@@ -136,17 +124,17 @@ public class Conductor extends ServiceTask {
     deviceChannelAssignments.clear();
     File midiFile = midiFiles.get(songIndex);
     SongBuilder songBuilder = new SongBuilder();
-    currentSong = new CurrentSong(songBuilder.createSong(midiFile), songIndex);
-    System.out.println("Selecting song " + songIndex + " - " + currentSong.getSong().getTitle());
-    publish(new OnSong(currentSong.getSong()));
+    song = songBuilder.createSong(midiFile);
+    System.out.println("Selecting song " + songIndex + " - " + song.getTitle());
+    publish(new OnSong(song));
     if (deviceIndexes.size() > 0) {
-      publish(new OnSelectChannel(currentSong.getSong(), deviceChannelAssignments, deviceIndexes.first()));
+      publish(new OnSelectChannel(song, deviceChannelAssignments, deviceIndexes.first()));
     }
   }
 
   private void doTranspose(int distance) {
-    currentSong.getSong().transposeTo(distance);
-    publish(new OnSong(currentSong.getSong()));
+    song.transposeTo(distance);
+    publish(new OnSong(song));
   }
 
   private MidiFiles getMidiFiles() {

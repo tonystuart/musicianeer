@@ -9,6 +9,7 @@
 
 package com.example.afs.musicpad.song;
 
+import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.NavigableSet;
@@ -20,6 +21,7 @@ import com.example.afs.musicpad.analyzer.TranspositionFinder;
 import com.example.afs.musicpad.midi.Instruments;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.song.Note.NoteBuilder;
+import com.example.afs.musicpad.util.FileUtilities;
 
 public class Song {
 
@@ -31,6 +33,7 @@ public class Song {
     String format(int program);
   }
 
+  private File file;
   private String title;
   private long duration;
   private int transposition;
@@ -46,13 +49,9 @@ public class Song {
   public Song() {
   }
 
-  public Song(String name) {
-    this.title = name;
-  }
-
-  public Song(String name, int transposition) {
-    this.title = name;
-    this.transposition = transposition;
+  public Song(File file) {
+    this.file = file;
+    this.title = FileUtilities.getBaseName(file.getPath());
   }
 
   public void add(Note note) {
@@ -209,6 +208,10 @@ public class Song {
 
   public long getDuration() {
     return duration;
+  }
+
+  public File getFile() {
+    return file;
   }
 
   public int getHighestMidiNote() {

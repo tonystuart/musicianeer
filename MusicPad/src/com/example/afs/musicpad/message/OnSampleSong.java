@@ -9,23 +9,23 @@
 
 package com.example.afs.musicpad.message;
 
-import com.example.afs.musicpad.CurrentSong;
+import com.example.afs.musicpad.song.Song;
 
 public class OnSampleSong extends TypedMessage {
 
-  private CurrentSong currentSong;
+  private Song song;
 
-  public OnSampleSong(CurrentSong currentSong) {
-    this.currentSong = currentSong;
+  public OnSampleSong(Song song) {
+    this.song = song;
   }
 
-  public CurrentSong getCurrentSong() {
-    return currentSong;
+  public Song getSong() {
+    return song;
   }
 
   @Override
   public String toString() {
-    return "OnSampleSong [currentSong=" + currentSong + "]";
+    return "OnSampleSong [song=" + song + "]";
   }
 
 }

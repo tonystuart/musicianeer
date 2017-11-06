@@ -17,7 +17,7 @@ import com.example.afs.musicpad.song.Song;
 public class SongBuilder {
 
   public Song createSong(File file) {
-    Song song = new Song(file.getName());
+    Song song = new Song(file);
     SongListener songListener = new SongListener(song);
     MidiParser midiParser = new MidiParser(songListener, Default.TICKS_PER_BEAT);
     midiParser.parse(file.getPath());

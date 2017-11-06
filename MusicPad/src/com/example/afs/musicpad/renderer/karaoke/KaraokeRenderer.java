@@ -9,15 +9,19 @@
 
 package com.example.afs.musicpad.renderer.karaoke;
 
+import java.io.File;
 import java.util.NavigableMap;
+import java.util.Random;
 
-import com.example.afs.musicpad.CurrentSong;
+import com.example.afs.musicpad.Command;
 import com.example.afs.musicpad.MidiFiles;
 import com.example.afs.musicpad.html.Option;
 import com.example.afs.musicpad.html.Template;
+import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnKaraokeBandEvent;
 import com.example.afs.musicpad.message.OnKaraokeBandHtml;
 import com.example.afs.musicpad.message.OnKaraokeBandHtml.Action;
+import com.example.afs.musicpad.message.OnSampleSong;
 import com.example.afs.musicpad.midi.Instruments;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.playable.Playable;
@@ -29,20 +33,22 @@ import com.example.afs.musicpad.util.RandomAccessList;
 public class KaraokeRenderer extends SongRenderer {
 
   private KaraokeBand karaokeBand;
+  private Random random = new Random();
 
   public KaraokeRenderer(MessageBroker broker) {
     super(broker);
     karaokeBand = new KaraokeBand(broker);
+    subscribe(OnSampleSong.class, message -> doSampleSong(message));
     subscribe(OnKaraokeBandEvent.class, message -> doKaraokeBandEvent(message));
   }
 
   @Override
   public void start() {
     super.start();
-    MidiFiles midiFiles = request(MidiFiles.class);
-    karaokeBand.renderSongList(midiFiles.getMidiFiles());
-    CurrentSong currentSong = request(CurrentSong.class);
-    karaokeBand.selectSong(currentSong.getSong(), currentSong.getIndex());
+    MidiFiles midiFilesResponse = request(MidiFiles.class);
+    RandomAccessList<File> midiFiles = midiFilesResponse.getMidiFiles();
+    karaokeBand.renderSongList(midiFiles);
+    pickRandomSong(midiFiles);
   }
 
   @Override
@@ -95,6 +101,10 @@ public class KaraokeRenderer extends SongRenderer {
     publish(new OnKaraokeBandHtml(Action.REPLACE_CHILDREN, "body", karaokeBand.render()));
   }
 
+  private void doSampleSong(OnSampleSong message) {
+    karaokeBand.renderSongDetails(message.getSong());
+  }
+
   private String getProgramOptions() {
     Template template = new Template("#program-options");
     for (int i = 0; i < Midi.PROGRAMS; i++) {
@@ -106,12 +116,24 @@ public class KaraokeRenderer extends SongRenderer {
   }
 
   private void pickRandomSong() {
+    MidiFiles midiFilesResponse = request(MidiFiles.class);
+    RandomAccessList<File> midiFiles = midiFilesResponse.getMidiFiles();
+    pickRandomSong(midiFiles);
+  }
+
+  private void pickRandomSong(RandomAccessList<File> midiFiles) {
+    if (midiFiles.size() > 0) {
+      int songIndex = random.nextInt(midiFiles.size());
+      sampleSong(songIndex);
+    }
   }
 
   private void sampleChannel(int channelIndex) {
   }
 
   private void sampleSong(int songIndex) {
+    karaokeBand.selectSong(songIndex);
+    publish(new OnCommand(Command.SAMPLE_SONG, songIndex));
   }
 
   private void selectChannel() {

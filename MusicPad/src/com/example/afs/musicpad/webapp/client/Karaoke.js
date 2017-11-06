@@ -18,15 +18,15 @@ karaoke.onKaraokeBandHtml = function(message) {
         musicPad.setElementHtml(message.selector, message.html);
         break;
     case 'ADD_CLASS':
-        matches = document.querySelectorAll(selector);
+        matches = document.querySelectorAll(message.selector);
         for (const match of matches) {
-            match.classlist.add(message.html);
+            match.classList.add(message.html);
         }
         break;
     case 'REMOVE_CLASS':
-        matches = document.querySelectorAll(selector);
+        matches = document.querySelectorAll(message.selector);
         for (const match of matches) {
-            match.classlist.remove(message.html);
+            match.classList.remove(message.html);
         }
         break;
     }

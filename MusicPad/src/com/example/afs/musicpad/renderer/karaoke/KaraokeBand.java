@@ -95,6 +95,11 @@ public class KaraokeBand extends ShadowDom {
     }
   }
 
+  public void renderSongDetails(Song song) {
+    Element songsRight = getElementById("song-details");
+    replaceChildren(songsRight, createSongDetails(song));
+  }
+
   public void renderSongList(RandomAccessList<File> midiFiles) {
     Division div = createSongList(midiFiles);
     Element songList = getElementById("song-list");
@@ -114,9 +119,7 @@ public class KaraokeBand extends ShadowDom {
     ensureVisible(selectedChannel);
   }
 
-  public void selectSong(Song song, int songIndex) {
-    Element songsRight = getElementById("song-details");
-    replaceChildren(songsRight, createSongDetails(song));
+  public void selectSong(int songIndex) {
     Element selectedSong = getElementByClassName("selected-song");
     if (selectedSong != null) {
       removeClass(selectedSong, "selected-song");
@@ -128,7 +131,7 @@ public class KaraokeBand extends ShadowDom {
 
   @Override
   protected void onAddClassName(Element element, String className) {
-    broker.publish(new OnKaraokeBandHtml(Action.ADD_CLASS, "#" + element.getId(), className.substring(1)));
+    broker.publish(new OnKaraokeBandHtml(Action.ADD_CLASS, "#" + element.getId(), className));
   }
 
   @Override
@@ -138,7 +141,7 @@ public class KaraokeBand extends ShadowDom {
 
   @Override
   protected void onRemoveClassName(Element element, String className) {
-    broker.publish(new OnKaraokeBandHtml(Action.REMOVE_CLASS, "#" + element.getId(), className.substring(1)));
+    broker.publish(new OnKaraokeBandHtml(Action.REMOVE_CLASS, "#" + element.getId(), className));
   }
 
   @Override

@@ -183,7 +183,7 @@ public class TransportTask extends MessageTask {
 
   private void doSampleSong(OnSampleSong message) {
     transport.stop();
-    this.song = message.getCurrentSong().getSong();
+    this.song = message.getSong();
     transport.play(song.getNotes());
   }
 

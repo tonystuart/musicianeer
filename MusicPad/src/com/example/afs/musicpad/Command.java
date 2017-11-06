@@ -20,7 +20,6 @@ public enum Command {
   INCREASE_TEMPO, //
   MOVE_BACKWARD, //
   MOVE_FORWARD, //
-  PICK_RANDOM_SONG, //
   PLAY, //
   QUIT, //
   RESET, //

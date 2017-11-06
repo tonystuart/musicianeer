@@ -15,15 +15,9 @@ import com.example.afs.musicpad.task.ServiceTask.Response;
 public class CurrentSong implements Response {
 
   private Song song;
-  private int index;
 
-  public CurrentSong(Song song, int index) {
+  public CurrentSong(Song song) {
     this.song = song;
-    this.index = index;
-  }
-
-  public int getIndex() {
-    return index;
   }
 
   public Song getSong() {
@@ -32,6 +26,6 @@ public class CurrentSong implements Response {
 
   @Override
   public String toString() {
-    return "CurrentSong [song=" + song + ", index=" + index + "]";
+    return "CurrentSong [song=" + song + "]";
   }
 }

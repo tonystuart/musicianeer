@@ -15,10 +15,7 @@ import java.util.Iterator;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import com.example.afs.musicpad.message.OnChannelCommand;
-import com.example.afs.musicpad.message.OnCommand;
-import com.example.afs.musicpad.message.OnDeviceCommand;
-import com.example.afs.musicpad.message.OnSynchronize;
+import com.example.afs.musicpad.message.OnKaraokeBandEvent;
 import com.example.afs.musicpad.message.TypedMessage;
 import com.example.afs.musicpad.task.Message;
 import com.example.afs.musicpad.task.MessageBroker;
@@ -52,18 +49,9 @@ public class WebApp extends ServiceTask {
     if (messageType == null) {
       throw new IllegalArgumentException("Missing messageType");
     }
-    if (messageType.equals(OnCommand.class.getSimpleName())) {
-      OnCommand onCommand = JsonUtilities.fromJson(json, OnCommand.class);
-      getBroker().publish(onCommand);
-    } else if (messageType.equals(OnChannelCommand.class.getSimpleName())) {
-      OnChannelCommand onChannelCommand = JsonUtilities.fromJson(json, OnChannelCommand.class);
-      getBroker().publish(onChannelCommand);
-    } else if (messageType.equals(OnDeviceCommand.class.getSimpleName())) {
-      OnDeviceCommand onDeviceCommand = JsonUtilities.fromJson(json, OnDeviceCommand.class);
-      getBroker().publish(onDeviceCommand);
-    } else if (messageType.equals(OnSynchronize.class.getSimpleName())) {
-      OnSynchronize onSynchronize = JsonUtilities.fromJson(json, OnSynchronize.class);
-      doSynchronize(onSynchronize, webSocket);
+    if (messageType.equals(OnKaraokeBandEvent.class.getSimpleName())) {
+      OnKaraokeBandEvent onKaraokeBandEvent = JsonUtilities.fromJson(json, OnKaraokeBandEvent.class);
+      publish(onKaraokeBandEvent);
     }
   }
 
@@ -87,14 +75,6 @@ public class WebApp extends ServiceTask {
   protected void doMessage(Message message) {
     for (WebSocket webSocket : webSockets) {
       webSocket.write(message);
-    }
-  }
-
-  protected void doSynchronize(OnSynchronize onSynchronize, WebSocket source) {
-    for (WebSocket webSocket : webSockets) {
-      if (webSocket != source) {
-        webSocket.write(onSynchronize);
-      }
     }
   }
 
