@@ -10,35 +10,40 @@
 package com.example.afs.musicpad.renderer.karaoke;
 
 import java.io.File;
-import java.util.NavigableMap;
 import java.util.Random;
 
 import com.example.afs.musicpad.Command;
+import com.example.afs.musicpad.DeviceCommand;
 import com.example.afs.musicpad.MidiFiles;
 import com.example.afs.musicpad.html.Option;
 import com.example.afs.musicpad.html.Template;
 import com.example.afs.musicpad.message.OnCommand;
+import com.example.afs.musicpad.message.OnDeviceCommand;
 import com.example.afs.musicpad.message.OnKaraokeBandEvent;
 import com.example.afs.musicpad.message.OnKaraokeBandHtml;
 import com.example.afs.musicpad.message.OnKaraokeBandHtml.Action;
+import com.example.afs.musicpad.message.OnRenderSong;
+import com.example.afs.musicpad.message.OnSampleChannel;
 import com.example.afs.musicpad.message.OnSampleSong;
+import com.example.afs.musicpad.message.OnSelectChannel;
 import com.example.afs.musicpad.midi.Instruments;
 import com.example.afs.musicpad.midi.Midi;
-import com.example.afs.musicpad.playable.Playable;
-import com.example.afs.musicpad.renderer.SongRenderer;
-import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.task.MessageBroker;
+import com.example.afs.musicpad.task.ServiceTask;
 import com.example.afs.musicpad.util.RandomAccessList;
 
-public class KaraokeRenderer extends SongRenderer {
+public class KaraokeController extends ServiceTask {
 
-  private KaraokeBand karaokeBand;
+  private KaraokeView karaokeView;
   private Random random = new Random();
 
-  public KaraokeRenderer(MessageBroker broker) {
+  public KaraokeController(MessageBroker broker) {
     super(broker);
-    karaokeBand = new KaraokeBand(broker);
+    karaokeView = new KaraokeView(broker);
+    subscribe(OnRenderSong.class, message -> doRenderSong(message));
     subscribe(OnSampleSong.class, message -> doSampleSong(message));
+    subscribe(OnSelectChannel.class, message -> doSelectChannel(message));
+    subscribe(OnSampleChannel.class, message -> doSampleChannel(message));
     subscribe(OnKaraokeBandEvent.class, message -> doKaraokeBandEvent(message));
   }
 
@@ -47,12 +52,8 @@ public class KaraokeRenderer extends SongRenderer {
     super.start();
     MidiFiles midiFilesResponse = request(MidiFiles.class);
     RandomAccessList<File> midiFiles = midiFilesResponse.getMidiFiles();
-    karaokeBand.renderSongList(midiFiles);
+    karaokeView.renderSongList(midiFiles);
     pickRandomSong(midiFiles);
-  }
-
-  @Override
-  protected void render(Song song, NavigableMap<Integer, RandomAccessList<Playable>> devicePlayables, NavigableMap<Integer, Integer> deviceChannelAssignments) {
   }
 
   private void backToSongs() {
@@ -98,11 +99,22 @@ public class KaraokeRenderer extends SongRenderer {
   }
 
   private void doLoad() {
-    publish(new OnKaraokeBandHtml(Action.REPLACE_CHILDREN, "body", karaokeBand.render()));
+    publish(new OnKaraokeBandHtml(Action.REPLACE_CHILDREN, "body", karaokeView.render()));
+  }
+
+  private void doRenderSong(OnRenderSong message) {
+  }
+
+  private void doSampleChannel(OnSampleChannel message) {
+    karaokeView.selectChannel(message.getSong(), message.getChannel());
   }
 
   private void doSampleSong(OnSampleSong message) {
-    karaokeBand.renderSongDetails(message.getSong());
+    karaokeView.renderSongDetails(message.getSong());
+  }
+
+  private void doSelectChannel(OnSelectChannel message) {
+    karaokeView.renderChannelList(message.getSong(), message.getDeviceIndex(), message.getDeviceChannelAssignments());
   }
 
   private String getProgramOptions() {
@@ -129,20 +141,24 @@ public class KaraokeRenderer extends SongRenderer {
   }
 
   private void sampleChannel(int channelIndex) {
+    publish(new OnDeviceCommand(DeviceCommand.SAMPLE_CHANNEL, karaokeView.getDeviceIndex(), channelIndex));
   }
 
   private void sampleSong(int songIndex) {
-    karaokeBand.selectSong(songIndex);
+    karaokeView.selectSong(songIndex);
     publish(new OnCommand(Command.SAMPLE_SONG, songIndex));
   }
 
   private void selectChannel() {
+    publish(new OnDeviceCommand(DeviceCommand.SELECT_CHANNEL, karaokeView.getDeviceIndex(), karaokeView.getChannelIndex()));
   }
 
   private void selectSong() {
+    publish(new OnCommand(Command.SELECT_SONG, karaokeView.getSongIndex()));
   }
 
   private void stop() {
+    publish(new OnCommand(Command.STOP, 0));
   }
 
 }

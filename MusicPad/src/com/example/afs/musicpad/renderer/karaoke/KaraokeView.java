@@ -22,6 +22,7 @@ import com.example.afs.musicpad.analyzer.KeySignatures;
 import com.example.afs.musicpad.device.common.DeviceHandler.OutputType;
 import com.example.afs.musicpad.html.Division;
 import com.example.afs.musicpad.html.Element;
+import com.example.afs.musicpad.html.Node;
 import com.example.afs.musicpad.html.Parent;
 import com.example.afs.musicpad.message.OnKaraokeBandHtml;
 import com.example.afs.musicpad.message.OnKaraokeBandHtml.Action;
@@ -38,13 +39,17 @@ import com.example.afs.musicpad.util.FileUtilities;
 import com.example.afs.musicpad.util.RandomAccessList;
 import com.example.afs.musicpad.util.Value;
 
-public class KaraokeBand extends ShadowDom {
+public class KaraokeView extends ShadowDom {
+
+  private int songIndex;
+  private int deviceIndex;
+  private int channelIndex;
 
   private MessageBroker broker;
 
-  public KaraokeBand(MessageBroker broker) {
+  public KaraokeView(MessageBroker broker) {
     this.broker = broker;
-    add(div("#songs", ".tab", ".tab-selected") //
+    add(div("#songs", ".tab", ".selected-tab") //
         .add(div(".left") //
             .add(div(".title") //
                 .add(text("Pick a Song")) //
@@ -66,7 +71,7 @@ public class KaraokeBand extends ShadowDom {
     add(div("#channels", ".tab") //
         .add(div(".left") //
             .add(div("#channel-title", ".title") //
-                .add(text("Red Player: Pick your Part"))) //
+                .add(text("Player: Pick your Part"))) //
             .add(div("#channel-list") //
                 .addClickHandler()) // createChannelList
             .add(div(".controls") // 
@@ -84,49 +89,58 @@ public class KaraokeBand extends ShadowDom {
     ;
   }
 
-  public void renderChannelList(Song song, NavigableMap<Integer, Integer> deviceChannelAssignments) {
+  public int getChannelIndex() {
+    return channelIndex;
+  }
+
+  public int getDeviceIndex() {
+    return deviceIndex;
+  }
+
+  public int getSongIndex() {
+    return songIndex;
+  }
+
+  public void renderChannelList(Song song, int deviceIndex, NavigableMap<Integer, Integer> deviceChannelAssignments) {
+    this.deviceIndex = deviceIndex;
     Division channelList = createChannelList(song, deviceChannelAssignments);
-    Element channelListParent = getElementById("channel-list");
+    Parent channelListParent = getElementById("channel-list");
     replaceChildren(channelListParent, channelList);
     int defaultChannel = getDefaultChannel(song, deviceChannelAssignments);
     Element selectedChannel = getElementById("channel-index-" + defaultChannel);
     if (selectedChannel != null) {
-      addClass(selectedChannel, "selected-channel");
+      selectChannel(song, defaultChannel);
     }
+    Parent channels = getElementById("channels");
+    swapClassNameByPrefix(channels, "device-", deviceIndex);
+    Parent channelTitle = getElementById("channel-title");
+    String name = Utils.getPlayerName(deviceIndex);
+    replaceChildren(channelTitle, text(name + ": Pick your Part"));
+    selectElement("channels", "selected-tab");
   }
 
   public void renderSongDetails(Song song) {
-    Element songsRight = getElementById("song-details");
+    Parent songsRight = getElementById("song-details");
     replaceChildren(songsRight, createSongDetails(song));
   }
 
   public void renderSongList(RandomAccessList<File> midiFiles) {
     Division div = createSongList(midiFiles);
-    Element songList = getElementById("song-list");
-    replaceChildren(songList, div);
+    Parent songListParent = getElementById("song-list");
+    replaceChildren(songListParent, div);
   }
 
-  public void selectChannel(Song song, int channel) {
-    Element channelDetails = createChannelDetails(song, channel);
-    Element channelDetailsParent = getElementById("channel-details");
+  public void selectChannel(Song song, int channelIndex) {
+    this.channelIndex = channelIndex;
+    Element channelDetails = createChannelDetails(song, channelIndex);
+    Parent channelDetailsParent = getElementById("channel-details");
     replaceChildren(channelDetailsParent, channelDetails);
-    Element selectedChannel = getElementByClassName("selected-channel");
-    if (selectedChannel != null) {
-      removeClass(selectedChannel, "selected-channel");
-    }
-    selectedChannel = getElementById("channel-index-" + channel);
-    addClass(selectedChannel, "selected-channel");
-    ensureVisible(selectedChannel);
+    selectElement("channel-index-" + channelIndex, "selected-channel");
   }
 
   public void selectSong(int songIndex) {
-    Element selectedSong = getElementByClassName("selected-song");
-    if (selectedSong != null) {
-      removeClass(selectedSong, "selected-song");
-    }
-    selectedSong = getElementById("song-index-" + songIndex);
-    addClass(selectedSong, "selected-song");
-    ensureVisible(selectedSong);
+    this.songIndex = songIndex;
+    selectElement("song-index-" + songIndex, "selected-song");
   }
 
   @Override
@@ -145,7 +159,7 @@ public class KaraokeBand extends ShadowDom {
   }
 
   @Override
-  protected void onReplaceChildren(Parent parent, Element newChild) {
+  protected void onReplaceChildren(Parent parent, Node newChild) {
     broker.publish(new OnKaraokeBandHtml(Action.REPLACE_CHILDREN, "#" + parent.getId(), newChild.render()));
   }
 
@@ -195,6 +209,16 @@ public class KaraokeBand extends ShadowDom {
           .add(text(name)));
     }
     return div;
+  }
+
+  private String findClassNameByPrefix(Parent parent, String prefix) {
+    Set<String> classList = parent.getClassList();
+    for (String className : classList) {
+      if (className.startsWith(prefix)) {
+        return className;
+      }
+    }
+    return null;
   }
 
   private String getChannelText(int channel, List<String> programNames, NavigableMap<Integer, Integer> deviceChannelAssignments) {
@@ -329,6 +353,35 @@ public class KaraokeBand extends ShadowDom {
             .add(text(name))) //
         .add(div(".value") //
             .add(text(value))); //
+  }
+
+  private Element selectElement(String id, String className) {
+    Element newSelection = swapClassName(id, className);
+    ensureVisible(newSelection);
+    return newSelection;
+  }
+
+  private Element swapClassName(String id, String className) {
+    Element newSelection = getElementById(id);
+    Element previousSelection = getElementByClassName(className);
+    if (previousSelection != newSelection) {
+      if (previousSelection != null) {
+        removeClass(previousSelection, className);
+      }
+      addClass(newSelection, className);
+    }
+    return newSelection;
+  }
+
+  private void swapClassNameByPrefix(Parent parent, String prefix, Object suffix) {
+    String newClassName = prefix + suffix;
+    String oldClassName = findClassNameByPrefix(parent, prefix);
+    if (!newClassName.equals(oldClassName)) {
+      if (oldClassName != null) {
+        removeClass(parent, oldClassName);
+      }
+      addClass(parent, newClassName);
+    }
   }
 
 }

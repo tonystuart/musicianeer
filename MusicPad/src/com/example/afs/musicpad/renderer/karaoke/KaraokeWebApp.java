@@ -27,7 +27,7 @@ public class KaraokeWebApp extends WebApp {
 
   public KaraokeWebApp(MessageBroker broker, KaraokeWebAppFactory karaokeWebAppFactory) {
     super(broker, karaokeWebAppFactory);
-    setRenderer(new KaraokeRenderer(broker));
+    setRenderer(new KaraokeController(broker));
     subscribe(OnTick.class, message -> doMessage(message));
     subscribe(OnKaraokeBandHtml.class, message -> doMessage(message));
   }

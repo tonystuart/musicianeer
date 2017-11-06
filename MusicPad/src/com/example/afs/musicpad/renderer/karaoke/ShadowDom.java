@@ -16,6 +16,7 @@ import java.util.Set;
 
 import com.example.afs.musicpad.html.Division;
 import com.example.afs.musicpad.html.Element;
+import com.example.afs.musicpad.html.Node;
 import com.example.afs.musicpad.html.Parent;
 import com.example.afs.musicpad.html.TextElement;
 
@@ -92,12 +93,10 @@ public class ShadowDom {
     return root.render();
   }
 
-  public void replaceChildren(Element element, Element newChild) {
-    if (element instanceof Parent) {
-      Parent parent = (Parent) element;
-      parent.replaceChildren(newChild);
-      onReplaceChildren(parent, newChild);
-    }
+  public void replaceChildren(Parent parent, Node newChild) {
+    // TODO: Remove ids and classes of old children, add ids and classes of new child
+    parent.replaceChildren(newChild);
+    onReplaceChildren(parent, newChild);
   }
 
   public TextElement text(Object value) {
@@ -113,7 +112,7 @@ public class ShadowDom {
   protected void onRemoveClassName(Element element, String className) {
   }
 
-  protected void onReplaceChildren(Parent parent, Element newChild) {
+  protected void onReplaceChildren(Parent parent, Node newChild) {
   }
 
   private Set<Element> realizeClass(String className) {
