@@ -10,7 +10,10 @@
 package com.example.afs.musicpad.renderer.karaoke;
 
 import java.io.File;
+import java.util.Map.Entry;
+import java.util.NavigableMap;
 import java.util.Random;
+import java.util.TreeMap;
 
 import com.example.afs.musicpad.Command;
 import com.example.afs.musicpad.DeviceCommand;
@@ -28,6 +31,8 @@ import com.example.afs.musicpad.message.OnSampleSong;
 import com.example.afs.musicpad.message.OnSelectChannel;
 import com.example.afs.musicpad.midi.Instruments;
 import com.example.afs.musicpad.midi.Midi;
+import com.example.afs.musicpad.playable.Playable;
+import com.example.afs.musicpad.playable.Playables;
 import com.example.afs.musicpad.task.MessageBroker;
 import com.example.afs.musicpad.task.ServiceTask;
 import com.example.afs.musicpad.util.RandomAccessList;
@@ -66,20 +71,31 @@ public class KaraokeController extends ServiceTask {
       sampleChannel(Integer.parseInt(id.substring("channel-index-".length())));
     } else {
       switch (id) {
-      case "roulette":
+      case "song-roulette":
         pickRandomSong();
         break;
-      case "stop":
+      case "song-stop":
         stop();
         break;
-      case "select-song":
+      case "song-next":
         selectSong();
         break;
-      case "select-channel":
+      case "channel-to-song":
+        backToSongs();
+        break;
+      case "channel-stop":
+        stop();
+        break;
+      case "channel-next":
         selectChannel();
         break;
-      case "back-to-songs":
+      case "prompter-to-song":
         backToSongs();
+        break;
+      case "prompter-stop":
+        stop();
+        break;
+      case "prompter-next":
         break;
       }
     }
@@ -103,6 +119,13 @@ public class KaraokeController extends ServiceTask {
   }
 
   private void doRenderSong(OnRenderSong message) {
+    NavigableMap<Integer, RandomAccessList<Playable>> devicePlayables = new TreeMap<>();
+    for (Entry<Integer, Integer> entry : message.getDeviceChannelAssignments().entrySet()) {
+      Integer deviceIndex = entry.getKey();
+      Playables playables = request(Playables.getPlayableDeviceKey(deviceIndex));
+      devicePlayables.put(deviceIndex, playables.getPlayables());
+    }
+    karaokeView.renderSong(message.getSong(), devicePlayables);
   }
 
   private void doSampleChannel(OnSampleChannel message) {

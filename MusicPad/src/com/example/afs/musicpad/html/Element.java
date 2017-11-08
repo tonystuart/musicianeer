@@ -34,7 +34,7 @@ public class Element extends Node {
       } else if (firstChar == '.') {
         addClassName(property.substring(1));
       } else {
-        processArgument(property);
+        throw new IllegalArgumentException(property);
       }
     }
   }
@@ -117,7 +117,4 @@ public class Element extends Node {
     this.id = id;
   }
 
-  protected void processArgument(String text) {
-    throw new UnsupportedOperationException("Cannot process " + text);
-  }
 }

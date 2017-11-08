@@ -7,9 +7,7 @@
 // This program is made available on an "as is" basis, without
 // warranties or conditions of any kind, either express or implied.
 
-package com.example.afs.musicpad.renderer.karaoke;
-
-import com.example.afs.musicpad.html.Range;
+package com.example.afs.musicpad.html;
 
 public class MidiRange extends Range {
   public MidiRange(String... properties) {

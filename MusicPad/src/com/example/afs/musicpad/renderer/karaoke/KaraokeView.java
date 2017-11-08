@@ -17,6 +17,8 @@ import java.util.Map.Entry;
 import java.util.NavigableMap;
 import java.util.Set;
 
+import com.example.afs.musicpad.Command;
+import com.example.afs.musicpad.DeviceCommand;
 import com.example.afs.musicpad.analyzer.KeyScore;
 import com.example.afs.musicpad.analyzer.KeySignatures;
 import com.example.afs.musicpad.device.common.DeviceHandler.OutputType;
@@ -24,12 +26,15 @@ import com.example.afs.musicpad.html.Division;
 import com.example.afs.musicpad.html.Element;
 import com.example.afs.musicpad.html.Node;
 import com.example.afs.musicpad.html.Parent;
+import com.example.afs.musicpad.html.ShadowDom;
 import com.example.afs.musicpad.message.OnKaraokeBandHtml;
 import com.example.afs.musicpad.message.OnKaraokeBandHtml.Action;
 import com.example.afs.musicpad.midi.Midi;
+import com.example.afs.musicpad.playable.Playable;
 import com.example.afs.musicpad.player.Sound;
 import com.example.afs.musicpad.player.Sounds;
 import com.example.afs.musicpad.player.Sounds.SoundCount;
+import com.example.afs.musicpad.renderer.CommandRenderer;
 import com.example.afs.musicpad.song.ChannelNotes;
 import com.example.afs.musicpad.song.Default;
 import com.example.afs.musicpad.song.Note;
@@ -57,13 +62,13 @@ public class KaraokeView extends ShadowDom {
             .add(div("#song-list") // createSongList
                 .addClickHandler()) //
             .add(div(".controls") //
-                .add(div("#roulette")//
+                .add(div("#song-roulette")//
                     .addClickHandler() //
                     .add(text("Roulette"))) //
-                .add(div("#stop")//
+                .add(div("#song-stop")//
                     .addClickHandler() //
                     .add(text("Stop"))) //
-                .add(div("#select-song") //
+                .add(div("#song-next") //
                     .addClickHandler() //
                     .add(text("Select this Song"))))) //
         .add(div(".right") //
@@ -75,18 +80,35 @@ public class KaraokeView extends ShadowDom {
             .add(div("#channel-list") //
                 .addClickHandler()) // createChannelList
             .add(div(".controls") // 
-                .add(div("#back-to-songs")//
+                .add(div("#channel-to-song")//
                     .addClickHandler() //
                     .add(text("Back to Songs"))) //
-                .add(div("#stop")//
+                .add(div("#channel-stop")//
                     .addClickHandler() //
                     .add(text("Stop"))) //
-                .add(div("#select-channel") //
+                .add(div("#channel-next") //
                     .addClickHandler() //
                     .add(text("Select this Part"))))) //
         .add(div(".right") //
-            .add(div("#channel-details", ".details")))) // createChannelDetails
-    ;
+            .add(div("#channel-details", ".details")))); // createChannelDetails
+    add(div("#prompter", ".tab") //
+        .add(div(".left") //
+            .add(div("#prompter-title", ".title") //
+                .add(text("Prompter Title"))) //
+            .add(div("#prompter-list") //
+                .addClickHandler()) //
+            .add(div(".controls") //
+                .add(div("#prompter-to-song") //
+                    .addClickHandler() //
+                    .add(text("Back to Songs"))) //
+                .add(div("#prompter-stop") //
+                    .addClickHandler() //
+                    .add(text("Stop"))) //
+                .add(div("#prompter-next") //
+                    .addClickHandler() //
+                    .add(text("Play")))))
+        .add(div(".right") //
+            .add(div("#prompter-details", ".details")))); // createPrompterDetails
   }
 
   public int getChannelIndex() {
@@ -117,6 +139,19 @@ public class KaraokeView extends ShadowDom {
     String name = Utils.getPlayerName(deviceIndex);
     replaceChildren(channelTitle, text(name + ": Pick your Part"));
     selectElement("channels", "selected-tab");
+  }
+
+  public void renderSong(Song song, NavigableMap<Integer, RandomAccessList<Playable>> devicePlayables) {
+    KaraokeNotator karaokeNotator = new KaraokeNotator(song, devicePlayables);
+    Division prompterList = karaokeNotator.createPrompterList();
+    Parent prompterListParent = getElementById("prompter-list");
+    replaceChildren(prompterListParent, prompterList, false);
+    Division prompterDetails = createPrompterDetails(devicePlayables);
+    Parent prompterDetailsParent = getElementById("prompter-details");
+    replaceChildren(prompterDetailsParent, prompterDetails);
+    Parent prompterTitle = getElementById("prompter-title");
+    replaceChildren(prompterTitle, text(song.getTitle()));
+    selectElement("prompter", "selected-tab");
   }
 
   public void renderSongDetails(Song song) {
@@ -187,6 +222,51 @@ public class KaraokeView extends ShadowDom {
     return div;
   }
 
+  private Division createPrompterDetails(NavigableMap<Integer, RandomAccessList<Playable>> devicePlayables) {
+    Division div = div(".detail-container");
+    for (Integer deviceIndex : devicePlayables.keySet()) {
+      div.add(div(".detail", ".device-" + deviceIndex) // 
+          .add(div(".name") //
+              .add(text(Utils.getPlayerName(deviceIndex) + " Volume"))) //
+          .add(div(".value") // 
+              .add(div(".value-content") //
+                  .add(range(".device-velocity-" + deviceIndex) //  
+                      .property("oninput", CommandRenderer.render(DeviceCommand.VELOCITY, deviceIndex))) //
+                  .add(div(".channel-program") //
+                      .add(div(".device-channel-" + deviceIndex) //
+                          .add(text("Channel"))) //
+                      .add(div(".device-program-" + deviceIndex) //
+                          .add(text("Instrument")))) //
+                  .add(label() // 
+                      .add(checkbox(".background-mute-" + deviceIndex) //
+                          .property("onclick", CommandRenderer.render(DeviceCommand.MUTE_BACKGROUND, deviceIndex, "this.checked ? 1 : 0"))) //
+                      .add(text("&nbsp;Mute background"))))));
+    }
+    div.add(div(".detail") //
+        .add(div(".name") //
+            .add(text("Background Volume"))) //
+        .add(div(".value") //
+            .add(div(".value-content") //
+                .add(range(".background-velocity") //
+                    .property("oninput", CommandRenderer.render(Command.SET_BACKGROUND_VELOCITY))))));
+    div.add(div(".detail") //
+        .add(div(".name") //
+            .add(text("Master Volume"))) //
+        .add(div(".value") //
+            .add(div(".value-content") //
+                .add(range(".master-gain") //
+                    .property("oninput", CommandRenderer.render(Command.SET_MASTER_GAIN))))));
+    div.add(div(".detail") //
+        .add(div(".name") //
+            .add(text("Tempo"))) //
+        .add(div(".value") //
+            .add(div(".value-content") //
+                .add(range(".tempo") //
+                    .property("oninput", CommandRenderer.render(Command.SET_TEMPO))))));
+
+    return div;
+  }
+
   private Element createSongDetails(Song song) {
     return div() //
         .add(nameValue("Title", song.getTitle())) //
@@ -209,16 +289,6 @@ public class KaraokeView extends ShadowDom {
           .add(text(name)));
     }
     return div;
-  }
-
-  private String findClassNameByPrefix(Parent parent, String prefix) {
-    Set<String> classList = parent.getClassList();
-    for (String className : classList) {
-      if (className.startsWith(prefix)) {
-        return className;
-      }
-    }
-    return null;
   }
 
   private String getChannelText(int channel, List<String> programNames, NavigableMap<Integer, Integer> deviceChannelAssignments) {
@@ -353,35 +423,6 @@ public class KaraokeView extends ShadowDom {
             .add(text(name))) //
         .add(div(".value") //
             .add(text(value))); //
-  }
-
-  private Element selectElement(String id, String className) {
-    Element newSelection = swapClassName(id, className);
-    ensureVisible(newSelection);
-    return newSelection;
-  }
-
-  private Element swapClassName(String id, String className) {
-    Element newSelection = getElementById(id);
-    Element previousSelection = getElementByClassName(className);
-    if (previousSelection != newSelection) {
-      if (previousSelection != null) {
-        removeClass(previousSelection, className);
-      }
-      addClass(newSelection, className);
-    }
-    return newSelection;
-  }
-
-  private void swapClassNameByPrefix(Parent parent, String prefix, Object suffix) {
-    String newClassName = prefix + suffix;
-    String oldClassName = findClassNameByPrefix(parent, prefix);
-    if (!newClassName.equals(oldClassName)) {
-      if (oldClassName != null) {
-        removeClass(parent, oldClassName);
-      }
-      addClass(parent, newClassName);
-    }
   }
 
 }

@@ -23,18 +23,15 @@ import com.example.afs.musicpad.playable.Playable;
 import com.example.afs.musicpad.song.Default;
 import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.song.Word;
-import com.example.afs.musicpad.util.FileUtilities;
 import com.example.afs.musicpad.util.RandomAccessList;
 
-public class KarokeNotator {
+public class KaraokeNotator {
   private Song song;
   private Map<Integer, PlayableIterator> playableIterators;
   private Map<Integer, Playable> deviceSustain = new HashMap<>();
-  private NavigableMap<Integer, RandomAccessList<Playable>> devicePlayables;
 
-  public KarokeNotator(Song song, NavigableMap<Integer, RandomAccessList<Playable>> devicePlayables) {
+  public KaraokeNotator(Song song, NavigableMap<Integer, RandomAccessList<Playable>> devicePlayables) {
     this.song = song;
-    this.devicePlayables = devicePlayables;
     this.playableIterators = new HashMap<>();
     for (Entry<Integer, RandomAccessList<Playable>> entry : devicePlayables.entrySet()) {
       int device = entry.getKey();
@@ -43,12 +40,17 @@ public class KarokeNotator {
     }
   }
 
-  public String render() {
-    Division division = new Division("#prompter", ".content", ".tab");
-    division.appendChild(createLeft());
-    division.appendChild(createRight());
-    String html = division.render();
-    return html;
+  public Division createPrompterList() {
+    Division division = new Division();
+    long tick = 0;
+    while (tick < song.getDuration()) {
+      int beatsPerMeasure = song.getBeatsPerMeasure(tick);
+      long endTick = tick + (beatsPerMeasure * Default.TICKS_PER_BEAT);
+      division.appendChild(createLine(tick, endTick));
+      tick = endTick;
+    }
+    optimize(division);
+    return division;
   }
 
   private Division convertToInterlude(Division line) {
@@ -60,13 +62,6 @@ public class KarokeNotator {
       line.appendChild(createInterlude(tick));
     }
     return line;
-  }
-
-  private Node createBackToSongsButton() {
-    Division division = new Division();
-    division.appendChild(new TextElement("Back to Songs"));
-    division.appendProperty("onclick", "karaoke.onBackToSongs()");
-    return division;
   }
 
   private Node createChannelPrompt(long endTick, int deviceIndex) {
@@ -100,14 +95,6 @@ public class KarokeNotator {
     return division;
   }
 
-  private Node createControls() {
-    Division division = new Division(".controls");
-    division.appendChild(createBackToSongsButton());
-    division.appendChild(createStopButton());
-    division.appendChild(createPlayButton());
-    return division;
-  }
-
   private Node createInterlude(long tick) {
     String text;
     if (tick == 0) {
@@ -115,15 +102,8 @@ public class KarokeNotator {
     } else {
       text = "[ Interlude ]";
     }
-    Division division = new Division("#" + String.valueOf(tick), ".interlude", text);
-    return division;
-  }
-
-  private Node createLeft() {
-    Division division = new Division(".left");
-    division.appendChild(createTitle());
-    division.appendChild(createPrompterList());
-    division.appendChild(createControls());
+    Division division = new Division("#" + String.valueOf(tick), ".interlude");
+    division.add(new TextElement(text));
     return division;
   }
 
@@ -136,13 +116,6 @@ public class KarokeNotator {
     return division;
   }
 
-  private Node createPlayButton() {
-    Division division = new Division();
-    division.appendChild(new TextElement("Play"));
-    division.appendProperty("onclick", "karaoke.onPlay()");
-    return division;
-  }
-
   private Division createPrompt(long promptBeginTick, long promptEndTick) {
     Division division = new Division("#" + String.valueOf(promptBeginTick), ".prompt");
     for (int deviceIndex : playableIterators.keySet()) {
@@ -152,43 +125,11 @@ public class KarokeNotator {
     return division;
   }
 
-  private Division createPrompterList() {
-    Division division = new Division("#prompter-list");
-    division.appendProperty("onclick", "karaoke.onPrompterClick(event)");
-    long tick = 0;
-    while (tick < song.getDuration()) {
-      int beatsPerMeasure = song.getBeatsPerMeasure(tick);
-      long endTick = tick + (beatsPerMeasure * Default.TICKS_PER_BEAT);
-      division.appendChild(createLine(tick, endTick));
-      tick = endTick;
-    }
-    optimize(division);
-    return division;
-  }
-
-  private Node createRight() {
-    Division division = new Division(".right");
-    division.appendChild(new PrompterDetails(devicePlayables));
-    return division;
-  }
-
-  private Node createStopButton() {
-    Division division = new Division();
-    division.appendChild(new TextElement("Stop"));
-    division.appendProperty("onclick", "karaoke.onStop()");
-    return division;
-  }
-
   private Division createTextPrompt(long promptBeginTick, long promptEndTick) {
     String text = getWords(promptBeginTick, promptEndTick);
     Division textDivision = new Division(".words");
     textDivision.appendChild(new TextElement(text));
     return textDivision;
-  }
-
-  private Node createTitle() {
-    Division division = new Division(".title", FileUtilities.getBaseName(song.getTitle()));
-    return division;
   }
 
   private String getText(SortedSet<Word> words) {

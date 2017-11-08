@@ -25,11 +25,11 @@ public class ServiceTask extends MessageTask {
 
   private class OnServiceRequested implements Message {
 
-    private Class<? extends Response> type;
+    private Object requestType;
     private Rendezvous rendezvous;
 
-    public <T extends Response> OnServiceRequested(Class<T> type, Rendezvous rendezvous) {
-      this.type = type;
+    public <T extends Response> OnServiceRequested(Object requestType, Rendezvous rendezvous) {
+      this.requestType = requestType;
       this.rendezvous = rendezvous;
     }
 
@@ -37,8 +37,8 @@ public class ServiceTask extends MessageTask {
       return rendezvous;
     }
 
-    public Class<? extends Response> getType() {
-      return type;
+    public Object getRequestType() {
+      return requestType;
     }
 
   }
@@ -66,10 +66,10 @@ public class ServiceTask extends MessageTask {
 
   }
 
-  private static Map<Class<? extends Response>, ServiceTask> globalProviders = new HashMap<>();
+  private static Map<Object, ServiceTask> globalProviders = new HashMap<>();
 
   public Rendezvous rendezvous = new Rendezvous();
-  private Map<Class<? extends Response>, Provider<? extends Response>> localProviders = new HashMap<>();
+  private Map<Object, Provider<? extends Response>> localProviders = new HashMap<>();
 
   public ServiceTask(MessageBroker broker, long timeoutMillis) {
     super(broker, timeoutMillis);
@@ -81,35 +81,50 @@ public class ServiceTask extends MessageTask {
   }
 
   public <T extends Response> void provide(Class<T> type, Provider<T> provider) {
-    synchronized (globalProviders) {
-      ServiceTask serviceTask = globalProviders.get(type);
-      if (serviceTask != null) {
-        throw new IllegalStateException("Class " + type.getName() + " already has provider " + serviceTask.getClass().getName());
-      }
-      globalProviders.put(type, this);
-      localProviders.put(type, provider);
-    }
+    provideObject(type, provider);
+  }
+
+  public <T extends Response> void provide(String key, Provider<T> provider) {
+    provideObject(key, provider);
   }
 
   public <T extends Response> T request(Class<T> type) {
-    synchronized (globalProviders) {
-      ServiceTask serviceTask = globalProviders.get(type);
-      if (serviceTask == null) {
-        throw new IllegalStateException("Class " + type.getName() + " does not have a provider");
-      }
-    }
-    OnServiceRequested onServiceRequested = new OnServiceRequested(type, rendezvous);
-    publish(onServiceRequested);
-    return rendezvous.receive();
+    return requestObject(type);
+  }
 
+  public <T extends Response> T request(String key) {
+    return requestObject(key);
   }
 
   private <T extends Response> void doServiceRequested(OnServiceRequested request) {
     @SuppressWarnings("unchecked")
-    Provider<T> provider = (Provider<T>) localProviders.get(request.getType());
+    Provider<T> provider = (Provider<T>) localProviders.get(request.getRequestType());
     if (provider != null) {
       T value = provider.onRequest();
       request.getRendezvous().transfer(value);
     }
+  }
+
+  private <T extends Response> void provideObject(Object requestType, Provider<T> provider) {
+    synchronized (globalProviders) {
+      ServiceTask serviceTask = globalProviders.get(requestType);
+      if (serviceTask != null) {
+        throw new IllegalStateException("Class " + requestType + " already has provider " + serviceTask.getClass().getName());
+      }
+      globalProviders.put(requestType, this);
+      localProviders.put(requestType, provider);
+    }
+  }
+
+  private <T extends Response> T requestObject(Object requestType) {
+    synchronized (globalProviders) {
+      ServiceTask serviceTask = globalProviders.get(requestType);
+      if (serviceTask == null) {
+        throw new IllegalStateException("Class " + requestType + " does not have a provider");
+      }
+    }
+    OnServiceRequested onServiceRequested = new OnServiceRequested(requestType, rendezvous);
+    publish(onServiceRequested);
+    return rendezvous.receive();
   }
 }

@@ -27,16 +27,17 @@ import com.example.afs.musicpad.message.OnSampleChannel;
 import com.example.afs.musicpad.message.OnSong;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.playable.PlayableMap;
+import com.example.afs.musicpad.playable.Playables;
 import com.example.afs.musicpad.player.Player;
 import com.example.afs.musicpad.player.Player.Action;
 import com.example.afs.musicpad.player.Sound;
 import com.example.afs.musicpad.song.ChannelNotes;
 import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.task.MessageBroker;
-import com.example.afs.musicpad.task.MessageTask;
+import com.example.afs.musicpad.task.ServiceTask;
 import com.example.afs.musicpad.util.Range;
 
-public class DeviceHandler extends MessageTask {
+public class DeviceHandler extends ServiceTask {
 
   public static enum InputType {
     ALPHA, NUMERIC, MIDI, DETACH
@@ -74,6 +75,7 @@ public class DeviceHandler extends MessageTask {
     subscribe(OnSong.class, message -> doSong(message));
     subscribe(OnSampleChannel.class, message -> doSampleChannel(message));
     subscribe(OnDeviceCommand.class, message -> doDeviceCommand(message));
+    provide(Playables.getPlayableDeviceKey(deviceIndex), () -> getPlayables());
   }
 
   public void detach() {
@@ -320,6 +322,13 @@ public class DeviceHandler extends MessageTask {
     song = message.getSong();
   }
 
+  private Playables getPlayables() {
+    if (playableMap == null) {
+      playableMap = createPlayableMap();
+    }
+    return new Playables(playableMap.getPlayables());
+  }
+
   private void processKeyboardCommand(int inputCode) {
     switch (inputCode) {
     case KeyEvent.VK_ESCAPE:
@@ -414,7 +423,6 @@ public class DeviceHandler extends MessageTask {
   }
 
   private void updateChannel() {
-    // Suppress identical messages (e.g. due to sample channel and select channel) to make life simpler downstream (e.g. karaoke renderer)
     if (!song.equals(oldSong) || inputType != oldInputType || channel != oldChannel || player.getOutputType() != oldOutputType) {
       playableMap = createPlayableMap();
       getBroker().publish(new OnChannelUpdate(deviceIndex, deviceName, channel, inputType, player.getOutputType(), playableMap));

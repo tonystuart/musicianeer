@@ -11,7 +11,6 @@ package com.example.afs.musicpad.html;
 
 import java.util.Iterator;
 
-import com.example.afs.musicpad.renderer.karaoke.MidiRange;
 import com.example.afs.musicpad.util.DirectList;
 import com.example.afs.musicpad.util.RandomAccessList;
 
@@ -106,11 +105,6 @@ public class Parent extends Element implements Iterable<Node> {
 
   public TextElement text(String text) {
     return new TextElement(text);
-  }
-
-  @Override
-  protected void processArgument(String text) {
-    appendChild(new TextElement(text));
   }
 
 }
