@@ -16,4 +16,12 @@ public class CheckBox extends Input {
     appendProperty("type", "checkbox");
   }
 
+  public CheckBox addCheckHandler() {
+    if (getId() == null) {
+      throw new IllegalStateException();
+    }
+    appendProperty("onclick", "karaoke.onInput(event, this.checked ? 1 : 0)");
+    return this;
+  }
+
 }

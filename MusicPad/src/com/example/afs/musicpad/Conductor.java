@@ -49,6 +49,7 @@ public class Conductor extends ServiceTask {
     subscribe(OnDeviceCommand.class, message -> doDeviceCommand(message));
     subscribe(OnDeviceAttached.class, message -> doDeviceAttached(message));
     subscribe(OnDeviceDetached.class, message -> doDeviceDetached(message));
+    // TODO: Subscribe to OnChannelUpdate and publish so that things like KaraokeController can render a new prompter
     provide(MidiFiles.class, () -> getMidiFiles());
     provide(CurrentSong.class, () -> new CurrentSong(song));
   }
@@ -95,6 +96,7 @@ public class Conductor extends ServiceTask {
     Integer deviceIndex = message.getDeviceIndex();
     deviceIndexes.remove(deviceIndex);
     deviceChannelAssignments.remove(deviceIndex);
+    // TODO: publish event so things like KaraokeController can render a new prompter
   }
 
   private void doSampleChannel(int deviceIndex, int channel) {

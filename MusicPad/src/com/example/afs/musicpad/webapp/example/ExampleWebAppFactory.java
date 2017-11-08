@@ -7,18 +7,20 @@
 // This program is made available on an "as is" basis, without
 // warranties or conditions of any kind, either express or implied.
 
-package com.example.afs.musicpad.webapp;
+package com.example.afs.musicpad.webapp.example;
 
 import com.example.afs.musicpad.task.MessageBroker;
+import com.example.afs.musicpad.webapp.WebApp;
+import com.example.afs.musicpad.webapp.WebAppFactory;
 
-public class StaffWebAppFactory extends WebAppFactory {
+public class ExampleWebAppFactory extends WebAppFactory {
 
-  public StaffWebAppFactory(MessageBroker broker) {
+  public ExampleWebAppFactory(MessageBroker broker) {
     super(broker);
   }
 
   @Override
   protected WebApp createWebApp(MessageBroker broker, WebAppFactory webAppFactory) {
-    return new StaffWebApp(broker, this);
+    return new ExampleWebApp(broker, this);
   }
 }

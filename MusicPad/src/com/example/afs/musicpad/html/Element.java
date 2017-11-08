@@ -43,6 +43,14 @@ public class Element extends Node {
     realizeClassList().add(className);
   }
 
+  public Element addClickHandler() {
+    if (getId() == null) {
+      throw new IllegalStateException();
+    }
+    appendProperty("onclick", "karaoke.onClick(event)");
+    return this;
+  }
+
   public void appendProperty(String name) {
     appendProperty(name, null);
   }

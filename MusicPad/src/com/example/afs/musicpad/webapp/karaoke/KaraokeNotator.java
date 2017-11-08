@@ -7,7 +7,7 @@
 // This program is made available on an "as is" basis, without
 // warranties or conditions of any kind, either express or implied.
 
-package com.example.afs.musicpad.renderer.karaoke;
+package com.example.afs.musicpad.webapp.karaoke;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -20,6 +20,7 @@ import com.example.afs.musicpad.html.Division;
 import com.example.afs.musicpad.html.Node;
 import com.example.afs.musicpad.html.TextElement;
 import com.example.afs.musicpad.playable.Playable;
+import com.example.afs.musicpad.playable.Playables;
 import com.example.afs.musicpad.song.Default;
 import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.song.Word;
@@ -30,12 +31,12 @@ public class KaraokeNotator {
   private Map<Integer, PlayableIterator> playableIterators;
   private Map<Integer, Playable> deviceSustain = new HashMap<>();
 
-  public KaraokeNotator(Song song, NavigableMap<Integer, RandomAccessList<Playable>> devicePlayables) {
+  public KaraokeNotator(Song song, NavigableMap<Integer, Playables> devicePlayables) {
     this.song = song;
     this.playableIterators = new HashMap<>();
-    for (Entry<Integer, RandomAccessList<Playable>> entry : devicePlayables.entrySet()) {
+    for (Entry<Integer, Playables> entry : devicePlayables.entrySet()) {
       int device = entry.getKey();
-      RandomAccessList<Playable> playables = entry.getValue();
+      RandomAccessList<Playable> playables = entry.getValue().getPlayables();
       playableIterators.put(device, new PlayableIterator(playables));
     }
   }
@@ -103,7 +104,7 @@ public class KaraokeNotator {
       text = "[ Interlude ]";
     }
     Division division = new Division("#" + String.valueOf(tick), ".interlude");
-    division.add(new TextElement(text));
+    division.appendChild(new TextElement(text));
     return division;
   }
 

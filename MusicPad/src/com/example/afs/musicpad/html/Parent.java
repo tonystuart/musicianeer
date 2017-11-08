@@ -31,12 +31,9 @@ public class Parent extends Element implements Iterable<Node> {
     return this;
   }
 
+  @Override
   public Parent addClickHandler() {
-    if (getId() == null) {
-      throw new IllegalStateException();
-    }
-    appendProperty("onclick", "karaoke.onClick(event)");
-    return this;
+    return (Parent) super.addClickHandler();
   }
 
   public void appendChild(Node childElement) {

@@ -2,13 +2,24 @@
 var karaoke = karaoke || {};
 
 karaoke.onClick = function(event) {
-    const id = event.target.id;
-    console.log("onClick=" + id);
-    musicPad.send(JSON.stringify({
-        type: "OnKaraokeBandEvent",
-        action: "CLICK",
-        id: id
-    }));
+  const id = event.target.id;
+  console.log("onClick=" + id);
+  musicPad.send(JSON.stringify({
+      type: "OnKaraokeBandEvent",
+      action: "CLICK",
+      id: id
+  }));
+}
+
+karaoke.onInput = function(event, value) {
+  const id = event.target.id;
+  console.log("onInput=" + id);
+  musicPad.send(JSON.stringify({
+      type: "OnKaraokeBandEvent",
+      action: "INPUT",
+      id: id,
+      value: value
+  }));
 }
 
 karaoke.onKaraokeBandHtml = function(message) {

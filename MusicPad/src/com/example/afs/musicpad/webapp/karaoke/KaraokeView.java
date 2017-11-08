@@ -7,7 +7,7 @@
 // This program is made available on an "as is" basis, without
 // warranties or conditions of any kind, either express or implied.
 
-package com.example.afs.musicpad.renderer.karaoke;
+package com.example.afs.musicpad.webapp.karaoke;
 
 import java.io.File;
 import java.util.HashSet;
@@ -17,8 +17,6 @@ import java.util.Map.Entry;
 import java.util.NavigableMap;
 import java.util.Set;
 
-import com.example.afs.musicpad.Command;
-import com.example.afs.musicpad.DeviceCommand;
 import com.example.afs.musicpad.analyzer.KeyScore;
 import com.example.afs.musicpad.analyzer.KeySignatures;
 import com.example.afs.musicpad.device.common.DeviceHandler.OutputType;
@@ -29,12 +27,12 @@ import com.example.afs.musicpad.html.Parent;
 import com.example.afs.musicpad.html.ShadowDom;
 import com.example.afs.musicpad.message.OnKaraokeBandHtml;
 import com.example.afs.musicpad.message.OnKaraokeBandHtml.Action;
+import com.example.afs.musicpad.midi.Instruments;
 import com.example.afs.musicpad.midi.Midi;
-import com.example.afs.musicpad.playable.Playable;
+import com.example.afs.musicpad.playable.Playables;
 import com.example.afs.musicpad.player.Sound;
 import com.example.afs.musicpad.player.Sounds;
 import com.example.afs.musicpad.player.Sounds.SoundCount;
-import com.example.afs.musicpad.renderer.CommandRenderer;
 import com.example.afs.musicpad.song.ChannelNotes;
 import com.example.afs.musicpad.song.Default;
 import com.example.afs.musicpad.song.Note;
@@ -141,7 +139,7 @@ public class KaraokeView extends ShadowDom {
     selectElement("channels", "selected-tab");
   }
 
-  public void renderSong(Song song, NavigableMap<Integer, RandomAccessList<Playable>> devicePlayables) {
+  public void renderSong(Song song, NavigableMap<Integer, Playables> devicePlayables) {
     KaraokeNotator karaokeNotator = new KaraokeNotator(song, devicePlayables);
     Division prompterList = karaokeNotator.createPrompterList();
     Parent prompterListParent = getElementById("prompter-list");
@@ -222,24 +220,27 @@ public class KaraokeView extends ShadowDom {
     return div;
   }
 
-  private Division createPrompterDetails(NavigableMap<Integer, RandomAccessList<Playable>> devicePlayables) {
+  private Division createPrompterDetails(NavigableMap<Integer, Playables> devicePlayables) {
     Division div = div(".detail-container");
-    for (Integer deviceIndex : devicePlayables.keySet()) {
+    for (Entry<Integer, Playables> entry : devicePlayables.entrySet()) {
+      int deviceIndex = entry.getKey();
+      int channelIndex = entry.getValue().getChannelIndex();
+      int programIndex = entry.getValue().getProgramIndex();
       div.add(div(".detail", ".device-" + deviceIndex) // 
           .add(div(".name") //
               .add(text(Utils.getPlayerName(deviceIndex) + " Volume"))) //
           .add(div(".value") // 
               .add(div(".value-content") //
-                  .add(range(".device-velocity-" + deviceIndex) //  
-                      .property("oninput", CommandRenderer.render(DeviceCommand.VELOCITY, deviceIndex))) //
+                  .add(range("#device-velocity-" + deviceIndex) //  
+                      .addInputHandler()) //
                   .add(div(".channel-program") //
                       .add(div(".device-channel-" + deviceIndex) //
-                          .add(text("Channel"))) //
+                          .add(text("Channel " + Value.toNumber(channelIndex) + ":&nbsp;"))) //
                       .add(div(".device-program-" + deviceIndex) //
-                          .add(text("Instrument")))) //
+                          .add(text(Instruments.getProgramName(programIndex))))) //
                   .add(label() // 
-                      .add(checkbox(".background-mute-" + deviceIndex) //
-                          .property("onclick", CommandRenderer.render(DeviceCommand.MUTE_BACKGROUND, deviceIndex, "this.checked ? 1 : 0"))) //
+                      .add(checkbox("#background-mute-" + deviceIndex) //
+                          .addCheckHandler()) //
                       .add(text("&nbsp;Mute background"))))));
     }
     div.add(div(".detail") //
@@ -247,22 +248,22 @@ public class KaraokeView extends ShadowDom {
             .add(text("Background Volume"))) //
         .add(div(".value") //
             .add(div(".value-content") //
-                .add(range(".background-velocity") //
-                    .property("oninput", CommandRenderer.render(Command.SET_BACKGROUND_VELOCITY))))));
+                .add(range("#background-velocity") //
+                    .addInputHandler()))));
     div.add(div(".detail") //
         .add(div(".name") //
             .add(text("Master Volume"))) //
         .add(div(".value") //
             .add(div(".value-content") //
-                .add(range(".master-gain") //
-                    .property("oninput", CommandRenderer.render(Command.SET_MASTER_GAIN))))));
+                .add(range("#master-gain") //
+                    .addInputHandler()))));
     div.add(div(".detail") //
         .add(div(".name") //
             .add(text("Tempo"))) //
         .add(div(".value") //
             .add(div(".value-content") //
-                .add(range(".tempo") //
-                    .property("oninput", CommandRenderer.render(Command.SET_TEMPO))))));
+                .add(range("#tempo") //
+                    .addInputHandler()))));
 
     return div;
   }

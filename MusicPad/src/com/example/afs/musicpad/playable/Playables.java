@@ -19,12 +19,29 @@ public class Playables implements Response {
   }
 
   private RandomAccessList<Playable> playables;
+  private int channelIndex;
+  private int programIndex;
 
-  public Playables(RandomAccessList<Playable> playables) {
+  public Playables(RandomAccessList<Playable> playables, int channelIndex, int programIndex) {
     this.playables = playables;
+    this.channelIndex = channelIndex;
+    this.programIndex = programIndex;
+  }
+
+  public int getChannelIndex() {
+    return channelIndex;
   }
 
   public RandomAccessList<Playable> getPlayables() {
     return playables;
+  }
+
+  public int getProgramIndex() {
+    return programIndex;
+  }
+
+  @Override
+  public String toString() {
+    return "Playables [channelIndex=" + channelIndex + ", programIndex=" + programIndex + ", playables=" + playables + "]";
   }
 }

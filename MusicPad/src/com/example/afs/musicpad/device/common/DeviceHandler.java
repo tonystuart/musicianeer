@@ -326,7 +326,7 @@ public class DeviceHandler extends ServiceTask {
     if (playableMap == null) {
       playableMap = createPlayableMap();
     }
-    return new Playables(playableMap.getPlayables());
+    return new Playables(playableMap.getPlayables(), channel, player.getProgram());
   }
 
   private void processKeyboardCommand(int inputCode) {

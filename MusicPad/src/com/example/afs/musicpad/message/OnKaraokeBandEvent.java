@@ -12,15 +12,21 @@ package com.example.afs.musicpad.message;
 public class OnKaraokeBandEvent extends TypedMessage {
 
   public enum Action {
-    LOAD, CLICK
+    LOAD, CLICK, INPUT
   }
 
-  private Action action;
   private String id;
+  private Action action;
+  private int value;
 
   public OnKaraokeBandEvent(Action action, String id) {
+    this(action, id, 0);
+  }
+
+  public OnKaraokeBandEvent(Action action, String id, int value) {
     this.action = action;
     this.id = id;
+    this.value = value;
   }
 
   public Action getAction() {
@@ -31,9 +37,13 @@ public class OnKaraokeBandEvent extends TypedMessage {
     return id;
   }
 
+  public int getValue() {
+    return value;
+  }
+
   @Override
   public String toString() {
-    return "OnKaraokeBandEvent [action=" + action + ", id=" + id + "]";
+    return "OnKaraokeBandEvent [action=" + action + ", id=" + id + ", value=" + value + "]";
   }
 
 }

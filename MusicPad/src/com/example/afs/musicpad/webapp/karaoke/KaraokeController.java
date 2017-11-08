@@ -7,7 +7,7 @@
 // This program is made available on an "as is" basis, without
 // warranties or conditions of any kind, either express or implied.
 
-package com.example.afs.musicpad.renderer.karaoke;
+package com.example.afs.musicpad.webapp.karaoke;
 
 import java.io.File;
 import java.util.Map.Entry;
@@ -31,7 +31,6 @@ import com.example.afs.musicpad.message.OnSampleSong;
 import com.example.afs.musicpad.message.OnSelectChannel;
 import com.example.afs.musicpad.midi.Instruments;
 import com.example.afs.musicpad.midi.Midi;
-import com.example.afs.musicpad.playable.Playable;
 import com.example.afs.musicpad.playable.Playables;
 import com.example.afs.musicpad.task.MessageBroker;
 import com.example.afs.musicpad.task.ServiceTask;
@@ -101,6 +100,10 @@ public class KaraokeController extends ServiceTask {
     }
   }
 
+  private void doInput(String id, int value) {
+    System.out.println("KaraokeController.doInput: id=" + id + ", value=" + value);
+  }
+
   private void doKaraokeBandEvent(OnKaraokeBandEvent message) {
     switch (message.getAction()) {
     case LOAD:
@@ -109,8 +112,11 @@ public class KaraokeController extends ServiceTask {
     case CLICK:
       doClick(message.getId());
       break;
-    default:
+    case INPUT:
+      doInput(message.getId(), message.getValue());
       break;
+    default:
+      throw new UnsupportedOperationException();
     }
   }
 
@@ -119,11 +125,11 @@ public class KaraokeController extends ServiceTask {
   }
 
   private void doRenderSong(OnRenderSong message) {
-    NavigableMap<Integer, RandomAccessList<Playable>> devicePlayables = new TreeMap<>();
+    NavigableMap<Integer, Playables> devicePlayables = new TreeMap<>();
     for (Entry<Integer, Integer> entry : message.getDeviceChannelAssignments().entrySet()) {
       Integer deviceIndex = entry.getKey();
       Playables playables = request(Playables.getPlayableDeviceKey(deviceIndex));
-      devicePlayables.put(deviceIndex, playables.getPlayables());
+      devicePlayables.put(deviceIndex, playables);
     }
     karaokeView.renderSong(message.getSong(), devicePlayables);
   }

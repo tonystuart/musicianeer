@@ -15,8 +15,15 @@ public class Input extends Element {
     super("input", properties);
   }
 
+  public Input addInputHandler() {
+    if (getId() == null) {
+      throw new IllegalStateException();
+    }
+    appendProperty("oninput", "karaoke.onInput(event, this.value)");
+    return this;
+  }
+
   public void setValue(Object value) {
     appendProperty("value", value);
   }
-
 }

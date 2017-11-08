@@ -7,26 +7,31 @@
 // This program is made available on an "as is" basis, without
 // warranties or conditions of any kind, either express or implied.
 
-package com.example.afs.musicpad.webapp;
+package com.example.afs.musicpad.webapp.example;
 
 import org.eclipse.jetty.util.log.Log;
 import org.eclipse.jetty.util.log.Logger;
 
-import com.example.afs.musicpad.message.OnStaffPrompter;
 import com.example.afs.musicpad.message.OnTick;
-import com.example.afs.musicpad.renderer.staff.StaffRenderer;
 import com.example.afs.musicpad.task.MessageBroker;
+import com.example.afs.musicpad.task.MessageTask;
+import com.example.afs.musicpad.webapp.WebApp;
 
-public class StaffWebApp extends WebApp {
+public class ExampleWebApp extends WebApp {
+
+  public class ExampleRenderer extends MessageTask {
+    protected ExampleRenderer(MessageBroker broker) {
+      super(broker);
+    }
+  }
 
   @SuppressWarnings("unused")
-  private static final Logger LOG = Log.getLogger(StaffWebApp.class);
+  private static final Logger LOG = Log.getLogger(ExampleWebApp.class);
 
-  public StaffWebApp(MessageBroker broker, StaffWebAppFactory staffWebAppFactory) {
-    super(broker, staffWebAppFactory);
-    setRenderer(new StaffRenderer(broker));
+  public ExampleWebApp(MessageBroker broker, ExampleWebAppFactory exampleWebAppFactory) {
+    super(broker, exampleWebAppFactory);
+    setRenderer(new ExampleRenderer(broker));
     subscribe(OnTick.class, message -> doMessage(message));
-    subscribe(OnStaffPrompter.class, message -> doMessage(message));
   }
 
 }

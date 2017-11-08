@@ -21,9 +21,10 @@ import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.log.Log;
 import org.eclipse.jetty.util.log.Logger;
 
-import com.example.afs.musicpad.renderer.karaoke.KaraokeWebAppFactory;
 import com.example.afs.musicpad.task.MessageBroker;
 import com.example.afs.musicpad.task.MessageTask;
+import com.example.afs.musicpad.webapp.example.ExampleWebAppFactory;
+import com.example.afs.musicpad.webapp.karaoke.KaraokeWebAppFactory;
 
 public class WebServer extends MessageTask {
 
@@ -31,13 +32,13 @@ public class WebServer extends MessageTask {
   private static final int PORT = 8080;
 
   private Server server;
-  private StaffWebAppFactory staffWebAppFactory;
+  private ExampleWebAppFactory exampleWebAppFactory;
   private KaraokeWebAppFactory karaokeWebAppFactory;
 
   public WebServer(MessageBroker broker) {
     super(broker);
     karaokeWebAppFactory = new KaraokeWebAppFactory(getBroker());
-    staffWebAppFactory = new StaffWebAppFactory(getBroker());
+    exampleWebAppFactory = new ExampleWebAppFactory(getBroker());
     createServer();
   }
 
@@ -91,7 +92,7 @@ public class WebServer extends MessageTask {
   }
 
   private ServletHolder createStaffServlet() {
-    WebAppServlet staffServlet = new WebAppServlet(staffWebAppFactory);
+    WebAppServlet staffServlet = new WebAppServlet(exampleWebAppFactory);
     ServletHolder servletHolder = new ServletHolder("StaffServlet", staffServlet);
     return servletHolder;
   }
