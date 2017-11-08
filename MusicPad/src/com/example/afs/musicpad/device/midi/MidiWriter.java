@@ -23,7 +23,7 @@ import com.example.afs.musicpad.device.midi.configuration.On;
 import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnDeviceCommand;
 import com.example.afs.musicpad.message.OnDeviceMessage;
-import com.example.afs.musicpad.message.OnSong;
+import com.example.afs.musicpad.message.OnSampleSong;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.song.ChannelNotes;
 import com.example.afs.musicpad.song.Song;
@@ -52,7 +52,7 @@ public class MidiWriter extends MessageTask implements HasSendDeviceMessage {
     subscribe(OnCommand.class, message -> doCommand(message));
     subscribe(OnDeviceCommand.class, message -> doDeviceCommand(message));
     subscribe(OnDeviceMessage.class, message -> doDeviceMessage(message));
-    subscribe(OnSong.class, message -> doSong(message));
+    subscribe(OnSampleSong.class, message -> doSampleSong(message));
     connectDevices();
   }
 
@@ -132,7 +132,7 @@ public class MidiWriter extends MessageTask implements HasSendDeviceMessage {
     sendDeviceMessage(port, command, channel, data1, data2);
   }
 
-  private void doSong(OnSong message) {
+  private void doSampleSong(OnSampleSong message) {
     this.song = message.getSong();
     updateChannelState(ChannelNotes.ALL_CHANNELS);
   }

@@ -19,11 +19,10 @@ import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnDeviceAttached;
 import com.example.afs.musicpad.message.OnDeviceCommand;
 import com.example.afs.musicpad.message.OnDeviceDetached;
+import com.example.afs.musicpad.message.OnPickChannel;
 import com.example.afs.musicpad.message.OnRenderSong;
 import com.example.afs.musicpad.message.OnSampleChannel;
 import com.example.afs.musicpad.message.OnSampleSong;
-import com.example.afs.musicpad.message.OnSelectChannel;
-import com.example.afs.musicpad.message.OnSong;
 import com.example.afs.musicpad.parser.SongBuilder;
 import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.task.MessageBroker;
@@ -105,6 +104,7 @@ public class Conductor extends ServiceTask {
   }
 
   private void doSampleSong(int songIndex) {
+    deviceChannelAssignments.clear();
     File midiFile = midiFiles.get(songIndex);
     SongBuilder songBuilder = new SongBuilder();
     song = songBuilder.createSong(midiFile);
@@ -118,25 +118,20 @@ public class Conductor extends ServiceTask {
     if (next == null) {
       publish(new OnRenderSong(song, deviceChannelAssignments));
     } else {
-      publish(new OnSelectChannel(song, deviceChannelAssignments, next));
+      publish(new OnPickChannel(song, deviceChannelAssignments, next));
     }
   }
 
   private void doSelectSong(int songIndex) {
-    deviceChannelAssignments.clear();
-    File midiFile = midiFiles.get(songIndex);
-    SongBuilder songBuilder = new SongBuilder();
-    song = songBuilder.createSong(midiFile);
     System.out.println("Selecting song " + songIndex + " - " + song.getTitle());
-    publish(new OnSong(song));
     if (deviceIndexes.size() > 0) {
-      publish(new OnSelectChannel(song, deviceChannelAssignments, deviceIndexes.first()));
+      publish(new OnPickChannel(song, deviceChannelAssignments, deviceIndexes.first()));
     }
   }
 
   private void doTranspose(int distance) {
     song.transposeTo(distance);
-    publish(new OnSong(song));
+    publish(new OnSampleSong(song));
   }
 
   private MidiFiles getMidiFiles() {

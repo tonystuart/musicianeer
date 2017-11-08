@@ -17,7 +17,6 @@ import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnRenderSong;
 import com.example.afs.musicpad.message.OnSampleChannel;
 import com.example.afs.musicpad.message.OnSampleSong;
-import com.example.afs.musicpad.message.OnSong;
 import com.example.afs.musicpad.message.OnTick;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.song.ChannelNotes;
@@ -37,7 +36,6 @@ public class TransportTask extends MessageTask {
   public TransportTask(MessageBroker broker, Synthesizer synthesizer) {
     super(broker);
     this.transport = new Transport(synthesizer);
-    subscribe(OnSong.class, message -> doSong(message));
     subscribe(OnCommand.class, message -> doCommand(message));
     subscribe(OnSampleSong.class, message -> doSampleSong(message));
     subscribe(OnRenderSong.class, message -> doRenderSong(message));
@@ -168,6 +166,7 @@ public class TransportTask extends MessageTask {
   }
 
   private void doRenderSong(OnRenderSong message) {
+    transport.stop();
     publishTick(0);
   }
 
@@ -182,9 +181,10 @@ public class TransportTask extends MessageTask {
   }
 
   private void doSampleSong(OnSampleSong message) {
+    song = message.getSong();
     transport.stop();
-    this.song = message.getSong();
     transport.play(song.getNotes());
+    seekPosition = 0;
   }
 
   private void doSeek(long tick) {
@@ -203,13 +203,6 @@ public class TransportTask extends MessageTask {
 
   private void doSetTempo(int tempo) {
     setPercentTempo(Range.scaleMidiToPercent(tempo));
-  }
-
-  private void doSong(OnSong message) {
-    transport.stop();
-    //transport.muteAllChannels(false);
-    song = message.getSong();
-    seekPosition = 0;
   }
 
   private void doStop(int parameter) {

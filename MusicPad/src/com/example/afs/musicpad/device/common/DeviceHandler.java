@@ -24,7 +24,7 @@ import com.example.afs.musicpad.message.OnDeviceCommand;
 import com.example.afs.musicpad.message.OnKeyDown;
 import com.example.afs.musicpad.message.OnKeyUp;
 import com.example.afs.musicpad.message.OnSampleChannel;
-import com.example.afs.musicpad.message.OnSong;
+import com.example.afs.musicpad.message.OnSampleSong;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.playable.PlayableMap;
 import com.example.afs.musicpad.playable.Playables;
@@ -72,7 +72,7 @@ public class DeviceHandler extends ServiceTask {
     this.inputType = inputType;
     this.player = new Player(synthesizer, deviceIndex);
     subscribe(OnCommand.class, message -> doCommand(message));
-    subscribe(OnSong.class, message -> doSong(message));
+    subscribe(OnSampleSong.class, message -> doSampleSong(message));
     subscribe(OnSampleChannel.class, message -> doSampleChannel(message));
     subscribe(OnDeviceCommand.class, message -> doDeviceCommand(message));
     provide(Playables.getPlayableDeviceKey(deviceIndex), () -> getPlayables());
@@ -318,7 +318,7 @@ public class DeviceHandler extends ServiceTask {
     }
   }
 
-  private void doSong(OnSong message) {
+  private void doSampleSong(OnSampleSong message) {
     song = message.getSong();
   }
 

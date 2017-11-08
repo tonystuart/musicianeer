@@ -28,7 +28,7 @@ import com.example.afs.musicpad.message.OnKaraokeBandHtml.Action;
 import com.example.afs.musicpad.message.OnRenderSong;
 import com.example.afs.musicpad.message.OnSampleChannel;
 import com.example.afs.musicpad.message.OnSampleSong;
-import com.example.afs.musicpad.message.OnSelectChannel;
+import com.example.afs.musicpad.message.OnPickChannel;
 import com.example.afs.musicpad.midi.Instruments;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.playable.Playables;
@@ -46,7 +46,7 @@ public class KaraokeController extends ServiceTask {
     karaokeView = new KaraokeView(broker);
     subscribe(OnRenderSong.class, message -> doRenderSong(message));
     subscribe(OnSampleSong.class, message -> doSampleSong(message));
-    subscribe(OnSelectChannel.class, message -> doSelectChannel(message));
+    subscribe(OnPickChannel.class, message -> doPickChannel(message));
     subscribe(OnSampleChannel.class, message -> doSampleChannel(message));
     subscribe(OnKaraokeBandEvent.class, message -> doKaraokeBandEvent(message));
   }
@@ -142,7 +142,7 @@ public class KaraokeController extends ServiceTask {
     karaokeView.renderSongDetails(message.getSong());
   }
 
-  private void doSelectChannel(OnSelectChannel message) {
+  private void doPickChannel(OnPickChannel message) {
     karaokeView.renderChannelList(message.getSong(), message.getDeviceIndex(), message.getDeviceChannelAssignments());
   }
 
