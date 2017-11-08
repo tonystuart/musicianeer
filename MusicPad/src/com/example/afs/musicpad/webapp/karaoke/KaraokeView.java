@@ -109,6 +109,10 @@ public class KaraokeView extends ShadowDom {
             .add(div("#prompter-details", ".details")))); // createPrompterDetails
   }
 
+  public void selectSongsTab() {
+    selectElement("songs", "selected-tab");
+  }
+
   public int getChannelIndex() {
     return channelIndex;
   }

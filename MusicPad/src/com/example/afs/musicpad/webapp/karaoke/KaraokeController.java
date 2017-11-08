@@ -25,13 +25,14 @@ import com.example.afs.musicpad.message.OnDeviceCommand;
 import com.example.afs.musicpad.message.OnKaraokeBandEvent;
 import com.example.afs.musicpad.message.OnKaraokeBandHtml;
 import com.example.afs.musicpad.message.OnKaraokeBandHtml.Action;
+import com.example.afs.musicpad.message.OnPickChannel;
 import com.example.afs.musicpad.message.OnRenderSong;
 import com.example.afs.musicpad.message.OnSampleChannel;
 import com.example.afs.musicpad.message.OnSampleSong;
-import com.example.afs.musicpad.message.OnPickChannel;
 import com.example.afs.musicpad.midi.Instruments;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.playable.Playables;
+import com.example.afs.musicpad.song.ChannelNotes;
 import com.example.afs.musicpad.task.MessageBroker;
 import com.example.afs.musicpad.task.ServiceTask;
 import com.example.afs.musicpad.util.RandomAccessList;
@@ -61,6 +62,8 @@ public class KaraokeController extends ServiceTask {
   }
 
   private void backToSongs() {
+    karaokeView.selectSongsTab();
+    sampleSong(karaokeView.getSongIndex());
   }
 
   private void doClick(String id) {
@@ -95,6 +98,7 @@ public class KaraokeController extends ServiceTask {
         stop();
         break;
       case "prompter-next":
+        play();
         break;
       }
     }
@@ -124,6 +128,11 @@ public class KaraokeController extends ServiceTask {
     publish(new OnKaraokeBandHtml(Action.REPLACE_CHILDREN, "body", karaokeView.render()));
   }
 
+  private void doPickChannel(OnPickChannel message) {
+    karaokeView.renderChannelList(message.getSong(), message.getDeviceIndex(), message.getDeviceChannelAssignments());
+    sampleChannel(karaokeView.getChannelIndex());
+  }
+
   private void doRenderSong(OnRenderSong message) {
     NavigableMap<Integer, Playables> devicePlayables = new TreeMap<>();
     for (Entry<Integer, Integer> entry : message.getDeviceChannelAssignments().entrySet()) {
@@ -140,10 +149,6 @@ public class KaraokeController extends ServiceTask {
 
   private void doSampleSong(OnSampleSong message) {
     karaokeView.renderSongDetails(message.getSong());
-  }
-
-  private void doPickChannel(OnPickChannel message) {
-    karaokeView.renderChannelList(message.getSong(), message.getDeviceIndex(), message.getDeviceChannelAssignments());
   }
 
   private String getProgramOptions() {
@@ -167,6 +172,10 @@ public class KaraokeController extends ServiceTask {
       int songIndex = random.nextInt(midiFiles.size());
       sampleSong(songIndex);
     }
+  }
+
+  private void play() {
+    publish(new OnCommand(Command.PLAY, ChannelNotes.ALL_CHANNELS));
   }
 
   private void sampleChannel(int channelIndex) {
