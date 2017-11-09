@@ -27,6 +27,9 @@ import com.example.afs.musicpad.song.Word;
 import com.example.afs.musicpad.util.RandomAccessList;
 
 public class KaraokeNotator {
+
+  private static final String TICK = "tick-";
+
   private Song song;
   private Map<Integer, PlayableIterator> playableIterators;
   private Map<Integer, Playable> deviceSustain = new HashMap<>();
@@ -58,7 +61,7 @@ public class KaraokeNotator {
     if (line.getChildCount() > 0) {
       Division prompt = (Division) line.getChild(0);
       String id = prompt.getId();
-      long tick = Long.parseLong(id);
+      long tick = Long.parseLong(id.substring(TICK.length()));
       line.clear();
       line.appendChild(createInterlude(tick));
     }
@@ -103,7 +106,7 @@ public class KaraokeNotator {
     } else {
       text = "[ Interlude ]";
     }
-    Division division = new Division("#" + String.valueOf(tick), ".interlude");
+    Division division = new Division("#" + TICK + String.valueOf(tick), ".interlude");
     division.appendChild(new TextElement(text));
     return division;
   }
@@ -118,7 +121,7 @@ public class KaraokeNotator {
   }
 
   private Division createPrompt(long promptBeginTick, long promptEndTick) {
-    Division division = new Division("#" + String.valueOf(promptBeginTick), ".prompt");
+    Division division = new Division("#" + TICK + String.valueOf(promptBeginTick), ".prompt");
     for (int deviceIndex : playableIterators.keySet()) {
       division.appendChild(createChannelPrompt(promptEndTick, deviceIndex));
     }

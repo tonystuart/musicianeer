@@ -144,9 +144,10 @@ input {
 }
 
 .tab {
-    display: none;
-  flex-direction: row;
-  flex-grow: 1;
+    visibility: hidden;
+    display:  flex;
+    flex-direction: row;
+    flex-grow: 1;
     position: fixed;
     top: 0;
     bottom: 0;
@@ -171,7 +172,7 @@ input {
 }
 
 .selected-tab {
-	display: flex;
+	visibility: visible;
 }
 
 .details {

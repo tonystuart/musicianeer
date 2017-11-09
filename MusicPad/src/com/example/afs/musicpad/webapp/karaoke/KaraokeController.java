@@ -71,6 +71,9 @@ public class KaraokeController extends ServiceTask {
       sampleSong(Integer.parseInt(id.substring("song-index-".length())));
     } else if (id.startsWith("channel-index-")) {
       sampleChannel(Integer.parseInt(id.substring("channel-index-".length())));
+    } else if (id.startsWith("tick-")) {
+      System.out.println("doClick: id=" + id);
+      seek(Integer.parseInt(id.substring("tick-".length())));
     } else {
       switch (id) {
       case "song-roulette":
@@ -185,6 +188,10 @@ public class KaraokeController extends ServiceTask {
   private void sampleSong(int songIndex) {
     karaokeView.selectSong(songIndex);
     publish(new OnCommand(Command.SAMPLE_SONG, songIndex));
+  }
+
+  private void seek(int tick) {
+    publish(new OnCommand(Command.SEEK, tick));
   }
 
   private void selectChannel() {

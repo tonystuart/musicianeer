@@ -93,7 +93,7 @@ public class KaraokeView extends ShadowDom {
         .add(div(".left") //
             .add(div("#prompter-title", ".title") //
                 .add(text("Prompter Title"))) //
-            .add(div("#prompter-list") //
+            .add(div("#prompter-list") // renderSong
                 .addClickHandler()) //
             .add(div(".controls") //
                 .add(div("#prompter-to-song") //
@@ -107,10 +107,6 @@ public class KaraokeView extends ShadowDom {
                     .add(text("Play")))))
         .add(div(".right") //
             .add(div("#prompter-details", ".details")))); // createPrompterDetails
-  }
-
-  public void selectSongsTab() {
-    selectElement("songs", "selected-tab");
   }
 
   public int getChannelIndex() {
@@ -178,6 +174,10 @@ public class KaraokeView extends ShadowDom {
   public void selectSong(int songIndex) {
     this.songIndex = songIndex;
     selectElement("song-index-" + songIndex, "selected-song");
+  }
+
+  public void selectSongsTab() {
+    selectElement("songs", "selected-tab");
   }
 
   @Override
@@ -253,7 +253,8 @@ public class KaraokeView extends ShadowDom {
         .add(div(".value") //
             .add(div(".value-content") //
                 .add(range("#background-velocity") //
-                    .addInputHandler()))));
+                    .addInputHandler() //
+                    .setValue(10)))));
     div.add(div(".detail") //
         .add(div(".name") //
             .add(text("Master Volume"))) //

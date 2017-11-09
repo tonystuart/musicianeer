@@ -23,7 +23,8 @@ public class Input extends Element {
     return this;
   }
 
-  public void setValue(Object value) {
+  public Input setValue(Object value) {
     appendProperty("value", value);
+    return this;
   }
 }
