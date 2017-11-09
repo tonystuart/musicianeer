@@ -11,19 +11,19 @@ package com.example.afs.musicpad;
 
 import java.io.File;
 
-import com.example.afs.musicpad.task.ServiceTask.Response;
+import com.example.afs.musicpad.playable.Playables;
+import com.example.afs.musicpad.song.Song;
+import com.example.afs.musicpad.task.ServiceTask.Service;
 import com.example.afs.musicpad.util.RandomAccessList;
 
-public class MidiFiles implements Response {
+public class Services {
 
-  private RandomAccessList<File> midiFiles;
+  public static final Service<Song> GetCurrentSong = new Service<Song>() {
+  };
 
-  public MidiFiles(RandomAccessList<File> midiFiles) {
-    this.midiFiles = midiFiles;
-  }
+  public static final Service<RandomAccessList<File>> GetMidiFiles = new Service<RandomAccessList<File>>() {
+  };
 
-  public RandomAccessList<File> getMidiFiles() {
-    return midiFiles;
-  }
-
+  public static Service<Playables> GetPlayables = new Service<Playables>() {
+  };
 }

@@ -49,8 +49,8 @@ public class Conductor extends ServiceTask {
     subscribe(OnDeviceAttached.class, message -> doDeviceAttached(message));
     subscribe(OnDeviceDetached.class, message -> doDeviceDetached(message));
     // TODO: Subscribe to OnChannelUpdate and publish so that things like KaraokeController can render a new prompter
-    provide(MidiFiles.class, () -> getMidiFiles());
-    provide(CurrentSong.class, () -> new CurrentSong(song));
+    provide(Services.GetMidiFiles, () -> midiFiles);
+    provide(Services.GetCurrentSong, () -> song);
   }
 
   private void doCommand(OnCommand message) {
@@ -132,10 +132,6 @@ public class Conductor extends ServiceTask {
   private void doTranspose(int distance) {
     song.transposeTo(distance);
     publish(new OnSampleSong(song));
-  }
-
-  private MidiFiles getMidiFiles() {
-    return new MidiFiles(midiFiles);
   }
 
   private boolean isMidiFile(String name) {

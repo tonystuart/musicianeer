@@ -17,7 +17,7 @@ import java.util.TreeMap;
 
 import com.example.afs.musicpad.Command;
 import com.example.afs.musicpad.DeviceCommand;
-import com.example.afs.musicpad.MidiFiles;
+import com.example.afs.musicpad.Services;
 import com.example.afs.musicpad.html.Option;
 import com.example.afs.musicpad.html.Template;
 import com.example.afs.musicpad.message.OnCommand;
@@ -32,6 +32,7 @@ import com.example.afs.musicpad.message.OnSampleSong;
 import com.example.afs.musicpad.midi.Instruments;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.playable.Playables;
+import com.example.afs.musicpad.playable.Playables.PlayablesService;
 import com.example.afs.musicpad.song.ChannelNotes;
 import com.example.afs.musicpad.task.MessageBroker;
 import com.example.afs.musicpad.task.ServiceTask;
@@ -55,8 +56,7 @@ public class KaraokeController extends ServiceTask {
   @Override
   public void start() {
     super.start();
-    MidiFiles midiFilesResponse = request(MidiFiles.class);
-    RandomAccessList<File> midiFiles = midiFilesResponse.getMidiFiles();
+    RandomAccessList<File> midiFiles = request(Services.GetMidiFiles);
     karaokeView.renderSongList(midiFiles);
     pickRandomSong(midiFiles);
   }
@@ -140,7 +140,7 @@ public class KaraokeController extends ServiceTask {
     NavigableMap<Integer, Playables> devicePlayables = new TreeMap<>();
     for (Entry<Integer, Integer> entry : message.getDeviceChannelAssignments().entrySet()) {
       Integer deviceIndex = entry.getKey();
-      Playables playables = request(Playables.getPlayableDeviceKey(deviceIndex));
+      Playables playables = request(new PlayablesService(deviceIndex));
       devicePlayables.put(deviceIndex, playables);
     }
     karaokeView.renderSong(message.getSong(), devicePlayables);
@@ -165,8 +165,7 @@ public class KaraokeController extends ServiceTask {
   }
 
   private void pickRandomSong() {
-    MidiFiles midiFilesResponse = request(MidiFiles.class);
-    RandomAccessList<File> midiFiles = midiFilesResponse.getMidiFiles();
+    RandomAccessList<File> midiFiles = request(Services.GetMidiFiles);
     pickRandomSong(midiFiles);
   }
 

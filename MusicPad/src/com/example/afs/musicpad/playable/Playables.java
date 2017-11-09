@@ -9,10 +9,44 @@
 
 package com.example.afs.musicpad.playable;
 
-import com.example.afs.musicpad.task.ServiceTask.Response;
+import com.example.afs.musicpad.task.ServiceTask.Service;
 import com.example.afs.musicpad.util.RandomAccessList;
 
-public class Playables implements Response {
+public class Playables {
+
+  public static class PlayablesService implements Service<Playables> {
+    private int deviceIndex;
+
+    public PlayablesService(int deviceIndex) {
+      this.deviceIndex = deviceIndex;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      if (this == obj) {
+        return true;
+      }
+      if (obj == null) {
+        return false;
+      }
+      if (getClass() != obj.getClass()) {
+        return false;
+      }
+      PlayablesService other = (PlayablesService) obj;
+      if (deviceIndex != other.deviceIndex) {
+        return false;
+      }
+      return true;
+    }
+
+    @Override
+    public int hashCode() {
+      final int prime = 31;
+      int result = 1;
+      result = prime * result + deviceIndex;
+      return result;
+    }
+  }
 
   public static String getPlayableDeviceKey(int deviceIndex) {
     return "playables-" + deviceIndex;
