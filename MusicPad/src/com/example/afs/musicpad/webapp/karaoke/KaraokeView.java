@@ -24,6 +24,7 @@ import com.example.afs.musicpad.html.Division;
 import com.example.afs.musicpad.html.Element;
 import com.example.afs.musicpad.html.Node;
 import com.example.afs.musicpad.html.Parent;
+import com.example.afs.musicpad.html.Range;
 import com.example.afs.musicpad.html.ShadowDom;
 import com.example.afs.musicpad.message.OnKaraokeBandHtml;
 import com.example.afs.musicpad.message.OnKaraokeBandHtml.Action;
@@ -180,6 +181,11 @@ public class KaraokeView extends ShadowDom {
     selectElement("songs", "selected-tab");
   }
 
+  public void setBackgroundVelocity(int value) {
+    Range backgroundVelocity = getElementById("background-velocity");
+    setProperty(backgroundVelocity, "value", value);
+  }
+
   @Override
   protected void onAddClassName(Element element, String className) {
     broker.publish(new OnKaraokeBandHtml(Action.ADD_CLASS, "#" + element.getId(), className));
@@ -198,6 +204,11 @@ public class KaraokeView extends ShadowDom {
   @Override
   protected void onReplaceChildren(Parent parent, Node newChild) {
     broker.publish(new OnKaraokeBandHtml(Action.REPLACE_CHILDREN, "#" + parent.getId(), newChild.render()));
+  }
+
+  @Override
+  protected void onSetProperty(Element element, String name, Object value) {
+    broker.publish(new OnKaraokeBandHtml(Action.SET_PROPERTY, "#" + element.getId(), name, value.toString()));
   }
 
   private Element createChannelDetails(Song song, int channel) {
@@ -253,8 +264,7 @@ public class KaraokeView extends ShadowDom {
         .add(div(".value") //
             .add(div(".value-content") //
                 .add(range("#background-velocity") //
-                    .addInputHandler() //
-                    .setValue(10)))));
+                    .addInputHandler()))));
     div.add(div(".detail") //
         .add(div(".name") //
             .add(text("Master Volume"))) //

@@ -15,8 +15,8 @@ public class Svg extends Parent {
 
   public Svg(int left, int top, int width, int height, String... properties) {
     super("svg", properties);
-    appendProperty("viewBox", left + " " + top + " " + width + " " + height);
-    appendProperty("preserveAspectRatio", "xMinYMin meet");
+    setProperty("viewBox", left + " " + top + " " + width + " " + height);
+    setProperty("preserveAspectRatio", "xMinYMin meet");
   }
 
 }

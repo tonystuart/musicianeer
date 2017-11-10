@@ -51,16 +51,16 @@ public class Range {
     } else if (scaledValue > dataMaximum) {
       scaledValue = dataMaximum;
     }
-    //System.out.println("control=" + controlValue + " in " + controlMinimum + " to " + controlMaximum + " is " + scaledValue + " in range " + dataMinimum + " to " + dataMaximum);
+    System.out.println("control=" + controlValue + " in " + controlMinimum + " to " + controlMaximum + " is " + scaledValue + " in range " + dataMinimum + " to " + dataMaximum);
     return scaledValue;
   }
 
   public static int scaleMidiToPercent(int midiValue) {
-    return scale(0, 200, Midi.MIN_VALUE, Midi.MAX_VALUE, midiValue);
+    return scale(0, 100, Midi.MIN_VALUE, Midi.MAX_VALUE, midiValue);
   }
 
   public static int scalePercentToMidi(int percentValue) {
-    return scale(Midi.MIN_VALUE, Midi.MAX_VALUE, 0, 200, percentValue);
+    return scale(Midi.MIN_VALUE, Midi.MAX_VALUE, 0, 100, percentValue);
   }
 
 }

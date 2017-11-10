@@ -127,6 +127,11 @@ public class ShadowDom {
     return newSelection;
   }
 
+  public void setProperty(Element element, String name, Object value) {
+    element.setProperty(name, value);
+    onSetProperty(element, name, value);
+  }
+
   public Element swapClassName(String id, String className) {
     Element newSelection = getElementById(id);
     Element previousSelection = getElementByClassName(className);
@@ -164,6 +169,9 @@ public class ShadowDom {
   }
 
   protected void onReplaceChildren(Parent parent, Node newChild) {
+  }
+
+  protected void onSetProperty(Element element, String name, Object value) {
   }
 
   private void addManagedNode(Node node, boolean isManageDeep) {

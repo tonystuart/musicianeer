@@ -31,18 +31,18 @@ karaoke.onKaraokeBandHtml = function(message) {
     let matches;
     switch (message.action) {
     case 'REPLACE_CHILDREN':
-        musicPad.setElementHtml(message.selector, message.html);
+        musicPad.setElementHtml(message.selector, message.value);
         break;
     case 'ADD_CLASS':
         matches = document.querySelectorAll(message.selector);
         for (const match of matches) {
-            match.classList.add(message.html);
+            match.classList.add(message.value);
         }
         break;
     case 'REMOVE_CLASS':
         matches = document.querySelectorAll(message.selector);
         for (const match of matches) {
-            match.classList.remove(message.html);
+            match.classList.remove(message.value);
         }
         break;
     case 'ENSURE_VISIBLE':
@@ -52,6 +52,12 @@ karaoke.onKaraokeBandHtml = function(message) {
         let elementTop = element.offsetTop - songList.offsetTop;
         if (elementTop < songList.scrollTop || (elementTop + element.offsetHeight) > songList.scrollTop + songList.offsetHeight) {
             songList.scrollTop = elementTop - midpoint;
+        }
+        break;
+    case 'SET_PROPERTY':
+        matches = document.querySelectorAll(message.selector);
+        for (const match of matches) {
+            match[message.name] = message.value;
         }
         break;
     }

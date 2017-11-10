@@ -13,7 +13,7 @@ public class Range extends Input {
 
   public Range(String... properties) {
     super(properties);
-    appendProperty("type", "range");
+    setProperty("type", "range");
   }
 
   @Deprecated
@@ -26,15 +26,15 @@ public class Range extends Input {
   }
 
   public void setMaximum(Object maximum) {
-    appendProperty("max", maximum);
+    setProperty("max", maximum);
   }
 
   public void setMinimum(Object minimum) {
-    appendProperty("min", minimum);
+    setProperty("min", minimum);
   }
 
   public void setStep(Object step) {
-    appendProperty("step", step);
+    setProperty("step", step);
   }
 
 }

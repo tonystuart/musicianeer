@@ -71,7 +71,7 @@ public class Parent extends Element implements Iterable<Node> {
   }
 
   public Parent onClick(String handler) {
-    appendProperty("onclick", handler);
+    setProperty("onclick", handler);
     return this;
   }
 

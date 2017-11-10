@@ -12,34 +12,44 @@ package com.example.afs.musicpad.message;
 public class OnKaraokeBandHtml extends TypedMessage {
 
   public enum Action {
-    REPLACE_CHILDREN, ADD_CLASS, REMOVE_CLASS, ENSURE_VISIBLE
+    REPLACE_CHILDREN, ADD_CLASS, REMOVE_CLASS, ENSURE_VISIBLE, SET_PROPERTY
   }
 
-  private String html;
+  private String name;
+  private String value;
   private Action action;
   private String selector;
 
-  public OnKaraokeBandHtml(Action action, String selector, String html) {
+  public OnKaraokeBandHtml(Action action, String selector, String value) {
+    this(action, selector, null, value);
+  }
+
+  public OnKaraokeBandHtml(Action action, String selector, String name, String value) {
     this.action = action;
     this.selector = selector;
-    this.html = html;
+    this.name = name;
+    this.value = value;
   }
 
   public Action getAction() {
     return action;
   }
 
-  public String getHtml() {
-    return html;
+  public String getName() {
+    return name;
   }
 
   public String getSelector() {
     return selector;
   }
 
+  public String getValue() {
+    return value;
+  }
+
   @Override
   public String toString() {
-    return "OnKaraokeBandHtml [action=" + action + ", selector=" + selector + ", html=" + html + "]";
+    return "OnKaraokeBandHtml [action=" + action + ", selector=" + selector + ", name=" + name + ", value=" + value + "]";
   }
 
 }

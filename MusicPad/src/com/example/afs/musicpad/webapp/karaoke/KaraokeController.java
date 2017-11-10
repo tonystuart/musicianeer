@@ -46,6 +46,7 @@ public class KaraokeController extends ServiceTask {
   public KaraokeController(MessageBroker broker) {
     super(broker);
     karaokeView = new KaraokeView(broker);
+    subscribe(OnCommand.class, message -> doCommand(message));
     subscribe(OnRenderSong.class, message -> doRenderSong(message));
     subscribe(OnSampleSong.class, message -> doSampleSong(message));
     subscribe(OnPickChannel.class, message -> doPickChannel(message));
@@ -107,6 +108,17 @@ public class KaraokeController extends ServiceTask {
     }
   }
 
+  private void doCommand(OnCommand message) {
+    switch (message.getCommand()) {
+    case SET_BACKGROUND_VELOCITY:
+      doSetBackgroundVelocity(message.getParameter());
+      break;
+    default:
+      break;
+
+    }
+  }
+
   private void doInput(String id, int value) {
     System.out.println("KaraokeController.doInput: id=" + id + ", value=" + value);
   }
@@ -144,6 +156,7 @@ public class KaraokeController extends ServiceTask {
       devicePlayerDetail.put(deviceIndex, playerDetail);
     }
     karaokeView.renderSong(message.getSong(), devicePlayerDetail);
+    karaokeView.setBackgroundVelocity(request(Services.getMidiVelocity));
   }
 
   private void doSampleChannel(OnSampleChannel message) {
@@ -152,6 +165,10 @@ public class KaraokeController extends ServiceTask {
 
   private void doSampleSong(OnSampleSong message) {
     karaokeView.renderSongDetails(message.getSong());
+  }
+
+  private void doSetBackgroundVelocity(int velocity) {
+    karaokeView.setBackgroundVelocity(velocity);
   }
 
   private String getProgramOptions() {

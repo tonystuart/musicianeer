@@ -21,6 +21,6 @@ public class Select extends Parent {
   }
 
   public void setValue(String value) {
-    appendProperty("value", value);
+    setProperty("value", value);
   }
 }

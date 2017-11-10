@@ -12,7 +12,7 @@ package com.example.afs.musicpad.html;
 public class Button extends Input {
 
   public Button() {
-    appendProperty("type", "button");
+    setProperty("type", "button");
   }
 
   public Button(String id, String value) {

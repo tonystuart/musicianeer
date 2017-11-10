@@ -19,12 +19,12 @@ public class Input extends Element {
     if (getId() == null) {
       throw new IllegalStateException();
     }
-    appendProperty("oninput", "karaoke.onInput(event, this.value)");
+    setProperty("oninput", "karaoke.onInput(event, this.value)");
     return this;
   }
 
   public Input setValue(Object value) {
-    appendProperty("value", value);
+    setProperty("value", value);
     return this;
   }
 }

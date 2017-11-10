@@ -29,11 +29,11 @@ public class Option extends Parent {
   }
 
   public void setValue(Object value) {
-    appendProperty("value", value);
+    setProperty("value", value);
   }
 
   private void setSelected() {
-    appendProperty("selected");
+    setProperty("selected");
   }
 
   private void setText(String text) {

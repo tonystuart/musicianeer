@@ -13,14 +13,14 @@ public class CheckBox extends Input {
 
   public CheckBox(String... properties) {
     super(properties);
-    appendProperty("type", "checkbox");
+    setProperty("type", "checkbox");
   }
 
   public CheckBox addCheckHandler() {
     if (getId() == null) {
       throw new IllegalStateException();
     }
-    appendProperty("onclick", "karaoke.onInput(event, this.checked ? 1 : 0)");
+    setProperty("onclick", "karaoke.onInput(event, this.checked ? 1 : 0)");
     return this;
   }
 

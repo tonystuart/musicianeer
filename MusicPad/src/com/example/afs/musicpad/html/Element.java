@@ -47,15 +47,15 @@ public class Element extends Node {
     if (getId() == null) {
       throw new IllegalStateException();
     }
-    appendProperty("onclick", "karaoke.onClick(event)");
+    setProperty("onclick", "karaoke.onClick(event)");
     return this;
   }
 
-  public void appendProperty(String name) {
-    appendProperty(name, null);
+  public void setProperty(String name) {
+    setProperty(name, null);
   }
 
-  public void appendProperty(String name, Object value) {
+  public void setProperty(String name, Object value) {
     if (attributes == null) {
       attributes = new HashMap<>();
     }
@@ -75,7 +75,7 @@ public class Element extends Node {
   }
 
   public Element property(String name, Object value) {
-    appendProperty(name, value);
+    setProperty(name, value);
     return this;
   }
 

@@ -12,6 +12,7 @@ package com.example.afs.musicpad.transport;
 import com.example.afs.fluidsynth.Synthesizer;
 import com.example.afs.musicpad.ChannelCommand;
 import com.example.afs.musicpad.Command;
+import com.example.afs.musicpad.Services;
 import com.example.afs.musicpad.message.OnChannelCommand;
 import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnRenderSong;
@@ -23,11 +24,11 @@ import com.example.afs.musicpad.song.ChannelNotes;
 import com.example.afs.musicpad.song.Default;
 import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.task.MessageBroker;
-import com.example.afs.musicpad.task.MessageTask;
+import com.example.afs.musicpad.task.ServiceTask;
 import com.example.afs.musicpad.transport.Transport.Whence;
 import com.example.afs.musicpad.util.Range;
 
-public class TransportTask extends MessageTask {
+public class TransportTask extends ServiceTask {
 
   private Song song;
   private Transport transport;
@@ -41,6 +42,7 @@ public class TransportTask extends MessageTask {
     subscribe(OnRenderSong.class, message -> doRenderSong(message));
     subscribe(OnSampleChannel.class, message -> doSampleChannel(message));
     subscribe(OnChannelCommand.class, message -> doChannelCommand(message));
+    provide(Services.getMidiVelocity, () -> getMidiVelocity());
   }
 
   private void doChannelCommand(OnChannelCommand message) {
@@ -91,7 +93,7 @@ public class TransportTask extends MessageTask {
       doSetBackgroundVelocity(parameter);
       break;
     case SET_MASTER_GAIN:
-      doMasterGain(parameter);
+      doSetMidiMasterGain(parameter);
       break;
     case SET_TEMPO:
       doSetTempo(parameter);
@@ -108,14 +110,15 @@ public class TransportTask extends MessageTask {
   }
 
   private void doDecreaseBackgroundVelocity() {
-    setBackgroundPercentVelocity(Math.max(0, transport.getPercentVelocity() - 10));
+    // Publish event instead of setting directly so that other components can detect change
+    publish(new OnCommand(Command.SET_BACKGROUND_VELOCITY, Range.scalePercentToMidi(Math.max(0, getPercentVelocity() - 10))));
   }
 
   private void doDecreaseMasterGain() {
     float currentGain = transport.getGain();
     float newGain = currentGain - 0.2f;
     if (newGain >= 0) {
-      setMasterGain(newGain);
+      setPercentMasterGain(newGain);
     }
   }
 
@@ -124,24 +127,21 @@ public class TransportTask extends MessageTask {
   }
 
   private void doIncreaseBackgroundVelocity() {
-    setBackgroundPercentVelocity(Math.max(0, transport.getPercentVelocity() + 10));
+    // Publish event instead of setting directly so that other components can detect change
+    int newPercentVelocity = Math.min(100, getPercentVelocity() + 10);
+    publish(new OnCommand(Command.SET_BACKGROUND_VELOCITY, Range.scalePercentToMidi(newPercentVelocity)));
   }
 
   private void doIncreaseMasterGain() {
     float currentGain = transport.getGain();
     float newGain = currentGain + 0.2f;
     if (newGain <= Synthesizer.MAXIMUM_GAIN) {
-      setMasterGain(newGain);
+      setPercentMasterGain(newGain);
     }
   }
 
   private void doIncreaseTempo() {
     publish(new OnCommand(Command.SET_TEMPO, Range.scalePercentToMidi(Math.min(200, transport.getPercentTempo() + 10))));
-  }
-
-  private void doMasterGain(int masterGain) {
-    float gain = Range.scale(0f, Synthesizer.MAXIMUM_GAIN, Midi.MIN_VALUE, Midi.MAX_VALUE, masterGain);
-    setMasterGain(gain);
   }
 
   private void doMoveBackward() {
@@ -198,11 +198,15 @@ public class TransportTask extends MessageTask {
   }
 
   private void doSetBackgroundVelocity(int velocity) {
-    setBackgroundPercentVelocity(Range.scaleMidiToPercent(velocity));
+    setMidiVelocity(velocity);
+  }
+
+  private void doSetMidiMasterGain(int masterGain) {
+    setMidiMasterGain(masterGain);
   }
 
   private void doSetTempo(int tempo) {
-    setPercentTempo(Range.scaleMidiToPercent(tempo));
+    setMidiTempo(tempo);
   }
 
   private void doStop(int parameter) {
@@ -221,20 +225,40 @@ public class TransportTask extends MessageTask {
     transport.allNotesOff(); // turn off notes that were playing before transpose
   }
 
+  private int getMidiVelocity() {
+    return Range.scalePercentToMidi(getPercentVelocity());
+  }
+
+  private int getPercentVelocity() {
+    return transport.getPercentVelocity();
+  }
+
   private void publishTick(long tick) {
     getBroker().publish(new OnTick(tick));
   }
 
-  private void setBackgroundPercentVelocity(int percentVelocity) {
-    transport.setPercentVelocity(percentVelocity);
+  private void setMidiMasterGain(int masterGain) {
+    setPercentMasterGain(Range.scale(0f, Synthesizer.MAXIMUM_GAIN, Midi.MIN_VALUE, Midi.MAX_VALUE, masterGain));
   }
 
-  private void setMasterGain(float gain) {
+  private void setMidiTempo(int tempo) {
+    setPercentTempo(Range.scaleMidiToPercent(tempo));
+  }
+
+  private void setMidiVelocity(int velocity) {
+    setPercentVelocity(Range.scaleMidiToPercent(velocity));
+  }
+
+  private void setPercentMasterGain(float gain) {
     transport.setGain(gain);
   }
 
   private void setPercentTempo(int percentTempo) {
     transport.setPercentTempo(percentTempo);
+  }
+
+  private void setPercentVelocity(int percentVelocity) {
+    transport.setPercentVelocity(percentVelocity);
   }
 
 }

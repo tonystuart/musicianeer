@@ -18,7 +18,7 @@ import com.example.afs.musicpad.util.RandomAccessList;
 
 public class Services {
 
-  public static final Service<Integer> getBackgroundMidiVelocity = new Service<Integer>() {
+  public static final Service<Integer> getMidiVelocity = new Service<Integer>() {
   };
 
   public static final Service<Song> GetCurrentSong = new Service<Song>() {
