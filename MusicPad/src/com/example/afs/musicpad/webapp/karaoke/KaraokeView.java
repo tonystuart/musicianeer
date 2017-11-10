@@ -29,7 +29,7 @@ import com.example.afs.musicpad.message.OnKaraokeBandHtml;
 import com.example.afs.musicpad.message.OnKaraokeBandHtml.Action;
 import com.example.afs.musicpad.midi.Instruments;
 import com.example.afs.musicpad.midi.Midi;
-import com.example.afs.musicpad.playable.Playables;
+import com.example.afs.musicpad.playable.PlayerDetail;
 import com.example.afs.musicpad.player.Sound;
 import com.example.afs.musicpad.player.Sounds;
 import com.example.afs.musicpad.player.Sounds.SoundCount;
@@ -139,12 +139,12 @@ public class KaraokeView extends ShadowDom {
     selectElement("channels", "selected-tab");
   }
 
-  public void renderSong(Song song, NavigableMap<Integer, Playables> devicePlayables) {
-    KaraokeNotator karaokeNotator = new KaraokeNotator(song, devicePlayables);
+  public void renderSong(Song song, NavigableMap<Integer, PlayerDetail> devicePlayerDetail) {
+    KaraokeNotator karaokeNotator = new KaraokeNotator(song, devicePlayerDetail);
     Division prompterList = karaokeNotator.createPrompterList();
     Parent prompterListParent = getElementById("prompter-list");
     replaceChildren(prompterListParent, prompterList, false);
-    Division prompterDetails = createPrompterDetails(devicePlayables);
+    Division prompterDetails = createPrompterDetails(devicePlayerDetail);
     Parent prompterDetailsParent = getElementById("prompter-details");
     replaceChildren(prompterDetailsParent, prompterDetails);
     Parent prompterTitle = getElementById("prompter-title");
@@ -224,9 +224,9 @@ public class KaraokeView extends ShadowDom {
     return div;
   }
 
-  private Division createPrompterDetails(NavigableMap<Integer, Playables> devicePlayables) {
+  private Division createPrompterDetails(NavigableMap<Integer, PlayerDetail> devicePlayables) {
     Division div = div(".detail-container");
-    for (Entry<Integer, Playables> entry : devicePlayables.entrySet()) {
+    for (Entry<Integer, PlayerDetail> entry : devicePlayables.entrySet()) {
       int deviceIndex = entry.getKey();
       int channelIndex = entry.getValue().getChannelIndex();
       int programIndex = entry.getValue().getProgramIndex();

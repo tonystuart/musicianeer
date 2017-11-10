@@ -27,8 +27,8 @@ import com.example.afs.musicpad.message.OnSampleChannel;
 import com.example.afs.musicpad.message.OnSampleSong;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.playable.PlayableMap;
-import com.example.afs.musicpad.playable.Playables;
-import com.example.afs.musicpad.playable.Playables.PlayablesService;
+import com.example.afs.musicpad.playable.PlayerDetail;
+import com.example.afs.musicpad.playable.PlayerDetail.PlayerDetailService;
 import com.example.afs.musicpad.player.Player;
 import com.example.afs.musicpad.player.Player.Action;
 import com.example.afs.musicpad.player.Sound;
@@ -76,7 +76,7 @@ public class DeviceHandler extends ServiceTask {
     subscribe(OnSampleSong.class, message -> doSampleSong(message));
     subscribe(OnSampleChannel.class, message -> doSampleChannel(message));
     subscribe(OnDeviceCommand.class, message -> doDeviceCommand(message));
-    provide(new PlayablesService(deviceIndex), () -> getPlayables());
+    provide(new PlayerDetailService(deviceIndex), () -> getPlayerDetail());
   }
 
   public void detach() {
@@ -323,11 +323,11 @@ public class DeviceHandler extends ServiceTask {
     song = message.getSong();
   }
 
-  private Playables getPlayables() {
+  private PlayerDetail getPlayerDetail() {
     if (playableMap == null) {
       playableMap = createPlayableMap();
     }
-    return new Playables(playableMap.getPlayables(), channel, player.getProgram());
+    return new PlayerDetail(playableMap.getPlayables(), channel, player.getProgram());
   }
 
   private void processKeyboardCommand(int inputCode) {

@@ -20,7 +20,7 @@ import com.example.afs.musicpad.html.Division;
 import com.example.afs.musicpad.html.Node;
 import com.example.afs.musicpad.html.TextElement;
 import com.example.afs.musicpad.playable.Playable;
-import com.example.afs.musicpad.playable.Playables;
+import com.example.afs.musicpad.playable.PlayerDetail;
 import com.example.afs.musicpad.song.Default;
 import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.song.Word;
@@ -34,10 +34,10 @@ public class KaraokeNotator {
   private Map<Integer, PlayableIterator> playableIterators;
   private Map<Integer, Playable> deviceSustain = new HashMap<>();
 
-  public KaraokeNotator(Song song, NavigableMap<Integer, Playables> devicePlayables) {
+  public KaraokeNotator(Song song, NavigableMap<Integer, PlayerDetail> devicePlayerDetail) {
     this.song = song;
     this.playableIterators = new HashMap<>();
-    for (Entry<Integer, Playables> entry : devicePlayables.entrySet()) {
+    for (Entry<Integer, PlayerDetail> entry : devicePlayerDetail.entrySet()) {
       int device = entry.getKey();
       RandomAccessList<Playable> playables = entry.getValue().getPlayables();
       playableIterators.put(device, new PlayableIterator(playables));

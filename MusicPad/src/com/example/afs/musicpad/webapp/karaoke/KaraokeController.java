@@ -31,8 +31,8 @@ import com.example.afs.musicpad.message.OnSampleChannel;
 import com.example.afs.musicpad.message.OnSampleSong;
 import com.example.afs.musicpad.midi.Instruments;
 import com.example.afs.musicpad.midi.Midi;
-import com.example.afs.musicpad.playable.Playables;
-import com.example.afs.musicpad.playable.Playables.PlayablesService;
+import com.example.afs.musicpad.playable.PlayerDetail;
+import com.example.afs.musicpad.playable.PlayerDetail.PlayerDetailService;
 import com.example.afs.musicpad.song.ChannelNotes;
 import com.example.afs.musicpad.task.MessageBroker;
 import com.example.afs.musicpad.task.ServiceTask;
@@ -137,13 +137,13 @@ public class KaraokeController extends ServiceTask {
   }
 
   private void doRenderSong(OnRenderSong message) {
-    NavigableMap<Integer, Playables> devicePlayables = new TreeMap<>();
+    NavigableMap<Integer, PlayerDetail> devicePlayerDetail = new TreeMap<>();
     for (Entry<Integer, Integer> entry : message.getDeviceChannelAssignments().entrySet()) {
       Integer deviceIndex = entry.getKey();
-      Playables playables = request(new PlayablesService(deviceIndex));
-      devicePlayables.put(deviceIndex, playables);
+      PlayerDetail playerDetail = request(new PlayerDetailService(deviceIndex));
+      devicePlayerDetail.put(deviceIndex, playerDetail);
     }
-    karaokeView.renderSong(message.getSong(), devicePlayables);
+    karaokeView.renderSong(message.getSong(), devicePlayerDetail);
   }
 
   private void doSampleChannel(OnSampleChannel message) {

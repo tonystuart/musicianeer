@@ -12,12 +12,12 @@ package com.example.afs.musicpad.playable;
 import com.example.afs.musicpad.task.ServiceTask.Service;
 import com.example.afs.musicpad.util.RandomAccessList;
 
-public class Playables {
+public class PlayerDetail {
 
-  public static class PlayablesService implements Service<Playables> {
+  public static class PlayerDetailService implements Service<PlayerDetail> {
     private int deviceIndex;
 
-    public PlayablesService(int deviceIndex) {
+    public PlayerDetailService(int deviceIndex) {
       this.deviceIndex = deviceIndex;
     }
 
@@ -32,7 +32,7 @@ public class Playables {
       if (getClass() != obj.getClass()) {
         return false;
       }
-      PlayablesService other = (PlayablesService) obj;
+      PlayerDetailService other = (PlayerDetailService) obj;
       if (deviceIndex != other.deviceIndex) {
         return false;
       }
@@ -49,14 +49,14 @@ public class Playables {
   }
 
   public static String getPlayableDeviceKey(int deviceIndex) {
-    return "playables-" + deviceIndex;
+    return "playable-device-" + deviceIndex;
   }
 
   private RandomAccessList<Playable> playables;
   private int channelIndex;
   private int programIndex;
 
-  public Playables(RandomAccessList<Playable> playables, int channelIndex, int programIndex) {
+  public PlayerDetail(RandomAccessList<Playable> playables, int channelIndex, int programIndex) {
     this.playables = playables;
     this.channelIndex = channelIndex;
     this.programIndex = programIndex;
@@ -76,6 +76,6 @@ public class Playables {
 
   @Override
   public String toString() {
-    return "Playables [channelIndex=" + channelIndex + ", programIndex=" + programIndex + ", playables=" + playables + "]";
+    return "PlayerDetail [channelIndex=" + channelIndex + ", programIndex=" + programIndex + ", playables=" + playables + "]";
   }
 }
