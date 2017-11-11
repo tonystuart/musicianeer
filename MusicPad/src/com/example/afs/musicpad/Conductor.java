@@ -80,6 +80,9 @@ public class Conductor extends ServiceTask {
     int deviceIndex = message.getDeviceIndex();
     int parameter = message.getParameter();
     switch (message.getDeviceCommand()) {
+    case INPUT:
+      doInput(deviceIndex, parameter);
+      break;
     case SAMPLE_CHANNEL:
       doSampleChannel(deviceIndex, parameter);
       break;
@@ -95,7 +98,23 @@ public class Conductor extends ServiceTask {
     Integer deviceIndex = message.getDeviceIndex();
     deviceIndexes.remove(deviceIndex);
     deviceChannelAssignments.remove(deviceIndex);
-    // TODO: publish event so things like KaraokeController can render a new prompter
+    if (deviceIndexes.size() == deviceChannelAssignments.size()) {
+      publish(new OnRenderSong(song, deviceChannelAssignments));
+    } else {
+      Integer next;
+      if (deviceChannelAssignments.size() > 0) {
+        next = deviceIndexes.higher(deviceChannelAssignments.lastKey());
+      } else {
+        next = deviceIndexes.first();
+      }
+      publish(new OnPickChannel(song, deviceChannelAssignments, next));
+    }
+  }
+
+  private void doInput(int deviceIndex, int parameter) {
+    if (deviceIndexes.size() == deviceChannelAssignments.size()) {
+      publish(new OnRenderSong(song, deviceChannelAssignments));
+    }
   }
 
   private void doSampleChannel(int deviceIndex, int channel) {

@@ -42,7 +42,7 @@ import com.example.afs.musicpad.task.ServiceTask;
 public class DeviceHandler extends ServiceTask {
 
   public static enum InputType {
-    ALPHA, NUMERIC, MIDI, DETACH
+    ALPHA, NUMERIC, MIDI
   }
 
   public static enum OutputType {
@@ -83,7 +83,7 @@ public class DeviceHandler extends ServiceTask {
   }
 
   public void detach() {
-    getBroker().publish(new OnDeviceCommand(DeviceCommand.INPUT, deviceIndex, InputType.DETACH.ordinal()));
+    getBroker().publish(new OnCommand(Command.DETACH, deviceIndex));
   }
 
   public int getDeviceIndex() {
@@ -239,9 +239,6 @@ public class DeviceHandler extends ServiceTask {
     case NUMERIC:
       this.inputType = inputType;
       updateChannel();
-      break;
-    case DETACH:
-      getBroker().publish(new OnCommand(Command.DETACH, deviceIndex));
       break;
     default:
       throw new UnsupportedOperationException();

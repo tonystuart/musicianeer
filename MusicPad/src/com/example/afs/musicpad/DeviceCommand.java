@@ -10,7 +10,6 @@
 package com.example.afs.musicpad;
 
 public enum DeviceCommand {
-  SELECT_CHANNEL, //
   DECREASE_PLAYER_VELOCITY, //
   INCREASE_PLAYER_VELOCITY, //
   INPUT, //
@@ -22,5 +21,6 @@ public enum DeviceCommand {
   PREVIOUS_CHANNEL, //
   PREVIOUS_PROGRAM, //
   SAMPLE_CHANNEL, //
+  SELECT_CHANNEL, //
   VELOCITY, //
 }
