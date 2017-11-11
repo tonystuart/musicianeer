@@ -80,8 +80,8 @@ public class Parent extends Element implements Iterable<Node> {
     return (Parent) super.property(name, value);
   }
 
-  public MidiRange range(String... properties) {
-    return new MidiRange(properties);
+  public PercentRange range(String... properties) {
+    return new PercentRange(properties);
   }
 
   @Override

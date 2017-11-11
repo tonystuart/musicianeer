@@ -16,15 +16,15 @@ public class OnKaraokeBandHtml extends TypedMessage {
   }
 
   private String name;
-  private String value;
+  private Object value;
   private Action action;
   private String selector;
 
-  public OnKaraokeBandHtml(Action action, String selector, String value) {
+  public OnKaraokeBandHtml(Action action, String selector, Object value) {
     this(action, selector, null, value);
   }
 
-  public OnKaraokeBandHtml(Action action, String selector, String name, String value) {
+  public OnKaraokeBandHtml(Action action, String selector, String name, Object value) {
     this.action = action;
     this.selector = selector;
     this.name = name;
@@ -43,7 +43,7 @@ public class OnKaraokeBandHtml extends TypedMessage {
     return selector;
   }
 
-  public String getValue() {
+  public Object getValue() {
     return value;
   }
 

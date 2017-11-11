@@ -16,15 +16,6 @@ public class Range extends Input {
     setProperty("type", "range");
   }
 
-  @Deprecated
-  public Range(String id, int minimum, int maximum, int step, int value) {
-    this("." + id);
-    setMinimum(minimum);
-    setMaximum(maximum);
-    setStep(step);
-    setValue(value);
-  }
-
   public void setMaximum(Object maximum) {
     setProperty("max", maximum);
   }

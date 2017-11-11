@@ -17,6 +17,7 @@ import com.example.afs.musicpad.device.common.DeviceHandler.OutputType;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.song.Note;
 import com.example.afs.musicpad.transport.NoteEvent;
+import com.example.afs.musicpad.util.Range;
 
 public class Player {
 
@@ -59,12 +60,12 @@ public class Player {
     return outputType;
   }
 
-  public int getProgram() {
-    return program;
+  public int getPercentVelocity() {
+    return Range.scaleMidiToPercent(velocity);
   }
 
-  public int getVelocity() {
-    return velocity;
+  public int getProgram() {
+    return program;
   }
 
   public void play(Action action, int midiNote) {
@@ -125,8 +126,8 @@ public class Player {
     }
   }
 
-  public void setVelocity(int velocity) {
-    this.velocity = velocity;
+  public void setPercentVelocity(int velocity) {
+    this.velocity = Range.scalePercentToMidi(velocity);
   }
 
   private void press(int midiNote) {

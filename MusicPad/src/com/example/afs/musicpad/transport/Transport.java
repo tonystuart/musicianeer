@@ -19,6 +19,7 @@ import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.song.Default;
 import com.example.afs.musicpad.song.Note;
 import com.example.afs.musicpad.transport.NoteEvent.Type;
+import com.example.afs.musicpad.util.Range;
 import com.example.afs.musicpad.util.Velocity;
 
 public class Transport {
@@ -31,9 +32,9 @@ public class Transport {
     RELATIVE, ABSOLUTE
   }
 
+  private static final int DEFAULT_PERCENT_GAIN = 10;
   private static final int DEFAULT_PERCENT_TEMPO = 100;
-  private static final int DEFAULT_PERCENT_VELOCITY = 12;
-  private static final float DEFAULT_GAIN = 5 * Synthesizer.DEFAULT_GAIN;
+  private static final int DEFAULT_PERCENT_VELOCITY = 10;
 
   private int percentVelocity = DEFAULT_PERCENT_VELOCITY;
   private int[] currentPrograms = new int[Midi.CHANNELS];
@@ -46,7 +47,7 @@ public class Transport {
   public Transport(Synthesizer synthesizer) {
     this.synthesizer = synthesizer;
     this.sequencer = new NoteEventSequencer(noteEvent -> processNoteEvent(noteEvent));
-    setGain(DEFAULT_GAIN);
+    setPercentGain(DEFAULT_PERCENT_GAIN);
     sequencer.start();
   }
 
@@ -54,12 +55,12 @@ public class Transport {
     synthesizer.allNotesOff();
   }
 
-  public float getGain() {
-    return synthesizer.getGain();
+  public int getPercentGain() {
+    return (int) Range.scale(0, 100, Synthesizer.MINIMUM_GAIN, Synthesizer.MAXIMUM_GAIN, synthesizer.getGain());
   }
 
   public int getPercentTempo() {
-    return sequencer.getPercentTempo();
+    return Range.scale(0, 100, 0, 200, sequencer.getPercentTempo());
   }
 
   public int getPercentVelocity() {
@@ -125,7 +126,7 @@ public class Transport {
   }
 
   public void reset() {
-    synthesizer.setGain(DEFAULT_GAIN);
+    synthesizer.setGain(DEFAULT_PERCENT_GAIN);
     setPercentTempo(DEFAULT_PERCENT_TEMPO);
     setPercentVelocity(DEFAULT_PERCENT_VELOCITY);
   }
@@ -177,12 +178,12 @@ public class Transport {
     }
   }
 
-  public void setGain(float gain) {
-    synthesizer.setGain(gain);
+  public void setPercentGain(int gain) {
+    synthesizer.setGain(Range.scale(Synthesizer.MINIMUM_GAIN, Synthesizer.MAXIMUM_GAIN, 0, 100, gain));
   }
 
   public void setPercentTempo(int percentTempo) {
-    sequencer.setPercentTempo(percentTempo);
+    sequencer.setPercentTempo(Range.scale(0, 200, 0, 100, percentTempo));
   }
 
   public void setPercentVelocity(int percentVelocity) {

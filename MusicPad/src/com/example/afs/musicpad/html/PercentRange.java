@@ -9,12 +9,12 @@
 
 package com.example.afs.musicpad.html;
 
-public class MidiRange extends Range {
-  public MidiRange(String... properties) {
+public class PercentRange extends Range {
+  public PercentRange(String... properties) {
     super(properties);
     setMinimum(0);
-    setMaximum(127);
+    setMaximum(100);
     setStep(1);
-    setValue(64);
+    setValue(50);
   }
 }

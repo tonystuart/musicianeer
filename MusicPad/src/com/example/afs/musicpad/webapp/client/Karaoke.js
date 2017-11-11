@@ -8,7 +8,6 @@ karaoke.onClick = function(event) {
     if (!id) {
         id = event.target.closest('[id]').id;
     }
-    console.log('onClick=' + id);
     musicPad.send(JSON.stringify({
         type: 'OnKaraokeBandEvent',
         action: 'CLICK',
@@ -18,7 +17,6 @@ karaoke.onClick = function(event) {
 
 karaoke.onInput = function(event, value) {
     const id = event.target.id;
-    console.log('onInput=' + id);
     musicPad.send(JSON.stringify({
         type: 'OnKaraokeBandEvent',
         action: 'INPUT',
@@ -57,7 +55,9 @@ karaoke.onKaraokeBandHtml = function(message) {
     case 'SET_PROPERTY':
         matches = document.querySelectorAll(message.selector);
         for (const match of matches) {
-            match[message.name] = message.value;
+            if (!match.matches(':active')) {
+                match[message.name] = message.value;
+            }
         }
         break;
     }

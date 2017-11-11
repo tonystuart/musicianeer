@@ -27,31 +27,31 @@ public class Range {
     return conform(inputValue, minimum, maximum - 1);
   }
 
-  public static float scale(float dataMinimum, float dataMaximum, float controlMinimum, float controlMaximum, float controlValue) {
-    float dataRange = dataMaximum - dataMinimum;
-    float controlRange = controlMaximum - controlMinimum;
-    float scaledControlValue = (controlValue - controlMinimum) / controlRange;
-    float scaledValue = dataMinimum + (scaledControlValue * dataRange);
-    if (scaledValue < dataMinimum) {
-      scaledValue = dataMinimum;
-    } else if (scaledValue > dataMaximum) {
-      scaledValue = dataMaximum;
+  public static float scale(float targetMinimum, float targetMaximum, float sourceMinimum, float sourceMaximum, float sourceValue) {
+    float targetRange = targetMaximum - targetMinimum;
+    float sourceRange = sourceMaximum - sourceMinimum;
+    float scaledSourceValue = (sourceValue - sourceMinimum) / sourceRange;
+    float scaledValue = targetMinimum + (scaledSourceValue * targetRange);
+    if (scaledValue < targetMinimum) {
+      scaledValue = targetMinimum;
+    } else if (scaledValue > targetMaximum) {
+      scaledValue = targetMaximum;
     }
-    //System.out.println("control=" + controlValue + " in " + controlMinimum + " to " + controlMaximum + " is " + scaledValue + " in range " + dataMinimum + " to " + dataMaximum);
+    //System.out.println("source=" + sourceValue + " in " + sourceMinimum + " to " + sourceMaximum + " is " + scaledValue + " in range " + targetMinimum + " to " + targetMaximum);
     return scaledValue;
   }
 
-  public static int scale(int dataMinimum, int dataMaximum, int controlMinimum, int controlMaximum, int controlValue) {
-    int dataRange = dataMaximum - dataMinimum;
-    int controlRange = controlMaximum - controlMinimum;
-    double scaledControlValue = (double) (controlValue - controlMinimum) / controlRange;
-    int scaledValue = (int) (dataMinimum + (scaledControlValue * dataRange));
-    if (scaledValue < dataMinimum) {
-      scaledValue = dataMinimum;
-    } else if (scaledValue > dataMaximum) {
-      scaledValue = dataMaximum;
+  public static int scale(int targetMinimum, int targetMaximum, int sourceMinimum, int sourceMaximum, int sourceValue) {
+    int targetRange = targetMaximum - targetMinimum;
+    int sourceRange = sourceMaximum - sourceMinimum;
+    double scaledSourceValue = (double) (sourceValue - sourceMinimum) / sourceRange;
+    int scaledValue = (int) (targetMinimum + (scaledSourceValue * targetRange));
+    if (scaledValue < targetMinimum) {
+      scaledValue = targetMinimum;
+    } else if (scaledValue > targetMaximum) {
+      scaledValue = targetMaximum;
     }
-    System.out.println("control=" + controlValue + " in " + controlMinimum + " to " + controlMaximum + " is " + scaledValue + " in range " + dataMinimum + " to " + dataMaximum);
+    //System.out.println("source=" + sourceValue + " in " + sourceMinimum + " to " + sourceMaximum + " is " + scaledValue + " in range " + targetMinimum + " to " + targetMaximum);
     return scaledValue;
   }
 

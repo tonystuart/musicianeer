@@ -42,7 +42,9 @@ public class TransportTask extends ServiceTask {
     subscribe(OnRenderSong.class, message -> doRenderSong(message));
     subscribe(OnSampleChannel.class, message -> doSampleChannel(message));
     subscribe(OnChannelCommand.class, message -> doChannelCommand(message));
-    provide(Services.getMidiVelocity, () -> getMidiVelocity());
+    provide(Services.getBackgroundVelocity, () -> transport.getPercentVelocity());
+    provide(Services.getMasterGain, () -> transport.getPercentGain());
+    provide(Services.getTempo, () -> transport.getPercentTempo());
   }
 
   private void doChannelCommand(OnChannelCommand message) {
@@ -110,38 +112,27 @@ public class TransportTask extends ServiceTask {
   }
 
   private void doDecreaseBackgroundVelocity() {
-    // Publish event instead of setting directly so that other components can detect change
-    publish(new OnCommand(Command.SET_BACKGROUND_VELOCITY, Range.scalePercentToMidi(Math.max(0, getPercentVelocity() - 10))));
+    publish(new OnCommand(Command.SET_BACKGROUND_VELOCITY, Math.max(0, transport.getPercentVelocity() - 10)));
   }
 
   private void doDecreaseMasterGain() {
-    float currentGain = transport.getGain();
-    float newGain = currentGain - 0.2f;
-    if (newGain >= 0) {
-      setPercentMasterGain(newGain);
-    }
+    publish(new OnCommand(Command.SET_BACKGROUND_VELOCITY, Math.max(0, transport.getPercentGain() - 10)));
   }
 
   private void doDecreaseTempo() {
-    publish(new OnCommand(Command.SET_TEMPO, Range.scalePercentToMidi(Math.max(0, transport.getPercentTempo() - 10))));
+    publish(new OnCommand(Command.SET_TEMPO, Math.max(0, transport.getPercentTempo() - 10)));
   }
 
   private void doIncreaseBackgroundVelocity() {
-    // Publish event instead of setting directly so that other components can detect change
-    int newPercentVelocity = Math.min(100, getPercentVelocity() + 10);
-    publish(new OnCommand(Command.SET_BACKGROUND_VELOCITY, Range.scalePercentToMidi(newPercentVelocity)));
+    publish(new OnCommand(Command.SET_BACKGROUND_VELOCITY, Math.min(100, transport.getPercentVelocity() + 10)));
   }
 
   private void doIncreaseMasterGain() {
-    float currentGain = transport.getGain();
-    float newGain = currentGain + 0.2f;
-    if (newGain <= Synthesizer.MAXIMUM_GAIN) {
-      setPercentMasterGain(newGain);
-    }
+    publish(new OnCommand(Command.SET_MASTER_GAIN, Math.min(100, transport.getPercentGain() + 10)));
   }
 
   private void doIncreaseTempo() {
-    publish(new OnCommand(Command.SET_TEMPO, Range.scalePercentToMidi(Math.min(200, transport.getPercentTempo() + 10))));
+    publish(new OnCommand(Command.SET_TEMPO, Math.min(100, transport.getPercentTempo() + 10)));
   }
 
   private void doMoveBackward() {
@@ -198,15 +189,15 @@ public class TransportTask extends ServiceTask {
   }
 
   private void doSetBackgroundVelocity(int velocity) {
-    setMidiVelocity(velocity);
+    transport.setPercentVelocity(velocity);
   }
 
-  private void doSetMidiMasterGain(int masterGain) {
-    setMidiMasterGain(masterGain);
+  private void doSetMidiMasterGain(int gain) {
+    transport.setPercentGain(gain);
   }
 
   private void doSetTempo(int tempo) {
-    setMidiTempo(tempo);
+    transport.setPercentTempo(tempo);
   }
 
   private void doStop(int parameter) {
@@ -225,40 +216,8 @@ public class TransportTask extends ServiceTask {
     transport.allNotesOff(); // turn off notes that were playing before transpose
   }
 
-  private int getMidiVelocity() {
-    return Range.scalePercentToMidi(getPercentVelocity());
-  }
-
-  private int getPercentVelocity() {
-    return transport.getPercentVelocity();
-  }
-
   private void publishTick(long tick) {
     getBroker().publish(new OnTick(tick));
-  }
-
-  private void setMidiMasterGain(int masterGain) {
-    setPercentMasterGain(Range.scale(0f, Synthesizer.MAXIMUM_GAIN, Midi.MIN_VALUE, Midi.MAX_VALUE, masterGain));
-  }
-
-  private void setMidiTempo(int tempo) {
-    setPercentTempo(Range.scaleMidiToPercent(tempo));
-  }
-
-  private void setMidiVelocity(int velocity) {
-    setPercentVelocity(Range.scaleMidiToPercent(velocity));
-  }
-
-  private void setPercentMasterGain(float gain) {
-    transport.setGain(gain);
-  }
-
-  private void setPercentTempo(int percentTempo) {
-    transport.setPercentTempo(percentTempo);
-  }
-
-  private void setPercentVelocity(int percentVelocity) {
-    transport.setPercentVelocity(percentVelocity);
   }
 
 }

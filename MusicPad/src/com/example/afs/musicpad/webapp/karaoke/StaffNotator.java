@@ -16,7 +16,7 @@ import java.util.SortedSet;
 
 import com.example.afs.musicpad.html.Division;
 import com.example.afs.musicpad.midi.Midi;
-import com.example.afs.musicpad.playable.Playable;
+import com.example.afs.musicpad.player.Playable;
 import com.example.afs.musicpad.player.Sound;
 import com.example.afs.musicpad.song.Default;
 import com.example.afs.musicpad.song.Note;

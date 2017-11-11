@@ -18,6 +18,7 @@ public class TickScheduler {
   protected long baseTick;
   protected long baseTimeMillis;
   protected int percentTempo = 100;
+  protected int appliedPercentTempo = percentTempo;
 
   public TickScheduler() {
     this(0);
@@ -37,7 +38,7 @@ public class TickScheduler {
       baseTimeMillis = System.currentTimeMillis();
     }
     long deltaTick = noteTick - baseTick;
-    deltaTick = (deltaTick * 100) / percentTempo;
+    deltaTick = (deltaTick * 100) / appliedPercentTempo;
     long deltaMillis = Tick.convertTickToMillis(beatsPerMinute, deltaTick);
     long eventTimeMillis = baseTimeMillis + deltaMillis;
     // Update base values to handle changes in beats per minute
@@ -73,6 +74,11 @@ public class TickScheduler {
 
   public void setPercentTempo(int percentTempo) {
     this.percentTempo = percentTempo;
+    if (percentTempo == 0) {
+      appliedPercentTempo = 1;
+    } else {
+      appliedPercentTempo = percentTempo;
+    }
   }
 
 }

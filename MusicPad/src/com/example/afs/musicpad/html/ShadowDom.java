@@ -84,9 +84,9 @@ public class ShadowDom {
     return label;
   }
 
-  public MidiRange range(String... properties) {
-    MidiRange midiRange = new MidiRange(properties);
-    return midiRange;
+  public PercentRange range(String... properties) {
+    PercentRange percentRange = new PercentRange(properties);
+    return percentRange;
   }
 
   public void removeClass(Element element, String className) {

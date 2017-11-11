@@ -31,8 +31,10 @@ import com.example.afs.musicpad.message.OnSampleChannel;
 import com.example.afs.musicpad.message.OnSampleSong;
 import com.example.afs.musicpad.midi.Instruments;
 import com.example.afs.musicpad.midi.Midi;
-import com.example.afs.musicpad.playable.PlayerDetail;
-import com.example.afs.musicpad.playable.PlayerDetail.PlayerDetailService;
+import com.example.afs.musicpad.player.BackgroundMuteService;
+import com.example.afs.musicpad.player.PlayerDetail;
+import com.example.afs.musicpad.player.PlayerDetailService;
+import com.example.afs.musicpad.player.PlayerVelocityService;
 import com.example.afs.musicpad.song.ChannelNotes;
 import com.example.afs.musicpad.task.MessageBroker;
 import com.example.afs.musicpad.task.ServiceTask;
@@ -47,6 +49,7 @@ public class KaraokeController extends ServiceTask {
     super(broker);
     karaokeView = new KaraokeView(broker);
     subscribe(OnCommand.class, message -> doCommand(message));
+    subscribe(OnDeviceCommand.class, message -> doDeviceCommand(message));
     subscribe(OnRenderSong.class, message -> doRenderSong(message));
     subscribe(OnSampleSong.class, message -> doSampleSong(message));
     subscribe(OnPickChannel.class, message -> doPickChannel(message));
@@ -113,14 +116,49 @@ public class KaraokeController extends ServiceTask {
     case SET_BACKGROUND_VELOCITY:
       doSetBackgroundVelocity(message.getParameter());
       break;
+    case SET_MASTER_GAIN:
+      doSetMasterGain(message.getParameter());
+      break;
+    case SET_TEMPO:
+      doSetTempo(message.getParameter());
+      break;
     default:
       break;
 
     }
   }
 
+  private void doDeviceCommand(OnDeviceCommand message) {
+    switch (message.getDeviceCommand()) {
+    case MUTE_BACKGROUND:
+      doSetBackgroundMute(message.getDeviceIndex(), message.getParameter());
+      break;
+    case VELOCITY:
+      doSetDeviceVelocity(message.getDeviceIndex(), message.getParameter());
+      break;
+    default:
+      break;
+    }
+  }
+
   private void doInput(String id, int value) {
-    System.out.println("KaraokeController.doInput: id=" + id + ", value=" + value);
+    if (id.startsWith("background-mute-")) {
+      publish(new OnDeviceCommand(DeviceCommand.MUTE_BACKGROUND, Integer.parseInt(id.substring("background-mute-".length())), value));
+    } else if (id.startsWith("device-velocity-")) {
+      publish(new OnDeviceCommand(DeviceCommand.VELOCITY, Integer.parseInt(id.substring("device-velocity-".length())), value));
+    } else {
+      switch (id) {
+      case "background-velocity":
+        publish(new OnCommand(Command.SET_BACKGROUND_VELOCITY, value));
+        break;
+      case "master-gain":
+        publish(new OnCommand(Command.SET_MASTER_GAIN, value));
+        break;
+      case "tempo":
+        publish(new OnCommand(Command.SET_TEMPO, value));
+        break;
+      }
+    }
   }
 
   private void doKaraokeBandEvent(OnKaraokeBandEvent message) {
@@ -150,13 +188,20 @@ public class KaraokeController extends ServiceTask {
 
   private void doRenderSong(OnRenderSong message) {
     NavigableMap<Integer, PlayerDetail> devicePlayerDetail = new TreeMap<>();
-    for (Entry<Integer, Integer> entry : message.getDeviceChannelAssignments().entrySet()) {
+    NavigableMap<Integer, Integer> deviceChannelAssignments = message.getDeviceChannelAssignments();
+    for (Entry<Integer, Integer> entry : deviceChannelAssignments.entrySet()) {
       Integer deviceIndex = entry.getKey();
       PlayerDetail playerDetail = request(new PlayerDetailService(deviceIndex));
       devicePlayerDetail.put(deviceIndex, playerDetail);
     }
     karaokeView.renderSong(message.getSong(), devicePlayerDetail);
-    karaokeView.setBackgroundVelocity(request(Services.getMidiVelocity));
+    for (Integer deviceIndex : deviceChannelAssignments.keySet()) {
+      karaokeView.setDeviceVelocity(deviceIndex, request(new PlayerVelocityService(deviceIndex)));
+      karaokeView.setBackgroundMute(deviceIndex, request(new BackgroundMuteService(deviceIndex)));
+    }
+    karaokeView.setBackgroundVelocity(request(Services.getBackgroundVelocity));
+    karaokeView.setMasterGain(request(Services.getMasterGain));
+    karaokeView.setTempo(request(Services.getTempo));
   }
 
   private void doSampleChannel(OnSampleChannel message) {
@@ -167,8 +212,24 @@ public class KaraokeController extends ServiceTask {
     karaokeView.renderSongDetails(message.getSong());
   }
 
+  private void doSetBackgroundMute(int deviceIndex, int mute) {
+    karaokeView.setBackgroundMute(deviceIndex, mute);
+  }
+
   private void doSetBackgroundVelocity(int velocity) {
     karaokeView.setBackgroundVelocity(velocity);
+  }
+
+  private void doSetDeviceVelocity(int deviceIndex, int velocity) {
+    karaokeView.setDeviceVelocity(deviceIndex, velocity);
+  }
+
+  private void doSetMasterGain(int gain) {
+    karaokeView.setMasterGain(gain);
+  }
+
+  private void doSetTempo(int tempo) {
+    karaokeView.setTempo(tempo);
   }
 
   private String getProgramOptions() {

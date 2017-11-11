@@ -20,6 +20,7 @@ import java.util.Set;
 import com.example.afs.musicpad.analyzer.KeyScore;
 import com.example.afs.musicpad.analyzer.KeySignatures;
 import com.example.afs.musicpad.device.common.DeviceHandler.OutputType;
+import com.example.afs.musicpad.html.CheckBox;
 import com.example.afs.musicpad.html.Division;
 import com.example.afs.musicpad.html.Element;
 import com.example.afs.musicpad.html.Node;
@@ -30,7 +31,7 @@ import com.example.afs.musicpad.message.OnKaraokeBandHtml;
 import com.example.afs.musicpad.message.OnKaraokeBandHtml.Action;
 import com.example.afs.musicpad.midi.Instruments;
 import com.example.afs.musicpad.midi.Midi;
-import com.example.afs.musicpad.playable.PlayerDetail;
+import com.example.afs.musicpad.player.PlayerDetail;
 import com.example.afs.musicpad.player.Sound;
 import com.example.afs.musicpad.player.Sounds;
 import com.example.afs.musicpad.player.Sounds.SoundCount;
@@ -181,9 +182,33 @@ public class KaraokeView extends ShadowDom {
     selectElement("songs", "selected-tab");
   }
 
+  public void setBackgroundMute(int deviceIndex, int value) {
+    CheckBox backgroundMute = getElementById("background-mute-" + deviceIndex);
+    setProperty(backgroundMute, "checked", value);
+  }
+
+  public void setBackgroundMute(Integer deviceIndex, Boolean value) {
+    setBackgroundMute(deviceIndex, value ? 1 : 0);
+  }
+
   public void setBackgroundVelocity(int value) {
     Range backgroundVelocity = getElementById("background-velocity");
     setProperty(backgroundVelocity, "value", value);
+  }
+
+  public void setDeviceVelocity(int deviceIndex, int value) {
+    Range deviceVelocity = getElementById("device-velocity-" + deviceIndex);
+    setProperty(deviceVelocity, "value", value);
+  }
+
+  public void setMasterGain(int value) {
+    Range masterGain = getElementById("master-gain");
+    setProperty(masterGain, "value", value);
+  }
+
+  public void setTempo(int value) {
+    Range tempo = getElementById("tempo");
+    setProperty(tempo, "value", value);
   }
 
   @Override
@@ -208,7 +233,7 @@ public class KaraokeView extends ShadowDom {
 
   @Override
   protected void onSetProperty(Element element, String name, Object value) {
-    broker.publish(new OnKaraokeBandHtml(Action.SET_PROPERTY, "#" + element.getId(), name, value.toString()));
+    broker.publish(new OnKaraokeBandHtml(Action.SET_PROPERTY, "#" + element.getId(), name, value));
   }
 
   private Element createChannelDetails(Song song, int channel) {

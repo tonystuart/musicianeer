@@ -26,17 +26,18 @@ import com.example.afs.musicpad.message.OnKeyUp;
 import com.example.afs.musicpad.message.OnSampleChannel;
 import com.example.afs.musicpad.message.OnSampleSong;
 import com.example.afs.musicpad.midi.Midi;
-import com.example.afs.musicpad.playable.PlayableMap;
-import com.example.afs.musicpad.playable.PlayerDetail;
-import com.example.afs.musicpad.playable.PlayerDetail.PlayerDetailService;
+import com.example.afs.musicpad.player.BackgroundMuteService;
+import com.example.afs.musicpad.player.PlayableMap;
 import com.example.afs.musicpad.player.Player;
 import com.example.afs.musicpad.player.Player.Action;
+import com.example.afs.musicpad.player.PlayerDetail;
+import com.example.afs.musicpad.player.PlayerDetailService;
+import com.example.afs.musicpad.player.PlayerVelocityService;
 import com.example.afs.musicpad.player.Sound;
 import com.example.afs.musicpad.song.ChannelNotes;
 import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.task.MessageBroker;
 import com.example.afs.musicpad.task.ServiceTask;
-import com.example.afs.musicpad.util.Range;
 
 public class DeviceHandler extends ServiceTask {
 
@@ -77,6 +78,8 @@ public class DeviceHandler extends ServiceTask {
     subscribe(OnSampleChannel.class, message -> doSampleChannel(message));
     subscribe(OnDeviceCommand.class, message -> doDeviceCommand(message));
     provide(new PlayerDetailService(deviceIndex), () -> getPlayerDetail());
+    provide(new PlayerVelocityService(deviceIndex), () -> player.getPercentVelocity());
+    provide(new BackgroundMuteService(deviceIndex), () -> synthesizer.isMuted(channel));
   }
 
   public void detach() {
@@ -162,7 +165,7 @@ public class DeviceHandler extends ServiceTask {
       doReset();
       break;
     case SET_TEMPO:
-      player.setPercentTempo(Range.scaleMidiToPercent(parameter));
+      player.setPercentTempo(parameter);
       break;
     case STOP:
       // TODO: Consider making explicit
@@ -174,9 +177,7 @@ public class DeviceHandler extends ServiceTask {
   }
 
   private void doDecreasePlayerVelocity() {
-    int currentPlayerVelocity = player.getVelocity();
-    int newPlayerVelocity = Math.max(0, currentPlayerVelocity - 5);
-    setVelocity(newPlayerVelocity);
+    publish(new OnDeviceCommand(DeviceCommand.VELOCITY, deviceIndex, Math.max(0, player.getPercentVelocity() - 5)));
   }
 
   private void doDeviceCommand(OnDeviceCommand message) {
@@ -227,9 +228,7 @@ public class DeviceHandler extends ServiceTask {
   }
 
   private void doIncreasePlayerVelocity() {
-    int currentPlayerVelocity = player.getVelocity();
-    int newPlayerVelocity = Math.min(Midi.MAX_VALUE, currentPlayerVelocity + 5);
-    setVelocity(newPlayerVelocity);
+    publish(new OnDeviceCommand(DeviceCommand.VELOCITY, deviceIndex, Math.min(100, player.getPercentVelocity() + 5)));
   }
 
   private void doInput(int typeIndex) {
@@ -420,7 +419,7 @@ public class DeviceHandler extends ServiceTask {
   }
 
   private void setVelocity(int velocity) {
-    player.setVelocity(velocity);
+    player.setPercentVelocity(velocity);
   }
 
   private void updateChannel() {

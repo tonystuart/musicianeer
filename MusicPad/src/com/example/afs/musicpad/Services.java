@@ -11,22 +11,28 @@ package com.example.afs.musicpad;
 
 import java.io.File;
 
-import com.example.afs.musicpad.playable.PlayerDetail;
+import com.example.afs.musicpad.player.PlayerDetail;
 import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.task.ServiceTask.Service;
 import com.example.afs.musicpad.util.RandomAccessList;
 
 public class Services {
 
-  public static final Service<Integer> getMidiVelocity = new Service<Integer>() {
+  public static final Service<Integer> getBackgroundVelocity = new Service<Integer>() {
   };
 
   public static final Service<Song> GetCurrentSong = new Service<Song>() {
+  };
+
+  public static final Service<Integer> getMasterGain = new Service<Integer>() {
   };
 
   public static final Service<RandomAccessList<File>> GetMidiFiles = new Service<RandomAccessList<File>>() {
   };
 
   public static Service<PlayerDetail> GetPlayerDetail = new Service<PlayerDetail>() {
+  };
+
+  public static final Service<Integer> getTempo = new Service<Integer>() {
   };
 }

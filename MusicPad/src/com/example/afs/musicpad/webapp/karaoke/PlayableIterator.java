@@ -9,7 +9,7 @@
 
 package com.example.afs.musicpad.webapp.karaoke;
 
-import com.example.afs.musicpad.playable.Playable;
+import com.example.afs.musicpad.player.Playable;
 import com.example.afs.musicpad.util.RandomAccessList;
 
 public class PlayableIterator {
