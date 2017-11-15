@@ -179,6 +179,7 @@ public class KaraokeController extends ServiceTask {
 
   private void doLoad() {
     publish(new OnKaraokeBandHtml(Action.REPLACE_CHILDREN, "body", karaokeView.render()));
+    karaokeView.selectSong(karaokeView.getSongIndex()); // refresh highlight on current song
   }
 
   private void doPickChannel(OnPickChannel message) {
