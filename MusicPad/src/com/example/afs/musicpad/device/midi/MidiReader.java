@@ -124,10 +124,22 @@ public class MidiReader implements HasSendCommand, HasSendDeviceMessage, HasSend
     }
   }
 
+  private String formatMessage(MidiMessage message) {
+    StringBuilder s = new StringBuilder();
+    for (byte b : message.getMessage()) {
+      if (s.length() > 0) {
+        s.append(" ");
+      }
+      s.append(String.format("%02x", b));
+    }
+    return s.toString();
+  }
+
   private void receiveFromDevice(MidiMessage message, long timestamp, int port) {
     try {
       if (message instanceof ShortMessage) {
         ShortMessage shortMessage = (ShortMessage) message;
+        System.out.println("MidiReader.receiveFromDevice: message=" + formatMessage(message) + ", command=" + shortMessage.getCommand() + ", channel=" + shortMessage.getChannel() + ", data1=" + shortMessage.getData1() + ", data2=" + shortMessage.getData2());
         context.setPort(port);
         context.setType(shortMessage.getCommand());
         context.setChannel(shortMessage.getChannel());
@@ -154,6 +166,8 @@ public class MidiReader implements HasSendCommand, HasSendDeviceMessage, HasSend
             player.bendPitch(pitchBend);
           }
         }
+      } else {
+        System.out.println("MidiReader.receiveFromDevice: message=" + formatMessage(message));
       }
     } catch (RuntimeException e) {
       e.printStackTrace();
