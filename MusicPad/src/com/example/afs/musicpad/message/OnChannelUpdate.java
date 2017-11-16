@@ -10,8 +10,8 @@
 package com.example.afs.musicpad.message;
 
 import com.example.afs.musicpad.device.common.DeviceHandler.InputType;
-import com.example.afs.musicpad.device.common.DeviceHandler.OutputType;
 import com.example.afs.musicpad.player.PlayableMap;
+import com.example.afs.musicpad.player.PlayableMap.OutputType;
 
 public class OnChannelUpdate extends TypedMessage {
 

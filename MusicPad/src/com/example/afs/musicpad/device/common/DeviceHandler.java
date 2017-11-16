@@ -28,6 +28,7 @@ import com.example.afs.musicpad.message.OnSampleSong;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.player.BackgroundMuteService;
 import com.example.afs.musicpad.player.PlayableMap;
+import com.example.afs.musicpad.player.PlayableMap.OutputType;
 import com.example.afs.musicpad.player.Player;
 import com.example.afs.musicpad.player.Player.Action;
 import com.example.afs.musicpad.player.PlayerDetail;
@@ -43,10 +44,6 @@ public class DeviceHandler extends ServiceTask {
 
   public static enum InputType {
     ALPHA, NUMERIC, MIDI
-  }
-
-  public static enum OutputType {
-    TICK, MEASURE
   }
 
   private int channel;

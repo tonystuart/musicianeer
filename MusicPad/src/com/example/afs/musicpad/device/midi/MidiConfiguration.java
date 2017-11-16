@@ -7,8 +7,12 @@
 // This program is made available on an "as is" basis, without
 // warranties or conditions of any kind, either express or implied.
 
-package com.example.afs.musicpad.device.midi.configuration;
+package com.example.afs.musicpad.device.midi;
 
-public enum ChannelState {
-  ACTIVE, INACTIVE, SELECTED
+public class MidiConfiguration {
+
+  public enum ChannelState {
+    SELECTED, ACTIVE, INACTIVE
+  }
+
 }

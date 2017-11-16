@@ -15,11 +15,7 @@ import javax.sound.midi.MidiUnavailableException;
 import javax.sound.midi.Receiver;
 import javax.sound.midi.ShortMessage;
 
-import com.example.afs.musicpad.device.midi.configuration.ChannelState;
-import com.example.afs.musicpad.device.midi.configuration.Context;
-import com.example.afs.musicpad.device.midi.configuration.Context.HasSendDeviceMessage;
-import com.example.afs.musicpad.device.midi.configuration.MidiConfiguration;
-import com.example.afs.musicpad.device.midi.configuration.On;
+import com.example.afs.musicpad.device.midi.MidiConfiguration.ChannelState;
 import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnDeviceCommand;
 import com.example.afs.musicpad.message.OnDeviceMessage;
@@ -31,12 +27,10 @@ import com.example.afs.musicpad.task.MessageBroker;
 import com.example.afs.musicpad.task.MessageTask;
 import com.example.afs.musicpad.util.DirectList;
 import com.example.afs.musicpad.util.RandomAccessList;
-import com.example.afs.musicpad.util.Value;
 
-public class MidiWriter extends MessageTask implements HasSendDeviceMessage {
+public class MidiWriter extends MessageTask {
 
   private int deviceIndex;
-  private Context context;
   private MidiDeviceBundle deviceBundle;
   private MidiConfiguration configuration;
   private RandomAccessList<Receiver> receivers = new DirectList<>();
@@ -47,8 +41,6 @@ public class MidiWriter extends MessageTask implements HasSendDeviceMessage {
     this.deviceBundle = deviceBundle;
     this.configuration = configuration;
     this.deviceIndex = deviceIndex;
-    this.context = configuration.getContext();
-    context.setHasSendDeviceMessage(this);
     subscribe(OnCommand.class, message -> doCommand(message));
     subscribe(OnDeviceCommand.class, message -> doDeviceCommand(message));
     subscribe(OnDeviceMessage.class, message -> doDeviceMessage(message));
@@ -56,7 +48,6 @@ public class MidiWriter extends MessageTask implements HasSendDeviceMessage {
     connectDevices();
   }
 
-  @Override
   public void sendDeviceMessage(int port, int command, int channel, int data1, int data2) {
     try {
       ShortMessage shortMessage = new ShortMessage(command, channel, data1, data2);
@@ -103,12 +94,6 @@ public class MidiWriter extends MessageTask implements HasSendDeviceMessage {
   }
 
   private void doCommand(OnCommand message) {
-    context.set("command", message.getCommand());
-    context.set("parameter", message.getParameter());
-    On onCommand = configuration.getOn(MidiConfiguration.COMMAND);
-    if (onCommand != null) {
-      onCommand.execute(context);
-    }
   }
 
   private void doDeviceCommand(OnDeviceCommand message) {
@@ -138,20 +123,9 @@ public class MidiWriter extends MessageTask implements HasSendDeviceMessage {
   }
 
   private void initializeDevice() {
-    On onInitialization = configuration.getOn(MidiConfiguration.INITIALIZATION);
-    if (onInitialization != null) {
-      onInitialization.execute(context);
-    }
   }
 
   private void setChannelState(int channel, ChannelState channelState) {
-    int channelNumber = Value.toNumber(channel);
-    context.setStatusChannel(channelNumber);
-    context.setChannelState(channelState);
-    On onChannelStatus = configuration.getOn(MidiConfiguration.CHANNEL_STATUS);
-    if (onChannelStatus != null) {
-      onChannelStatus.execute(context);
-    }
   }
 
   private void updateChannelState(int assignedChannel) {

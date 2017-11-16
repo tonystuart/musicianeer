@@ -15,10 +15,9 @@ import java.io.InputStream;
 import com.example.afs.musicpad.device.common.Controller;
 import com.example.afs.musicpad.device.common.DeviceBundle;
 import com.example.afs.musicpad.device.common.DeviceHandler;
-import com.example.afs.musicpad.device.midi.configuration.MidiConfiguration;
-import com.example.afs.musicpad.device.midi.configuration.Parser;
 import com.example.afs.musicpad.task.MessageBroker;
 import com.example.afs.musicpad.util.FileUtilities;
+import com.example.afs.musicpad.util.JsonUtilities;
 
 public class MidiController implements Controller {
 
@@ -63,13 +62,13 @@ public class MidiController implements Controller {
     File configurationFile = new File(overridePathName);
     if (configurationFile.isFile() && configurationFile.canRead()) {
       String contents = FileUtilities.read(fileName);
-      MidiConfiguration configuration = new Parser().parse(contents);
+      MidiConfiguration configuration = JsonUtilities.fromJson(contents, MidiConfiguration.class);
       return configuration;
     }
     InputStream inputStream = getClass().getClassLoader().getResourceAsStream(fileName);
     if (inputStream != null) {
       String contents = FileUtilities.read(inputStream);
-      MidiConfiguration configuration = new Parser().parse(contents);
+      MidiConfiguration configuration = JsonUtilities.fromJson(contents, MidiConfiguration.class);
       return configuration;
     }
     System.out.println("Cannot find configuration for " + type + ", using default");

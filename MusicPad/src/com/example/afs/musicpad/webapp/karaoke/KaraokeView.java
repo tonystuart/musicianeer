@@ -19,7 +19,6 @@ import java.util.Set;
 
 import com.example.afs.musicpad.analyzer.KeyScore;
 import com.example.afs.musicpad.analyzer.KeySignatures;
-import com.example.afs.musicpad.device.common.DeviceHandler.OutputType;
 import com.example.afs.musicpad.html.CheckBox;
 import com.example.afs.musicpad.html.Division;
 import com.example.afs.musicpad.html.Element;
@@ -31,6 +30,7 @@ import com.example.afs.musicpad.message.OnKaraokeBandHtml;
 import com.example.afs.musicpad.message.OnKaraokeBandHtml.Action;
 import com.example.afs.musicpad.midi.Instruments;
 import com.example.afs.musicpad.midi.Midi;
+import com.example.afs.musicpad.player.PlayableMap.OutputType;
 import com.example.afs.musicpad.player.PlayerDetail;
 import com.example.afs.musicpad.player.Sound;
 import com.example.afs.musicpad.player.Sounds;

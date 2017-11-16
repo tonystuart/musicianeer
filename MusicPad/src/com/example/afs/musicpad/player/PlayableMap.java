@@ -13,6 +13,10 @@ import com.example.afs.musicpad.util.RandomAccessList;
 
 public interface PlayableMap {
 
+  enum OutputType {
+    TICK, MEASURE
+  }
+
   RandomAccessList<Playable> getPlayables();
 
   Sound onDown(int inputCode);

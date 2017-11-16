@@ -94,7 +94,9 @@ public class ShadowDom {
     if (classList != null) {
       classList.remove(className);
       Set<Element> elementsWithClass = classes.get(className);
-      elementsWithClass.remove(element);
+      if (elementsWithClass != null) {
+        elementsWithClass.remove(element);
+      }
       onRemoveClassName(element, className);
     }
   }

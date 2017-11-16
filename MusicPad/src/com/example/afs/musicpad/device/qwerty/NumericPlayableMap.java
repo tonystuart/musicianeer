@@ -9,7 +9,6 @@
 
 package com.example.afs.musicpad.device.qwerty;
 
-import com.example.afs.musicpad.device.common.DeviceHandler.OutputType;
 import com.example.afs.musicpad.song.Note;
 
 public class NumericPlayableMap extends QwertyPlayableMap {
