@@ -20,32 +20,28 @@ import com.example.afs.musicpad.util.RandomAccessList;
 
 public abstract class AbstractPlayableMap implements PlayableMap {
 
-  private int autoRegister;
-  private int registerDown;
+  private int autoBank;
+  private int bankDown;
 
-  private final int noteKeyCount;
-  private final int registerKeyCount;
   private final int supportedSounds;
 
-  protected final int[] noteKeys;
-  protected final int[] registerKeys;
+  protected final int[] bankInputCodes;
+  protected final int[] noteInputCodes;
 
   private final Sounds sounds;
-  private final Sound[][] keyIndexToSounds;
+  private final Sound[][] inputIndexToSound;
   private final RandomAccessList<Playable> playables;
 
-  public AbstractPlayableMap(Iterable<Note> notes, OutputType outputType, int[] noteKeys, int[] registerKeys) {
-    this.noteKeys = noteKeys;
-    this.registerKeys = registerKeys;
-    this.noteKeyCount = noteKeys.length;
-    this.registerKeyCount = registerKeys.length;
-    this.supportedSounds = noteKeyCount * registerKeyCount;
+  public AbstractPlayableMap(Iterable<Note> notes, OutputType outputType, int[] noteInputCodes, int[] bankInputCodes) {
+    this.noteInputCodes = noteInputCodes;
+    this.bankInputCodes = bankInputCodes;
+    this.supportedSounds = noteInputCodes.length * bankInputCodes.length;
     this.sounds = new Sounds(outputType, notes);
     Map<Sound, SoundCount> uniqueSoundCounts = sounds.getUniqueSoundCounts();
     SoundCount[] sortedSounds = sortByFrequency(uniqueSoundCounts);
     int maxSounds = Math.min(uniqueSoundCounts.size(), supportedSounds);
-    keyIndexToSounds = assignSoundsToRegisters(sortedSounds, maxSounds);
-    sortByPitch(keyIndexToSounds, maxSounds);
+    inputIndexToSound = assignSoundsToBanks(sortedSounds, maxSounds);
+    sortByPitch(inputIndexToSound, maxSounds);
     Map<Sound, String> soundToLegend = assignSoundsToLegend(maxSounds);
     playables = getPlayables(soundToLegend);
   }
@@ -58,18 +54,18 @@ public abstract class AbstractPlayableMap implements PlayableMap {
   @Override
   public Sound onDown(int inputCode) {
     Sound sound;
-    int keyIndex = indexOf(noteKeys, inputCode);
-    if (keyIndex != -1) {
-      int thisRegister = registerDown != 0 ? registerDown : autoRegister;
-      sound = keyIndexToSounds[thisRegister][keyIndex];
-      //System.out.println("inputCode=" + inputCode + ", keyIndex=" + keyIndex + ", sound=" + sound);
-      autoRegister = 0;
+    int noteIndex = indexOf(noteInputCodes, inputCode);
+    if (noteIndex != -1) {
+      int thisBank = bankDown != 0 ? bankDown : autoBank;
+      sound = inputIndexToSound[thisBank][noteIndex];
+      //System.out.println("inputCode=" + inputCode + ", noteIndex=" + noteIndex + ", sound=" + sound);
+      autoBank = 0;
     } else {
       sound = null;
-      int index = indexOf(registerKeys, inputCode);
+      int index = indexOf(bankInputCodes, inputCode);
       if (index != -1) {
-        registerDown = index;
-        autoRegister = registerDown;
+        bankDown = index;
+        autoBank = bankDown;
       }
     }
     return sound;
@@ -77,21 +73,38 @@ public abstract class AbstractPlayableMap implements PlayableMap {
 
   @Override
   public void onUp(int inputCode) {
-    if (indexOf(registerKeys, inputCode) != -1) {
-      registerDown = 0;
+    if (indexOf(bankInputCodes, inputCode) != -1) {
+      bankDown = 0;
     }
   }
 
+  protected abstract String getBankLegend(int bankIndex);
+
   protected abstract String getNoteLegend(int noteIndex);
 
-  protected abstract String getRegisterLegend(int registerIndex);
+  private Sound[][] assignSoundsToBanks(SoundCount[] sortedSounds, int maxSounds) {
+    int index = 0;
+    Sound[][] inputIndexToSound = new Sound[bankInputCodes.length][noteInputCodes.length];
+    for (int i = 0; i < bankInputCodes.length; i++) {
+      for (int j = 0; j < noteInputCodes.length; j++) {
+        if (index < maxSounds) {
+          Sound sound = sortedSounds[index].getValue();
+          inputIndexToSound[i][j] = sound;
+          index++;
+        } else {
+          inputIndexToSound[i][j] = null;
+        }
+      }
+    }
+    return inputIndexToSound;
+  }
 
   private Map<Sound, String> assignSoundsToLegend(int maxSounds) {
     int index = 0;
     Map<Sound, String> soundToLegend = new HashMap<>();
-    for (int i = 0; i < registerKeyCount && index < maxSounds; i++) {
-      for (int j = 0; j < noteKeyCount && index < maxSounds; j++) {
-        Sound sound = keyIndexToSounds[i][j];
+    for (int i = 0; i < bankInputCodes.length && index < maxSounds; i++) {
+      for (int j = 0; j < noteInputCodes.length && index < maxSounds; j++) {
+        Sound sound = inputIndexToSound[i][j];
         soundToLegend.put(sound, getLegend(i, j));
         index++;
       }
@@ -99,31 +112,14 @@ public abstract class AbstractPlayableMap implements PlayableMap {
     return soundToLegend;
   }
 
-  private Sound[][] assignSoundsToRegisters(SoundCount[] sortedSounds, int maxSounds) {
-    int index = 0;
-    Sound[][] keyIndexToSound = new Sound[registerKeyCount][noteKeyCount];
-    for (int i = 0; i < registerKeyCount; i++) {
-      for (int j = 0; j < noteKeyCount; j++) {
-        if (index < maxSounds) {
-          Sound sound = sortedSounds[index].getValue();
-          keyIndexToSound[i][j] = sound;
-          index++;
-        } else {
-          keyIndexToSound[i][j] = null;
-        }
-      }
-    }
-    return keyIndexToSound;
-  }
-
-  private String getLegend(int register, int noteIndex) {
-    String registerString;
-    if (register == 0) {
-      registerString = "";
+  private String getLegend(int bank, int noteIndex) {
+    String bankString;
+    if (bank == 0) {
+      bankString = "";
     } else {
-      registerString = getRegisterLegend(register);
+      bankString = getBankLegend(bank);
     }
-    return registerString + getNoteLegend(noteIndex);
+    return bankString + getNoteLegend(noteIndex);
   }
 
   private RandomAccessList<Playable> getPlayables(Map<Sound, String> soundToLegend) {
@@ -158,11 +154,11 @@ public abstract class AbstractPlayableMap implements PlayableMap {
     return sortedSounds;
   }
 
-  private void sortByPitch(Sound[][] keyIndexToSound, int maxSounds) {
+  private void sortByPitch(Sound[][] inputIndexToSound, int maxSounds) {
     int amountRemaining = maxSounds;
-    for (int i = 0; amountRemaining > 0 && i < keyIndexToSound[i].length; i++) {
-      Arrays.sort(keyIndexToSound[i], 0, Math.min(noteKeyCount, amountRemaining));
-      amountRemaining = Math.max(amountRemaining - noteKeyCount, 0);
+    for (int i = 0; amountRemaining > 0 && i < inputIndexToSound[i].length; i++) {
+      Arrays.sort(inputIndexToSound[i], 0, Math.min(noteInputCodes.length, amountRemaining));
+      amountRemaining = Math.max(amountRemaining - noteInputCodes.length, 0);
     }
   }
 

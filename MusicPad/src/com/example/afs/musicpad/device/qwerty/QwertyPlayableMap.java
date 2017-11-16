@@ -25,18 +25,18 @@ public class QwertyPlayableMap extends AbstractPlayableMap {
     return keysArray;
   }
 
-  public QwertyPlayableMap(Iterable<Note> notes, OutputType outputType, String noteKeys, String registerKeys) {
-    super(notes, outputType, getKeysArray(noteKeys), getKeysArray(registerKeys));
+  public QwertyPlayableMap(Iterable<Note> notes, OutputType outputType, String noteInputCodes, String bankInputCodes) {
+    super(notes, outputType, getKeysArray(noteInputCodes), getKeysArray(bankInputCodes));
+  }
+
+  @Override
+  protected String getBankLegend(int bankIndex) {
+    return KeyEvent.getKeyText(bankInputCodes[bankIndex]) + "+";
   }
 
   @Override
   protected String getNoteLegend(int noteIndex) {
-    return KeyEvent.getKeyText(noteKeys[noteIndex]);
-  }
-
-  @Override
-  protected String getRegisterLegend(int registerIndex) {
-    return KeyEvent.getKeyText(registerKeys[registerIndex]) + "+";
+    return KeyEvent.getKeyText(noteInputCodes[noteIndex]);
   }
 
 }
