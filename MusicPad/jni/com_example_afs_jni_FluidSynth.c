@@ -49,6 +49,11 @@ JNIEXPORT jint JNICALL Java_com_example_afs_jni_FluidSynth_fluid_1synth_1cc
   	return fluid_synth_cc((fluid_synth_t*)synth, chan, num, val);
 }
 
+JNIEXPORT jint JNICALL Java_com_example_afs_jni_FluidSynth_fluid_1synth_1channel_1pressure
+  (JNIEnv *env, jclass this, jlong synth, jint chan, jint val) {
+  	return fluid_synth_noteoff((fluid_synth_t*)synth, chan, val);
+}
+
 JNIEXPORT jint JNICALL Java_com_example_afs_jni_FluidSynth_fluid_1synth_1noteoff
   (JNIEnv *env, jclass this, jlong synth, jint chan, jint key) {
   	return fluid_synth_noteoff((fluid_synth_t*)synth, chan, key);

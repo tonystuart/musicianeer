@@ -31,7 +31,7 @@ public class MidiController implements Controller {
     this.midiDeviceBundle = (MidiDeviceBundle) deviceBundle;
     MidiConfiguration configuration = initializeConfiguration();
     MessageBroker broker = deviceHandler.getBroker();
-    midiReader = new MidiReader(broker, deviceHandler.getPlayer(), deviceHandler.getDeviceIndex(), midiDeviceBundle, configuration);
+    midiReader = new MidiReader(broker, deviceHandler, midiDeviceBundle, configuration);
     midiWriter = new MidiWriter(broker, midiDeviceBundle, configuration, deviceHandler.getDeviceIndex());
   }
 

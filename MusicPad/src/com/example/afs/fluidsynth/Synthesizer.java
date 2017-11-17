@@ -132,6 +132,10 @@ public class Synthesizer {
     FluidSynth.fluid_synth_noteoff(synth, channel, key);
   }
 
+  public void setChannelPressure(int channel, int pressure) {
+    FluidSynth.fluid_synth_channel_pressure(synth, channel, pressure);
+  }
+
   /**
    * Set midi channel type
    * 

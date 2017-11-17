@@ -33,6 +33,8 @@ public class FluidSynth {
 
   public static native int fluid_synth_cc(long synth, int chan, int num, int val);
 
+  public static native int fluid_synth_channel_pressure(long synth, int chan, int val);
+
   public static native int fluid_synth_noteoff(long synth, int chan, int key);
 
   public static native int fluid_synth_noteon(long synth, int chan, int key, int vel);

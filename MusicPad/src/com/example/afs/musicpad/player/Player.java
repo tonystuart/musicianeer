@@ -12,12 +12,10 @@ package com.example.afs.musicpad.player;
 import com.example.afs.fluidsynth.Synthesizer;
 import com.example.afs.jni.FluidSynth;
 import com.example.afs.musicpad.Trace;
-import com.example.afs.musicpad.analyzer.Names;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.player.PlayableMap.OutputType;
 import com.example.afs.musicpad.song.Note;
 import com.example.afs.musicpad.transport.NoteEvent;
-import com.example.afs.musicpad.util.Range;
 
 public class Player {
 
@@ -29,12 +27,9 @@ public class Player {
   private static final int PLAYER_CHANNELS = Midi.CHANNELS;
   public static final int TOTAL_CHANNELS = PLAYER_BASE + PLAYER_CHANNELS;
 
-  private static final int DEFAULT_VELOCITY = 64;
-
   private int program;
   private int playerChannel;
   private int percentTempo;
-  private int velocity = DEFAULT_VELOCITY;
   private boolean isEnabled = true;
 
   private Synthesizer synthesizer;
@@ -60,29 +55,18 @@ public class Player {
     return outputType;
   }
 
-  public int getPercentVelocity() {
-    return Range.scaleMidiToPercent(velocity);
-  }
-
   public int getProgram() {
     return program;
   }
 
-  public void play(Action action, int midiNote) {
-    if (action == Action.PRESS && Trace.isTracePlay()) {
-      System.out.println("Player.play: midiNote=" + Names.formatNote(midiNote));
-    }
-    synthesizeNote(action, midiNote);
-  }
-
-  public void play(Action action, Sound sound) {
+  public void play(Action action, Sound sound, int velocity) {
     if (isEnabled) {
       if (action == Action.PRESS && Trace.isTracePlay()) {
         System.out.println("Player.play: soundType=" + sound);
       }
       switch (outputType) {
       case TICK:
-        sendToSynthesizer(action, sound);
+        sendToSynthesizer(action, sound, velocity);
         break;
       case MEASURE:
         sendToArpeggiator(action, sound);
@@ -94,7 +78,6 @@ public class Player {
   }
 
   public void reset() {
-    velocity = DEFAULT_VELOCITY;
     if (arpeggiator != null) {
       arpeggiator.setPercentTempo(100);
     }
@@ -126,21 +109,20 @@ public class Player {
     }
   }
 
-  public void setPercentVelocity(int velocity) {
-    this.velocity = Range.scalePercentToMidi(velocity);
-  }
-
-  private void press(int midiNote) {
+  private void press(int midiNote, int velocity) {
     synthesizer.pressKey(playerChannel, midiNote, velocity);
   }
 
   private synchronized void processNoteEvent(NoteEvent noteEvent) {
+    Note note = noteEvent.getNote();
+    int midiNote = note.getMidiNote();
+    int velocity = note.getVelocity();
     switch (noteEvent.getType()) {
     case NOTE_OFF:
-      release(noteEvent.getNote().getMidiNote());
+      release(midiNote, velocity);
       break;
     case NOTE_ON:
-      press(noteEvent.getNote().getMidiNote());
+      press(midiNote, velocity);
       break;
     case TICK:
       // TICK fills to end-of-measure
@@ -158,7 +140,7 @@ public class Player {
     }
   }
 
-  private void release(int midiNote) {
+  private void release(int midiNote, int velocity) {
     synthesizer.releaseKey(playerChannel, midiNote);
   }
 
@@ -182,19 +164,19 @@ public class Player {
     }
   }
 
-  private void sendToSynthesizer(Action action, Sound sound) {
+  private void sendToSynthesizer(Action action, Sound sound, int velocity) {
     for (Note note : sound.getNotes()) {
-      synthesizeNote(action, note.getMidiNote());
+      synthesizeNote(action, note.getMidiNote(), velocity);
     }
   }
 
-  private void synthesizeNote(Action action, int midiNote) {
+  private void synthesizeNote(Action action, int midiNote, int velocity) {
     switch (action) {
     case PRESS:
-      press(midiNote);
+      press(midiNote, velocity);
       break;
     case RELEASE:
-      release(midiNote);
+      release(midiNote, velocity);
       break;
     default:
       throw new UnsupportedOperationException();

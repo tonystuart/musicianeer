@@ -15,16 +15,15 @@ import java.util.Set;
 import com.example.afs.fluidsynth.Synthesizer;
 import com.example.afs.musicpad.Command;
 import com.example.afs.musicpad.DeviceCommand;
-import com.example.afs.musicpad.device.midi.MidiPlayableMap;
 import com.example.afs.musicpad.device.qwerty.AlphaPlayableMap;
 import com.example.afs.musicpad.device.qwerty.NumericPlayableMap;
-import com.example.afs.musicpad.message.OnChannelUpdate;
 import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnDeviceCommand;
 import com.example.afs.musicpad.message.OnKeyDown;
 import com.example.afs.musicpad.message.OnKeyUp;
 import com.example.afs.musicpad.message.OnSampleChannel;
 import com.example.afs.musicpad.message.OnSampleSong;
+import com.example.afs.musicpad.midi.BeatStepPlayableMap;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.player.BackgroundMuteService;
 import com.example.afs.musicpad.player.PlayableMap;
@@ -39,6 +38,7 @@ import com.example.afs.musicpad.song.ChannelNotes;
 import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.task.MessageBroker;
 import com.example.afs.musicpad.task.ServiceTask;
+import com.example.afs.musicpad.util.Range;
 
 public class DeviceHandler extends ServiceTask {
 
@@ -46,10 +46,13 @@ public class DeviceHandler extends ServiceTask {
     ALPHA, NUMERIC, MIDI
   }
 
+  private static final int DEFAULT_VELOCITY = 64;
+
   private int channel;
   private int deviceIndex;
   private boolean isCommand;
-
+  private int velocity = DEFAULT_VELOCITY;
+  
   private Song song;
   private Player player;
   private String deviceName;
@@ -75,7 +78,7 @@ public class DeviceHandler extends ServiceTask {
     subscribe(OnSampleChannel.class, message -> doSampleChannel(message));
     subscribe(OnDeviceCommand.class, message -> doDeviceCommand(message));
     provide(new PlayerDetailService(deviceIndex), () -> getPlayerDetail());
-    provide(new PlayerVelocityService(deviceIndex), () -> player.getPercentVelocity());
+    provide(new PlayerVelocityService(deviceIndex), () -> getPercentVelocity());
     provide(new BackgroundMuteService(deviceIndex), () -> synthesizer.isMuted(channel));
   }
 
@@ -91,41 +94,36 @@ public class DeviceHandler extends ServiceTask {
     return deviceName;
   }
 
+  public int getPercentVelocity() {
+    return Range.scaleMidiToPercent(velocity);
+  }
+
   public Player getPlayer() {
     return player;
   }
 
+  public void onChannelPressure(int channel, int pressure) {
+    synthesizer.setChannelPressure(channel, pressure);
+  }
+
   public void onDown(int inputCode) {
-    if (inputCode == KeyEvent.VK_NUM_LOCK) {
-      System.out.println("deviceName=" + deviceName + ", deviceIndex=" + deviceIndex + ", inputCode=" + inputCode);
-      isCommand = true;
-    } else if (isCommand) {
-      processKeyboardCommand(inputCode);
-    } else if (playableMap != null) {
-      Sound sound = playableMap.onDown(inputCode);
-      if (sound != null) {
-        if (sound != null) {
-          player.play(Action.PRESS, sound);
-          activeSounds[inputCode] = sound;
-          publish(new OnKeyDown(deviceIndex, sound));
-        }
-      }
-    }
+    processDown(inputCode, velocity);
+  }
+
+  public void onDown(int inputCode, int velocity) {
+    processDown(inputCode, Range.scale(this.velocity / 2, Midi.MAX_VALUE, 0, Midi.MAX_VALUE, velocity));
   }
 
   public void onUp(int inputCode) {
-    if (inputCode == KeyEvent.VK_NUM_LOCK) {
-      isCommand = false;
-    } else if (isCommand) {
-    } else if (playableMap != null) {
-      playableMap.onUp(inputCode);
-      Sound sound = activeSounds[inputCode];
-      if (sound != null) {
-        player.play(Action.RELEASE, sound);
-        activeSounds[inputCode] = null;
-        publish(new OnKeyUp(deviceIndex, sound));
-      }
-    }
+    processUp(inputCode, velocity);
+  }
+
+  public void onUp(int inputCode, int velocity) {
+    processUp(inputCode, Range.scale(this.velocity / 2, Midi.MAX_VALUE, 0, Midi.MAX_VALUE, velocity));
+  }
+
+  public void setPercentVelocity(int velocity) {
+    this.velocity = Range.scalePercentToMidi(velocity);
   }
 
   @Override
@@ -143,7 +141,7 @@ public class DeviceHandler extends ServiceTask {
       playableMap = new NumericPlayableMap(song.getChannelNotes(channel), player.getOutputType());
       break;
     case MIDI:
-      playableMap = new MidiPlayableMap(song.getChannelNotes(channel), player.getOutputType());
+      playableMap = new BeatStepPlayableMap(song.getChannelNotes(channel), player.getOutputType());
       break;
     default:
       throw new UnsupportedOperationException();
@@ -174,7 +172,7 @@ public class DeviceHandler extends ServiceTask {
   }
 
   private void doDecreasePlayerVelocity() {
-    publish(new OnDeviceCommand(DeviceCommand.VELOCITY, deviceIndex, Math.max(0, player.getPercentVelocity() - 5)));
+    publish(new OnDeviceCommand(DeviceCommand.VELOCITY, deviceIndex, Math.max(0, getPercentVelocity() - 5)));
   }
 
   private void doDeviceCommand(OnDeviceCommand message) {
@@ -216,7 +214,7 @@ public class DeviceHandler extends ServiceTask {
         selectChannel(parameter);
         break;
       case VELOCITY:
-        setVelocity(parameter);
+        setPercentVelocity(parameter);
         break;
       default:
         break;
@@ -225,7 +223,7 @@ public class DeviceHandler extends ServiceTask {
   }
 
   private void doIncreasePlayerVelocity() {
-    publish(new OnDeviceCommand(DeviceCommand.VELOCITY, deviceIndex, Math.min(100, player.getPercentVelocity() + 5)));
+    publish(new OnDeviceCommand(DeviceCommand.VELOCITY, deviceIndex, Math.min(100, getPercentVelocity() + 5)));
   }
 
   private void doInput(int typeIndex) {
@@ -299,6 +297,7 @@ public class DeviceHandler extends ServiceTask {
   }
 
   private void doReset() {
+    velocity = DEFAULT_VELOCITY;
     player.reset();
     synthesizer.muteChannel(channel, false);
   }
@@ -321,6 +320,24 @@ public class DeviceHandler extends ServiceTask {
       playableMap = createPlayableMap();
     }
     return new PlayerDetail(playableMap.getPlayables(), channel, player.getProgram());
+  }
+
+  private void processDown(int inputCode, int velocity) {
+    if (inputCode == KeyEvent.VK_NUM_LOCK) {
+      System.out.println("deviceName=" + deviceName + ", deviceIndex=" + deviceIndex + ", inputCode=" + inputCode);
+      isCommand = true;
+    } else if (isCommand) {
+      processKeyboardCommand(inputCode);
+    } else if (playableMap != null) {
+      Sound sound = playableMap.onDown(inputCode);
+      if (sound != null) {
+        if (sound != null) {
+          player.play(Action.PRESS, sound, velocity);
+          activeSounds[inputCode] = sound;
+          publish(new OnKeyDown(deviceIndex, sound));
+        }
+      }
+    }
   }
 
   private void processKeyboardCommand(int inputCode) {
@@ -394,6 +411,21 @@ public class DeviceHandler extends ServiceTask {
     }
   }
 
+  private void processUp(int inputCode, int velocity) {
+    if (inputCode == KeyEvent.VK_NUM_LOCK) {
+      isCommand = false;
+    } else if (isCommand) {
+    } else if (playableMap != null) {
+      playableMap.onUp(inputCode);
+      Sound sound = activeSounds[inputCode];
+      if (sound != null) {
+        player.play(Action.RELEASE, sound, velocity);
+        activeSounds[inputCode] = null;
+        publish(new OnKeyUp(deviceIndex, sound));
+      }
+    }
+  }
+
   private void selectChannel(int channel) {
     this.channel = channel;
     if (channel == Midi.DRUM) {
@@ -412,14 +444,9 @@ public class DeviceHandler extends ServiceTask {
     player.selectProgram(program);
   }
 
-  private void setVelocity(int velocity) {
-    player.setPercentVelocity(velocity);
-  }
-
   private void updateChannel() {
     if (!song.equals(oldSong) || inputType != oldInputType || channel != oldChannel || player.getOutputType() != oldOutputType) {
       playableMap = createPlayableMap();
-      getBroker().publish(new OnChannelUpdate(deviceIndex, deviceName, channel, inputType, player.getOutputType(), playableMap));
       oldSong = song;
       oldInputType = inputType;
       oldChannel = channel;
