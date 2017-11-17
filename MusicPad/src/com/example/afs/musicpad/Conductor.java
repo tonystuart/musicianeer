@@ -48,7 +48,6 @@ public class Conductor extends ServiceTask {
     subscribe(OnDeviceCommand.class, message -> doDeviceCommand(message));
     subscribe(OnDeviceAttached.class, message -> doDeviceAttached(message));
     subscribe(OnDeviceDetached.class, message -> doDeviceDetached(message));
-    // TODO: Subscribe to OnChannelUpdate and publish so that things like KaraokeController can render a new prompter
     provide(Services.GetMidiFiles, () -> midiFiles);
     provide(Services.GetCurrentSong, () -> song);
   }
@@ -100,7 +99,7 @@ public class Conductor extends ServiceTask {
     deviceChannelAssignments.remove(deviceIndex);
     if (deviceIndexes.size() == deviceChannelAssignments.size()) {
       publish(new OnRenderSong(song, deviceChannelAssignments));
-    } else {
+    } else if (deviceChannelAssignments.size() > 0) { // only if channel selection has already begun
       Integer next;
       if (deviceChannelAssignments.size() > 0) {
         next = deviceIndexes.higher(deviceChannelAssignments.lastKey());
