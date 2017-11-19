@@ -9,17 +9,17 @@
 
 package com.example.afs.musicpad.device.common;
 
-import java.util.Map;
+import java.util.Set;
 
 import com.example.afs.musicpad.device.common.DeviceHandler.InputType;
 
 public interface WatcherBehavior {
 
-  Controller attachDevice(DeviceHandler deviceHandler, DeviceBundle deviceBundle);
+  Controller attachDevice(DeviceHandler deviceHandler, String deviceName);
 
   void detachDevice(String name, Controller controller);
 
-  Map<String, DeviceBundle> getDevices();
+  Set<String> getDeviceNames();
 
   InputType getInputType();
 

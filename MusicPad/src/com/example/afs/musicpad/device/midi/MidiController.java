@@ -13,7 +13,6 @@ import java.io.File;
 import java.io.InputStream;
 
 import com.example.afs.musicpad.device.common.Controller;
-import com.example.afs.musicpad.device.common.DeviceBundle;
 import com.example.afs.musicpad.device.common.DeviceHandler;
 import com.example.afs.musicpad.task.MessageBroker;
 import com.example.afs.musicpad.util.FileUtilities;
@@ -26,9 +25,9 @@ public class MidiController implements Controller {
   private DeviceHandler deviceHandler;
   private MidiDeviceBundle midiDeviceBundle;
 
-  public MidiController(DeviceHandler deviceHandler, DeviceBundle deviceBundle) {
+  public MidiController(DeviceHandler deviceHandler, MidiDeviceBundle midiDeviceBundle) {
     this.deviceHandler = deviceHandler;
-    this.midiDeviceBundle = (MidiDeviceBundle) deviceBundle;
+    this.midiDeviceBundle = midiDeviceBundle;
     MidiConfiguration configuration = initializeConfiguration();
     MessageBroker broker = deviceHandler.getBroker();
     midiReader = new MidiReader(broker, deviceHandler, midiDeviceBundle, configuration);

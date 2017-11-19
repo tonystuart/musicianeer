@@ -10,7 +10,6 @@
 package com.example.afs.musicpad.device.qwerty;
 
 import com.example.afs.musicpad.device.common.Controller;
-import com.example.afs.musicpad.device.common.DeviceBundle;
 import com.example.afs.musicpad.device.common.DeviceHandler;
 
 public class QwertyController implements Controller {
@@ -18,7 +17,7 @@ public class QwertyController implements Controller {
   private DeviceHandler deviceHandler;
   private QwertyReader qwertyReader;
 
-  public QwertyController(DeviceHandler deviceHandler, DeviceBundle deviceBundle) {
+  public QwertyController(DeviceHandler deviceHandler) {
     this.deviceHandler = deviceHandler;
     qwertyReader = new QwertyReader(deviceHandler);
   }

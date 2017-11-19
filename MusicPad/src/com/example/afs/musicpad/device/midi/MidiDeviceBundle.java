@@ -11,11 +11,10 @@ package com.example.afs.musicpad.device.midi;
 
 import javax.sound.midi.MidiDevice;
 
-import com.example.afs.musicpad.device.common.DeviceBundle;
 import com.example.afs.musicpad.util.DirectList;
 import com.example.afs.musicpad.util.RandomAccessList;
 
-public class MidiDeviceBundle implements DeviceBundle {
+public class MidiDeviceBundle {
 
   private String type;
   private int card;

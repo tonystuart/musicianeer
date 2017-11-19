@@ -41,29 +41,28 @@ public class DeviceWatcher extends MessageTask {
 
   @Override
   public void onTimeout() throws InterruptedException {
-    Map<String, DeviceBundle> newDevices = watcherBehavior.getDevices();
+    Set<String> newDeviceNames = watcherBehavior.getDeviceNames();
     Iterator<Entry<String, Controller>> oldIterator = oldDevices.entrySet().iterator();
     while (oldIterator.hasNext()) {
       Entry<String, Controller> oldEntry = oldIterator.next();
-      if (!newDevices.containsKey(oldEntry.getKey())) {
+      if (!newDeviceNames.contains(oldEntry.getKey())) {
         detachDevice(oldEntry.getKey(), oldEntry.getValue());
         oldIterator.remove();
       }
     }
-    for (Entry<String, DeviceBundle> newEntry : newDevices.entrySet()) {
-      if (!oldDevices.containsKey(newEntry.getKey()) && !detachedDevices.contains(newEntry.getKey())) {
-        attachDevice(newEntry.getKey(), newEntry.getValue());
+    for (String newDeviceName : newDeviceNames) {
+      if (!oldDevices.containsKey(newDeviceName) && !detachedDevices.contains(newDeviceName)) {
+        attachDevice(newDeviceName);
       }
     }
   }
 
-  private void attachDevice(String name, DeviceBundle deviceBundle) {
-    // TODO: Replace the overwrought WatcherBehavior with a case statement on DeviceType
-    int deviceIndex = DeviceIdFactory.getDeviceIndex(name);
+  private void attachDevice(String deviceName) {
+    int deviceIndex = DeviceIdFactory.getDeviceIndex(deviceName);
     InputType inputType = watcherBehavior.getInputType();
-    DeviceHandler deviceHandler = new DeviceHandler(getBroker(), synthesizer, name, deviceIndex, inputType);
-    Controller controller = watcherBehavior.attachDevice(deviceHandler, deviceBundle);
-    oldDevices.put(name, controller);
+    DeviceHandler deviceHandler = new DeviceHandler(getBroker(), synthesizer, deviceName, deviceIndex, inputType);
+    Controller controller = watcherBehavior.attachDevice(deviceHandler, deviceName);
+    oldDevices.put(deviceName, controller);
     controller.start();
     publish(new OnDeviceAttached(deviceHandler.getDeviceIndex()));
   }
