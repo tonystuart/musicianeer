@@ -9,6 +9,7 @@
 
 package com.example.afs.musicpad.device.qwerty;
 
+import java.awt.event.KeyEvent;
 import java.io.FileDescriptor;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -16,13 +17,22 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 
 import com.example.afs.jni.Input;
+import com.example.afs.musicpad.Command;
+import com.example.afs.musicpad.DeviceCommand;
 import com.example.afs.musicpad.device.common.DeviceHandler;
+import com.example.afs.musicpad.device.common.DeviceHandler.InputType;
+import com.example.afs.musicpad.message.OnCommand;
+import com.example.afs.musicpad.message.OnDeviceCommand;
+import com.example.afs.musicpad.player.PlayableMap.OutputType;
+import com.example.afs.musicpad.song.ChannelNotes;
+import com.example.afs.musicpad.task.Message;
 
 // See /usr/include/linux/input.h
 // See https://www.kernel.org/doc/Documentation/input/input.txt
 
 public class QwertyReader {
 
+  private boolean isCommand;
   private boolean isTerminated;
 
   private Thread deviceReader;
@@ -60,10 +70,88 @@ public class QwertyReader {
     }
   }
 
+  private void processKeyboardCommand(int inputCode) {
+    switch (inputCode) {
+    case KeyEvent.VK_ESCAPE:
+      publish(new OnCommand(Command.DETACH, deviceHandler.getDeviceIndex()));
+      break;
+    case KeyEvent.VK_BACK_SPACE:
+      publish(new OnCommand(Command.RESET));
+      break;
+    case 'B':
+      publish(new OnCommand(Command.MOVE_BACKWARD));
+      break;
+    case 'D':
+      publish(new OnCommand(Command.DECREASE_MASTER_GAIN, 0));
+      break;
+    case 'F':
+      publish(new OnCommand(Command.MOVE_FORWARD));
+      break;
+    case 'I':
+      publish(new OnCommand(Command.INCREASE_MASTER_GAIN, 0));
+      break;
+    case 'P':
+      publish(new OnCommand(Command.PLAY, ChannelNotes.ALL_CHANNELS));
+      break;
+    case 'S':
+      publish(new OnCommand(Command.STOP, 0));
+      break;
+    case '0':
+      publish(new OnCommand(Command.DECREASE_TEMPO, 0));
+      break;
+    case '1':
+      publish(new OnCommand(Command.INCREASE_TEMPO, 0));
+      break;
+    case '2':
+      publish(new OnCommand(Command.DECREASE_BACKGROUND_VELOCITY, 0));
+      break;
+    case '3':
+      publish(new OnCommand(Command.INCREASE_BACKGROUND_VELOCITY, 0));
+      break;
+    case '4':
+      publish(new OnDeviceCommand(DeviceCommand.DECREASE_PLAYER_VELOCITY, deviceHandler.getDeviceIndex(), 0));
+      break;
+    case '5':
+      publish(new OnDeviceCommand(DeviceCommand.INCREASE_PLAYER_VELOCITY, deviceHandler.getDeviceIndex(), 0));
+      break;
+    case '6':
+      publish(new OnDeviceCommand(DeviceCommand.PREVIOUS_CHANNEL, deviceHandler.getDeviceIndex(), 0));
+      break;
+    case '7':
+      publish(new OnDeviceCommand(DeviceCommand.NEXT_CHANNEL, deviceHandler.getDeviceIndex(), 0));
+      break;
+    case '8':
+      publish(new OnDeviceCommand(DeviceCommand.PREVIOUS_PROGRAM, deviceHandler.getDeviceIndex(), 0));
+      break;
+    case '9':
+      publish(new OnDeviceCommand(DeviceCommand.NEXT_PROGRAM, deviceHandler.getDeviceIndex(), 0));
+      break;
+    case '/':
+      publish(new OnDeviceCommand(DeviceCommand.INPUT, deviceHandler.getDeviceIndex(), InputType.NUMERIC.ordinal()));
+      break;
+    case '*':
+      publish(new OnDeviceCommand(DeviceCommand.INPUT, deviceHandler.getDeviceIndex(), InputType.ALPHA.ordinal()));
+      break;
+    case '-':
+      publish(new OnDeviceCommand(DeviceCommand.OUTPUT, deviceHandler.getDeviceIndex(), OutputType.MEASURE.ordinal()));
+      break;
+    case '+':
+      publish(new OnDeviceCommand(DeviceCommand.OUTPUT, deviceHandler.getDeviceIndex(), OutputType.TICK.ordinal()));
+      break;
+    }
+  }
+
   private void processKeyDown(int keyCode) {
     if (keyCode < QwertyKeyCodes.inputCodes.length) {
       char inputCode = QwertyKeyCodes.inputCodes[keyCode];
-      deviceHandler.onDown(inputCode);
+      if (inputCode == KeyEvent.VK_NUM_LOCK) {
+        System.out.println("deviceName=" + deviceHandler.getDeviceName() + ", deviceHandler.getDeviceIndex()=" + deviceHandler.getDeviceIndex());
+        isCommand = true;
+      } else if (isCommand) {
+        processKeyboardCommand(inputCode);
+      } else {
+        deviceHandler.onDown(inputCode);
+      }
     } else {
       // e.g. windows meta key (125)
     }
@@ -72,10 +160,19 @@ public class QwertyReader {
   private void processKeyUp(int keyCode) {
     if (keyCode < QwertyKeyCodes.inputCodes.length) {
       char inputCode = QwertyKeyCodes.inputCodes[keyCode];
-      deviceHandler.onUp(inputCode);
+      if (inputCode == KeyEvent.VK_NUM_LOCK) {
+        isCommand = false;
+      } else if (isCommand) {
+      } else {
+        deviceHandler.onUp(inputCode);
+      }
     } else {
       // e.g. windows meta key (125)
     }
+  }
+
+  private void publish(Message message) {
+    deviceHandler.getBroker().publish(message);
   }
 
   private void run() {
