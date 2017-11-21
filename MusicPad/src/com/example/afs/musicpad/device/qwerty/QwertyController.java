@@ -14,28 +14,39 @@ import com.example.afs.musicpad.device.common.DeviceHandler;
 
 public class QwertyController implements Controller {
 
+  private String deviceName;
   private DeviceHandler deviceHandler;
   private QwertyReader qwertyReader;
 
-  public QwertyController(DeviceHandler deviceHandler) {
-    this.deviceHandler = deviceHandler;
-    qwertyReader = new QwertyReader(deviceHandler);
+  public QwertyController(String deviceName) {
+    this.deviceName = deviceName;
   }
 
   @Override
-  public int getDevice() {
-    return deviceHandler.getDeviceIndex();
+  public DeviceHandler getDeviceHandler() {
+    return deviceHandler;
+  }
+
+  public String getDeviceName() {
+    return deviceName;
+  }
+
+  @Override
+  public void setDeviceHandler(DeviceHandler deviceHandler) {
+    this.deviceHandler = deviceHandler;
   }
 
   @Override
   public void start() {
-    deviceHandler.start();
+    if (deviceHandler == null) {
+      throw new IllegalStateException();
+    }
+    qwertyReader = new QwertyReader(deviceHandler, this);
     qwertyReader.start();
   }
 
   @Override
   public void terminate() {
-    deviceHandler.terminate();
     qwertyReader.terminate();
   }
 

@@ -15,7 +15,7 @@ import com.example.afs.musicpad.device.common.DeviceHandler.InputType;
 
 public interface WatcherBehavior {
 
-  Controller attachDevice(DeviceHandler deviceHandler, String deviceName);
+  Controller attachDevice(String deviceName);
 
   void detachDevice(String name, Controller controller);
 

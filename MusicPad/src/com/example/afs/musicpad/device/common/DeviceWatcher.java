@@ -60,17 +60,21 @@ public class DeviceWatcher extends MessageTask {
   private void attachDevice(String deviceName) {
     int deviceIndex = DeviceIdFactory.getDeviceIndex(deviceName);
     InputType inputType = watcherBehavior.getInputType();
-    DeviceHandler deviceHandler = new DeviceHandler(getBroker(), synthesizer, deviceName, deviceIndex, inputType);
-    Controller controller = watcherBehavior.attachDevice(deviceHandler, deviceName);
+    DeviceHandler deviceHandler = new DeviceHandler(getBroker(), synthesizer, deviceIndex, inputType);
+    Controller controller = watcherBehavior.attachDevice(deviceName);
     oldDevices.put(deviceName, controller);
+    deviceHandler.setController(controller);
+    controller.setDeviceHandler(deviceHandler);
+    deviceHandler.start();
     controller.start();
-    publish(new OnDeviceAttached(deviceHandler.getDeviceIndex()));
+    publish(new OnDeviceAttached(deviceIndex));
   }
 
   private void detachDevice(String name, Controller controller) {
     watcherBehavior.detachDevice(name, controller);
+    controller.getDeviceHandler().terminate();
     controller.terminate();
-    publish(new OnDeviceDetached(controller.getDevice()));
+    publish(new OnDeviceDetached(controller.getDeviceHandler().getDeviceIndex()));
   }
 
   private void doCommand(OnCommand message) {
@@ -104,7 +108,7 @@ public class DeviceWatcher extends MessageTask {
 
   private Entry<String, Controller> findByControllerDeviceIndex(int deviceIndex) {
     for (Entry<String, Controller> entry : oldDevices.entrySet()) {
-      if (entry.getValue().getDevice() == deviceIndex) {
+      if (entry.getValue().getDeviceHandler().getDeviceIndex() == deviceIndex) {
         return entry;
       }
     }

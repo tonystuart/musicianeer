@@ -52,8 +52,8 @@ public class DeviceHandler extends ServiceTask {
 
   private Song song;
   private Player player;
-  private String deviceName;
   private InputType inputType;
+  private Controller controller;
   private Synthesizer synthesizer;
   private PlayableMap playableMap;
   private Sound[] activeSounds = new Sound[256]; // NB: KeyEvents VK codes, not midiNotes
@@ -63,10 +63,9 @@ public class DeviceHandler extends ServiceTask {
   private int oldChannel;
   private OutputType oldOutputType;
 
-  public DeviceHandler(MessageBroker broker, Synthesizer synthesizer, String deviceName, int deviceIndex, InputType inputType) {
+  public DeviceHandler(MessageBroker broker, Synthesizer synthesizer, int deviceIndex, InputType inputType) {
     super(broker);
     this.synthesizer = synthesizer;
-    this.deviceName = deviceName;
     this.deviceIndex = deviceIndex;
     this.inputType = inputType;
     this.player = new Player(synthesizer, deviceIndex);
@@ -81,10 +80,6 @@ public class DeviceHandler extends ServiceTask {
 
   public int getDeviceIndex() {
     return deviceIndex;
-  }
-
-  public String getDeviceName() {
-    return deviceName;
   }
 
   public int getPercentVelocity() {
@@ -115,13 +110,12 @@ public class DeviceHandler extends ServiceTask {
     processUp(inputCode, Range.scale(this.velocity / 2, Midi.MAX_VALUE, 0, Midi.MAX_VALUE, velocity));
   }
 
-  public void setPercentVelocity(int velocity) {
-    this.velocity = Range.scalePercentToMidi(velocity);
+  public void setController(Controller controller) {
+    this.controller = controller;
   }
 
-  @Override
-  public String toString() {
-    return "DeviceHandler [deviceName=" + deviceName + ", deviceIndex=" + deviceIndex + ", channel=" + channel + ", inputType=" + inputType + "]";
+  public void setPercentVelocity(int velocity) {
+    this.velocity = Range.scalePercentToMidi(velocity);
   }
 
   private PlayableMap createPlayableMap() {

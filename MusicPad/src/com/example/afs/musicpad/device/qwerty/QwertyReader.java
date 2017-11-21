@@ -36,14 +36,16 @@ public class QwertyReader {
   private boolean isTerminated;
 
   private Thread deviceReader;
+  private QwertyController qwertyController;
   private DeviceHandler deviceHandler;
 
-  public QwertyReader(DeviceHandler deviceHandler) {
+  public QwertyReader(DeviceHandler deviceHandler, QwertyController qwertyController) {
     this.deviceHandler = deviceHandler;
+    this.qwertyController = qwertyController;
   }
 
   public void start() {
-    deviceReader = new Thread(() -> run(), deviceHandler.getDeviceName());
+    deviceReader = new Thread(() -> run(), qwertyController.getDeviceName());
     deviceReader.start();
   }
 
@@ -145,7 +147,7 @@ public class QwertyReader {
     if (keyCode < QwertyKeyCodes.inputCodes.length) {
       char inputCode = QwertyKeyCodes.inputCodes[keyCode];
       if (inputCode == KeyEvent.VK_NUM_LOCK) {
-        System.out.println("deviceName=" + deviceHandler.getDeviceName() + ", deviceHandler.getDeviceIndex()=" + deviceHandler.getDeviceIndex());
+        System.out.println("deviceName=" + qwertyController.getDeviceName() + ", deviceHandler.getDeviceIndex()=" + deviceHandler.getDeviceIndex());
         isCommand = true;
       } else if (isCommand) {
         processKeyboardCommand(inputCode);
@@ -176,7 +178,7 @@ public class QwertyReader {
   }
 
   private void run() {
-    try (FileInputStream fileInputStream = new FileInputStream(deviceHandler.getDeviceName())) {
+    try (FileInputStream fileInputStream = new FileInputStream(qwertyController.getDeviceName())) {
       int fd = getFileDescriptor(fileInputStream);
       int rc = Input.capture(fd, true);
       if (rc == -1) {
@@ -202,7 +204,7 @@ public class QwertyReader {
     } catch (IOException e1) {
       throw new RuntimeException(e1);
     }
-    System.out.println("Terminating QWERTY device " + deviceHandler.getDeviceName());
+    System.out.println("Terminating QWERTY device " + qwertyController.getDeviceName());
   }
 
 }

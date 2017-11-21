@@ -14,16 +14,15 @@ import java.util.HashSet;
 import java.util.Set;
 
 import com.example.afs.musicpad.device.common.Controller;
-import com.example.afs.musicpad.device.common.DeviceHandler;
 import com.example.afs.musicpad.device.common.DeviceHandler.InputType;
 import com.example.afs.musicpad.device.common.WatcherBehavior;
 
 public class QwertyWatcherBehavior implements WatcherBehavior {
 
   @Override
-  public Controller attachDevice(DeviceHandler deviceHandler, String deviceName) {
-    System.out.println("Attaching QWERTY device " + deviceHandler.getDeviceName());
-    Controller controller = new QwertyController(deviceHandler);
+  public Controller attachDevice(String deviceName) {
+    System.out.println("Attaching QWERTY device " + deviceName);
+    Controller controller = new QwertyController(deviceName);
     return controller;
   }
 

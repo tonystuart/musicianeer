@@ -25,30 +25,35 @@ public class MidiController implements Controller {
   private DeviceHandler deviceHandler;
   private MidiDeviceBundle midiDeviceBundle;
 
-  public MidiController(DeviceHandler deviceHandler, MidiDeviceBundle midiDeviceBundle) {
-    this.deviceHandler = deviceHandler;
+  public MidiController(MidiDeviceBundle midiDeviceBundle) {
     this.midiDeviceBundle = midiDeviceBundle;
-    MidiConfiguration configuration = initializeConfiguration();
-    MessageBroker broker = deviceHandler.getBroker();
-    midiReader = new MidiReader(broker, deviceHandler, midiDeviceBundle, configuration);
-    midiWriter = new MidiWriter(broker, midiDeviceBundle, configuration, deviceHandler.getDeviceIndex());
   }
 
   @Override
-  public int getDevice() {
-    return deviceHandler.getDeviceIndex();
+  public DeviceHandler getDeviceHandler() {
+    return deviceHandler;
+  }
+
+  @Override
+  public void setDeviceHandler(DeviceHandler deviceHandler) {
+    this.deviceHandler = deviceHandler;
   }
 
   @Override
   public void start() {
-    deviceHandler.start();
+    if (deviceHandler == null) {
+      throw new IllegalStateException();
+    }
+    MidiConfiguration configuration = initializeConfiguration();
+    MessageBroker broker = deviceHandler.getBroker();
+    midiReader = new MidiReader(broker, deviceHandler, midiDeviceBundle, configuration);
+    midiWriter = new MidiWriter(broker, midiDeviceBundle, configuration, deviceHandler.getDeviceIndex());
     midiReader.start();
     midiWriter.start();
   }
 
   @Override
   public void terminate() {
-    deviceHandler.terminate();
     midiReader.terminate();
     midiWriter.terminate();
   }
