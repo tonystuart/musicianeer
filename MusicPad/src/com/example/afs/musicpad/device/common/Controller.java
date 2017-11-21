@@ -11,8 +11,6 @@ package com.example.afs.musicpad.device.common;
 
 public interface Controller {
 
-  DeviceHandler getDeviceHandler();
-
   void setDeviceHandler(DeviceHandler deviceHandler);
 
   void start();

@@ -27,9 +27,41 @@ import com.example.afs.musicpad.task.MessageTask;
 
 public class DeviceWatcher extends MessageTask {
 
+  private static class Device {
+    private int deviceIndex;
+    private Controller controller;
+    private DeviceHandler deviceHandler;
+
+    public Device(int deviceIndex, Controller controller, DeviceHandler deviceHandler) {
+      this.deviceIndex = deviceIndex;
+      this.controller = controller;
+      this.deviceHandler = deviceHandler;
+    }
+
+    public Controller getController() {
+      return controller;
+    }
+
+    public int getDeviceIndex() {
+      return deviceIndex;
+    }
+
+    public void start() {
+      deviceHandler.setController(controller);
+      controller.setDeviceHandler(deviceHandler);
+      deviceHandler.start();
+      controller.start();
+    }
+
+    public void terminate() {
+      deviceHandler.terminate();
+      controller.terminate();
+    }
+  }
+
   private Synthesizer synthesizer;
   private WatcherBehavior watcherBehavior;
-  private Map<String, Controller> oldDevices = new HashMap<>();
+  private Map<String, Device> oldDevices = new HashMap<>();
   private Set<String> detachedDevices = new HashSet<>();
 
   public DeviceWatcher(MessageBroker broker, Synthesizer synthesizer, WatcherBehavior watcherBehavior) {
@@ -42,9 +74,9 @@ public class DeviceWatcher extends MessageTask {
   @Override
   public void onTimeout() throws InterruptedException {
     Set<String> newDeviceNames = watcherBehavior.getDeviceNames();
-    Iterator<Entry<String, Controller>> oldIterator = oldDevices.entrySet().iterator();
+    Iterator<Entry<String, Device>> oldIterator = oldDevices.entrySet().iterator();
     while (oldIterator.hasNext()) {
-      Entry<String, Controller> oldEntry = oldIterator.next();
+      Entry<String, Device> oldEntry = oldIterator.next();
       if (!newDeviceNames.contains(oldEntry.getKey())) {
         detachDevice(oldEntry.getKey(), oldEntry.getValue());
         oldIterator.remove();
@@ -62,19 +94,16 @@ public class DeviceWatcher extends MessageTask {
     InputType inputType = watcherBehavior.getInputType();
     DeviceHandler deviceHandler = new DeviceHandler(getBroker(), synthesizer, deviceIndex, inputType);
     Controller controller = watcherBehavior.attachDevice(deviceName);
-    oldDevices.put(deviceName, controller);
-    deviceHandler.setController(controller);
-    controller.setDeviceHandler(deviceHandler);
-    deviceHandler.start();
-    controller.start();
+    Device device = new Device(deviceIndex, controller, deviceHandler);
+    oldDevices.put(deviceName, device);
+    device.start();
     publish(new OnDeviceAttached(deviceIndex));
   }
 
-  private void detachDevice(String name, Controller controller) {
-    watcherBehavior.detachDevice(name, controller);
-    controller.getDeviceHandler().terminate();
-    controller.terminate();
-    publish(new OnDeviceDetached(controller.getDeviceHandler().getDeviceIndex()));
+  private void detachDevice(String name, Device device) {
+    watcherBehavior.detachDevice(name, device.getController());
+    device.terminate();
+    publish(new OnDeviceDetached(device.getDeviceIndex()));
   }
 
   private void doCommand(OnCommand message) {
@@ -92,11 +121,11 @@ public class DeviceWatcher extends MessageTask {
   }
 
   private void doDetach(int parameter) {
-    Entry<String, Controller> entry = findByControllerDeviceIndex(parameter);
+    Entry<String, Device> entry = findByDeviceIndex(parameter);
     if (entry != null) {
       String deviceName = entry.getKey();
-      Controller controller = entry.getValue();
-      detachDevice(deviceName, controller);
+      Device device = entry.getValue();
+      detachDevice(deviceName, device);
       detachedDevices.add(deviceName);
       oldDevices.remove(deviceName);
     }
@@ -106,9 +135,9 @@ public class DeviceWatcher extends MessageTask {
     detachedDevices.clear();
   }
 
-  private Entry<String, Controller> findByControllerDeviceIndex(int deviceIndex) {
-    for (Entry<String, Controller> entry : oldDevices.entrySet()) {
-      if (entry.getValue().getDeviceHandler().getDeviceIndex() == deviceIndex) {
+  private Entry<String, Device> findByDeviceIndex(int deviceIndex) {
+    for (Entry<String, Device> entry : oldDevices.entrySet()) {
+      if (entry.getValue().getDeviceIndex() == deviceIndex) {
         return entry;
       }
     }

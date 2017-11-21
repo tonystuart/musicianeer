@@ -30,11 +30,6 @@ public class MidiController implements Controller {
   }
 
   @Override
-  public DeviceHandler getDeviceHandler() {
-    return deviceHandler;
-  }
-
-  @Override
   public void setDeviceHandler(DeviceHandler deviceHandler) {
     this.deviceHandler = deviceHandler;
   }

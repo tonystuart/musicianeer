@@ -22,11 +22,6 @@ public class QwertyController implements Controller {
     this.deviceName = deviceName;
   }
 
-  @Override
-  public DeviceHandler getDeviceHandler() {
-    return deviceHandler;
-  }
-
   public String getDeviceName() {
     return deviceName;
   }
