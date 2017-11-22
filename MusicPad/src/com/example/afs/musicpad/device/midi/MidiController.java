@@ -12,6 +12,7 @@ package com.example.afs.musicpad.device.midi;
 import java.io.File;
 import java.io.InputStream;
 
+import com.example.afs.musicpad.device.common.Configuration;
 import com.example.afs.musicpad.device.common.Controller;
 import com.example.afs.musicpad.device.common.DeviceHandler;
 import com.example.afs.musicpad.task.MessageBroker;
@@ -22,27 +23,25 @@ public class MidiController implements Controller {
 
   private MidiReader midiReader;
   private MidiWriter midiWriter;
-  private DeviceHandler deviceHandler;
+  private MidiConfiguration configuration;
   private MidiDeviceBundle midiDeviceBundle;
 
-  public MidiController(MidiDeviceBundle midiDeviceBundle) {
+  public MidiController(DeviceHandler deviceHandler, MidiDeviceBundle midiDeviceBundle) {
     this.midiDeviceBundle = midiDeviceBundle;
+    //configuration = initializeConfiguration(deviceHandler.getBroker(), deviceHandler.getDeviceIndex());
+    configuration = new BeatStepConfiguration(deviceHandler.getBroker(), deviceHandler.getDeviceIndex());
+    MessageBroker broker = deviceHandler.getBroker();
+    midiReader = new MidiReader(broker, deviceHandler, midiDeviceBundle, configuration);
+    midiWriter = new MidiWriter(broker, midiDeviceBundle, configuration, deviceHandler.getDeviceIndex());
   }
 
   @Override
-  public void setDeviceHandler(DeviceHandler deviceHandler) {
-    this.deviceHandler = deviceHandler;
+  public Configuration getConfiguration() {
+    return configuration;
   }
 
   @Override
   public void start() {
-    if (deviceHandler == null) {
-      throw new IllegalStateException();
-    }
-    MidiConfiguration configuration = initializeConfiguration();
-    MessageBroker broker = deviceHandler.getBroker();
-    midiReader = new MidiReader(broker, deviceHandler, midiDeviceBundle, configuration);
-    midiWriter = new MidiWriter(broker, midiDeviceBundle, configuration, deviceHandler.getDeviceIndex());
     midiReader.start();
     midiWriter.start();
   }
@@ -53,7 +52,7 @@ public class MidiController implements Controller {
     midiWriter.terminate();
   }
 
-  private MidiConfiguration initializeConfiguration() {
+  private MidiConfiguration initializeConfiguration(MessageBroker broker, int deviceIndex) {
     String home = System.getProperty("user.home");
     String type = midiDeviceBundle.getType();
     String fileName = type + ".configuration";
@@ -71,7 +70,7 @@ public class MidiController implements Controller {
       return configuration;
     }
     System.out.println("Cannot find configuration for " + type + ", using default");
-    return new MidiConfiguration();
+    return new MidiConfiguration(broker, deviceIndex);
   }
 
 }

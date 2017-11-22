@@ -11,16 +11,12 @@ package com.example.afs.musicpad.device.common;
 
 import java.util.Set;
 
-import com.example.afs.musicpad.device.common.DeviceHandler.InputType;
-
 public interface WatcherBehavior {
 
-  Controller attachDevice(String deviceName);
+  Controller attachDevice(DeviceHandler deviceHandler, String deviceName);
 
   void detachDevice(String name, Controller controller);
 
   Set<String> getDeviceNames();
-
-  InputType getInputType();
 
 }

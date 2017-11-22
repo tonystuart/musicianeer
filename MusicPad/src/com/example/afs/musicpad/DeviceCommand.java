@@ -12,7 +12,6 @@ package com.example.afs.musicpad;
 public enum DeviceCommand {
   DECREASE_PLAYER_VELOCITY, //
   INCREASE_PLAYER_VELOCITY, //
-  INPUT, //
   MUTE_BACKGROUND, //
   NEXT_CHANNEL, //
   NEXT_PROGRAM, //

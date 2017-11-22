@@ -14,15 +14,13 @@ import java.util.Set;
 import com.example.afs.fluidsynth.Synthesizer;
 import com.example.afs.musicpad.Command;
 import com.example.afs.musicpad.DeviceCommand;
-import com.example.afs.musicpad.device.qwerty.AlphaPlayableMap;
-import com.example.afs.musicpad.device.qwerty.NumericPlayableMap;
 import com.example.afs.musicpad.message.OnCommand;
+import com.example.afs.musicpad.message.OnConfigurationChange;
 import com.example.afs.musicpad.message.OnDeviceCommand;
 import com.example.afs.musicpad.message.OnKeyDown;
 import com.example.afs.musicpad.message.OnKeyUp;
 import com.example.afs.musicpad.message.OnSampleChannel;
 import com.example.afs.musicpad.message.OnSampleSong;
-import com.example.afs.musicpad.midi.BeatStepPlayableMap;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.player.BackgroundMuteService;
 import com.example.afs.musicpad.player.PlayableMap;
@@ -40,10 +38,6 @@ import com.example.afs.musicpad.util.Range;
 
 public class DeviceHandler extends ServiceTask {
 
-  public static enum InputType {
-    ALPHA, NUMERIC, MIDI
-  }
-
   private static final int DEFAULT_VELOCITY = 64;
 
   private int channel;
@@ -52,27 +46,21 @@ public class DeviceHandler extends ServiceTask {
 
   private Song song;
   private Player player;
-  private InputType inputType;
   private Controller controller;
   private Synthesizer synthesizer;
   private PlayableMap playableMap;
   private Sound[] activeSounds = new Sound[256]; // NB: KeyEvents VK codes, not midiNotes
 
-  private Song oldSong;
-  private InputType oldInputType;
-  private int oldChannel;
-  private OutputType oldOutputType;
-
-  public DeviceHandler(MessageBroker broker, Synthesizer synthesizer, int deviceIndex, InputType inputType) {
+  public DeviceHandler(MessageBroker broker, Synthesizer synthesizer, int deviceIndex) {
     super(broker);
     this.synthesizer = synthesizer;
     this.deviceIndex = deviceIndex;
-    this.inputType = inputType;
     this.player = new Player(synthesizer, deviceIndex);
     subscribe(OnCommand.class, message -> doCommand(message));
     subscribe(OnSampleSong.class, message -> doSampleSong(message));
     subscribe(OnSampleChannel.class, message -> doSampleChannel(message));
     subscribe(OnDeviceCommand.class, message -> doDeviceCommand(message));
+    subscribe(OnConfigurationChange.class, message -> doConfigurationChange(message));
     provide(new PlayerDetailService(deviceIndex), () -> getPlayerDetail());
     provide(new PlayerVelocityService(deviceIndex), () -> getPercentVelocity());
     provide(new BackgroundMuteService(deviceIndex), () -> synthesizer.isMuted(channel));
@@ -118,22 +106,8 @@ public class DeviceHandler extends ServiceTask {
     this.velocity = Range.scalePercentToMidi(velocity);
   }
 
-  private PlayableMap createPlayableMap() {
-    PlayableMap playableMap;
-    switch (inputType) {
-    case ALPHA:
-      playableMap = new AlphaPlayableMap(song.getChannelNotes(channel), player.getOutputType());
-      break;
-    case NUMERIC:
-      playableMap = new NumericPlayableMap(song.getChannelNotes(channel), player.getOutputType());
-      break;
-    case MIDI:
-      playableMap = new BeatStepPlayableMap(song.getChannelNotes(channel), player.getOutputType());
-      break;
-    default:
-      throw new UnsupportedOperationException();
-    }
-    return playableMap;
+  private void createPlayableMap() {
+    playableMap = new PlayableMap(controller.getConfiguration(), song.getChannelNotes(channel), player.getOutputType());
   }
 
   private void doCommand(OnCommand message) {
@@ -158,12 +132,18 @@ public class DeviceHandler extends ServiceTask {
     }
   }
 
+  private void doConfigurationChange(OnConfigurationChange message) {
+    if (message.getDeviceIndex() == deviceIndex) {
+      createPlayableMap();
+    }
+  }
+
   private void doDecreasePlayerVelocity() {
     publish(new OnDeviceCommand(DeviceCommand.VELOCITY, deviceIndex, Math.max(0, getPercentVelocity() - 5)));
   }
 
   private void doDeviceCommand(OnDeviceCommand message) {
-    if (this.deviceIndex == message.getDeviceIndex()) {
+    if (message.getDeviceIndex() == deviceIndex) {
       DeviceCommand deviceCommand = message.getDeviceCommand();
       int parameter = message.getParameter();
       switch (deviceCommand) {
@@ -172,9 +152,6 @@ public class DeviceHandler extends ServiceTask {
         break;
       case INCREASE_PLAYER_VELOCITY:
         doIncreasePlayerVelocity();
-        break;
-      case INPUT:
-        doInput(parameter);
         break;
       case OUTPUT:
         doOutput(parameter);
@@ -213,20 +190,6 @@ public class DeviceHandler extends ServiceTask {
     publish(new OnDeviceCommand(DeviceCommand.VELOCITY, deviceIndex, Math.min(100, getPercentVelocity() + 5)));
   }
 
-  private void doInput(int typeIndex) {
-    InputType inputType = InputType.values()[typeIndex];
-    switch (inputType) {
-    case ALPHA:
-    case MIDI:
-    case NUMERIC:
-      this.inputType = inputType;
-      updateChannel();
-      break;
-    default:
-      throw new UnsupportedOperationException();
-    }
-  }
-
   private void doMuteBackground() {
     synthesizer.muteChannel(channel, !synthesizer.isMuted(channel));
   }
@@ -257,7 +220,7 @@ public class DeviceHandler extends ServiceTask {
   private void doOutput(int typeIndex) {
     OutputType outputType = OutputType.values()[typeIndex];
     player.setOutputType(outputType);
-    updateChannel();
+    createPlayableMap();
   }
 
   private void doPreviousChannel() {
@@ -304,7 +267,7 @@ public class DeviceHandler extends ServiceTask {
 
   private PlayerDetail getPlayerDetail() {
     if (playableMap == null) {
-      playableMap = createPlayableMap();
+      createPlayableMap();
     }
     return new PlayerDetail(playableMap.getPlayables(), channel, player.getProgram());
   }
@@ -345,21 +308,11 @@ public class DeviceHandler extends ServiceTask {
         selectProgram(program);
       }
     }
-    updateChannel();
+    createPlayableMap();
   }
 
   private void selectProgram(int program) {
     player.selectProgram(program);
-  }
-
-  private void updateChannel() {
-    if (!song.equals(oldSong) || inputType != oldInputType || channel != oldChannel || player.getOutputType() != oldOutputType) {
-      playableMap = createPlayableMap();
-      oldSong = song;
-      oldInputType = inputType;
-      oldChannel = channel;
-      oldOutputType = player.getOutputType();
-    }
   }
 
 }

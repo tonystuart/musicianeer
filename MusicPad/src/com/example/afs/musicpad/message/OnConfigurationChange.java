@@ -7,14 +7,23 @@
 // This program is made available on an "as is" basis, without
 // warranties or conditions of any kind, either express or implied.
 
-package com.example.afs.musicpad.device.qwerty;
+package com.example.afs.musicpad.message;
 
-import com.example.afs.musicpad.song.Note;
+public class OnConfigurationChange extends TypedMessage {
 
-public class NumericPlayableMap extends QwertyPlayableMap {
+  private int deviceIndex;
 
-  public NumericPlayableMap(Iterable<Note> notes, OutputType outputType) {
-    super(notes, outputType, "123456789", " 0/*-+");
+  public OnConfigurationChange(int deviceIndex) {
+    this.deviceIndex = deviceIndex;
+  }
+
+  public int getDeviceIndex() {
+    return deviceIndex;
+  }
+
+  @Override
+  public String toString() {
+    return "OnConfigurationChange [deviceIndex=" + deviceIndex + "]";
   }
 
 }

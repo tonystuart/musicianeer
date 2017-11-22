@@ -9,10 +9,21 @@
 
 package com.example.afs.musicpad.device.midi;
 
-public class MidiConfiguration {
+import com.example.afs.musicpad.device.common.Configuration;
+import com.example.afs.musicpad.task.MessageBroker;
+
+public class MidiConfiguration extends Configuration {
 
   public enum ChannelState {
     SELECTED, ACTIVE, INACTIVE
+  }
+
+  private int deviceIndex;
+  private MessageBroker broker;
+
+  public MidiConfiguration(MessageBroker broker, int deviceIndex) {
+    this.broker = broker;
+    this.deviceIndex = deviceIndex;
   }
 
 }

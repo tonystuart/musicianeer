@@ -20,7 +20,7 @@ import javax.sound.midi.MidiSystem;
 import javax.sound.midi.MidiUnavailableException;
 
 import com.example.afs.musicpad.device.common.Controller;
-import com.example.afs.musicpad.device.common.DeviceHandler.InputType;
+import com.example.afs.musicpad.device.common.DeviceHandler;
 import com.example.afs.musicpad.device.common.WatcherBehavior;
 
 public class MidiWatcherBehavior implements WatcherBehavior {
@@ -28,10 +28,10 @@ public class MidiWatcherBehavior implements WatcherBehavior {
   private static final Pattern PATTERN = Pattern.compile("^(.*) \\[hw\\:([0-9]+),([0-9]+),([0-9]+)\\]$");
 
   @Override
-  public Controller attachDevice(String deviceName) {
+  public Controller attachDevice(DeviceHandler deviceHandler, String deviceName) {
     System.out.println("Attaching MIDI device " + deviceName);
     MidiDeviceBundle midiDeviceBundle = getMidiDeviceBundle(deviceName);
-    Controller controller = new MidiController(midiDeviceBundle);
+    Controller controller = new MidiController(deviceHandler, midiDeviceBundle);
     return controller;
   }
 
@@ -56,11 +56,6 @@ public class MidiWatcherBehavior implements WatcherBehavior {
       }
     }
     return devices;
-  }
-
-  @Override
-  public InputType getInputType() {
-    return InputType.MIDI;
   }
 
   private MidiDeviceBundle getMidiDeviceBundle(String deviceName) {

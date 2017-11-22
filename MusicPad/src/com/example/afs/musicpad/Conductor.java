@@ -16,6 +16,7 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import com.example.afs.musicpad.message.OnCommand;
+import com.example.afs.musicpad.message.OnConfigurationChange;
 import com.example.afs.musicpad.message.OnDeviceAttached;
 import com.example.afs.musicpad.message.OnDeviceCommand;
 import com.example.afs.musicpad.message.OnDeviceDetached;
@@ -48,6 +49,7 @@ public class Conductor extends ServiceTask {
     subscribe(OnDeviceCommand.class, message -> doDeviceCommand(message));
     subscribe(OnDeviceAttached.class, message -> doDeviceAttached(message));
     subscribe(OnDeviceDetached.class, message -> doDeviceDetached(message));
+    subscribe(OnConfigurationChange.class, message -> doConfigurationChange(message));
     provide(Services.GetMidiFiles, () -> midiFiles);
     provide(Services.GetCurrentSong, () -> song);
   }
@@ -70,6 +72,12 @@ public class Conductor extends ServiceTask {
     }
   }
 
+  private void doConfigurationChange(OnConfigurationChange message) {
+    if (deviceIndexes.size() == deviceChannelAssignments.size()) {
+      publish(new OnRenderSong(song, deviceChannelAssignments));
+    }
+  }
+
   private void doDeviceAttached(OnDeviceAttached message) {
     int deviceIndex = message.getDeviceIndex();
     deviceIndexes.add(deviceIndex);
@@ -79,9 +87,6 @@ public class Conductor extends ServiceTask {
     int deviceIndex = message.getDeviceIndex();
     int parameter = message.getParameter();
     switch (message.getDeviceCommand()) {
-    case INPUT:
-      doInput(deviceIndex, parameter);
-      break;
     case SAMPLE_CHANNEL:
       doSampleChannel(deviceIndex, parameter);
       break;
@@ -107,12 +112,6 @@ public class Conductor extends ServiceTask {
         next = deviceIndexes.first();
       }
       publish(new OnPickChannel(song, deviceChannelAssignments, next));
-    }
-  }
-
-  private void doInput(int deviceIndex, int parameter) {
-    if (deviceIndexes.size() == deviceChannelAssignments.size()) {
-      publish(new OnRenderSong(song, deviceChannelAssignments));
     }
   }
 

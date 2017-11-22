@@ -18,7 +18,6 @@ import java.util.Set;
 
 import com.example.afs.fluidsynth.Synthesizer;
 import com.example.afs.musicpad.Command;
-import com.example.afs.musicpad.device.common.DeviceHandler.InputType;
 import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnDeviceAttached;
 import com.example.afs.musicpad.message.OnDeviceDetached;
@@ -48,7 +47,6 @@ public class DeviceWatcher extends MessageTask {
 
     public void start() {
       deviceHandler.setController(controller);
-      controller.setDeviceHandler(deviceHandler);
       deviceHandler.start();
       controller.start();
     }
@@ -91,9 +89,8 @@ public class DeviceWatcher extends MessageTask {
 
   private void attachDevice(String deviceName) {
     int deviceIndex = DeviceIdFactory.getDeviceIndex(deviceName);
-    InputType inputType = watcherBehavior.getInputType();
-    DeviceHandler deviceHandler = new DeviceHandler(getBroker(), synthesizer, deviceIndex, inputType);
-    Controller controller = watcherBehavior.attachDevice(deviceName);
+    DeviceHandler deviceHandler = new DeviceHandler(getBroker(), synthesizer, deviceIndex);
+    Controller controller = watcherBehavior.attachDevice(deviceHandler, deviceName);
     Device device = new Device(deviceIndex, controller, deviceHandler);
     oldDevices.put(deviceName, device);
     device.start();

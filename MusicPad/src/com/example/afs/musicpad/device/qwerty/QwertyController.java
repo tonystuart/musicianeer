@@ -17,9 +17,17 @@ public class QwertyController implements Controller {
   private String deviceName;
   private DeviceHandler deviceHandler;
   private QwertyReader qwertyReader;
+  private QwertyConfiguration qwertyConfiguration;
 
-  public QwertyController(String deviceName) {
+  public QwertyController(DeviceHandler deviceHandler, String deviceName) {
+    this.deviceHandler = deviceHandler;
     this.deviceName = deviceName;
+    this.qwertyConfiguration = new QwertyConfiguration(deviceHandler.getBroker(), deviceHandler.getDeviceIndex());
+  }
+
+  @Override
+  public QwertyConfiguration getConfiguration() {
+    return qwertyConfiguration;
   }
 
   public String getDeviceName() {
@@ -27,15 +35,7 @@ public class QwertyController implements Controller {
   }
 
   @Override
-  public void setDeviceHandler(DeviceHandler deviceHandler) {
-    this.deviceHandler = deviceHandler;
-  }
-
-  @Override
   public void start() {
-    if (deviceHandler == null) {
-      throw new IllegalStateException();
-    }
     qwertyReader = new QwertyReader(deviceHandler, this);
     qwertyReader.start();
   }

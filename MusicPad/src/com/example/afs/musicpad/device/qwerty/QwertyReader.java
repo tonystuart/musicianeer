@@ -20,7 +20,7 @@ import com.example.afs.jni.Input;
 import com.example.afs.musicpad.Command;
 import com.example.afs.musicpad.DeviceCommand;
 import com.example.afs.musicpad.device.common.DeviceHandler;
-import com.example.afs.musicpad.device.common.DeviceHandler.InputType;
+import com.example.afs.musicpad.device.qwerty.QwertyConfiguration.InputType;
 import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnDeviceCommand;
 import com.example.afs.musicpad.player.PlayableMap.OutputType;
@@ -36,16 +36,16 @@ public class QwertyReader {
   private boolean isTerminated;
 
   private Thread deviceReader;
-  private QwertyController qwertyController;
+  private QwertyController controller;
   private DeviceHandler deviceHandler;
 
   public QwertyReader(DeviceHandler deviceHandler, QwertyController qwertyController) {
     this.deviceHandler = deviceHandler;
-    this.qwertyController = qwertyController;
+    this.controller = qwertyController;
   }
 
   public void start() {
-    deviceReader = new Thread(() -> run(), qwertyController.getDeviceName());
+    deviceReader = new Thread(() -> run(), controller.getDeviceName());
     deviceReader.start();
   }
 
@@ -129,10 +129,10 @@ public class QwertyReader {
       publish(new OnDeviceCommand(DeviceCommand.NEXT_PROGRAM, deviceHandler.getDeviceIndex(), 0));
       break;
     case '/':
-      publish(new OnDeviceCommand(DeviceCommand.INPUT, deviceHandler.getDeviceIndex(), InputType.NUMERIC.ordinal()));
+      controller.getConfiguration().setInputType(InputType.NUMERIC);
       break;
     case '*':
-      publish(new OnDeviceCommand(DeviceCommand.INPUT, deviceHandler.getDeviceIndex(), InputType.ALPHA.ordinal()));
+      controller.getConfiguration().setInputType(InputType.ALPHA);
       break;
     case '-':
       publish(new OnDeviceCommand(DeviceCommand.OUTPUT, deviceHandler.getDeviceIndex(), OutputType.MEASURE.ordinal()));
@@ -147,7 +147,7 @@ public class QwertyReader {
     if (keyCode < QwertyKeyCodes.inputCodes.length) {
       char inputCode = QwertyKeyCodes.inputCodes[keyCode];
       if (inputCode == KeyEvent.VK_NUM_LOCK) {
-        System.out.println("deviceName=" + qwertyController.getDeviceName() + ", deviceHandler.getDeviceIndex()=" + deviceHandler.getDeviceIndex());
+        System.out.println("deviceName=" + controller.getDeviceName() + ", deviceHandler.getDeviceIndex()=" + deviceHandler.getDeviceIndex());
         isCommand = true;
       } else if (isCommand) {
         processKeyboardCommand(inputCode);
@@ -178,7 +178,7 @@ public class QwertyReader {
   }
 
   private void run() {
-    try (FileInputStream fileInputStream = new FileInputStream(qwertyController.getDeviceName())) {
+    try (FileInputStream fileInputStream = new FileInputStream(controller.getDeviceName())) {
       int fd = getFileDescriptor(fileInputStream);
       int rc = Input.capture(fd, true);
       if (rc == -1) {
@@ -204,7 +204,7 @@ public class QwertyReader {
     } catch (IOException e1) {
       throw new RuntimeException(e1);
     }
-    System.out.println("Terminating QWERTY device " + qwertyController.getDeviceName());
+    System.out.println("Terminating QWERTY device " + controller.getDeviceName());
   }
 
 }
