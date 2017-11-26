@@ -10,17 +10,17 @@
 package com.example.afs.musicpad.webapp.example;
 
 import com.example.afs.musicpad.task.MessageBroker;
-import com.example.afs.musicpad.webapp.WebApp;
-import com.example.afs.musicpad.webapp.WebAppFactory;
+import com.example.afs.musicpad.webapp.MultitonWebApp;
+import com.example.afs.musicpad.webapp.MultitonWebAppFactory;
 
-public class ExampleWebAppFactory extends WebAppFactory {
+public class ExampleWebAppFactory extends MultitonWebAppFactory {
 
   public ExampleWebAppFactory(MessageBroker broker) {
     super(broker);
   }
 
   @Override
-  protected WebApp createWebApp(MessageBroker broker, WebAppFactory webAppFactory) {
+  protected MultitonWebApp createWebApp(MessageBroker broker) {
     return new ExampleWebApp(broker, this);
   }
 }

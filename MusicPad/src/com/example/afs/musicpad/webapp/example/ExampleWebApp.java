@@ -12,26 +12,16 @@ package com.example.afs.musicpad.webapp.example;
 import org.eclipse.jetty.util.log.Log;
 import org.eclipse.jetty.util.log.Logger;
 
-import com.example.afs.musicpad.message.OnTick;
 import com.example.afs.musicpad.task.MessageBroker;
-import com.example.afs.musicpad.task.MessageTask;
-import com.example.afs.musicpad.webapp.WebApp;
+import com.example.afs.musicpad.webapp.MultitonWebApp;
 
-public class ExampleWebApp extends WebApp {
-
-  public class ExampleRenderer extends MessageTask {
-    protected ExampleRenderer(MessageBroker broker) {
-      super(broker);
-    }
-  }
+public class ExampleWebApp extends MultitonWebApp {
 
   @SuppressWarnings("unused")
   private static final Logger LOG = Log.getLogger(ExampleWebApp.class);
 
   public ExampleWebApp(MessageBroker broker, ExampleWebAppFactory exampleWebAppFactory) {
-    super(broker, exampleWebAppFactory);
-    setRenderer(new ExampleRenderer(broker));
-    subscribe(OnTick.class, message -> doMessage(message));
+    super(broker, exampleWebAppFactory, new ExampleController(broker));
   }
 
 }

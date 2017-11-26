@@ -9,37 +9,31 @@
 
 package com.example.afs.musicpad.webapp;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.Iterator;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
 
-import com.example.afs.musicpad.message.OnKaraokeBandEvent;
+import com.example.afs.musicpad.message.OnBrowserEvent;
+import com.example.afs.musicpad.message.OnBrowserEvent.Action;
 import com.example.afs.musicpad.message.TypedMessage;
-import com.example.afs.musicpad.task.Message;
+import com.example.afs.musicpad.task.ControllerTask;
 import com.example.afs.musicpad.task.MessageBroker;
-import com.example.afs.musicpad.task.MessageTask;
 import com.example.afs.musicpad.task.ServiceTask;
 import com.example.afs.musicpad.util.JsonUtilities;
 
-public class WebApp extends ServiceTask {
+public abstract class WebApp extends ServiceTask {
 
-  private static final int CLIENTS = 10;
   private static final long PING_INTERVAL_MS = 5000;
   private static final ByteBuffer PING = ByteBuffer.wrap("PING".getBytes());
 
-  private WebAppFactory webAppFactory;
-  private BlockingQueue<WebSocket> webSockets = new LinkedBlockingQueue<>(CLIENTS);
-  private MessageTask rendererTask;
+  private ControllerTask controllerTask;
 
-  protected WebApp(MessageBroker broker, WebAppFactory webAppFactory) {
+  public WebApp(MessageBroker broker, ControllerTask controllerTask) {
     super(broker, PING_INTERVAL_MS);
-    this.webAppFactory = webAppFactory;
+    this.controllerTask = controllerTask;
   }
 
   public void onWebSocketConnection(WebSocket webSocket) {
-    webSockets.add(webSocket);
+    doWebSocketConnection(webSocket);
+    controllerTask.addBrowserEvent(new OnBrowserEvent(Action.LOAD));
   }
 
   public void onWebSocketText(WebSocket webSocket, String json) {
@@ -49,53 +43,33 @@ public class WebApp extends ServiceTask {
     if (messageType == null) {
       throw new IllegalArgumentException("Missing messageType");
     }
-    if (messageType.equals(OnKaraokeBandEvent.class.getSimpleName())) {
-      OnKaraokeBandEvent onKaraokeBandEvent = JsonUtilities.fromJson(json, OnKaraokeBandEvent.class);
-      publish(onKaraokeBandEvent);
+    if (messageType.equals(OnBrowserEvent.class.getSimpleName())) {
+      OnBrowserEvent onBrowserEvent = JsonUtilities.fromJson(json, OnBrowserEvent.class);
+      controllerTask.addBrowserEvent(onBrowserEvent);
     }
-  }
-
-  public void removeMessageWebSocket(WebSocket webSocket) {
-    webSockets.remove(webSocket);
-    webAppFactory.releaseWebApp();
   }
 
   @Override
   public void start() {
     super.start();
-    rendererTask.start();
+    controllerTask.start();
   }
 
   @Override
   public void terminate() {
-    rendererTask.terminate();
+    controllerTask.terminate();
     super.terminate();
   }
 
-  protected void doMessage(Message message) {
-    for (WebSocket webSocket : webSockets) {
-      webSocket.write(message);
-    }
-  }
+  protected abstract void doPing(ByteBuffer ping);
+
+  protected abstract void doWebSocketConnection(WebSocket webSocket);
 
   @Override
   protected void onTimeout() throws InterruptedException {
-    Iterator<WebSocket> iterator = webSockets.iterator();
-    while (iterator.hasNext()) {
-      WebSocket webSocket = iterator.next();
-      try {
-        webSocket.getRemote().sendPing(PING);
-      } catch (IOException e) {
-        System.err.println("Client PING failed, closing WebSocket");
-        webSocket.getSession().close();
-        iterator.remove();
-      }
-    }
-
+    doPing(PING);
   }
 
-  protected void setRenderer(MessageTask rendererTask) {
-    this.rendererTask = rendererTask;
-  }
+  protected abstract void onWebSocketClose(WebSocket webSocket);
 
 }

@@ -17,7 +17,7 @@ public class WebSocket extends WebSocketAdapter {
   @Override
   public void onWebSocketClose(int statusCode, String reason) {
     super.onWebSocketClose(statusCode, reason);
-    webApp.removeMessageWebSocket(this);
+    webApp.onWebSocketClose(this);
   }
 
   @Override

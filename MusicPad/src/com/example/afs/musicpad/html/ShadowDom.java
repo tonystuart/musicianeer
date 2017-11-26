@@ -14,14 +14,23 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import com.example.afs.musicpad.message.OnShadowUpdate;
+import com.example.afs.musicpad.message.OnShadowUpdate.Action;
+import com.example.afs.musicpad.task.ControllerTask;
+
 // https://www.w3schools.com/jsref/dom_obj_document.asp
 // https://www.w3schools.com/jsref/dom_obj_all.asp
 
 public class ShadowDom {
 
+  private ControllerTask controllerTask;
   private Division root = new Division();
   private Map<String, Element> ids = new HashMap<>();
   private Map<String, Set<Element>> classes = new HashMap<>();
+
+  public ShadowDom(ControllerTask controllerTask) {
+    this.controllerTask = controllerTask;
+  }
 
   public Parent add(Element child) {
     root.appendChild(child);
@@ -162,18 +171,23 @@ public class ShadowDom {
   }
 
   protected void onAddClassName(Element element, String className) {
+    controllerTask.addShadowUpdate(new OnShadowUpdate(Action.ADD_CLASS, "#" + element.getId(), className));
   }
 
   protected void onEnsureVisible(Element element) {
+    controllerTask.addShadowUpdate(new OnShadowUpdate(Action.ENSURE_VISIBLE, "#" + element.getId(), ""));
   }
 
   protected void onRemoveClassName(Element element, String className) {
+    controllerTask.addShadowUpdate(new OnShadowUpdate(Action.REMOVE_CLASS, "#" + element.getId(), className));
   }
 
   protected void onReplaceChildren(Parent parent, Node newChild) {
+    controllerTask.addShadowUpdate(new OnShadowUpdate(Action.REPLACE_CHILDREN, "#" + parent.getId(), newChild.render()));
   }
 
   protected void onSetProperty(Element element, String name, Object value) {
+    controllerTask.addShadowUpdate(new OnShadowUpdate(Action.SET_PROPERTY, "#" + element.getId(), name, value));
   }
 
   private void addManagedNode(Node node, boolean isManageDeep) {

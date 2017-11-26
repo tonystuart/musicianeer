@@ -9,7 +9,7 @@ karaoke.onClick = function(event) {
         id = event.target.closest('[id]').id;
     }
     musicPad.send(JSON.stringify({
-        type: 'OnKaraokeBandEvent',
+        type: 'OnBrowserEvent',
         action: 'CLICK',
         id: id
     }));
@@ -18,14 +18,14 @@ karaoke.onClick = function(event) {
 karaoke.onInput = function(event, value) {
     const id = event.target.id;
     musicPad.send(JSON.stringify({
-        type: 'OnKaraokeBandEvent',
+        type: 'OnBrowserEvent',
         action: 'INPUT',
         id: id,
         value: value
     }));
 }
 
-karaoke.onKaraokeBandHtml = function(message) {
+karaoke.onShadowUpdate = function(message) {
     let matches;
     switch (message.action) {
     case 'REPLACE_CHILDREN':
@@ -169,8 +169,8 @@ karaoke.onWebSocketClose = function() {
 karaoke.onWebSocketMessage = function(json) {
     let message = JSON.parse(json);
     switch (message.type) {
-    case 'OnKaraokeBandHtml':
-        karaoke.onKaraokeBandHtml(message);
+    case 'OnShadowUpdate':
+        karaoke.onShadowUpdate(message);
         break;
     case 'OnTick':
         karaoke.onTick(message.tick);

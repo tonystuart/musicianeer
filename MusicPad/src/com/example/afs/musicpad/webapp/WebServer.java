@@ -60,6 +60,12 @@ public class WebServer extends MessageTask {
     return defaultServletHolder;
   }
 
+  private ServletHolder createExampleServlet() {
+    WebAppServlet exampleServlet = new WebAppServlet(exampleWebAppFactory);
+    ServletHolder servletHolder = new ServletHolder("ExampleServlet", exampleServlet);
+    return servletHolder;
+  }
+
   private ServletHolder createKaraokeServlet() {
     WebAppServlet karaokeServlet = new WebAppServlet(karaokeWebAppFactory);
     ServletHolder servletHolder = new ServletHolder("KaraokeServlet", karaokeServlet);
@@ -80,7 +86,7 @@ public class WebServer extends MessageTask {
     context.addServlet(createDefaultServlet(), "/");
     context.addServlet(CurrentFrameServlet.class, "/currentFrame.jpg");
     context.addServlet(createRestServlet(), "/v1/rest/*");
-    context.addServlet(createStaffServlet(), "/v1/staff/*");
+    context.addServlet(createExampleServlet(), "/v1/example/*");
     context.addServlet(createKaraokeServlet(), "/v1/karaoke/*");
     HandlerCollection handlers = new HandlerCollection();
     handlers.setHandlers(new Handler[] {
@@ -89,12 +95,6 @@ public class WebServer extends MessageTask {
     });
     server = new Server(PORT);
     server.setHandler(handlers);
-  }
-
-  private ServletHolder createStaffServlet() {
-    WebAppServlet staffServlet = new WebAppServlet(exampleWebAppFactory);
-    ServletHolder servletHolder = new ServletHolder("StaffServlet", staffServlet);
-    return servletHolder;
   }
 
   private String getResourceBase() {

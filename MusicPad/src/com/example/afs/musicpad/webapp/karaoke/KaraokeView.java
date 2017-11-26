@@ -22,12 +22,9 @@ import com.example.afs.musicpad.analyzer.KeySignatures;
 import com.example.afs.musicpad.html.CheckBox;
 import com.example.afs.musicpad.html.Division;
 import com.example.afs.musicpad.html.Element;
-import com.example.afs.musicpad.html.Node;
 import com.example.afs.musicpad.html.Parent;
 import com.example.afs.musicpad.html.Range;
 import com.example.afs.musicpad.html.ShadowDom;
-import com.example.afs.musicpad.message.OnKaraokeBandHtml;
-import com.example.afs.musicpad.message.OnKaraokeBandHtml.Action;
 import com.example.afs.musicpad.midi.Instruments;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.player.PlayableMap.OutputType;
@@ -39,7 +36,7 @@ import com.example.afs.musicpad.song.ChannelNotes;
 import com.example.afs.musicpad.song.Default;
 import com.example.afs.musicpad.song.Note;
 import com.example.afs.musicpad.song.Song;
-import com.example.afs.musicpad.task.MessageBroker;
+import com.example.afs.musicpad.task.ControllerTask;
 import com.example.afs.musicpad.util.FileUtilities;
 import com.example.afs.musicpad.util.RandomAccessList;
 import com.example.afs.musicpad.util.Value;
@@ -50,10 +47,8 @@ public class KaraokeView extends ShadowDom {
   private int deviceIndex;
   private int channelIndex;
 
-  private MessageBroker broker;
-
-  public KaraokeView(MessageBroker broker) {
-    this.broker = broker;
+  public KaraokeView(ControllerTask controllerTask) {
+    super(controllerTask);
     add(div("#songs", ".tab", ".selected-tab") //
         .add(div(".left") //
             .add(div(".title") //
@@ -209,31 +204,6 @@ public class KaraokeView extends ShadowDom {
   public void setTempo(int value) {
     Range tempo = getElementById("tempo");
     setProperty(tempo, "value", value);
-  }
-
-  @Override
-  protected void onAddClassName(Element element, String className) {
-    broker.publish(new OnKaraokeBandHtml(Action.ADD_CLASS, "#" + element.getId(), className));
-  }
-
-  @Override
-  protected void onEnsureVisible(Element element) {
-    broker.publish(new OnKaraokeBandHtml(Action.ENSURE_VISIBLE, "#" + element.getId(), ""));
-  }
-
-  @Override
-  protected void onRemoveClassName(Element element, String className) {
-    broker.publish(new OnKaraokeBandHtml(Action.REMOVE_CLASS, "#" + element.getId(), className));
-  }
-
-  @Override
-  protected void onReplaceChildren(Parent parent, Node newChild) {
-    broker.publish(new OnKaraokeBandHtml(Action.REPLACE_CHILDREN, "#" + parent.getId(), newChild.render()));
-  }
-
-  @Override
-  protected void onSetProperty(Element element, String name, Object value) {
-    broker.publish(new OnKaraokeBandHtml(Action.SET_PROPERTY, "#" + element.getId(), name, value));
   }
 
   private Element createChannelDetails(Song song, int channel) {

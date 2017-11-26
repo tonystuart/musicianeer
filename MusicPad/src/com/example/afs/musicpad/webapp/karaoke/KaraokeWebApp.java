@@ -12,30 +12,18 @@ package com.example.afs.musicpad.webapp.karaoke;
 import org.eclipse.jetty.util.log.Log;
 import org.eclipse.jetty.util.log.Logger;
 
-import com.example.afs.musicpad.message.OnKaraokeBandEvent;
-import com.example.afs.musicpad.message.OnKaraokeBandEvent.Action;
-import com.example.afs.musicpad.message.OnKaraokeBandHtml;
 import com.example.afs.musicpad.message.OnTick;
 import com.example.afs.musicpad.task.MessageBroker;
-import com.example.afs.musicpad.webapp.WebApp;
-import com.example.afs.musicpad.webapp.WebSocket;
+import com.example.afs.musicpad.webapp.SingletonWebApp;
 
-public class KaraokeWebApp extends WebApp {
+public class KaraokeWebApp extends SingletonWebApp {
 
   @SuppressWarnings("unused")
   private static final Logger LOG = Log.getLogger(KaraokeWebApp.class);
 
   public KaraokeWebApp(MessageBroker broker, KaraokeWebAppFactory karaokeWebAppFactory) {
-    super(broker, karaokeWebAppFactory);
-    setRenderer(new KaraokeController(broker));
+    super(broker, karaokeWebAppFactory, new KaraokeController(broker));
     subscribe(OnTick.class, message -> doMessage(message));
-    subscribe(OnKaraokeBandHtml.class, message -> doMessage(message));
-  }
-
-  @Override
-  public void onWebSocketConnection(WebSocket webSocket) {
-    super.onWebSocketConnection(webSocket);
-    publish(new OnKaraokeBandEvent(Action.LOAD, null));
   }
 
 }

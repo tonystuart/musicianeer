@@ -7,20 +7,24 @@
 // This program is made available on an "as is" basis, without
 // warranties or conditions of any kind, either express or implied.
 
-package com.example.afs.musicpad.webapp.karaoke;
+package com.example.afs.musicpad.webapp;
 
 import com.example.afs.musicpad.task.MessageBroker;
-import com.example.afs.musicpad.webapp.SingletonWebApp;
-import com.example.afs.musicpad.webapp.SingletonWebAppFactory;
 
-public class KaraokeWebAppFactory extends SingletonWebAppFactory {
+public abstract class MultitonWebAppFactory implements WebAppFactory {
+  private MessageBroker broker;
 
-  public KaraokeWebAppFactory(MessageBroker broker) {
-    super(broker);
+  public MultitonWebAppFactory(MessageBroker broker) {
+    this.broker = broker;
   }
 
   @Override
-  protected SingletonWebApp createWebApp(MessageBroker broker) {
-    return new KaraokeWebApp(broker, this);
+  public synchronized MultitonWebApp getWebApp() {
+    MultitonWebApp webApp = createWebApp(broker);
+    webApp.start();
+    return webApp;
   }
+
+  protected abstract MultitonWebApp createWebApp(MessageBroker broker);
+
 }

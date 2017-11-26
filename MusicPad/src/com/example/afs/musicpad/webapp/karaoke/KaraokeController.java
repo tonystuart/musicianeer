@@ -22,13 +22,12 @@ import com.example.afs.musicpad.html.Option;
 import com.example.afs.musicpad.html.Template;
 import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnDeviceCommand;
-import com.example.afs.musicpad.message.OnKaraokeBandEvent;
-import com.example.afs.musicpad.message.OnKaraokeBandHtml;
-import com.example.afs.musicpad.message.OnKaraokeBandHtml.Action;
 import com.example.afs.musicpad.message.OnPickChannel;
 import com.example.afs.musicpad.message.OnRenderSong;
 import com.example.afs.musicpad.message.OnSampleChannel;
 import com.example.afs.musicpad.message.OnSampleSong;
+import com.example.afs.musicpad.message.OnShadowUpdate;
+import com.example.afs.musicpad.message.OnShadowUpdate.Action;
 import com.example.afs.musicpad.midi.Instruments;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.player.BackgroundMuteService;
@@ -36,25 +35,24 @@ import com.example.afs.musicpad.player.PlayerDetail;
 import com.example.afs.musicpad.player.PlayerDetailService;
 import com.example.afs.musicpad.player.PlayerVelocityService;
 import com.example.afs.musicpad.song.ChannelNotes;
+import com.example.afs.musicpad.task.ControllerTask;
 import com.example.afs.musicpad.task.MessageBroker;
-import com.example.afs.musicpad.task.ServiceTask;
 import com.example.afs.musicpad.util.RandomAccessList;
 
-public class KaraokeController extends ServiceTask {
+public class KaraokeController extends ControllerTask {
 
   private KaraokeView karaokeView;
   private Random random = new Random();
 
   public KaraokeController(MessageBroker broker) {
     super(broker);
-    karaokeView = new KaraokeView(broker);
+    karaokeView = new KaraokeView(this);
     subscribe(OnCommand.class, message -> doCommand(message));
     subscribe(OnDeviceCommand.class, message -> doDeviceCommand(message));
     subscribe(OnRenderSong.class, message -> doRenderSong(message));
     subscribe(OnSampleSong.class, message -> doSampleSong(message));
     subscribe(OnPickChannel.class, message -> doPickChannel(message));
     subscribe(OnSampleChannel.class, message -> doSampleChannel(message));
-    subscribe(OnKaraokeBandEvent.class, message -> doKaraokeBandEvent(message));
   }
 
   @Override
@@ -65,12 +63,8 @@ public class KaraokeController extends ServiceTask {
     pickRandomSong(midiFiles);
   }
 
-  private void backToSongs() {
-    karaokeView.selectSongsTab();
-    sampleSong(karaokeView.getSongIndex());
-  }
-
-  private void doClick(String id) {
+  @Override
+  protected void doClick(String id) {
     if (id.startsWith("song-index-")) {
       sampleSong(Integer.parseInt(id.substring("song-index-".length())));
     } else if (id.startsWith("channel-index-")) {
@@ -111,6 +105,38 @@ public class KaraokeController extends ServiceTask {
     }
   }
 
+  @Override
+  protected void doInput(String id, int value) {
+    if (id.startsWith("background-mute-")) {
+      publish(new OnDeviceCommand(DeviceCommand.MUTE_BACKGROUND, Integer.parseInt(id.substring("background-mute-".length())), value));
+    } else if (id.startsWith("device-velocity-")) {
+      publish(new OnDeviceCommand(DeviceCommand.VELOCITY, Integer.parseInt(id.substring("device-velocity-".length())), value));
+    } else {
+      switch (id) {
+      case "background-velocity":
+        publish(new OnCommand(Command.SET_BACKGROUND_VELOCITY, value));
+        break;
+      case "master-gain":
+        publish(new OnCommand(Command.SET_MASTER_GAIN, value));
+        break;
+      case "tempo":
+        publish(new OnCommand(Command.SET_TEMPO, value));
+        break;
+      }
+    }
+  }
+
+  @Override
+  protected void doLoad() {
+    addShadowUpdate(new OnShadowUpdate(Action.REPLACE_CHILDREN, "body", karaokeView.render()));
+    karaokeView.selectSong(karaokeView.getSongIndex()); // refresh highlight on current song
+  }
+
+  private void backToSongs() {
+    karaokeView.selectSongsTab();
+    sampleSong(karaokeView.getSongIndex());
+  }
+
   private void doCommand(OnCommand message) {
     switch (message.getCommand()) {
     case SET_BACKGROUND_VELOCITY:
@@ -139,47 +165,6 @@ public class KaraokeController extends ServiceTask {
     default:
       break;
     }
-  }
-
-  private void doInput(String id, int value) {
-    if (id.startsWith("background-mute-")) {
-      publish(new OnDeviceCommand(DeviceCommand.MUTE_BACKGROUND, Integer.parseInt(id.substring("background-mute-".length())), value));
-    } else if (id.startsWith("device-velocity-")) {
-      publish(new OnDeviceCommand(DeviceCommand.VELOCITY, Integer.parseInt(id.substring("device-velocity-".length())), value));
-    } else {
-      switch (id) {
-      case "background-velocity":
-        publish(new OnCommand(Command.SET_BACKGROUND_VELOCITY, value));
-        break;
-      case "master-gain":
-        publish(new OnCommand(Command.SET_MASTER_GAIN, value));
-        break;
-      case "tempo":
-        publish(new OnCommand(Command.SET_TEMPO, value));
-        break;
-      }
-    }
-  }
-
-  private void doKaraokeBandEvent(OnKaraokeBandEvent message) {
-    switch (message.getAction()) {
-    case LOAD:
-      doLoad();
-      break;
-    case CLICK:
-      doClick(message.getId());
-      break;
-    case INPUT:
-      doInput(message.getId(), message.getValue());
-      break;
-    default:
-      throw new UnsupportedOperationException();
-    }
-  }
-
-  private void doLoad() {
-    publish(new OnKaraokeBandHtml(Action.REPLACE_CHILDREN, "body", karaokeView.render()));
-    karaokeView.selectSong(karaokeView.getSongIndex()); // refresh highlight on current song
   }
 
   private void doPickChannel(OnPickChannel message) {
