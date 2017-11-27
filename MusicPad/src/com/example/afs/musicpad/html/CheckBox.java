@@ -20,7 +20,7 @@ public class CheckBox extends Input {
     if (getId() == null) {
       throw new IllegalStateException();
     }
-    setProperty("onclick", "karaoke.onInput(event, this.checked ? 1 : 0)");
+    setProperty("onclick", "musicPad.onInput(event, this.checked ? 1 : 0)");
     return this;
   }
 

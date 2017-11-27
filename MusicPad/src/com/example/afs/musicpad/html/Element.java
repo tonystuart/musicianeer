@@ -47,19 +47,8 @@ public class Element extends Node {
     if (getId() == null) {
       throw new IllegalStateException();
     }
-    setProperty("onclick", "karaoke.onClick(event)");
+    setProperty("onclick", "musicPad.onClick(event)");
     return this;
-  }
-
-  public void setProperty(String name) {
-    setProperty(name, null);
-  }
-
-  public void setProperty(String name, Object value) {
-    if (attributes == null) {
-      attributes = new HashMap<>();
-    }
-    attributes.put(name, value);
   }
 
   public Set<String> getClassList() {
@@ -123,6 +112,17 @@ public class Element extends Node {
 
   public void setId(String id) {
     this.id = id;
+  }
+
+  public void setProperty(String name) {
+    setProperty(name, null);
+  }
+
+  public void setProperty(String name, Object value) {
+    if (attributes == null) {
+      attributes = new HashMap<>();
+    }
+    attributes.put(name, value);
   }
 
 }

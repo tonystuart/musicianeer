@@ -19,7 +19,7 @@ public class Input extends Element {
     if (getId() == null) {
       throw new IllegalStateException();
     }
-    setProperty("oninput", "karaoke.onInput(event, this.value)");
+    setProperty("oninput", "musicPad.onInput(event, this.value)");
     return this;
   }
 

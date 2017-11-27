@@ -3,66 +3,6 @@ var karaoke = karaoke || {};
 
 const TICK = 'tick-';
 
-karaoke.onClick = function(event) {
-    let id = event.target.id;
-    if (!id) {
-        id = event.target.closest('[id]').id;
-    }
-    musicPad.send(JSON.stringify({
-        type: 'OnBrowserEvent',
-        action: 'CLICK',
-        id: id
-    }));
-}
-
-karaoke.onInput = function(event, value) {
-    const id = event.target.id;
-    musicPad.send(JSON.stringify({
-        type: 'OnBrowserEvent',
-        action: 'INPUT',
-        id: id,
-        value: value
-    }));
-}
-
-karaoke.onShadowUpdate = function(message) {
-    let matches;
-    switch (message.action) {
-    case 'REPLACE_CHILDREN':
-        musicPad.setElementHtml(message.selector, message.value);
-        break;
-    case 'ADD_CLASS':
-        matches = document.querySelectorAll(message.selector);
-        for (const match of matches) {
-            match.classList.add(message.value);
-        }
-        break;
-    case 'REMOVE_CLASS':
-        matches = document.querySelectorAll(message.selector);
-        for (const match of matches) {
-            match.classList.remove(message.value);
-        }
-        break;
-    case 'ENSURE_VISIBLE':
-        let element = document.querySelector(message.selector);
-        let songList = element.parentElement.parentElement;
-        let midpoint = songList.offsetHeight / 2;
-        let elementTop = element.offsetTop - songList.offsetTop;
-        if (elementTop < songList.scrollTop || (elementTop + element.offsetHeight) > songList.scrollTop + songList.offsetHeight) {
-            songList.scrollTop = elementTop - midpoint;
-        }
-        break;
-    case 'SET_PROPERTY':
-        matches = document.querySelectorAll(message.selector);
-        for (const match of matches) {
-            if (!match.matches(':active')) {
-                match[message.name] = message.value;
-            }
-        }
-        break;
-    }
-}
-
 karaoke.getNextPrompt = function(currentPrompt) {
     let next = currentPrompt.nextElementSibling;
     if (next) {
@@ -170,7 +110,7 @@ karaoke.onWebSocketMessage = function(json) {
     let message = JSON.parse(json);
     switch (message.type) {
     case 'OnShadowUpdate':
-        karaoke.onShadowUpdate(message);
+        musicPad.onShadowUpdate(message);
         break;
     case 'OnTick':
         karaoke.onTick(message.tick);
