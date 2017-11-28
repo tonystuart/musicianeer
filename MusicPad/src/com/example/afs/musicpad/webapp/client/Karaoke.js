@@ -143,7 +143,7 @@ karaoke.showTickCountdown = function(tick) {
             karaoke.countdown = document.createElement('div');
             karaoke.countdown.className = 'countdown';
             // TODO: Pass resolution to client
-            karaoke.countdown.innerHTML = Math.floor((next.id - tick) / 512);
+            karaoke.countdown.innerHTML = Math.floor((next.id.substring(TICK.length) - tick) / 512);
             // next.appendChild(karaoke.countdown);
             currentPrompt.appendChild(karaoke.countdown);
         }
