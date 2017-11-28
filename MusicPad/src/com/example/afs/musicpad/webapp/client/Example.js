@@ -7,7 +7,6 @@ example.onLoad = function() {
 }
 
 example.onWebSocketClose = function() {
-    example.onTick(0);
 }
 
 example.onWebSocketMessage = function(json) {
