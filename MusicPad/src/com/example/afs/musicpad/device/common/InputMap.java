@@ -28,7 +28,7 @@ public class InputMap {
     for (int index = 0; index < length; index++) {
       char c = s.charAt(index);
       inputCodes[index] = c;
-      legends[index] = KeyEvent.getKeyText(c);
+      legends[index] = (c >= ' ' && c <= '~') ? String.valueOf(c) : KeyEvent.getKeyText(c);
     }
   }
 
