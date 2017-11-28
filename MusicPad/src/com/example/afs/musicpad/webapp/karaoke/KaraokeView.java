@@ -54,7 +54,7 @@ public class KaraokeView extends ShadowDom {
             .add(div(".title") //
                 .add(text("Pick a Song")) //
                 .add(div("#song-list-filter", ".hidden"))) //
-            .add(div("#song-list") // createSongList
+            .add(div("#song-list", ".list") // createSongList
                 .addClickHandler()) //
             .add(div(".controls") //
                 .add(div("#song-roulette")//
@@ -72,7 +72,7 @@ public class KaraokeView extends ShadowDom {
         .add(div(".left") //
             .add(div("#channel-title", ".title") //
                 .add(text("Player: Pick your Part"))) //
-            .add(div("#channel-list") //
+            .add(div("#channel-list", ".list") //
                 .addClickHandler()) // createChannelList
             .add(div(".controls") // 
                 .add(div("#channel-to-song")//
@@ -90,7 +90,7 @@ public class KaraokeView extends ShadowDom {
         .add(div(".left") //
             .add(div("#prompter-title", ".title") //
                 .add(text("Prompter Title"))) //
-            .add(div("#prompter-list") // renderSong
+            .add(div("#prompter-list", ".list") // renderSong
                 .addClickHandler()) //
             .add(div(".controls") //
                 .add(div("#prompter-to-song") //

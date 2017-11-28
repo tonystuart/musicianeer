@@ -20,8 +20,15 @@ public class ExampleView extends ShadowDom {
         .add(div(".left") //
             .add(div(".title") //
                 .add(text("Example Application"))) //
-            .add(div("#example-list") // createSongList
-                .addClickHandler()) //
+            .add(div("#example-list", ".list") //
+                .addClickHandler() //
+                .add(div() //
+                    .add(div("#item-1") //
+                        .add(text("Item 1"))) //
+                    .add(div("#item-2") //
+                        .add(text("Item 2"))) //
+                    .add(div("#item-3") //
+                        .add(text("Item 3"))))) //
             .add(div(".controls") //
                 .add(div("#example-1")//
                     .addClickHandler() //

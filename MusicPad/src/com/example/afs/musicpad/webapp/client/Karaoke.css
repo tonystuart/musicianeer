@@ -1,28 +1,11 @@
 @CHARSET "UTF-8";
 
-html {
-    height: 100%;
-    width: 100%;
-    font-family: Sans-Serif;
-}
-
 body {
-    height: 100%;
-    margin: 0px;
-    width: 100%;
-    font-size: 3vh;
     color: magenta;
-    cursor: default;
-    user-select: none;
     background-color: rgb(32, 32, 32);
     background-image: linear-gradient(45deg, black 25%, transparent 25%, transparent 75%, black 75%, black), linear-gradient(45deg, black 25%, transparent 25%, transparent 75%, black 75%, black), linear-gradient(to bottom, rgb(8, 8, 8), rgb(32, 32, 32));
     background-size: 10px 10px, 10px 10px, 10px 5px;
     background-position: 0px 0px, 5px 5px, 0px 0px;
-}
-
-input {
-    padding: 0;
-    margin: 0;
 }
 
 #prompter {
@@ -31,7 +14,7 @@ input {
 #prompter-list {
     overflow-y: auto;
 }
-	
+
 .line {
     border-bottom: 1px solid gray;
 }
@@ -44,75 +27,75 @@ input {
 }
 
 .device-0 {
-	color: red;
+    color: red;
 }
 
 .device-0 .selected-channel {
-	color: black;
-	background-color: red;
+    color: black;
+    background-color: red;
 }
 
 .device-1 {
-	color: lime;
+    color: lime;
 }
 
 .device-1 .selected-channel {
-	color: black;
-	background-color: lime;
+    color: black;
+    background-color: lime;
 }
 
 .device-2 {
-	color: cyan;
+    color: cyan;
 }
 
 .device-2 .selected-channel {
-  color: black;
-  background-color: cyan;
+    color: black;
+    background-color: cyan;
 }
 
 .device-3 {
-	color: yellow;
+    color: yellow;
 }
 
 .device-3 .selected-channel {
-  color: black;
-  background-color: yellow;
+    color: black;
+    background-color: yellow;
 }
 
 .device-4 {
-	color: salmon;
+    color: salmon;
 }
 
 .device-4 .selected-channel {
-  color: black;
-  background-color: salmon;
+    color: black;
+    background-color: salmon;
 }
 
 .device-5 {
-	color: chartreuse;
+    color: chartreuse;
 }
 
 .device-5 .selected-channel {
-  color: black;
-  background-color: chartreuse;
+    color: black;
+    background-color: chartreuse;
 }
 
 .device-6 {
-	color: aqua;
+    color: aqua;
 }
 
 .device-6 .selected-channel {
-  color: black;
-  background-color: aqua;
+    color: black;
+    background-color: aqua;
 }
 
 .device-7 {
-	color: darkorange;
+    color: darkorange;
 }
 
 .device-7 .selected-channel {
-  color: black;
-  background-color: darkorange;
+    color: black;
+    background-color: darkorange;
 }
 
 .words, .channel {
@@ -123,7 +106,7 @@ input {
 }
 
 .interlude {
-	padding: 4vh 0;
+    padding: 4vh 0;
 }
 
 .current-prompt {
@@ -134,194 +117,50 @@ input {
 
 .countdown {
     color: red;
-    /* z-index: 100; */
-    /* background-color: blue; */
     position: absolute;
     bottom: 1px;
     width: 100%;
     text-align: center;
-    /* padding-bottom: 5px; */
-}
-
-.tab {
-    visibility: hidden;
-    display:  flex;
-    flex-direction: row;
-    flex-grow: 1;
-    position: fixed;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-}
-
-.tab .right {
-	width: 50%;
-	display: flex;
-	flex-direction: column;
-	justify-content: flex-end;
-}
-
-.tab .left {
-	flex-grow: 1;
-	width: 50%;
-	/* margin: 10px; */
-	/* border: 1px solid magenta; */
-	display:  flex;
-	flex-direction: column;
-}
-
-.selected-tab {
-	visibility: visible;
-}
-
-.details {
-	flex-grow: 1;
-	margin-top: auto;
-	overflow-y: auto;
-	display: flex;
-}
-
-.detail {
-	display: table-row;
-}
-
-.detail .name, .detail .value {
-	display: table-cell;
-	padding: 5px;
-}
-
-.detail .name {
-	text-align: right;
-	width: 25%;
-	font-weight: bold;
-	vertical-align: top;
-}
-
-.detail .name::after {
-	content: ':';
-}
-
-.detail .value {
-	vertical-align: bottom;
 }
 
 #song-details div, #channel-details div, #prompter-details div {
-	margin: auto;
-}
-
-.controls div {
-	background-color: black;
+    margin: auto;
 }
 
 ::-webkit-scrollbar {
-    width: 12px;
     background-color: magenta;
-}
- 
-::-webkit-scrollbar-track {
-    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3); 
-    border-radius: 10px;
-}
- 
-::-webkit-scrollbar-thumb {
-    border-radius: 10px;
-    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5);
-    border: 1px solid black;
-}
-
-input[type=range] {
-  -webkit-appearance: none;
-  margin: 18px 0;
-  width: 100%;
-}
-
-input[type=range]:focus {
-  outline: none;
-}
-
-input[type=range]::-webkit-slider-runnable-track {
-  width: 100%;
-  height: 8.4px;
-  cursor: pointer;
-  animate: 0.2s;
-  box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
-  background: #3071a9;
-  border-radius: 1.3px;
-  border: 0.2px solid #010101;
 }
 
 input[type=range]::-webkit-slider-thumb {
-  box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
-  border: 1px solid #000000;
-  height: 36px;
-  width: 16px;
-  border-radius: 3px;
-  background: magenta;
-  cursor: pointer;
-  -webkit-appearance: none;
-  margin-top: -14px;
+    background: magenta;
 }
 
 input[type=range]:focus::-webkit-slider-runnable-track {
-  background: #367ebd;
-}
-
-.title {
-    font-size: 6vh;
-    font-weight: bold;
-    margin: 10px;
-    /* display: flex; */
-    /* align-items: center; */
-    /* flex-direction: column; */
-    flex-shrink: 0;
-    text-align: center;
-    position: relative;
-}
-
-.controls {
-	display: flex;
-	flex-direction: row;
-	justify-content: space-around;
-	margin: 10px;
-	/* height: 200px; */
-	flex-shrink: 0;
+    background: #367ebd;
 }
 
 .controls div {
-	/* margin: 20px; */
-	border: 1px solid magenta;
-	padding: 10px;
-	/* vertical-align: middle; */
-	/* vertical-align: middle; */
+    border: 1px solid magenta;
 }
 
 .controls div:hover {
-  background-color: gray;
+    background-color: gray;
 }
 
 .controls div:active {
-	color: black;
-	background-color: magenta;
+    background-color: magenta;
 }
 
 #song-list-filter {
-	position: absolute;
-	bottom: 0;
-	right: 0;
-	font-size: 50%;
-	border: 1px solid magenta;
-	color: magenta;
-	background: black;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    font-size: 50%;
+    border: 1px solid magenta;
 }
 
-#song-list, #channel-list, #prompter-list {
-    overflow-y: auto;
-    height: 100%;
-    text-align: center;
-    line-height: 120%;
+.list {
     border: 1px solid magenta;
-    background-color: black;
 }
 
 .selected-song {
@@ -329,28 +168,8 @@ input[type=range]:focus::-webkit-slider-runnable-track {
     background-color: magenta;
 }
 
-.hidden {
-	display: none;
-}
-
-.detail-container {
-	margin: auto;
-}
-
-.value-content {
-	display: flex;
-	flex-direction: column;
-  padding-right: 20px;
-  padding-left: 20px;
-}
-
-.value-content label {
-	text-align: center;
-}
-
 .channel-program {
-	display: flex;
-	flex-direction: row;
-	justify-content: center;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
 }
-

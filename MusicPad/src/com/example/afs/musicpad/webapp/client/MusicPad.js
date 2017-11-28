@@ -23,63 +23,63 @@ musicPad.createWebSocketClient = function(webSocketUrl, onMessageCallback, onClo
 }
 
 musicPad.onClick = function(event) {
-  let id = event.target.id;
-  if (!id) {
-      id = event.target.closest('[id]').id;
-  }
-  musicPad.send(JSON.stringify({
-      type: 'OnBrowserEvent',
-      action: 'CLICK',
-      id: id
-  }));
+    let id = event.target.id;
+    if (!id) {
+        id = event.target.closest('[id]').id;
+    }
+    musicPad.send(JSON.stringify({
+        type: 'OnBrowserEvent',
+        action: 'CLICK',
+        id: id
+    }));
 }
 
 musicPad.onInput = function(event, value) {
-  const id = event.target.id;
-  musicPad.send(JSON.stringify({
-      type: 'OnBrowserEvent',
-      action: 'INPUT',
-      id: id,
-      value: value
-  }));
+    const id = event.target.id;
+    musicPad.send(JSON.stringify({
+        type: 'OnBrowserEvent',
+        action: 'INPUT',
+        id: id,
+        value: value
+    }));
 }
 
 musicPad.onShadowUpdate = function(message) {
-  let matches = undefined;
-  switch (message.action) {
-  case 'REPLACE_CHILDREN':
-      musicPad.setElementHtml(message.selector, message.value);
-      break;
-  case 'ADD_CLASS':
-      matches = document.querySelectorAll(message.selector);
-      for (const match of matches) {
-          match.classList.add(message.value);
-      }
-      break;
-  case 'REMOVE_CLASS':
-      matches = document.querySelectorAll(message.selector);
-      for (const match of matches) {
-          match.classList.remove(message.value);
-      }
-      break;
-  case 'ENSURE_VISIBLE':
-      let element = document.querySelector(message.selector);
-      let grandparent = element.parentElement.parentElement;
-      let midpoint = grandparent.offsetHeight / 2;
-      let elementTop = element.offsetTop - grandparent.offsetTop;
-      if (elementTop < grandparent.scrollTop || (elementTop + element.offsetHeight) > grandparent.scrollTop + grandparent.offsetHeight) {
-          grandparent.scrollTop = elementTop - midpoint;
-      }
-      break;
-  case 'SET_PROPERTY':
-      matches = document.querySelectorAll(message.selector);
-      for (const match of matches) {
-          if (!match.matches(':active')) {
-              match[message.name] = message.value;
-          }
-      }
-      break;
-  }
+    let matches = undefined;
+    switch (message.action) {
+    case 'REPLACE_CHILDREN':
+        musicPad.setElementHtml(message.selector, message.value);
+        break;
+    case 'ADD_CLASS':
+        matches = document.querySelectorAll(message.selector);
+        for (const match of matches) {
+            match.classList.add(message.value);
+        }
+        break;
+    case 'REMOVE_CLASS':
+        matches = document.querySelectorAll(message.selector);
+        for (const match of matches) {
+            match.classList.remove(message.value);
+        }
+        break;
+    case 'ENSURE_VISIBLE':
+        let element = document.querySelector(message.selector);
+        let grandparent = element.parentElement.parentElement;
+        let midpoint = grandparent.offsetHeight / 2;
+        let elementTop = element.offsetTop - grandparent.offsetTop;
+        if (elementTop < grandparent.scrollTop || (elementTop + element.offsetHeight) > grandparent.scrollTop + grandparent.offsetHeight) {
+            grandparent.scrollTop = elementTop - midpoint;
+        }
+        break;
+    case 'SET_PROPERTY':
+        matches = document.querySelectorAll(message.selector);
+        for (const match of matches) {
+            if (!match.matches(':active')) {
+                match[message.name] = message.value;
+            }
+        }
+        break;
+    }
 }
 
 musicPad.send = function(json) {
@@ -130,4 +130,3 @@ musicPad.toSvg = function(svg, x) {
     let svgPoint = screenPoint.matrixTransform(inverse);
     return svgPoint.x;
 }
-

@@ -29,6 +29,9 @@ public class ExampleController extends ControllerTask {
 
   @Override
   protected void doClick(String id) {
+    if (id.startsWith("item-")) {
+      exampleView.selectElement(id, "selected-item");
+    }
   }
 
   @Override

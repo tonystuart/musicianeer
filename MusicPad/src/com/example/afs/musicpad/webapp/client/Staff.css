@@ -18,38 +18,37 @@ body {
 }
 
 line {
-  stroke: black;
-  stroke-width: 1;
+    stroke: black;
+    stroke-width: 1;
 }
 
 circle {
-  stroke: black;
-  stroke-width: 1;
+    stroke: black;
+    stroke-width: 1;
 }
 
 text {
-  font-size: 10pt;
-  stroke: black;
-  fill: black;
+    font-size: 10pt;
+    stroke: black;
+    fill: black;
 }
 
 .open {
-  fill: white;
+    fill: white;
 }
 
 .closed {
-  fill: black;
+    fill: black;
 }
 
-
 .channel-notators {
-  background-color: white;
-  display: flex;
-  flex-direction: column;
-  flex-grow: 1;
-  position: relative;
-  width: 100%;
-  height: 100%;
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    position: relative;
+    width: 100%;
+    height: 100%;
 }
 
 #notator-cursor {
@@ -61,30 +60,28 @@ text {
 }
 
 #notator-scroller {
-  display: flex;
-  flex-direction: column;
-  flex-grow: 1;
-  height: 100%;
-  overflow-x: auto;
-  width: 100%;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    height: 100%;
+    overflow-x: auto;
+    width: 100%;
 }
 
 .notator {
-  flex-grow: 1;
-  flex-shrink: 1;
-  position: relative;
-  display: flex;
+    flex-grow: 1;
+    flex-shrink: 1;
+    position: relative;
+    display: flex;
 }
 
 .notator svg {
-  bottom: 0;
-  height: 100%;
-  left: 0;
-  padding-left: calc(50%);
-  padding-right: calc(50%);
-  position: absolute;
-  right: 0;
-  top: 0;
+    bottom: 0;
+    height: 100%;
+    left: 0;
+    padding-left: calc(50%);
+    padding-right: calc(50%);
+    position: absolute;
+    right: 0;
+    top: 0;
 }
-
-
