@@ -12,6 +12,7 @@ package com.example.afs.musicpad.webapp;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
+import com.example.afs.musicpad.AsynchronousThread;
 import com.example.afs.musicpad.message.OnShadowUpdate;
 import com.example.afs.musicpad.task.ControllerTask;
 import com.example.afs.musicpad.task.Message;
@@ -28,12 +29,15 @@ public class MultitonWebApp extends WebApp {
   }
 
   @Override
+  @AsynchronousThread
   public void doWebSocketConnection(WebSocket webSocket) {
     this.webSocket = webSocket;
   }
 
   @Override
+  @AsynchronousThread
   public void onWebSocketClose(WebSocket webSocket) {
+    terminate();
   }
 
   protected void doMessage(Message message) {

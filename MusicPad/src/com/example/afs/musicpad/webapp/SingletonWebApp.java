@@ -15,6 +15,7 @@ import java.util.Iterator;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import com.example.afs.musicpad.AsynchronousThread;
 import com.example.afs.musicpad.message.OnShadowUpdate;
 import com.example.afs.musicpad.task.ControllerTask;
 import com.example.afs.musicpad.task.Message;
@@ -35,11 +36,13 @@ public class SingletonWebApp extends WebApp {
   }
 
   @Override
+  @AsynchronousThread
   public void doWebSocketConnection(WebSocket webSocket) {
     webSockets.add(webSocket);
   }
 
   @Override
+  @AsynchronousThread
   public void onWebSocketClose(WebSocket webSocket) {
     webSockets.remove(webSocket);
     singletonWebAppFactory.releaseWebApp();

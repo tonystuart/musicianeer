@@ -11,6 +11,7 @@ package com.example.afs.musicpad.webapp;
 
 import java.nio.ByteBuffer;
 
+import com.example.afs.musicpad.AsynchronousThread;
 import com.example.afs.musicpad.message.OnBrowserEvent;
 import com.example.afs.musicpad.message.OnBrowserEvent.Action;
 import com.example.afs.musicpad.message.TypedMessage;
@@ -63,6 +64,7 @@ public abstract class WebApp extends ServiceTask {
 
   protected abstract void doPing(ByteBuffer ping);
 
+  @AsynchronousThread
   protected abstract void doWebSocketConnection(WebSocket webSocket);
 
   @Override
@@ -70,6 +72,7 @@ public abstract class WebApp extends ServiceTask {
     doPing(PING);
   }
 
+  @AsynchronousThread
   protected abstract void onWebSocketClose(WebSocket webSocket);
 
 }
