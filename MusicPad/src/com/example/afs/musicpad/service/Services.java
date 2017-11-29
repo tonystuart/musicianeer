@@ -7,9 +7,10 @@
 // This program is made available on an "as is" basis, without
 // warranties or conditions of any kind, either express or implied.
 
-package com.example.afs.musicpad;
+package com.example.afs.musicpad.service;
 
 import java.io.File;
+import java.util.NavigableSet;
 
 import com.example.afs.musicpad.player.PlayerDetail;
 import com.example.afs.musicpad.song.Song;
@@ -21,18 +22,21 @@ public class Services {
   public static final Service<Integer> getBackgroundVelocity = new Service<Integer>() {
   };
 
-  public static final Service<Song> GetCurrentSong = new Service<Song>() {
+  public static final Service<Song> getCurrentSong = new Service<Song>() {
   };
 
   public static final Service<Integer> getMasterGain = new Service<Integer>() {
   };
 
-  public static final Service<RandomAccessList<File>> GetMidiFiles = new Service<RandomAccessList<File>>() {
+  public static final Service<RandomAccessList<File>> getMidiFiles = new Service<RandomAccessList<File>>() {
   };
 
-  public static Service<PlayerDetail> GetPlayerDetail = new Service<PlayerDetail>() {
+  public static Service<PlayerDetail> getPlayerDetail = new Service<PlayerDetail>() {
   };
 
   public static final Service<Integer> getTempo = new Service<Integer>() {
+  };
+
+  public static final Service<NavigableSet<Integer>> getDeviceIndexes = new Service<NavigableSet<Integer>>() {
   };
 }

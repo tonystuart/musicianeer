@@ -30,6 +30,7 @@ public class QwertyController implements Controller {
     return qwertyConfiguration;
   }
 
+  @Override
   public String getDeviceName() {
     return deviceName;
   }

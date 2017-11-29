@@ -22,15 +22,16 @@ import com.example.afs.musicpad.message.OnKeyUp;
 import com.example.afs.musicpad.message.OnSampleChannel;
 import com.example.afs.musicpad.message.OnSampleSong;
 import com.example.afs.musicpad.midi.Midi;
-import com.example.afs.musicpad.player.BackgroundMuteService;
 import com.example.afs.musicpad.player.PlayableMap;
 import com.example.afs.musicpad.player.PlayableMap.OutputType;
 import com.example.afs.musicpad.player.Player;
 import com.example.afs.musicpad.player.Player.Action;
 import com.example.afs.musicpad.player.PlayerDetail;
-import com.example.afs.musicpad.player.PlayerDetailService;
-import com.example.afs.musicpad.player.PlayerVelocityService;
 import com.example.afs.musicpad.player.Sound;
+import com.example.afs.musicpad.service.BackgroundMuteService;
+import com.example.afs.musicpad.service.DeviceControllerService;
+import com.example.afs.musicpad.service.PlayerDetailService;
+import com.example.afs.musicpad.service.PlayerVelocityService;
 import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.task.MessageBroker;
 import com.example.afs.musicpad.task.ServiceTask;
@@ -64,6 +65,7 @@ public class DeviceHandler extends ServiceTask {
     provide(new PlayerDetailService(deviceIndex), () -> getPlayerDetail());
     provide(new PlayerVelocityService(deviceIndex), () -> getPercentVelocity());
     provide(new BackgroundMuteService(deviceIndex), () -> synthesizer.isMuted(channel));
+    provide(new DeviceControllerService(deviceIndex), () -> controller);
   }
 
   public int getDeviceIndex() {

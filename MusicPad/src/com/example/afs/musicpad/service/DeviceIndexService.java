@@ -1,11 +1,9 @@
-package com.example.afs.musicpad.player;
+package com.example.afs.musicpad.service;
 
-import com.example.afs.musicpad.task.ServiceTask.Service;
-
-public class BackgroundMuteService implements Service<Boolean> {
+public class DeviceIndexService {
   private int deviceIndex;
 
-  public BackgroundMuteService(int deviceIndex) {
+  public DeviceIndexService(int deviceIndex) {
     this.deviceIndex = deviceIndex;
   }
 
@@ -20,7 +18,7 @@ public class BackgroundMuteService implements Service<Boolean> {
     if (getClass() != obj.getClass()) {
       return false;
     }
-    BackgroundMuteService other = (BackgroundMuteService) obj;
+    DeviceIndexService other = (DeviceIndexService) obj;
     if (deviceIndex != other.deviceIndex) {
       return false;
     }

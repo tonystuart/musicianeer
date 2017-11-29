@@ -25,6 +25,7 @@ import com.example.afs.musicpad.message.OnRenderSong;
 import com.example.afs.musicpad.message.OnSampleChannel;
 import com.example.afs.musicpad.message.OnSampleSong;
 import com.example.afs.musicpad.parser.SongBuilder;
+import com.example.afs.musicpad.service.Services;
 import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.task.MessageBroker;
 import com.example.afs.musicpad.task.ServiceTask;
@@ -50,8 +51,9 @@ public class Conductor extends ServiceTask {
     subscribe(OnDeviceAttached.class, message -> doDeviceAttached(message));
     subscribe(OnDeviceDetached.class, message -> doDeviceDetached(message));
     subscribe(OnConfigurationChange.class, message -> doConfigurationChange(message));
-    provide(Services.GetMidiFiles, () -> midiFiles);
-    provide(Services.GetCurrentSong, () -> song);
+    provide(Services.getMidiFiles, () -> midiFiles);
+    provide(Services.getCurrentSong, () -> song);
+    provide(Services.getDeviceIndexes, () -> deviceIndexes);
   }
 
   private void doCommand(OnCommand message) {

@@ -41,6 +41,11 @@ public class MidiController implements Controller {
   }
 
   @Override
+  public String getDeviceName() {
+    return midiDeviceBundle.getType();
+  }
+
+  @Override
   public void start() {
     midiReader.start();
     midiWriter.start();

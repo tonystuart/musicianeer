@@ -1,0 +1,6 @@
+@CHARSET "UTF-8";
+
+.selected-device {
+    color: black;
+    background-color: white;
+}

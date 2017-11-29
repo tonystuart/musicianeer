@@ -25,6 +25,7 @@ import com.example.afs.musicpad.task.MessageBroker;
 import com.example.afs.musicpad.task.MessageTask;
 import com.example.afs.musicpad.webapp.example.ExampleWebAppFactory;
 import com.example.afs.musicpad.webapp.karaoke.KaraokeWebAppFactory;
+import com.example.afs.musicpad.webapp.mapper.MapperWebAppFactory;
 
 public class WebServer extends MessageTask {
 
@@ -34,11 +35,13 @@ public class WebServer extends MessageTask {
   private Server server;
   private ExampleWebAppFactory exampleWebAppFactory;
   private KaraokeWebAppFactory karaokeWebAppFactory;
+  private MapperWebAppFactory mapperWebAppFactory;
 
   public WebServer(MessageBroker broker) {
     super(broker);
-    karaokeWebAppFactory = new KaraokeWebAppFactory(getBroker());
     exampleWebAppFactory = new ExampleWebAppFactory(getBroker());
+    karaokeWebAppFactory = new KaraokeWebAppFactory(getBroker());
+    mapperWebAppFactory = new MapperWebAppFactory(getBroker());
     createServer();
   }
 
@@ -72,6 +75,12 @@ public class WebServer extends MessageTask {
     return servletHolder;
   }
 
+  private ServletHolder createMapperServlet() {
+    WebAppServlet mapperServlet = new WebAppServlet(mapperWebAppFactory);
+    ServletHolder servletHolder = new ServletHolder("MapperServlet", mapperServlet);
+    return servletHolder;
+  }
+
   private ServletHolder createRestServlet() {
     RestServlet restServlet = new RestServlet();
     ServletHolder restServletHolder = new ServletHolder(restServlet);
@@ -88,6 +97,7 @@ public class WebServer extends MessageTask {
     context.addServlet(createRestServlet(), "/v1/rest/*");
     context.addServlet(createExampleServlet(), "/v1/example/*");
     context.addServlet(createKaraokeServlet(), "/v1/karaoke/*");
+    context.addServlet(createMapperServlet(), "/v1/mapper/*");
     HandlerCollection handlers = new HandlerCollection();
     handlers.setHandlers(new Handler[] {
         context,

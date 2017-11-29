@@ -7,16 +7,13 @@
 // This program is made available on an "as is" basis, without
 // warranties or conditions of any kind, either express or implied.
 
-package com.example.afs.musicpad.device.common;
+package com.example.afs.musicpad.service;
 
-public interface Controller {
+import com.example.afs.musicpad.player.PlayerDetail;
+import com.example.afs.musicpad.task.ServiceTask.Service;
 
-  Configuration getConfiguration();
-
-  String getDeviceName();
-
-  void start();
-
-  void terminate();
-
+public class PlayerDetailService extends DeviceIndexService implements Service<PlayerDetail> {
+  public PlayerDetailService(int deviceIndex) {
+    super(deviceIndex);
+  }
 }

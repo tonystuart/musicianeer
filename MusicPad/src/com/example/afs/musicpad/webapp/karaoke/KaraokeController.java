@@ -17,7 +17,6 @@ import java.util.TreeMap;
 
 import com.example.afs.musicpad.Command;
 import com.example.afs.musicpad.DeviceCommand;
-import com.example.afs.musicpad.Services;
 import com.example.afs.musicpad.html.Option;
 import com.example.afs.musicpad.html.Template;
 import com.example.afs.musicpad.message.OnCommand;
@@ -30,10 +29,11 @@ import com.example.afs.musicpad.message.OnShadowUpdate;
 import com.example.afs.musicpad.message.OnShadowUpdate.Action;
 import com.example.afs.musicpad.midi.Instruments;
 import com.example.afs.musicpad.midi.Midi;
-import com.example.afs.musicpad.player.BackgroundMuteService;
 import com.example.afs.musicpad.player.PlayerDetail;
-import com.example.afs.musicpad.player.PlayerDetailService;
-import com.example.afs.musicpad.player.PlayerVelocityService;
+import com.example.afs.musicpad.service.BackgroundMuteService;
+import com.example.afs.musicpad.service.PlayerDetailService;
+import com.example.afs.musicpad.service.PlayerVelocityService;
+import com.example.afs.musicpad.service.Services;
 import com.example.afs.musicpad.song.ChannelNotes;
 import com.example.afs.musicpad.task.ControllerTask;
 import com.example.afs.musicpad.task.MessageBroker;
@@ -58,7 +58,7 @@ public class KaraokeController extends ControllerTask {
   @Override
   public void start() {
     super.start();
-    RandomAccessList<File> midiFiles = request(Services.GetMidiFiles);
+    RandomAccessList<File> midiFiles = request(Services.getMidiFiles);
     karaokeView.renderSongList(midiFiles);
     pickRandomSong(midiFiles);
   }
@@ -229,7 +229,7 @@ public class KaraokeController extends ControllerTask {
   }
 
   private void pickRandomSong() {
-    RandomAccessList<File> midiFiles = request(Services.GetMidiFiles);
+    RandomAccessList<File> midiFiles = request(Services.getMidiFiles);
     pickRandomSong(midiFiles);
   }
 
