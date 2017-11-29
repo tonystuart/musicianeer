@@ -16,6 +16,8 @@ import java.util.TreeMap;
 import com.example.afs.musicpad.device.common.Controller;
 import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnDeviceCommand;
+import com.example.afs.musicpad.message.OnInputMessage;
+import com.example.afs.musicpad.message.OnPublishInputMode;
 import com.example.afs.musicpad.message.OnShadowUpdate;
 import com.example.afs.musicpad.message.OnShadowUpdate.Action;
 import com.example.afs.musicpad.service.DeviceControllerService;
@@ -25,6 +27,7 @@ import com.example.afs.musicpad.task.MessageBroker;
 
 public class MapperController extends ControllerTask {
 
+  private int deviceIndex;
   private MapperView mapperView;
   private NavigableMap<Integer, Controller> deviceControllers = new TreeMap<>();
 
@@ -33,12 +36,13 @@ public class MapperController extends ControllerTask {
     mapperView = new MapperView(this);
     subscribe(OnCommand.class, message -> doCommand(message));
     subscribe(OnDeviceCommand.class, message -> doDeviceCommand(message));
+    subscribe(OnInputMessage.class, message -> doInputMessage(message));
   }
 
   @Override
   public void start() {
     super.start();
-    // put MIDI devices in verbose mode. Handle multiple instances of this app.
+    publish(new OnPublishInputMode(true));
     NavigableSet<Integer> devices = request(Services.getDeviceIndexes);
     for (Integer deviceIndex : devices) {
       Controller controller = request(new DeviceControllerService(deviceIndex));
@@ -48,9 +52,16 @@ public class MapperController extends ControllerTask {
   }
 
   @Override
+  public void terminate() {
+    publish(new OnPublishInputMode(false));
+    super.terminate();
+  }
+
+  @Override
   protected void doClick(String id) {
     if (id.startsWith("device-")) {
       mapperView.selectElement(id, "selected-device");
+      deviceIndex = Integer.parseInt(id.substring("device-".length()));
     }
   }
 
@@ -67,6 +78,12 @@ public class MapperController extends ControllerTask {
   }
 
   private void doDeviceCommand(OnDeviceCommand message) {
+  }
+
+  private void doInputMessage(OnInputMessage message) {
+    if (message.getDeviceIndex() == deviceIndex) {
+      System.out.println("message=" + message);
+    }
   }
 
 }

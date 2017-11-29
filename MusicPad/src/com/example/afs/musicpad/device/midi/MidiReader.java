@@ -110,7 +110,7 @@ public class MidiReader {
         } else if (command == ShortMessage.CONTROL_CHANGE) {
           int control = data1;
           int value = data2;
-          deviceHandler.getPlayer().changeControl(control, value);
+          deviceHandler.onControlChange(control, value);
         } else if (command == ShortMessage.PITCH_BEND) {
           // Pitch bend is reported as a signed 14 bit value with MSB in data2 and LSB in data1
           // Options for converting it into values in the range 0 to 16384 include:
