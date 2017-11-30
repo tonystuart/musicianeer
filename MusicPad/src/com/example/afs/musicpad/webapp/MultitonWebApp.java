@@ -48,7 +48,11 @@ public class MultitonWebApp extends WebApp {
   }
 
   private void doMessage(Message message) {
-    System.out.println("webSocket=" + webSocket);
+    if (webSocket == null) {
+      throw new IllegalStateException("Message arrived before web socket is open. Wait for doLoad before publishing, message=" + message);
+    } else if (webSocket.isNotConnected()) {
+      System.out.println("Message arrived after web socket was closed, discarding message=" + message);
+    }
     webSocket.write(message);
   }
 

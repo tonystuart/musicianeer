@@ -41,14 +41,8 @@ public class MapperController extends ControllerTask {
 
   @Override
   public void start() {
-    super.start();
     publish(new OnPublishInputMode(true));
-    NavigableSet<Integer> devices = request(Services.getDeviceIndexes);
-    for (Integer deviceIndex : devices) {
-      Controller controller = request(new DeviceControllerService(deviceIndex));
-      deviceControllers.put(deviceIndex, controller);
-    }
-    mapperView.renderDeviceList(deviceControllers);
+    super.start();
   }
 
   @Override
@@ -71,7 +65,14 @@ public class MapperController extends ControllerTask {
 
   @Override
   protected void doLoad() {
+    // Defer processing that could send shadow update messages until here
     addShadowUpdate(new OnShadowUpdate(Action.REPLACE_CHILDREN, "body", mapperView.render()));
+    NavigableSet<Integer> devices = request(Services.getDeviceIndexes);
+    for (Integer deviceIndex : devices) {
+      Controller controller = request(new DeviceControllerService(deviceIndex));
+      deviceControllers.put(deviceIndex, controller);
+    }
+    mapperView.renderDeviceList(deviceControllers);
   }
 
   private void doCommand(OnCommand message) {
