@@ -21,7 +21,6 @@ import com.example.afs.musicpad.message.OnInputMessage;
 import com.example.afs.musicpad.message.OnInputMessage.MessageType;
 import com.example.afs.musicpad.message.OnKeyDown;
 import com.example.afs.musicpad.message.OnKeyUp;
-import com.example.afs.musicpad.message.OnPublishInputMode;
 import com.example.afs.musicpad.message.OnSampleChannel;
 import com.example.afs.musicpad.message.OnSampleSong;
 import com.example.afs.musicpad.midi.Midi;
@@ -54,7 +53,6 @@ public class DeviceHandler extends ServiceTask {
   private Synthesizer synthesizer;
   private PlayableMap playableMap;
   private Sound[] activeSounds = new Sound[256]; // NB: KeyEvents VK codes, not midiNotes
-  private ModeCounter publishInputMode = new ModeCounter();
 
   public DeviceHandler(MessageBroker broker, Synthesizer synthesizer, int deviceIndex) {
     super(broker);
@@ -66,7 +64,6 @@ public class DeviceHandler extends ServiceTask {
     subscribe(OnSampleChannel.class, message -> doSampleChannel(message));
     subscribe(OnDeviceCommand.class, message -> doDeviceCommand(message));
     subscribe(OnConfigurationChange.class, message -> doConfigurationChange(message));
-    subscribe(OnPublishInputMode.class, message -> doPublishInputMode(message));
     provide(new PlayerDetailService(deviceIndex), () -> getPlayerDetail());
     provide(new PlayerVelocityService(deviceIndex), () -> getPercentVelocity());
     provide(new BackgroundMuteService(deviceIndex), () -> synthesizer.isMuted(channel));
@@ -91,9 +88,7 @@ public class DeviceHandler extends ServiceTask {
 
   public void onControlChange(int control, int value) {
     getPlayer().changeControl(control, value);
-    if (publishInputMode.isSet()) {
-      publish(new OnInputMessage(MessageType.CONTROL_CHANGE, deviceIndex, control, value));
-    }
+    publish(new OnInputMessage(MessageType.CONTROL_CHANGE, deviceIndex, control, value));
   }
 
   public void onDown(int inputCode) {
@@ -260,10 +255,6 @@ public class DeviceHandler extends ServiceTask {
     }
   }
 
-  private void doPublishInputMode(OnPublishInputMode message) {
-    publishInputMode.adjust(message.isPublishMode());
-  }
-
   private void doReset() {
     velocity = DEFAULT_VELOCITY;
     player.reset();
@@ -301,9 +292,7 @@ public class DeviceHandler extends ServiceTask {
         }
       }
     }
-    if (publishInputMode.isSet()) {
-      publish(new OnInputMessage(MessageType.DOWN, deviceIndex, inputCode, velocity));
-    }
+    publish(new OnInputMessage(MessageType.DOWN, deviceIndex, inputCode, velocity));
   }
 
   private void processUp(int inputCode, int velocity) {
@@ -316,9 +305,7 @@ public class DeviceHandler extends ServiceTask {
         publish(new OnKeyUp(deviceIndex, sound));
       }
     }
-    if (publishInputMode.isSet()) {
-      publish(new OnInputMessage(MessageType.UP, deviceIndex, inputCode, velocity));
-    }
+    publish(new OnInputMessage(MessageType.UP, deviceIndex, inputCode, velocity));
   }
 
   private void selectChannel(int channel) {

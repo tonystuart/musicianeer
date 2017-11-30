@@ -58,4 +58,11 @@ public abstract class BrokerTask<M> extends SimpleTask<M> {
     broker.publish(message);
   }
 
+  protected void publishWithMetrics(M message) {
+    long beginNanos = System.nanoTime();
+    publish(message);
+    long endNanos = System.nanoTime();
+    double elapsedMillis = (endNanos - beginNanos) / 1000000D;
+    System.out.println("publish(" + message.getClass().getSimpleName() + ") in " + elapsedMillis + " ms");
+  }
 }

@@ -17,7 +17,6 @@ import com.example.afs.musicpad.device.common.Controller;
 import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnDeviceCommand;
 import com.example.afs.musicpad.message.OnInputMessage;
-import com.example.afs.musicpad.message.OnPublishInputMode;
 import com.example.afs.musicpad.message.OnShadowUpdate;
 import com.example.afs.musicpad.message.OnShadowUpdate.Action;
 import com.example.afs.musicpad.service.DeviceControllerService;
@@ -37,18 +36,6 @@ public class MapperController extends ControllerTask {
     subscribe(OnCommand.class, message -> doCommand(message));
     subscribe(OnDeviceCommand.class, message -> doDeviceCommand(message));
     subscribe(OnInputMessage.class, message -> doInputMessage(message));
-  }
-
-  @Override
-  public void start() {
-    publish(new OnPublishInputMode(true));
-    super.start();
-  }
-
-  @Override
-  public void terminate() {
-    publish(new OnPublishInputMode(false));
-    super.terminate();
   }
 
   @Override
