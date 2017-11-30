@@ -11,9 +11,11 @@ package com.example.afs.musicpad.webapp;
 
 import java.nio.ByteBuffer;
 
-import com.example.afs.musicpad.AsynchronousThread;
 import com.example.afs.musicpad.message.OnBrowserEvent;
 import com.example.afs.musicpad.message.OnBrowserEvent.Action;
+import com.example.afs.musicpad.message.OnWebSocketClose;
+import com.example.afs.musicpad.message.OnWebSocketConnect;
+import com.example.afs.musicpad.message.OnWebSocketText;
 import com.example.afs.musicpad.message.TypedMessage;
 import com.example.afs.musicpad.task.ControllerTask;
 import com.example.afs.musicpad.task.MessageBroker;
@@ -30,24 +32,9 @@ public abstract class WebApp extends ServiceTask {
   public WebApp(MessageBroker broker, ControllerTask controllerTask) {
     super(broker, PING_INTERVAL_MS);
     this.controllerTask = controllerTask;
-  }
-
-  public void onWebSocketConnection(WebSocket webSocket) {
-    doWebSocketConnection(webSocket);
-    controllerTask.addBrowserEvent(new OnBrowserEvent(Action.LOAD));
-  }
-
-  public void onWebSocketText(WebSocket webSocket, String json) {
-    //System.out.println("Received " + json);
-    TypedMessage message = JsonUtilities.fromJson(json, TypedMessage.class);
-    String messageType = message.getType();
-    if (messageType == null) {
-      throw new IllegalArgumentException("Missing messageType");
-    }
-    if (messageType.equals(OnBrowserEvent.class.getSimpleName())) {
-      OnBrowserEvent onBrowserEvent = JsonUtilities.fromJson(json, OnBrowserEvent.class);
-      controllerTask.addBrowserEvent(onBrowserEvent);
-    }
+    subscribe(OnWebSocketText.class, message -> doWebSocketText(message));
+    subscribe(OnWebSocketClose.class, message -> doWebSocketClose(message));
+    subscribe(OnWebSocketConnect.class, message -> doWebSocketConnect(message));
   }
 
   @Override
@@ -62,17 +49,38 @@ public abstract class WebApp extends ServiceTask {
     super.terminate();
   }
 
-  protected abstract void doPing(ByteBuffer ping);
-
-  @AsynchronousThread
-  protected abstract void doWebSocketConnection(WebSocket webSocket);
+  protected abstract void onPing(ByteBuffer ping);
 
   @Override
   protected void onTimeout() throws InterruptedException {
-    doPing(PING);
+    onPing(PING);
   }
 
-  @AsynchronousThread
   protected abstract void onWebSocketClose(WebSocket webSocket);
+
+  protected abstract void onWebSocketConnect(WebSocket webSocket);
+
+  private void doWebSocketClose(OnWebSocketClose message) {
+    onWebSocketClose(message.getWebSocket());
+  }
+
+  private void doWebSocketConnect(OnWebSocketConnect message) {
+    onWebSocketConnect(message.getWebSocket());
+    controllerTask.getInputQueue().add(new OnBrowserEvent(Action.LOAD));
+  }
+
+  private void doWebSocketText(OnWebSocketText message) {
+    String json = message.getText();
+    //System.out.println("Received " + json);
+    TypedMessage typedMessage = JsonUtilities.fromJson(json, TypedMessage.class);
+    String messageType = typedMessage.getType();
+    if (messageType == null) {
+      throw new IllegalArgumentException("Missing messageType");
+    }
+    if (messageType.equals(OnBrowserEvent.class.getSimpleName())) {
+      OnBrowserEvent onBrowserEvent = JsonUtilities.fromJson(json, OnBrowserEvent.class);
+      controllerTask.getInputQueue().add(onBrowserEvent);
+    }
+  }
 
 }

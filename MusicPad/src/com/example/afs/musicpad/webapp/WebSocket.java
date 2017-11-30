@@ -3,6 +3,9 @@ package com.example.afs.musicpad.webapp;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.WebSocketAdapter;
 
+import com.example.afs.musicpad.message.OnWebSocketClose;
+import com.example.afs.musicpad.message.OnWebSocketConnect;
+import com.example.afs.musicpad.message.OnWebSocketText;
 import com.example.afs.musicpad.task.Message;
 import com.example.afs.musicpad.util.JsonUtilities;
 
@@ -17,13 +20,13 @@ public class WebSocket extends WebSocketAdapter {
   @Override
   public void onWebSocketClose(int statusCode, String reason) {
     super.onWebSocketClose(statusCode, reason);
-    webApp.onWebSocketClose(this);
+    webApp.getInputQueue().add(new OnWebSocketClose(this));
   }
 
   @Override
   public void onWebSocketConnect(Session sess) {
     super.onWebSocketConnect(sess);
-    webApp.onWebSocketConnection(this);
+    webApp.getInputQueue().add(new OnWebSocketConnect(this));
   }
 
   @Override
@@ -33,9 +36,9 @@ public class WebSocket extends WebSocketAdapter {
   }
 
   @Override
-  public void onWebSocketText(String message) {
-    super.onWebSocketText(message);
-    webApp.onWebSocketText(this, message);
+  public void onWebSocketText(String text) {
+    super.onWebSocketText(text);
+    webApp.getInputQueue().add(new OnWebSocketText(this, text));
   }
 
   public void write(Message message) {

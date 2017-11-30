@@ -15,7 +15,6 @@ import java.util.Iterator;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import com.example.afs.musicpad.AsynchronousThread;
 import com.example.afs.musicpad.message.OnShadowUpdate;
 import com.example.afs.musicpad.task.ControllerTask;
 import com.example.afs.musicpad.task.Message;
@@ -28,24 +27,11 @@ public class SingletonWebApp extends WebApp {
   private BlockingQueue<WebSocket> webSockets = new LinkedBlockingQueue<>(CLIENTS);
   private SingletonWebAppFactory singletonWebAppFactory;
 
-  protected SingletonWebApp(MessageBroker broker, SingletonWebAppFactory singletonWebAppFactory, ControllerTask controllerTask) {
+  public SingletonWebApp(MessageBroker broker, SingletonWebAppFactory singletonWebAppFactory, ControllerTask controllerTask) {
     super(broker, controllerTask);
     this.singletonWebAppFactory = singletonWebAppFactory;
     controllerTask.setWebApp(this);
     subscribe(OnShadowUpdate.class, message -> doMessage(message));
-  }
-
-  @Override
-  @AsynchronousThread
-  public void doWebSocketConnection(WebSocket webSocket) {
-    webSockets.add(webSocket);
-  }
-
-  @Override
-  @AsynchronousThread
-  public void onWebSocketClose(WebSocket webSocket) {
-    webSockets.remove(webSocket);
-    singletonWebAppFactory.releaseWebApp();
   }
 
   protected void doMessage(Message message) {
@@ -55,7 +41,7 @@ public class SingletonWebApp extends WebApp {
   }
 
   @Override
-  protected void doPing(ByteBuffer ping) {
+  protected void onPing(ByteBuffer ping) {
     Iterator<WebSocket> iterator = webSockets.iterator();
     while (iterator.hasNext()) {
       WebSocket webSocket = iterator.next();
@@ -67,6 +53,17 @@ public class SingletonWebApp extends WebApp {
         iterator.remove();
       }
     }
+  }
+
+  @Override
+  protected void onWebSocketClose(WebSocket webSocket) {
+    webSockets.remove(webSocket);
+    singletonWebAppFactory.releaseWebApp();
+  }
+
+  @Override
+  protected void onWebSocketConnect(WebSocket webSocket) {
+    webSockets.add(webSocket);
   }
 
 }

@@ -26,10 +26,6 @@ public abstract class ControllerTask extends ServiceTask {
     this(broker, NO_TIMEOUT);
   }
 
-  public void addBrowserEvent(OnBrowserEvent onBrowserEvent) {
-    getInputQueue().add(onBrowserEvent);
-  }
-
   public void addShadowUpdate(OnShadowUpdate onShadowUpdate) {
     webApp.getInputQueue().add(onShadowUpdate);
   }

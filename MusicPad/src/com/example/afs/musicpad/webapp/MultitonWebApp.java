@@ -12,7 +12,6 @@ package com.example.afs.musicpad.webapp;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-import com.example.afs.musicpad.AsynchronousThread;
 import com.example.afs.musicpad.message.OnShadowUpdate;
 import com.example.afs.musicpad.task.ControllerTask;
 import com.example.afs.musicpad.task.Message;
@@ -22,36 +21,35 @@ public class MultitonWebApp extends WebApp {
 
   private WebSocket webSocket;
 
-  protected MultitonWebApp(MessageBroker broker, MultitonWebAppFactory multitonWebAppFactory, ControllerTask controllerTask) {
+  public MultitonWebApp(MessageBroker broker, MultitonWebAppFactory multitonWebAppFactory, ControllerTask controllerTask) {
     super(broker, controllerTask);
     controllerTask.setWebApp(this);
     subscribe(OnShadowUpdate.class, message -> doMessage(message));
   }
 
   @Override
-  @AsynchronousThread
-  public void doWebSocketConnection(WebSocket webSocket) {
-    this.webSocket = webSocket;
-  }
-
-  @Override
-  @AsynchronousThread
-  public void onWebSocketClose(WebSocket webSocket) {
-    terminate();
-  }
-
-  protected void doMessage(Message message) {
-    webSocket.write(message);
-  }
-
-  @Override
-  protected void doPing(ByteBuffer ping) {
+  protected void onPing(ByteBuffer ping) {
     try {
       webSocket.getRemote().sendPing(ping);
     } catch (IOException e) {
       System.err.println("Client PING failed, closing WebSocket");
       webSocket.getSession().close();
     }
+  }
+
+  @Override
+  protected void onWebSocketClose(WebSocket webSocket) {
+    terminate();
+  }
+
+  @Override
+  protected void onWebSocketConnect(WebSocket webSocket) {
+    this.webSocket = webSocket;
+  }
+
+  private void doMessage(Message message) {
+    System.out.println("webSocket=" + webSocket);
+    webSocket.write(message);
   }
 
 }
