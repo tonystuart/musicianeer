@@ -38,15 +38,15 @@ public abstract class WebApp extends ServiceTask {
   }
 
   @Override
-  public void start() {
-    super.start();
-    controllerTask.start();
+  public void tsStart() {
+    super.tsStart();
+    controllerTask.tsStart();
   }
 
   @Override
-  public void terminate() {
-    controllerTask.terminate();
-    super.terminate();
+  public void tsTerminate() {
+    controllerTask.tsTerminate();
+    super.tsTerminate();
   }
 
   protected abstract void onPing(ByteBuffer ping);
@@ -66,7 +66,7 @@ public abstract class WebApp extends ServiceTask {
 
   private void doWebSocketConnect(OnWebSocketConnect message) {
     onWebSocketConnect(message.getWebSocket());
-    controllerTask.getInputQueue().add(new OnBrowserEvent(Action.LOAD));
+    controllerTask.tsGetInputQueue().add(new OnBrowserEvent(Action.LOAD));
   }
 
   private void doWebSocketText(OnWebSocketText message) {
@@ -79,7 +79,7 @@ public abstract class WebApp extends ServiceTask {
     }
     if (messageType.equals(OnBrowserEvent.class.getSimpleName())) {
       OnBrowserEvent onBrowserEvent = JsonUtilities.fromJson(json, OnBrowserEvent.class);
-      controllerTask.getInputQueue().add(onBrowserEvent);
+      controllerTask.tsGetInputQueue().add(onBrowserEvent);
     }
   }
 

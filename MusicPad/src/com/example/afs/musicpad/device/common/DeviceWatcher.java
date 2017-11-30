@@ -46,13 +46,13 @@ public class DeviceWatcher extends MessageTask {
     }
 
     public void start() {
-      deviceHandler.setController(controller);
-      deviceHandler.start();
+      deviceHandler.tsSetController(controller);
+      deviceHandler.tsStart();
       controller.start();
     }
 
     public void terminate() {
-      deviceHandler.terminate();
+      deviceHandler.tsTerminate();
       controller.terminate();
     }
   }
@@ -89,7 +89,7 @@ public class DeviceWatcher extends MessageTask {
 
   private void attachDevice(String deviceName) {
     int deviceIndex = DeviceIdFactory.getDeviceIndex(deviceName);
-    DeviceHandler deviceHandler = new DeviceHandler(getBroker(), synthesizer, deviceIndex);
+    DeviceHandler deviceHandler = new DeviceHandler(tsGetBroker(), synthesizer, deviceIndex);
     Controller controller = watcherBehavior.attachDevice(deviceHandler, deviceName);
     Device device = new Device(deviceIndex, controller, deviceHandler);
     oldDevices.put(deviceName, device);

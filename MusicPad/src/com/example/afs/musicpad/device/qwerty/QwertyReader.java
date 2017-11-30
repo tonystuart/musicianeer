@@ -75,7 +75,7 @@ public class QwertyReader {
   private void processKeyboardCommand(int inputCode) {
     switch (inputCode) {
     case KeyEvent.VK_ESCAPE:
-      publish(new OnCommand(Command.DETACH, deviceHandler.getDeviceIndex()));
+      publish(new OnCommand(Command.DETACH, deviceHandler.tsGetDeviceIndex()));
       break;
     case KeyEvent.VK_BACK_SPACE:
       publish(new OnCommand(Command.RESET));
@@ -111,22 +111,22 @@ public class QwertyReader {
       publish(new OnCommand(Command.INCREASE_BACKGROUND_VELOCITY, 0));
       break;
     case '4':
-      publish(new OnDeviceCommand(DeviceCommand.DECREASE_PLAYER_VELOCITY, deviceHandler.getDeviceIndex(), 0));
+      publish(new OnDeviceCommand(DeviceCommand.DECREASE_PLAYER_VELOCITY, deviceHandler.tsGetDeviceIndex(), 0));
       break;
     case '5':
-      publish(new OnDeviceCommand(DeviceCommand.INCREASE_PLAYER_VELOCITY, deviceHandler.getDeviceIndex(), 0));
+      publish(new OnDeviceCommand(DeviceCommand.INCREASE_PLAYER_VELOCITY, deviceHandler.tsGetDeviceIndex(), 0));
       break;
     case '6':
-      publish(new OnDeviceCommand(DeviceCommand.PREVIOUS_CHANNEL, deviceHandler.getDeviceIndex(), 0));
+      publish(new OnDeviceCommand(DeviceCommand.PREVIOUS_CHANNEL, deviceHandler.tsGetDeviceIndex(), 0));
       break;
     case '7':
-      publish(new OnDeviceCommand(DeviceCommand.NEXT_CHANNEL, deviceHandler.getDeviceIndex(), 0));
+      publish(new OnDeviceCommand(DeviceCommand.NEXT_CHANNEL, deviceHandler.tsGetDeviceIndex(), 0));
       break;
     case '8':
-      publish(new OnDeviceCommand(DeviceCommand.PREVIOUS_PROGRAM, deviceHandler.getDeviceIndex(), 0));
+      publish(new OnDeviceCommand(DeviceCommand.PREVIOUS_PROGRAM, deviceHandler.tsGetDeviceIndex(), 0));
       break;
     case '9':
-      publish(new OnDeviceCommand(DeviceCommand.NEXT_PROGRAM, deviceHandler.getDeviceIndex(), 0));
+      publish(new OnDeviceCommand(DeviceCommand.NEXT_PROGRAM, deviceHandler.tsGetDeviceIndex(), 0));
       break;
     case '/':
       controller.getConfiguration().setInputType(InputType.NUMERIC);
@@ -135,10 +135,10 @@ public class QwertyReader {
       controller.getConfiguration().setInputType(InputType.ALPHA);
       break;
     case '-':
-      publish(new OnDeviceCommand(DeviceCommand.OUTPUT, deviceHandler.getDeviceIndex(), OutputType.MEASURE.ordinal()));
+      publish(new OnDeviceCommand(DeviceCommand.OUTPUT, deviceHandler.tsGetDeviceIndex(), OutputType.MEASURE.ordinal()));
       break;
     case '+':
-      publish(new OnDeviceCommand(DeviceCommand.OUTPUT, deviceHandler.getDeviceIndex(), OutputType.TICK.ordinal()));
+      publish(new OnDeviceCommand(DeviceCommand.OUTPUT, deviceHandler.tsGetDeviceIndex(), OutputType.TICK.ordinal()));
       break;
     }
   }
@@ -147,12 +147,12 @@ public class QwertyReader {
     if (keyCode < QwertyKeyCodes.inputCodes.length) {
       char inputCode = QwertyKeyCodes.inputCodes[keyCode];
       if (inputCode == KeyEvent.VK_NUM_LOCK) {
-        System.out.println("deviceName=" + controller.getDeviceName() + ", deviceHandler.getDeviceIndex()=" + deviceHandler.getDeviceIndex());
+        System.out.println("deviceName=" + controller.getDeviceName() + ", deviceHandler.getDeviceIndex()=" + deviceHandler.tsGetDeviceIndex());
         isCommand = true;
       } else if (isCommand) {
         processKeyboardCommand(inputCode);
       } else {
-        deviceHandler.onDown(inputCode);
+        deviceHandler.tsOnDown(inputCode);
       }
     } else {
       // e.g. windows meta key (125)
@@ -166,7 +166,7 @@ public class QwertyReader {
         isCommand = false;
       } else if (isCommand) {
       } else {
-        deviceHandler.onUp(inputCode);
+        deviceHandler.tsOnUp(inputCode);
       }
     } else {
       // e.g. windows meta key (125)
@@ -174,7 +174,7 @@ public class QwertyReader {
   }
 
   private void publish(Message message) {
-    deviceHandler.getBroker().publish(message);
+    deviceHandler.tsGetBroker().publish(message);
   }
 
   private void run() {

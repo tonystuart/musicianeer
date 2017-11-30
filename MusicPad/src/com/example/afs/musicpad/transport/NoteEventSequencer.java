@@ -24,7 +24,7 @@ public class NoteEventSequencer extends PausibleSequencerTask<NoteEvent> {
   }
 
   public void clear() {
-    getInputQueue().clear();
+    tsGetInputQueue().clear();
     setPaused(false);
     getScheduler().resetAll();
   }

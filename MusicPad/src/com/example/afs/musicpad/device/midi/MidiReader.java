@@ -34,7 +34,7 @@ public class MidiReader {
 
     @Override
     public void send(MidiMessage message, long timestamp) {
-      receiveFromDevice(message, timestamp, port);
+      tsReceiveFromDevice(message, timestamp, port);
     }
   }
 
@@ -93,7 +93,7 @@ public class MidiReader {
     return s.toString();
   }
 
-  private void receiveFromDevice(MidiMessage message, long timestamp, int port) {
+  private void tsReceiveFromDevice(MidiMessage message, long timestamp, int port) {
     try {
       if (message instanceof ShortMessage) {
         ShortMessage shortMessage = (ShortMessage) message;
@@ -102,15 +102,15 @@ public class MidiReader {
         int data2 = shortMessage.getData2();
         System.out.println("MidiReader.receiveFromDevice: message=" + formatMessage(message) + ", command=" + command + ", channel=" + shortMessage.getChannel() + ", data1=" + data1 + ", data2=" + data2);
         if (command == ShortMessage.NOTE_ON) {
-          deviceHandler.onDown(data1, data2);
+          deviceHandler.tsOnDown(data1, data2);
         } else if (command == ShortMessage.NOTE_OFF) {
-          deviceHandler.onUp(data1);
+          deviceHandler.tsOnUp(data1);
         } else if (command == ShortMessage.POLY_PRESSURE) {
-          deviceHandler.onChannelPressure(data1, data2);
+          deviceHandler.tsOnChannelPressure(data1, data2);
         } else if (command == ShortMessage.CONTROL_CHANGE) {
           int control = data1;
           int value = data2;
-          deviceHandler.onControlChange(control, value);
+          deviceHandler.tsOnControlChangle(control, value);
         } else if (command == ShortMessage.PITCH_BEND) {
           // Pitch bend is reported as a signed 14 bit value with MSB in data2 and LSB in data1
           // Options for converting it into values in the range 0 to 16384 include:
@@ -119,7 +119,7 @@ public class MidiReader {
           // We use the second approach
           int value = (data2 << 7) | data1;
           int pitchBend = value >= 8192 ? value - 8192 : value + 8192;
-          deviceHandler.getPlayer().bendPitch(pitchBend);
+          deviceHandler.tsOnPitchBend(pitchBend);
         }
       } else {
         System.out.println("MidiReader.receiveFromDevice: message=" + formatMessage(message));

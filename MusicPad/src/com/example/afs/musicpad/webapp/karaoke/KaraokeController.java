@@ -56,8 +56,8 @@ public class KaraokeController extends ControllerTask {
   }
 
   @Override
-  public void start() {
-    super.start();
+  public void tsStart() {
+    super.tsStart();
     RandomAccessList<File> midiFiles = request(Services.getMidiFiles);
     karaokeView.renderSongList(midiFiles);
     pickRandomSong(midiFiles);

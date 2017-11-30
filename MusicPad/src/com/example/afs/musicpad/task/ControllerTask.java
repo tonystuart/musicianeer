@@ -27,7 +27,7 @@ public abstract class ControllerTask extends ServiceTask {
   }
 
   public void addShadowUpdate(OnShadowUpdate onShadowUpdate) {
-    webApp.getInputQueue().add(onShadowUpdate);
+    webApp.tsGetInputQueue().add(onShadowUpdate);
   }
 
   public void setWebApp(WebApp webApp) {

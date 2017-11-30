@@ -148,7 +148,7 @@ public class Player {
     if (action == Action.PRESS) {
       if (arpeggiator == null) {
         arpeggiator = new Arpeggiator(noteEvent -> processNoteEvent(noteEvent));
-        arpeggiator.start();
+        arpeggiator.tsStart();
         if (percentTempo != 0) {
           arpeggiator.setPercentTempo(percentTempo);
         }

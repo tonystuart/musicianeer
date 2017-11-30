@@ -58,14 +58,14 @@ public class MidiWriter extends MessageTask {
   }
 
   @Override
-  public void start() {
-    super.start();
+  public void tsStart() {
+    super.tsStart();
     initializeDevice();
   }
 
   @Override
-  public void terminate() {
-    super.terminate();
+  public void tsTerminate() {
+    super.tsTerminate();
     disconnectDevices();
   }
 

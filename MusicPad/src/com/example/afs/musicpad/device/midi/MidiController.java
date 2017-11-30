@@ -29,10 +29,10 @@ public class MidiController implements Controller {
   public MidiController(DeviceHandler deviceHandler, MidiDeviceBundle midiDeviceBundle) {
     this.midiDeviceBundle = midiDeviceBundle;
     //configuration = initializeConfiguration(deviceHandler.getBroker(), deviceHandler.getDeviceIndex());
-    configuration = new BeatStepConfiguration(deviceHandler.getBroker(), deviceHandler.getDeviceIndex());
-    MessageBroker broker = deviceHandler.getBroker();
+    MessageBroker broker = deviceHandler.tsGetBroker();
+    configuration = new BeatStepConfiguration(broker, deviceHandler.tsGetDeviceIndex());
     midiReader = new MidiReader(broker, deviceHandler, midiDeviceBundle, configuration);
-    midiWriter = new MidiWriter(broker, midiDeviceBundle, configuration, deviceHandler.getDeviceIndex());
+    midiWriter = new MidiWriter(broker, midiDeviceBundle, configuration, deviceHandler.tsGetDeviceIndex());
   }
 
   @Override
@@ -48,13 +48,13 @@ public class MidiController implements Controller {
   @Override
   public void start() {
     midiReader.start();
-    midiWriter.start();
+    midiWriter.tsStart();
   }
 
   @Override
   public void terminate() {
     midiReader.terminate();
-    midiWriter.terminate();
+    midiWriter.tsTerminate();
   }
 
   private MidiConfiguration initializeConfiguration(MessageBroker broker, int deviceIndex) {

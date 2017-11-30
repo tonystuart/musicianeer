@@ -25,7 +25,7 @@ public abstract class SingletonWebAppFactory implements WebAppFactory {
   public synchronized SingletonWebApp getWebApp() {
     if (webApp == null) {
       webApp = createWebApp(broker);
-      webApp.start();
+      webApp.tsStart();
     }
     useCount++;
     return webApp;
@@ -43,7 +43,7 @@ public abstract class SingletonWebAppFactory implements WebAppFactory {
   private synchronized void onTimeout() {
     if (useCount == 0) {
       System.out.println("WebAppFactory: terminating WebApp");
-      webApp.terminate();
+      webApp.tsTerminate();
       webApp = null;
     } else {
       System.out.println("WebAppFactory: suppressing WebApp termination");

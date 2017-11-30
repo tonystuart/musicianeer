@@ -217,7 +217,7 @@ public class TransportTask extends ServiceTask {
   }
 
   private void publishTick(long tick) {
-    getBroker().publish(new OnTick(tick));
+    tsGetBroker().publish(new OnTick(tick));
   }
 
 }

@@ -39,15 +39,15 @@ public class WebServer extends MessageTask {
 
   public WebServer(MessageBroker broker) {
     super(broker);
-    exampleWebAppFactory = new ExampleWebAppFactory(getBroker());
-    karaokeWebAppFactory = new KaraokeWebAppFactory(getBroker());
-    mapperWebAppFactory = new MapperWebAppFactory(getBroker());
+    exampleWebAppFactory = new ExampleWebAppFactory(tsGetBroker());
+    karaokeWebAppFactory = new KaraokeWebAppFactory(tsGetBroker());
+    mapperWebAppFactory = new MapperWebAppFactory(tsGetBroker());
     createServer();
   }
 
   @Override
-  public void start() {
-    super.start();
+  public void tsStart() {
+    super.tsStart();
     try {
       server.start();
     } catch (Exception e) {

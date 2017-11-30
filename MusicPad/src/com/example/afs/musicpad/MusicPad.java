@@ -72,14 +72,14 @@ public class MusicPad {
 
   private void start() {
     if (optionalMqttPublisher.isPresent()) {
-      optionalMqttPublisher.get().start();
+      optionalMqttPublisher.get().tsStart();
     }
-    conductor.start();
-    transportTask.start();
-    commandProcessor.start();
-    webServer.start();
-    midiWatcher.start();
-    qwertyWatcher.start();
+    conductor.tsStart();
+    transportTask.tsStart();
+    commandProcessor.tsStart();
+    webServer.tsStart();
+    midiWatcher.tsStart();
+    qwertyWatcher.tsStart();
     broker.publish(new OnAllTasksStarted());
   }
 

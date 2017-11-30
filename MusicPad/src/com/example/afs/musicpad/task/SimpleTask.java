@@ -32,21 +32,25 @@ public abstract class SimpleTask<M> {
     this.name = getClass().getSimpleName();
   }
 
-  public BlockingQueue<M> getInputQueue() {
+  public BlockingQueue<M> tsGetInputQueue() {
     return inputQueue;
   }
 
-  public void start() {
-    thread = new Thread(() -> run(), name);
-    thread.start();
+  public synchronized void tsStart() {
+    if (thread == null) {
+      thread = new Thread(() -> run(), name);
+      thread.start();
+    }
   }
 
-  public void terminate() {
+  public synchronized void tsTerminate() {
     if (thread == null) {
       throw new IllegalStateException();
     }
-    isTerminated = true;
-    thread.interrupt();
+    if (!isTerminated) {
+      isTerminated = true;
+      thread.interrupt();
+    }
   }
 
   protected BlockingQueue<M> createInputQueue() {

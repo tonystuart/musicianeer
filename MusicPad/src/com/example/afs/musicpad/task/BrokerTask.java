@@ -28,17 +28,8 @@ public abstract class BrokerTask<M> extends SimpleTask<M> {
     this.broker = broker;
   }
 
-  public <T extends M> void subscribe(Class<T> type, Subscriber<T> subscriber) {
-    broker.subscribe(type, message -> getInputQueue().add(message));
-    delegate(type, subscriber);
-  }
-
   protected <T extends M> void delegate(Class<T> type, Subscriber<T> subscriber) {
     subscribers.put(type, subscriber);
-  }
-
-  protected Broker<M> getBroker() {
-    return broker;
   }
 
   @Override
@@ -64,5 +55,14 @@ public abstract class BrokerTask<M> extends SimpleTask<M> {
     long endNanos = System.nanoTime();
     double elapsedMillis = (endNanos - beginNanos) / 1000000D;
     System.out.println("publish(" + message.getClass().getSimpleName() + ") in " + elapsedMillis + " ms");
+  }
+
+  protected <T extends M> void subscribe(Class<T> type, Subscriber<T> subscriber) {
+    broker.subscribe(type, message -> tsGetInputQueue().add(message));
+    delegate(type, subscriber);
+  }
+
+  protected Broker<M> tsGetBroker() {
+    return broker;
   }
 }

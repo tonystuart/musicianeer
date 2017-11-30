@@ -39,7 +39,7 @@ public class MultitonWebApp extends WebApp {
 
   @Override
   protected void onWebSocketClose(WebSocket webSocket) {
-    terminate();
+    tsTerminate();
   }
 
   @Override

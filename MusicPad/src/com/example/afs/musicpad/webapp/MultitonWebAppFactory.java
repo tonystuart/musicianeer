@@ -21,7 +21,7 @@ public abstract class MultitonWebAppFactory implements WebAppFactory {
   @Override
   public synchronized MultitonWebApp getWebApp() {
     MultitonWebApp webApp = createWebApp(broker);
-    webApp.start();
+    webApp.tsStart();
     return webApp;
   }
 

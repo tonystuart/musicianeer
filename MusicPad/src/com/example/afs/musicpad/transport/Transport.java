@@ -48,7 +48,7 @@ public class Transport {
     this.synthesizer = synthesizer;
     this.sequencer = new NoteEventSequencer(noteEvent -> processNoteEvent(noteEvent));
     setPercentGain(DEFAULT_PERCENT_GAIN);
-    sequencer.start();
+    sequencer.tsStart();
   }
 
   public void allNotesOff() {
@@ -72,7 +72,7 @@ public class Transport {
   }
 
   public boolean isEmpty() {
-    return sequencer.getInputQueue().size() == 0;
+    return sequencer.tsGetInputQueue().size() == 0;
   }
 
   public boolean isPaused() {
@@ -98,7 +98,7 @@ public class Transport {
     long firstTick = -1;
     long lastTick = -1;
     long metronomeTick = -1;
-    BlockingQueue<NoteEvent> inputQueue = sequencer.getInputQueue();
+    BlockingQueue<NoteEvent> inputQueue = sequencer.tsGetInputQueue();
     int beatsPerMinute = Default.BEATS_PER_MINUTE;
     for (Note note : notes) {
       long beginTick = note.getTick();
@@ -150,7 +150,7 @@ public class Transport {
     default:
       throw new UnsupportedOperationException();
     }
-    BlockingQueue<NoteEvent> inputQueue = sequencer.getInputQueue();
+    BlockingQueue<NoteEvent> inputQueue = sequencer.tsGetInputQueue();
     if (newTick > currentTick) {
       NoteEvent noteEvent;
       while ((noteEvent = inputQueue.peek()) != null && noteEvent.getTick() < newTick) {

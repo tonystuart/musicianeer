@@ -20,8 +20,8 @@ public class MessageTask extends BrokerTask<Message> {
   }
 
   @Override
-  public MessageBroker getBroker() {
-    return (MessageBroker) super.getBroker();
+  public MessageBroker tsGetBroker() {
+    return (MessageBroker) super.tsGetBroker();
   }
 
 }

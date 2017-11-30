@@ -22,7 +22,7 @@ public class QwertyController implements Controller {
   public QwertyController(DeviceHandler deviceHandler, String deviceName) {
     this.deviceHandler = deviceHandler;
     this.deviceName = deviceName;
-    this.qwertyConfiguration = new QwertyConfiguration(deviceHandler.getBroker(), deviceHandler.getDeviceIndex());
+    this.qwertyConfiguration = new QwertyConfiguration(deviceHandler.tsGetBroker(), deviceHandler.tsGetDeviceIndex());
   }
 
   @Override

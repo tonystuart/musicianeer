@@ -25,7 +25,7 @@ public class Arpeggiator extends NoteEventSequencer {
 
   public void play(Sound sound) {
     clear();
-    BlockingQueue<NoteEvent> inputQueue = getInputQueue();
+    BlockingQueue<NoteEvent> inputQueue = tsGetInputQueue();
     RandomAccessList<Note> notes = sound.getNotes();
     int noteCount = notes.size();
     int lastNoteIndex = noteCount - 1;

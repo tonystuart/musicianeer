@@ -70,49 +70,37 @@ public class DeviceHandler extends ServiceTask {
     provide(new DeviceControllerService(deviceIndex), () -> controller);
   }
 
-  public int getDeviceIndex() {
+  public int tsGetDeviceIndex() {
     return deviceIndex;
   }
 
-  public int getPercentVelocity() {
-    return Range.scaleMidiToPercent(velocity);
-  }
-
-  public Player getPlayer() {
-    return player;
-  }
-
-  public void onChannelPressure(int channel, int pressure) {
+  public void tsOnChannelPressure(int channel, int pressure) {
     synthesizer.setChannelPressure(channel, pressure);
   }
 
-  public void onControlChange(int control, int value) {
-    getPlayer().changeControl(control, value);
+  public void tsOnControlChangle(int control, int value) {
+    player.changeControl(control, value);
     publish(new OnInputMessage(MessageType.CONTROL_CHANGE, deviceIndex, control, value));
   }
 
-  public void onDown(int inputCode) {
+  public void tsOnDown(int inputCode) {
     processDown(inputCode, velocity);
   }
 
-  public void onDown(int inputCode, int velocity) {
+  public void tsOnDown(int inputCode, int velocity) {
     processDown(inputCode, Range.scale(this.velocity / 2, Midi.MAX_VALUE, 0, Midi.MAX_VALUE, velocity));
   }
 
-  public void onUp(int inputCode) {
+  public void tsOnPitchBend(int pitchBend) {
+    player.bendPitch(pitchBend);
+  }
+
+  public void tsOnUp(int inputCode) {
     processUp(inputCode, velocity);
   }
 
-  public void onUp(int inputCode, int velocity) {
-    processUp(inputCode, Range.scale(this.velocity / 2, Midi.MAX_VALUE, 0, Midi.MAX_VALUE, velocity));
-  }
-
-  public void setController(Controller controller) {
+  public void tsSetController(Controller controller) {
     this.controller = controller;
-  }
-
-  public void setPercentVelocity(int velocity) {
-    this.velocity = Range.scalePercentToMidi(velocity);
   }
 
   private void createPlayableMap() {
@@ -274,6 +262,10 @@ public class DeviceHandler extends ServiceTask {
     song = message.getSong();
   }
 
+  private int getPercentVelocity() {
+    return Range.scaleMidiToPercent(velocity);
+  }
+
   private PlayerDetail getPlayerDetail() {
     if (playableMap == null) {
       createPlayableMap();
@@ -324,6 +316,10 @@ public class DeviceHandler extends ServiceTask {
 
   private void selectProgram(int program) {
     player.selectProgram(program);
+  }
+
+  private void setPercentVelocity(int velocity) {
+    this.velocity = Range.scalePercentToMidi(velocity);
   }
 
 }

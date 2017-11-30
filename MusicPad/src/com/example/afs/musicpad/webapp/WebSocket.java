@@ -20,13 +20,13 @@ public class WebSocket extends WebSocketAdapter {
   @Override
   public void onWebSocketClose(int statusCode, String reason) {
     super.onWebSocketClose(statusCode, reason);
-    webApp.getInputQueue().add(new OnWebSocketClose(this));
+    webApp.tsGetInputQueue().add(new OnWebSocketClose(this));
   }
 
   @Override
   public void onWebSocketConnect(Session sess) {
     super.onWebSocketConnect(sess);
-    webApp.getInputQueue().add(new OnWebSocketConnect(this));
+    webApp.tsGetInputQueue().add(new OnWebSocketConnect(this));
   }
 
   @Override
@@ -38,7 +38,7 @@ public class WebSocket extends WebSocketAdapter {
   @Override
   public void onWebSocketText(String text) {
     super.onWebSocketText(text);
-    webApp.getInputQueue().add(new OnWebSocketText(this, text));
+    webApp.tsGetInputQueue().add(new OnWebSocketText(this, text));
   }
 
   public void write(Message message) {
