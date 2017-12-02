@@ -52,12 +52,12 @@ public class MapperController extends ControllerTask {
   @Override
   protected void doInput(String id, String value) {
     System.out.println("id=" + id + ", value=" + value);
-    if ("karaoke-group".equals(value)) {
-      mapperView.renderKaraokeGroup();
-    } else if ("karaoke-sound".equals(value)) {
-      mapperView.renderKaraokeSound();
-    } else {
-      mapperView.renderKarokeOff();
+    if (id.equals("mapping")) {
+      mapperView.selectCommand();
+    } else if (id.startsWith("group-")) {
+      mapperView.selectGroup();
+    } else if (id.startsWith("sound-")) {
+      mapperView.selectSound();
     }
   }
 
@@ -73,6 +73,7 @@ public class MapperController extends ControllerTask {
       }
     }
     mapperView.renderDeviceList(deviceControllers);
+    mapperView.renderMessageDetails("NONE", 0, 0, 0);
   }
 
   private void doCommand(OnCommand message) {

@@ -9,15 +9,19 @@
 
 package com.example.afs.musicpad.html;
 
-public class Range extends NumericInput {
+public class Radio extends Input {
 
-  public Range(String... properties) {
+  public Radio(String... properties) {
     super(properties);
-    setProperty("type", "range");
+    setProperty("type", "radio");
   }
 
-  public void setStep(Object step) {
-    setProperty("step", step);
+  public Radio addCheckHandler() {
+    if (getId() == null) {
+      throw new IllegalStateException();
+    }
+    setProperty("onclick", "musicPad.onInput(event, this.checked ? 1 : 0)");
+    return this;
   }
 
 }

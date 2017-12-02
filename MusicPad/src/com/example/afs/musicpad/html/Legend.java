@@ -11,9 +11,8 @@ package com.example.afs.musicpad.html;
 
 public class Legend extends Parent {
 
-  public Legend(String legend) {
-    super("legend");
-    add(new TextElement(legend));
+  public Legend(String... properties) {
+    super("legend", properties);
   }
 
 }

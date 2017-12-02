@@ -9,7 +9,7 @@
 
 package com.example.afs.musicpad.html;
 
-public class NumberInput extends Input {
+public class NumberInput extends NumericInput {
 
   public NumberInput(String... properties) {
     super(properties);

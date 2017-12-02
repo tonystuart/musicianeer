@@ -23,6 +23,11 @@ public class Input extends Element {
     return this;
   }
 
+  public Input setName(Object name) {
+    setProperty("name", name);
+    return this;
+  }
+
   public Input setValue(Object value) {
     setProperty("value", value);
     return this;

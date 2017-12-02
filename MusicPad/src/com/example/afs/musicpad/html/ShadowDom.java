@@ -104,8 +104,8 @@ public class ShadowDom {
     return label;
   }
 
-  public Legend legend(String legend) {
-    return new Legend(legend);
+  public Legend legend(String... properties) {
+    return new Legend(properties);
   }
 
   public Parent nameValue(String name, Object value) {
@@ -126,6 +126,10 @@ public class ShadowDom {
 
   public OptionGroup optionGroup(String label) {
     return new OptionGroup(label);
+  }
+
+  public Radio radio(String... properties) {
+    return new Radio(properties);
   }
 
   public PercentRange range(String... properties) {

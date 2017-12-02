@@ -104,4 +104,13 @@ public class Parent extends Element implements Iterable<Node> {
     return new TextElement(text);
   }
 
+  @Override
+  protected void processProperty(String property) {
+    if (property.startsWith("$")) {
+      appendChild(new TextElement(property.substring(1)));
+    } else {
+      throw new IllegalArgumentException(property);
+    }
+  }
+
 }

@@ -9,15 +9,20 @@
 
 package com.example.afs.musicpad.html;
 
-public class Range extends NumericInput {
+public class NumericInput extends Input {
 
-  public Range(String... properties) {
+  public NumericInput(String... properties) {
     super(properties);
-    setProperty("type", "range");
   }
 
-  public void setStep(Object step) {
-    setProperty("step", step);
+  public NumericInput setMaximum(Object maximum) {
+    setProperty("max", maximum);
+    return this;
+  }
+
+  public NumericInput setMinimum(Object minimum) {
+    setProperty("min", minimum);
+    return this;
   }
 
 }

@@ -16,6 +16,7 @@ import com.example.afs.musicpad.device.common.Controller;
 import com.example.afs.musicpad.html.Division;
 import com.example.afs.musicpad.html.Node;
 import com.example.afs.musicpad.html.Parent;
+import com.example.afs.musicpad.html.Radio;
 import com.example.afs.musicpad.html.Select;
 import com.example.afs.musicpad.html.ShadowDom;
 import com.example.afs.musicpad.task.ControllerTask;
@@ -28,7 +29,7 @@ public class MapperView extends ShadowDom {
         .add(div(".left") //
             .add(div(".title") //
                 .add(text("MIDI Input Mapper"))) //
-            .add(div("#device-list", ".list") // renderDeviceList
+            .add(div("#mapper-list", ".list") // renderDeviceList
                 .addClickHandler()) //
             .add(div(".controls") //
                 .add(div("#mapper-1")//
@@ -41,33 +42,33 @@ public class MapperView extends ShadowDom {
                     .addClickHandler() //
                     .add(text("Mapper 3"))))) //
         .add(div(".right") //
-            .add(div("#message-details", ".details")))); // 
+            .add(div("#message-details", ".details")))); //
   }
 
   public void renderDeviceList(NavigableMap<Integer, Controller> deviceControllers) {
     Division div = createDeviceList(deviceControllers);
-    Parent songListParent = getElementById("device-list");
+    Parent songListParent = getElementById("mapper-list");
     replaceChildren(songListParent, div);
-  }
-
-  public void renderKaraokeGroup() {
-    removeClass("group", "hidden");
-    addClass("sound", "hidden");
-  }
-
-  public void renderKaraokeSound() {
-    removeClass("sound", "hidden");
-    addClass("group", "hidden");
-  }
-
-  public void renderKarokeOff() {
-    addClass("group", "hidden");
-    addClass("sound", "hidden");
   }
 
   public void renderMessageDetails(String messageType, int channel, int data1, int data2) {
     Parent songsRight = getElementById("message-details");
     replaceChildren(songsRight, createMessageDetails(messageType, channel, data1, data2));
+  }
+
+  public void selectCommand() {
+    Radio outputCommand = getElementById("output-command");
+    setProperty(outputCommand, "checked", true);
+  }
+
+  public void selectGroup() {
+    Radio outputGroup = getElementById("output-group");
+    setProperty(outputGroup, "checked", true);
+  }
+
+  public void selectSound() {
+    Radio outputSound = getElementById("output-sound");
+    setProperty(outputSound, "checked", true);
   }
 
   private Division createDeviceList(NavigableMap<Integer, Controller> deviceControllers) {
@@ -126,34 +127,59 @@ public class MapperView extends ShadowDom {
             .add(option("Transpose Higher", "library-transpose-higher"))) //
 
         .add(optionGroup("Karaoke Settings") //
-            .add(option("Group", "karaoke-group")) //
-            .add(option("Sound", "karaoke-sound")) //
-            .add(option("Tick / Measure", "karaoke-type"))); //
+            .add(option("Play Notes at Tick", "karaoke-type-tick")) //
+            .add(option("Play Notes in Measure", "karaoke-type-measure"))); //
   }
 
   private Node createMessageDetails(String messageType, int channel, int data1, int data2) {
     return div() //
-        .add(nameValue("Input", messageType)) //
-        .add(nameValue("Channel", channel)) //
-        .add(nameValue("Data1", data1)) //
-        .add(nameValue("Data2", data2)) //
-        .add(nameValue("Output", createMapping())) //
-        .add(fieldSet("#group", ".hidden") //
-            .add(legend("&nbsp;Group&nbsp;")) //
-            .add(text("Index")) //
-            .add(numberInput("#group-index") //
-                .addInputHandler()) //
-            .add(text("Label")) //
-            .add(textInput("#group-label") //
-                .addInputHandler())) //
-        .add(fieldSet("#sound", ".hidden") //
-            .add(legend("&nbsp;Sound&nbsp;")) //
-            .add(text("Index")) //
-            .add(numberInput("#sound-index") //
-                .addInputHandler()) //
-            .add(text("Label")) //
-            .add(textInput("#sound-label") //
-                .addInputHandler())) //
+        .add(fieldSet("#input") //
+            .add(legend() //
+                .add(text("Input")))
+            .add(nameValue("Input", messageType)) //
+            .add(nameValue("Channel", channel)) //
+            .add(nameValue("Data1", data1)) //
+            .add(nameValue("Data2", data2)) //
+            .add(label() // 
+                .add(checkbox("#all-messages") //
+                    .addCheckHandler()) //
+                .add(text("Show all input messages"))))
+        .add(fieldSet("#output") //
+            .add(legend() //
+                .add(text("Output"))) //
+            .add(fieldSet() //
+                .add(legend() //
+                    .add(label() //
+                        .add(radio("#output-command") //
+                            .setName("output-type")) //
+                        .add(text("&nbsp;Command&nbsp;")))) //
+                .add(createMapping())) //
+            .add(fieldSet("#group") //
+                .add(legend() //
+                    .add(label() //
+                        .add(radio("#output-group") //
+                            .setName("output-type")) //
+                        .add(text("&nbsp;Group&nbsp;")))) //
+                .add(text("Index")) //
+                .add(numberInput("#group-index") //
+                    .setMinimum(0) //
+                    .addInputHandler()) //
+                .add(text("Label")) //
+                .add(textInput("#group-label") //
+                    .addInputHandler())) //
+            .add(fieldSet("#sound") //
+                .add(legend() //
+                    .add(label() //
+                        .add(radio("#output-sound") //
+                            .setName("output-type")) //
+                        .add(text("&nbsp;Sound&nbsp;")))) //
+                .add(text("Index")) //
+                .add(numberInput("#sound-index") //
+                    .setMinimum(0) //
+                    .addInputHandler()) //
+                .add(text("Label")) //
+                .add(textInput("#sound-label") //
+                    .addInputHandler()))) //
     ; //
   }
 

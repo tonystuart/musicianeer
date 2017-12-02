@@ -17,9 +17,28 @@ body {
     user-select: none;
 }
 
-input {
-    padding: 0;
-    margin: 0;
+input[type=number], input[type=text] {
+    padding: 5px;
+    margin: 5px;
+    vertical-align: middle;
+    color: white;
+    background-color: black;
+    border: 1px solid white;
+}
+
+select {
+    padding: 5px;
+    margin: 5px;
+    vertical-align: middle;
+    color: white;
+    background-color: black;
+    border: 1px solid white;
+    width: 100%;
+}
+
+fieldset {
+	   color: white;
+	   border: 1px solid white;
 }
 
 .tab {

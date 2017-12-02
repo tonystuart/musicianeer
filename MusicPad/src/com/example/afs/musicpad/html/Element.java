@@ -34,7 +34,7 @@ public class Element extends Node {
       } else if (firstChar == '.') {
         addClassName(property.substring(1));
       } else {
-        throw new IllegalArgumentException(property);
+        processProperty(property);
       }
     }
   }
@@ -123,6 +123,10 @@ public class Element extends Node {
       attributes = new HashMap<>();
     }
     attributes.put(name, value);
+  }
+
+  protected void processProperty(String property) {
+    throw new IllegalArgumentException(property);
   }
 
 }
