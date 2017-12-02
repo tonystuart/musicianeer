@@ -5,6 +5,7 @@
     "/dev/input/by-path/pci-0000:00:14.0-usb-0:2.1:1.0-event-kbd": 2,
     "/dev/input/by-path/pci-0000:00:14.0-usb-0:2.2:1.0-event-kbd": 3,
     "/dev/input/by-path/platform-i8042-serio-0-event-kbd": 4,
-    "BeatStep-1-0": 5
+    "BeatStep-1-0": 5,
+    "L49-2-0": 6
   }
 }
