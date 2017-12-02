@@ -15,6 +15,8 @@ import java.util.TreeMap;
 
 import javax.sound.midi.ShortMessage;
 
+import com.example.afs.musicpad.Command;
+import com.example.afs.musicpad.device.common.Configuration;
 import com.example.afs.musicpad.device.common.Controller;
 import com.example.afs.musicpad.device.midi.MidiController;
 import com.example.afs.musicpad.message.OnCommand;
@@ -32,6 +34,7 @@ public class MapperController extends ControllerTask {
   private int deviceIndex;
   private MapperView mapperView;
   private NavigableMap<Integer, Controller> deviceControllers = new TreeMap<>();
+  private ShortMessage shortMessage;
 
   public MapperController(MessageBroker broker) {
     super(broker);
@@ -52,8 +55,8 @@ public class MapperController extends ControllerTask {
   @Override
   protected void doInput(String id, String value) {
     System.out.println("id=" + id + ", value=" + value);
-    if (id.equals("mapping")) {
-      mapperView.selectCommand();
+    if (id.equals("command")) {
+      configureCommand(value);
     } else if (id.startsWith("group-")) {
       mapperView.selectGroup();
     } else if (id.startsWith("sound-")) {
@@ -76,6 +79,15 @@ public class MapperController extends ControllerTask {
     mapperView.renderMessageDetails("NONE", 0, 0, 0);
   }
 
+  private void configureCommand(String value) {
+    mapperView.selectCommand();
+    Controller controller = deviceControllers.get(deviceIndex);
+    Configuration configuration = controller.getConfiguration();
+    if (value.equals("transport-select-tempo")) {
+      configuration.put(shortMessage, Command.SET_TEMPO);
+    }
+  }
+
   private void doCommand(OnCommand message) {
   }
 
@@ -84,7 +96,7 @@ public class MapperController extends ControllerTask {
 
   private void doShortMessage(OnShortMessage message) {
     if (message.getDeviceIndex() == deviceIndex) {
-      ShortMessage shortMessage = message.getShortMessage();
+      shortMessage = message.getShortMessage();
       int command = shortMessage.getCommand();
       int channel = shortMessage.getChannel();
       int data1 = shortMessage.getData1();

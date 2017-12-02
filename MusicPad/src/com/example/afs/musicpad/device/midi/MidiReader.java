@@ -15,9 +15,12 @@ import javax.sound.midi.MidiUnavailableException;
 import javax.sound.midi.Receiver;
 import javax.sound.midi.ShortMessage;
 
+import com.example.afs.musicpad.Command;
 import com.example.afs.musicpad.device.common.DeviceHandler;
+import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnShortMessage;
 import com.example.afs.musicpad.task.MessageBroker;
+import com.example.afs.musicpad.util.Range;
 
 public class MidiReader {
 
@@ -94,32 +97,41 @@ public class MidiReader {
     return s.toString();
   }
 
+  private void processMessage(ShortMessage shortMessage) {
+    int command = shortMessage.getCommand();
+    int data1 = shortMessage.getData1();
+    int data2 = shortMessage.getData2();
+    if (command == ShortMessage.NOTE_ON) {
+      deviceHandler.tsOnDown(data1, data2);
+    } else if (command == ShortMessage.NOTE_OFF) {
+      deviceHandler.tsOnUp(data1);
+    } else if (command == ShortMessage.POLY_PRESSURE) {
+      deviceHandler.tsOnChannelPressure(data1, data2);
+    } else if (command == ShortMessage.CONTROL_CHANGE) {
+      int control = data1;
+      int value = data2;
+      deviceHandler.tsOnControlChangle(control, value);
+    } else if (command == ShortMessage.PITCH_BEND) {
+      // Pitch bend is reported as a signed 14 bit value with MSB in data2 and LSB in data1
+      // Options for converting it into values in the range 0 to 16384 include:
+      // 1. Use LS(32-14) to set the sign and RS(32-14) to extend the size to produce values in range -8192 to 8192, then add 8192 to get values in range 0 to 16384
+      // 2. Recognize that values GT 8192 have their sign bit set, subtract 8192 from them and add 8192 to values LT 8192 to get values in range 0 to 16384
+      // We use the second approach
+      int value = (data2 << 7) | data1;
+      int pitchBend = value >= 8192 ? value - 8192 : value + 8192;
+      deviceHandler.tsOnPitchBend(pitchBend);
+    }
+  }
+
   private void tsReceiveFromDevice(MidiMessage message, long timestamp, int port) {
     try {
       if (message instanceof ShortMessage) {
         ShortMessage shortMessage = (ShortMessage) message;
-        int command = shortMessage.getCommand();
-        int data1 = shortMessage.getData1();
-        int data2 = shortMessage.getData2();
-        if (command == ShortMessage.NOTE_ON) {
-          deviceHandler.tsOnDown(data1, data2);
-        } else if (command == ShortMessage.NOTE_OFF) {
-          deviceHandler.tsOnUp(data1);
-        } else if (command == ShortMessage.POLY_PRESSURE) {
-          deviceHandler.tsOnChannelPressure(data1, data2);
-        } else if (command == ShortMessage.CONTROL_CHANGE) {
-          int control = data1;
-          int value = data2;
-          deviceHandler.tsOnControlChangle(control, value);
-        } else if (command == ShortMessage.PITCH_BEND) {
-          // Pitch bend is reported as a signed 14 bit value with MSB in data2 and LSB in data1
-          // Options for converting it into values in the range 0 to 16384 include:
-          // 1. Use LS(32-14) to set the sign and RS(32-14) to extend the size to produce values in range -8192 to 8192, then add 8192 to get values in range 0 to 16384
-          // 2. Recognize that values GT 8192 have their sign bit set, subtract 8192 from them and add 8192 to values LT 8192 to get values in range 0 to 16384
-          // We use the second approach
-          int value = (data2 << 7) | data1;
-          int pitchBend = value >= 8192 ? value - 8192 : value + 8192;
-          deviceHandler.tsOnPitchBend(pitchBend);
+        Command command = configuration.get(shortMessage);
+        if (command != null) {
+          broker.publish(new OnCommand(command, Range.scaleMidiToPercent(shortMessage.getData2())));
+        } else {
+          processMessage(shortMessage);
         }
         broker.publish(new OnShortMessage(deviceHandler.tsGetDeviceIndex(), shortMessage));
       } else {

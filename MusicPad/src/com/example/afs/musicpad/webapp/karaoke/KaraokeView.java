@@ -179,7 +179,9 @@ public class KaraokeView extends ShadowDom {
 
   public void setBackgroundMute(int deviceIndex, int value) {
     CheckBox backgroundMute = getElementById("background-mute-" + deviceIndex);
-    setProperty(backgroundMute, "checked", value);
+    if (backgroundMute != null) {
+      setProperty(backgroundMute, "checked", value);
+    }
   }
 
   public void setBackgroundMute(Integer deviceIndex, Boolean value) {
@@ -188,22 +190,30 @@ public class KaraokeView extends ShadowDom {
 
   public void setBackgroundVelocity(int value) {
     Range backgroundVelocity = getElementById("background-velocity");
-    setProperty(backgroundVelocity, "value", value);
+    if (backgroundVelocity != null) {
+      setProperty(backgroundVelocity, "value", value);
+    }
   }
 
   public void setDeviceVelocity(int deviceIndex, int value) {
     Range deviceVelocity = getElementById("device-velocity-" + deviceIndex);
-    setProperty(deviceVelocity, "value", value);
+    if (deviceVelocity != null) {
+      setProperty(deviceVelocity, "value", value);
+    }
   }
 
   public void setMasterGain(int value) {
     Range masterGain = getElementById("master-gain");
-    setProperty(masterGain, "value", value);
+    if (masterGain != null) {
+      setProperty(masterGain, "value", value);
+    }
   }
 
   public void setTempo(int value) {
     Range tempo = getElementById("tempo");
-    setProperty(tempo, "value", value);
+    if (tempo != null) {
+      setProperty(tempo, "value", value);
+    }
   }
 
   private Element createChannelDetails(Song song, int channel) {

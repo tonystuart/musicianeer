@@ -83,7 +83,7 @@ public class MapperView extends ShadowDom {
   }
 
   private Select createMapping() {
-    return new Select("#mapping") //
+    return new Select("#command") //
         .addChangeHandler() //
         .add(optionGroup("Player Settings") //
             .add(option("Select Instrument", "player-select-program")) //
