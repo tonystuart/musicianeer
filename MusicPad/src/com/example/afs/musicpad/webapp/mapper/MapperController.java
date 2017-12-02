@@ -13,12 +13,15 @@ import java.util.NavigableMap;
 import java.util.NavigableSet;
 import java.util.TreeMap;
 
+import javax.sound.midi.ShortMessage;
+
 import com.example.afs.musicpad.device.common.Controller;
+import com.example.afs.musicpad.device.midi.MidiController;
 import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnDeviceCommand;
-import com.example.afs.musicpad.message.OnInputMessage;
 import com.example.afs.musicpad.message.OnShadowUpdate;
 import com.example.afs.musicpad.message.OnShadowUpdate.Action;
+import com.example.afs.musicpad.message.OnShortMessage;
 import com.example.afs.musicpad.service.DeviceControllerService;
 import com.example.afs.musicpad.service.Services;
 import com.example.afs.musicpad.task.ControllerTask;
@@ -35,7 +38,7 @@ public class MapperController extends ControllerTask {
     mapperView = new MapperView(this);
     subscribe(OnCommand.class, message -> doCommand(message));
     subscribe(OnDeviceCommand.class, message -> doDeviceCommand(message));
-    subscribe(OnInputMessage.class, message -> doInputMessage(message));
+    subscribe(OnShortMessage.class, message -> doShortMessage(message));
   }
 
   @Override
@@ -47,7 +50,15 @@ public class MapperController extends ControllerTask {
   }
 
   @Override
-  protected void doInput(String id, int value) {
+  protected void doInput(String id, String value) {
+    System.out.println("id=" + id + ", value=" + value);
+    if ("karaoke-group".equals(value)) {
+      mapperView.renderKaraokeGroup();
+    } else if ("karaoke-sound".equals(value)) {
+      mapperView.renderKaraokeSound();
+    } else {
+      mapperView.renderKarokeOff();
+    }
   }
 
   @Override
@@ -57,7 +68,9 @@ public class MapperController extends ControllerTask {
     NavigableSet<Integer> devices = request(Services.getDeviceIndexes);
     for (Integer deviceIndex : devices) {
       Controller controller = request(new DeviceControllerService(deviceIndex));
-      deviceControllers.put(deviceIndex, controller);
+      if (controller instanceof MidiController) {
+        deviceControllers.put(deviceIndex, controller);
+      }
     }
     mapperView.renderDeviceList(deviceControllers);
   }
@@ -68,9 +81,36 @@ public class MapperController extends ControllerTask {
   private void doDeviceCommand(OnDeviceCommand message) {
   }
 
-  private void doInputMessage(OnInputMessage message) {
+  private void doShortMessage(OnShortMessage message) {
     if (message.getDeviceIndex() == deviceIndex) {
-      System.out.println("message=" + message);
+      ShortMessage shortMessage = message.getShortMessage();
+      int command = shortMessage.getCommand();
+      int channel = shortMessage.getChannel();
+      int data1 = shortMessage.getData1();
+      int data2 = shortMessage.getData2();
+      switch (command) {
+      case ShortMessage.NOTE_OFF:
+        break;
+      case ShortMessage.NOTE_ON:
+        mapperView.renderMessageDetails("NOTE_ON", channel, data1, data2);
+        break;
+      case ShortMessage.POLY_PRESSURE:
+        break;
+      case ShortMessage.CONTROL_CHANGE:
+        mapperView.renderMessageDetails("CONTROL_CHANGE", channel, data1, data2);
+        break;
+      case ShortMessage.PROGRAM_CHANGE:
+        mapperView.renderMessageDetails("PROGRAM_CHANGE", channel, data1, data2);
+        break;
+      case ShortMessage.CHANNEL_PRESSURE:
+        break;
+      case ShortMessage.PITCH_BEND:
+        mapperView.renderMessageDetails("PITCH_BEND", channel, data1, data2);
+        break;
+      default:
+        mapperView.renderMessageDetails("COMMAND_" + command, channel, data1, data2);
+        break;
+      }
     }
   }
 

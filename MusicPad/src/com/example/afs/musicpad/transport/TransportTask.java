@@ -10,9 +10,7 @@
 package com.example.afs.musicpad.transport;
 
 import com.example.afs.fluidsynth.Synthesizer;
-import com.example.afs.musicpad.ChannelCommand;
 import com.example.afs.musicpad.Command;
-import com.example.afs.musicpad.message.OnChannelCommand;
 import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnRenderSong;
 import com.example.afs.musicpad.message.OnSampleChannel;
@@ -41,17 +39,9 @@ public class TransportTask extends ServiceTask {
     subscribe(OnSampleSong.class, message -> doSampleSong(message));
     subscribe(OnRenderSong.class, message -> doRenderSong(message));
     subscribe(OnSampleChannel.class, message -> doSampleChannel(message));
-    subscribe(OnChannelCommand.class, message -> doChannelCommand(message));
     provide(Services.getBackgroundVelocity, () -> transport.getPercentVelocity());
     provide(Services.getMasterGain, () -> transport.getPercentGain());
     provide(Services.getTempo, () -> transport.getPercentTempo());
-  }
-
-  private void doChannelCommand(OnChannelCommand message) {
-    ChannelCommand command = message.getChannelCommand();
-    int channel = message.getChannel();
-    int parameter = message.getParameter();
-    System.out.println("TransportTask.doChannelCommand: command=" + command + ", channel=" + channel + ", parameter=" + parameter);
   }
 
   private void doCommand(OnCommand message) {

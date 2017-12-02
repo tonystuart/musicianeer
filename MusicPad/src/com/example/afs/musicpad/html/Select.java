@@ -11,16 +11,25 @@ package com.example.afs.musicpad.html;
 
 public class Select extends Parent {
 
-  public Select() {
-    super("select");
+  public Select(String... properties) {
+    super("select", properties);
   }
 
-  public Select(String id) {
-    this();
-    setId(id);
+  @Override
+  public Select add(Node child) {
+    return (Select) super.add(child);
+  }
+
+  public Select addChangeHandler() {
+    if (getId() == null) {
+      throw new IllegalStateException();
+    }
+    setProperty("onclick", "musicPad.onInput(event, this.value)");
+    return this;
   }
 
   public void setValue(String value) {
     setProperty("value", value);
   }
+
 }

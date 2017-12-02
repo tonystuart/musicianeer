@@ -106,21 +106,21 @@ public class KaraokeController extends ControllerTask {
   }
 
   @Override
-  protected void doInput(String id, int value) {
+  protected void doInput(String id, String value) {
     if (id.startsWith("background-mute-")) {
-      publish(new OnDeviceCommand(DeviceCommand.MUTE_BACKGROUND, Integer.parseInt(id.substring("background-mute-".length())), value));
+      publish(new OnDeviceCommand(DeviceCommand.MUTE_BACKGROUND, Integer.parseInt(id.substring("background-mute-".length())), Integer.parseInt(value)));
     } else if (id.startsWith("device-velocity-")) {
-      publish(new OnDeviceCommand(DeviceCommand.VELOCITY, Integer.parseInt(id.substring("device-velocity-".length())), value));
+      publish(new OnDeviceCommand(DeviceCommand.VELOCITY, Integer.parseInt(id.substring("device-velocity-".length())), Integer.parseInt(value)));
     } else {
       switch (id) {
       case "background-velocity":
-        publish(new OnCommand(Command.SET_BACKGROUND_VELOCITY, value));
+        publish(new OnCommand(Command.SET_BACKGROUND_VELOCITY, Integer.parseInt(value)));
         break;
       case "master-gain":
-        publish(new OnCommand(Command.SET_MASTER_GAIN, value));
+        publish(new OnCommand(Command.SET_MASTER_GAIN, Integer.parseInt(value)));
         break;
       case "tempo":
-        publish(new OnCommand(Command.SET_TEMPO, value));
+        publish(new OnCommand(Command.SET_TEMPO, Integer.parseInt(value)));
         break;
       }
     }

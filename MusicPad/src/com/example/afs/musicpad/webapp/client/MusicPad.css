@@ -61,6 +61,10 @@ input {
     display: flex;
 }
 
+.details div {
+    margin: auto;
+}
+
 .detail {
     display: table-row;
 }

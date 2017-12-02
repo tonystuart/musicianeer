@@ -7,9 +7,13 @@
 // This program is made available on an "as is" basis, without
 // warranties or conditions of any kind, either express or implied.
 
-package com.example.afs.musicpad;
+package com.example.afs.musicpad.html;
 
-public enum ChannelCommand {
-  MUTE, //
-  SOLO, //
+public class TextInput extends Input {
+
+  public TextInput(String... properties) {
+    super(properties);
+    setProperty("type", "text");
+  }
+
 }

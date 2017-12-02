@@ -123,10 +123,6 @@ body {
     text-align: center;
 }
 
-#song-details div, #channel-details div, #prompter-details div {
-    margin: auto;
-}
-
 ::-webkit-scrollbar {
     background-color: magenta;
 }

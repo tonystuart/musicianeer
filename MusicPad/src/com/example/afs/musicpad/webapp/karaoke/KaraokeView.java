@@ -428,12 +428,4 @@ public class KaraokeView extends ShadowDom {
     return true;
   }
 
-  private Parent nameValue(String name, Object value) {
-    return div(".detail") //
-        .add(div(".name") //
-            .add(text(name))) //
-        .add(div(".value") //
-            .add(text(value))); //
-  }
-
 }

@@ -44,6 +44,13 @@ public class ShadowDom {
     onAddClassName(element, className);
   }
 
+  public void addClass(String id, String className) {
+    Element element = getElementById(id);
+    if (element != null) {
+      addClass(element, className);
+    }
+  }
+
   public CheckBox checkbox(String... properties) {
     CheckBox checkBox = new CheckBox(properties);
     return checkBox;
@@ -56,6 +63,10 @@ public class ShadowDom {
 
   public void ensureVisible(Element element) {
     onEnsureVisible(element);
+  }
+
+  public FieldSet fieldSet(String... properties) {
+    return new FieldSet(properties);
   }
 
   public String findClassNameByPrefix(Parent parent, String prefix) {
@@ -93,6 +104,30 @@ public class ShadowDom {
     return label;
   }
 
+  public Legend legend(String legend) {
+    return new Legend(legend);
+  }
+
+  public Parent nameValue(String name, Object value) {
+    return div(".detail") //
+        .add(div(".name") //
+            .add(text(name))) //
+        .add(div(".value") //
+            .add(text(value))); //
+  }
+
+  public NumberInput numberInput(String... properties) {
+    return new NumberInput(properties);
+  }
+
+  public Option option(String text, String value) {
+    return new Option(text, value);
+  }
+
+  public OptionGroup optionGroup(String label) {
+    return new OptionGroup(label);
+  }
+
   public PercentRange range(String... properties) {
     PercentRange percentRange = new PercentRange(properties);
     return percentRange;
@@ -107,6 +142,13 @@ public class ShadowDom {
         elementsWithClass.remove(element);
       }
       onRemoveClassName(element, className);
+    }
+  }
+
+  public void removeClass(String id, String className) {
+    Element element = getElementById(id);
+    if (element != null) {
+      removeClass(element, className);
     }
   }
 
@@ -168,6 +210,10 @@ public class ShadowDom {
 
   public TextElement text(Object value) {
     return new TextElement(value);
+  }
+
+  public TextInput textInput(String... properties) {
+    return new TextInput(properties);
   }
 
   protected void onAddClassName(Element element, String className) {
@@ -246,4 +292,5 @@ public class ShadowDom {
       }
     }
   }
+
 }

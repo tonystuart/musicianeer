@@ -11,16 +11,12 @@ package com.example.afs.musicpad.html;
 
 public class Option extends Parent {
 
-  public Option() {
-    super("option");
-  }
-
   public Option(String text, Object value) {
     this(text, value, false);
   }
 
   public Option(String text, Object value, boolean isSelected) {
-    this();
+    super("option");
     setValue(value);
     setText(text);
     if (isSelected) {
@@ -28,16 +24,19 @@ public class Option extends Parent {
     }
   }
 
-  public void setValue(Object value) {
+  public Option setValue(Object value) {
     setProperty("value", value);
+    return this;
   }
 
-  private void setSelected() {
+  private Option setSelected() {
     setProperty("selected");
+    return this;
   }
 
-  private void setText(String text) {
+  private Option setText(String text) {
     appendChild(new TextElement(text));
+    return this;
   }
 
 }

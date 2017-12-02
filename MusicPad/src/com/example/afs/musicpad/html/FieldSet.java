@@ -9,11 +9,10 @@
 
 package com.example.afs.musicpad.html;
 
-public class Button extends Input {
+public class FieldSet extends Parent {
 
-  public Button(String... properties) {
-    super(properties);
-    setProperty("type", "button");
+  public FieldSet(String[] properties) {
+    super("fieldset", properties);
   }
 
 }

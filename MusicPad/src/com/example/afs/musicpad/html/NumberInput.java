@@ -9,11 +9,11 @@
 
 package com.example.afs.musicpad.html;
 
-public class Button extends Input {
+public class NumberInput extends Input {
 
-  public Button(String... properties) {
+  public NumberInput(String... properties) {
     super(properties);
-    setProperty("type", "button");
+    setProperty("type", "number");
   }
 
 }

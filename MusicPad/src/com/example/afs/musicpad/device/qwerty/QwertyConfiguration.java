@@ -18,7 +18,7 @@ import com.example.afs.musicpad.task.MessageBroker;
 
 public class QwertyConfiguration extends Configuration {
 
-  public enum InputType {
+  public enum KeyboardType {
     ALPHA, NUMERIC
   }
 
@@ -38,8 +38,8 @@ public class QwertyConfiguration extends Configuration {
     this.noteMap = NUMERIC_NOTE_MAP;
   }
 
-  public void setInputType(InputType inputType) {
-    switch (inputType) {
+  public void setKeyboardType(KeyboardType keyboardType) {
+    switch (keyboardType) {
     case ALPHA:
       bankMap = ALPHA_BANK_MAP;
       noteMap = ALPHA_NOTE_MAP;

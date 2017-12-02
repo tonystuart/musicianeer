@@ -14,7 +14,9 @@ import java.util.NavigableMap;
 
 import com.example.afs.musicpad.device.common.Controller;
 import com.example.afs.musicpad.html.Division;
+import com.example.afs.musicpad.html.Node;
 import com.example.afs.musicpad.html.Parent;
+import com.example.afs.musicpad.html.Select;
 import com.example.afs.musicpad.html.ShadowDom;
 import com.example.afs.musicpad.task.ControllerTask;
 
@@ -25,7 +27,7 @@ public class MapperView extends ShadowDom {
     add(div("#mapper", ".tab", ".selected-tab") //
         .add(div(".left") //
             .add(div(".title") //
-                .add(text("Mapper Application"))) //
+                .add(text("MIDI Input Mapper"))) //
             .add(div("#device-list", ".list") // renderDeviceList
                 .addClickHandler()) //
             .add(div(".controls") //
@@ -39,13 +41,33 @@ public class MapperView extends ShadowDom {
                     .addClickHandler() //
                     .add(text("Mapper 3"))))) //
         .add(div(".right") //
-            .add(div("#mapper-details", ".details")))); // 
+            .add(div("#message-details", ".details")))); // 
   }
 
   public void renderDeviceList(NavigableMap<Integer, Controller> deviceControllers) {
     Division div = createDeviceList(deviceControllers);
     Parent songListParent = getElementById("device-list");
     replaceChildren(songListParent, div);
+  }
+
+  public void renderKaraokeGroup() {
+    removeClass("group", "hidden");
+    addClass("sound", "hidden");
+  }
+
+  public void renderKaraokeSound() {
+    removeClass("sound", "hidden");
+    addClass("group", "hidden");
+  }
+
+  public void renderKarokeOff() {
+    addClass("group", "hidden");
+    addClass("sound", "hidden");
+  }
+
+  public void renderMessageDetails(String messageType, int channel, int data1, int data2) {
+    Parent songsRight = getElementById("message-details");
+    replaceChildren(songsRight, createMessageDetails(messageType, channel, data1, data2));
   }
 
   private Division createDeviceList(NavigableMap<Integer, Controller> deviceControllers) {
@@ -57,6 +79,82 @@ public class MapperView extends ShadowDom {
           .add(text(controller.getDeviceName())));
     }
     return div;
+  }
+
+  private Select createMapping() {
+    return new Select("#mapping") //
+        .addChangeHandler() //
+        .add(optionGroup("Player Settings") //
+            .add(option("Select Instrument", "player-select-program")) //
+            .add(option("Previous Instrument", "player-previous-program")) //
+            .add(option("Next Instrument", "player-next-program")) //
+            .add(option("Select Volume", "player-select-velocity")) //
+            .add(option("Decrease Volume", "player-decrease-velocity")) //
+            .add(option("Increase Volume", "player-increase-velocity")) //
+            .add(option("Select Channel", "player-select-channel")) //
+            .add(option("Previous Channel", "player-previous-channel")) //
+            .add(option("Next Channel", "player-next-channel"))) //
+
+        .add(optionGroup("Background Settings") //
+            .add(option("Mute", "background-mute")) //
+            .add(option("Select Volume", "background-select-velocity")) //
+            .add(option("Decrease Volume", "background-decrease-velocity")) //
+            .add(option("Increase Volume", "background-increase-velocity"))) //
+
+        .add(optionGroup("Master Settings") //
+            .add(option("Select Volume", "master-select-volume")) //
+            .add(option("Decrease Volume", "master-decrease-volume")) //
+            .add(option("Increase Volume", "master-increase-volume")) //
+            .add(option("Map to Piano", "master-override"))) //
+
+        .add(optionGroup("Transport Settings") //
+            .add(option("Play/Resume", "transport-play")) //
+            .add(option("Stop/Pause", "transport-stop")) //
+            .add(option("Select Measure", "transport-select-measure")) //
+            .add(option("Previous Measure", "transport-previous-measure")) //
+            .add(option("Next Measure", "transport-next-measure")) //
+            .add(option("Select Tempo", "transport-select-tempo")) //
+            .add(option("Decrease Tempo", "transport-decrease-tempo")) //
+            .add(option("Increase Tempo", "transport-increase-tempo"))) //
+
+        .add(optionGroup("Library Settings") //
+            .add(option("Select Song", "library-select-song")) //
+            .add(option("Previous Song", "library-previous-song")) //
+            .add(option("Next Song", "library-next-song")) //
+            .add(option("Select Transpose", "library-select-transpose")) //
+            .add(option("Transpose Lower", "library-transpose-lower")) //
+            .add(option("Transpose Higher", "library-transpose-higher"))) //
+
+        .add(optionGroup("Karaoke Settings") //
+            .add(option("Group", "karaoke-group")) //
+            .add(option("Sound", "karaoke-sound")) //
+            .add(option("Tick / Measure", "karaoke-type"))); //
+  }
+
+  private Node createMessageDetails(String messageType, int channel, int data1, int data2) {
+    return div() //
+        .add(nameValue("Input", messageType)) //
+        .add(nameValue("Channel", channel)) //
+        .add(nameValue("Data1", data1)) //
+        .add(nameValue("Data2", data2)) //
+        .add(nameValue("Output", createMapping())) //
+        .add(fieldSet("#group", ".hidden") //
+            .add(legend("&nbsp;Group&nbsp;")) //
+            .add(text("Index")) //
+            .add(numberInput("#group-index") //
+                .addInputHandler()) //
+            .add(text("Label")) //
+            .add(textInput("#group-label") //
+                .addInputHandler())) //
+        .add(fieldSet("#sound", ".hidden") //
+            .add(legend("&nbsp;Sound&nbsp;")) //
+            .add(text("Index")) //
+            .add(numberInput("#sound-index") //
+                .addInputHandler()) //
+            .add(text("Label")) //
+            .add(textInput("#sound-label") //
+                .addInputHandler())) //
+    ; //
   }
 
 }

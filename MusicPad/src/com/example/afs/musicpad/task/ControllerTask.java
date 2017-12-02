@@ -36,7 +36,7 @@ public abstract class ControllerTask extends ServiceTask {
 
   protected abstract void doClick(String id);
 
-  protected abstract void doInput(String id, int value);
+  protected abstract void doInput(String id, String value);
 
   protected abstract void doLoad();
 

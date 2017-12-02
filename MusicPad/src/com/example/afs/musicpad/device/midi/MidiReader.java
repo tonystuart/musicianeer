@@ -16,6 +16,7 @@ import javax.sound.midi.Receiver;
 import javax.sound.midi.ShortMessage;
 
 import com.example.afs.musicpad.device.common.DeviceHandler;
+import com.example.afs.musicpad.message.OnShortMessage;
 import com.example.afs.musicpad.task.MessageBroker;
 
 public class MidiReader {
@@ -100,7 +101,6 @@ public class MidiReader {
         int command = shortMessage.getCommand();
         int data1 = shortMessage.getData1();
         int data2 = shortMessage.getData2();
-        System.out.println("MidiReader.receiveFromDevice: message=" + formatMessage(message) + ", command=" + command + ", channel=" + shortMessage.getChannel() + ", data1=" + data1 + ", data2=" + data2);
         if (command == ShortMessage.NOTE_ON) {
           deviceHandler.tsOnDown(data1, data2);
         } else if (command == ShortMessage.NOTE_OFF) {
@@ -121,6 +121,7 @@ public class MidiReader {
           int pitchBend = value >= 8192 ? value - 8192 : value + 8192;
           deviceHandler.tsOnPitchBend(pitchBend);
         }
+        broker.publish(new OnShortMessage(deviceHandler.tsGetDeviceIndex(), shortMessage));
       } else {
         System.out.println("MidiReader.receiveFromDevice: message=" + formatMessage(message));
       }

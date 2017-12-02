@@ -17,17 +17,17 @@ public class OnBrowserEvent extends TypedMessage {
 
   private String id;
   private Action action;
-  private int value;
+  private String value;
 
   public OnBrowserEvent(Action action) {
-    this.action = action;
+    this(action, null, null);
   }
 
   public OnBrowserEvent(Action action, String id) {
-    this(action, id, 0);
+    this(action, id, null);
   }
 
-  public OnBrowserEvent(Action action, String id, int value) {
+  public OnBrowserEvent(Action action, String id, String value) {
     this.action = action;
     this.id = id;
     this.value = value;
@@ -41,7 +41,7 @@ public class OnBrowserEvent extends TypedMessage {
     return id;
   }
 
-  public int getValue() {
+  public String getValue() {
     return value;
   }
 

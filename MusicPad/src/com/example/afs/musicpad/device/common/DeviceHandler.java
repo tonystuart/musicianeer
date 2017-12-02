@@ -17,8 +17,6 @@ import com.example.afs.musicpad.DeviceCommand;
 import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnConfigurationChange;
 import com.example.afs.musicpad.message.OnDeviceCommand;
-import com.example.afs.musicpad.message.OnInputMessage;
-import com.example.afs.musicpad.message.OnInputMessage.MessageType;
 import com.example.afs.musicpad.message.OnKeyDown;
 import com.example.afs.musicpad.message.OnKeyUp;
 import com.example.afs.musicpad.message.OnSampleChannel;
@@ -80,7 +78,6 @@ public class DeviceHandler extends ServiceTask {
 
   public void tsOnControlChangle(int control, int value) {
     player.changeControl(control, value);
-    publish(new OnInputMessage(MessageType.CONTROL_CHANGE, deviceIndex, control, value));
   }
 
   public void tsOnDown(int inputCode) {
@@ -284,7 +281,6 @@ public class DeviceHandler extends ServiceTask {
         }
       }
     }
-    publish(new OnInputMessage(MessageType.DOWN, deviceIndex, inputCode, velocity));
   }
 
   private void processUp(int inputCode, int velocity) {
@@ -297,7 +293,6 @@ public class DeviceHandler extends ServiceTask {
         publish(new OnKeyUp(deviceIndex, sound));
       }
     }
-    publish(new OnInputMessage(MessageType.UP, deviceIndex, inputCode, velocity));
   }
 
   private void selectChannel(int channel) {

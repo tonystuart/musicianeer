@@ -20,7 +20,7 @@ import com.example.afs.jni.Input;
 import com.example.afs.musicpad.Command;
 import com.example.afs.musicpad.DeviceCommand;
 import com.example.afs.musicpad.device.common.DeviceHandler;
-import com.example.afs.musicpad.device.qwerty.QwertyConfiguration.InputType;
+import com.example.afs.musicpad.device.qwerty.QwertyConfiguration.KeyboardType;
 import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnDeviceCommand;
 import com.example.afs.musicpad.player.PlayableMap.OutputType;
@@ -129,10 +129,10 @@ public class QwertyReader {
       publish(new OnDeviceCommand(DeviceCommand.NEXT_PROGRAM, deviceHandler.tsGetDeviceIndex(), 0));
       break;
     case '/':
-      controller.getConfiguration().setInputType(InputType.NUMERIC);
+      controller.getConfiguration().setKeyboardType(KeyboardType.NUMERIC);
       break;
     case '*':
-      controller.getConfiguration().setInputType(InputType.ALPHA);
+      controller.getConfiguration().setKeyboardType(KeyboardType.ALPHA);
       break;
     case '-':
       publish(new OnDeviceCommand(DeviceCommand.OUTPUT, deviceHandler.tsGetDeviceIndex(), OutputType.MEASURE.ordinal()));

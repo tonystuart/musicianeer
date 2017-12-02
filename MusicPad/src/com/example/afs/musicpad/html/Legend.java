@@ -9,11 +9,11 @@
 
 package com.example.afs.musicpad.html;
 
-public class Button extends Input {
+public class Legend extends Parent {
 
-  public Button(String... properties) {
-    super(properties);
-    setProperty("type", "button");
+  public Legend(String legend) {
+    super("legend");
+    add(new TextElement(legend));
   }
 
 }

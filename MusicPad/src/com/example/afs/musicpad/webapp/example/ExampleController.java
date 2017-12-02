@@ -35,7 +35,7 @@ public class ExampleController extends ControllerTask {
   }
 
   @Override
-  protected void doInput(String id, int value) {
+  protected void doInput(String id, String value) {
   }
 
   @Override
