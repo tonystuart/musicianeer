@@ -16,6 +16,7 @@ import java.util.TreeMap;
 import javax.sound.midi.ShortMessage;
 
 import com.example.afs.musicpad.Command;
+import com.example.afs.musicpad.DeviceCommand;
 import com.example.afs.musicpad.device.common.Configuration;
 import com.example.afs.musicpad.device.common.Controller;
 import com.example.afs.musicpad.device.midi.MidiController;
@@ -28,6 +29,7 @@ import com.example.afs.musicpad.service.DeviceControllerService;
 import com.example.afs.musicpad.service.Services;
 import com.example.afs.musicpad.task.ControllerTask;
 import com.example.afs.musicpad.task.MessageBroker;
+import com.example.afs.musicpad.webapp.mapper.MapperView.Mapping;
 
 public class MapperController extends ControllerTask {
 
@@ -83,8 +85,109 @@ public class MapperController extends ControllerTask {
     mapperView.selectCommand();
     Controller controller = deviceControllers.get(deviceIndex);
     Configuration configuration = controller.getConfiguration();
-    if (value.equals("transport-select-tempo")) {
+    Mapping mapping = Mapping.valueOf(value);
+    switch (mapping) {
+    case BACKGROUND_DECREASE_VELOCITY:
+      configuration.put(shortMessage, Command.DECREASE_BACKGROUND_VELOCITY);
+      break;
+    case BACKGROUND_INCREASE_VELOCITY:
+      configuration.put(shortMessage, Command.INCREASE_BACKGROUND_VELOCITY);
+      break;
+    case BACKGROUND_MUTE:
+      configuration.put(shortMessage, DeviceCommand.MUTE_BACKGROUND);
+      break;
+    case BACKGROUND_SELECT_VELOCITY:
+      configuration.put(shortMessage, Command.SET_BACKGROUND_VELOCITY);
+      break;
+    case KARAOKE_TYPE_MEASURE:
+      configuration.put(shortMessage, DeviceCommand.OUTPUT_MEASURE);
+      break;
+    case KARAOKE_TYPE_TICK:
+      configuration.put(shortMessage, DeviceCommand.OUTPUT_TICK);
+      break;
+    case LIBRARY_NEXT_SONG:
+      configuration.put(shortMessage, Command.INCREASE_SONG_INDEX);
+      break;
+    case LIBRARY_PREVIOUS_SONG:
+      configuration.put(shortMessage, Command.DECREASE_SONG_INDEX);
+      break;
+    case LIBRARY_SELECT_SONG:
+      configuration.put(shortMessage, Command.SET_SONG_INDEX);
+      break;
+    case LIBRARY_SELECT_TRANSPOSE:
+      configuration.put(shortMessage, Command.SET_TRANSPOSITION);
+      break;
+    case LIBRARY_TRANSPOSE_HIGHER:
+      configuration.put(shortMessage, Command.INCREASE_TRANSPOSITION);
+      break;
+    case LIBRARY_TRANSPOSE_LOWER:
+      configuration.put(shortMessage, Command.DECREASE_TRANSPOSITION);
+      break;
+    case MASTER_DECREASE_VOLUME:
+      configuration.put(shortMessage, Command.DECREASE_MASTER_GAIN);
+      break;
+    case MASTER_INCREASE_VOLUME:
+      configuration.put(shortMessage, Command.INCREASE_MASTER_GAIN);
+      break;
+    case MASTER_INSTRUMENT:
+      configuration.put(shortMessage, Command.SET_MASTER_PROGRAM);
+      break;
+    case MASTER_SELECT_VOLUME:
+      configuration.put(shortMessage, Command.SET_MASTER_GAIN);
+      break;
+    case PLAYER_DECREASE_VELOCITY:
+      configuration.put(shortMessage, DeviceCommand.DECREASE_PLAYER_VELOCITY);
+      break;
+    case PLAYER_INCREASE_VELOCITY:
+      configuration.put(shortMessage, DeviceCommand.INCREASE_PLAYER_VELOCITY);
+      break;
+    case PLAYER_NEXT_CHANNEL:
+      configuration.put(shortMessage, DeviceCommand.NEXT_CHANNEL);
+      break;
+    case PLAYER_NEXT_PROGRAM:
+      configuration.put(shortMessage, DeviceCommand.NEXT_PROGRAM);
+      break;
+    case PLAYER_PREVIOUS_CHANNEL:
+      configuration.put(shortMessage, DeviceCommand.PREVIOUS_CHANNEL);
+      break;
+    case PLAYER_PREVIOUS_PROGRAM:
+      configuration.put(shortMessage, DeviceCommand.PREVIOUS_PROGRAM);
+      break;
+    case PLAYER_SELECT_CHANNEL:
+      configuration.put(shortMessage, DeviceCommand.SELECT_CHANNEL);
+      break;
+    case PLAYER_SELECT_PROGRAM:
+      configuration.put(shortMessage, DeviceCommand.PROGRAM);
+      break;
+    case PLAYER_SELECT_VELOCITY:
+      configuration.put(shortMessage, DeviceCommand.VELOCITY);
+      break;
+    case TRANSPORT_DECREASE_TEMPO:
+      configuration.put(shortMessage, Command.DECREASE_TEMPO);
+      break;
+    case TRANSPORT_INCREASE_TEMPO:
+      configuration.put(shortMessage, Command.INCREASE_TEMPO);
+      break;
+    case TRANSPORT_NEXT_MEASURE:
+      configuration.put(shortMessage, Command.MOVE_FORWARD);
+      break;
+    case TRANSPORT_PLAY:
+      configuration.put(shortMessage, Command.PLAY);
+      break;
+    case TRANSPORT_PREVIOUS_MEASURE:
+      configuration.put(shortMessage, Command.MOVE_BACKWARD);
+      break;
+    case TRANSPORT_SELECT_MEASURE:
+      configuration.put(shortMessage, Command.SEEK);
+      break;
+    case TRANSPORT_SELECT_TEMPO:
       configuration.put(shortMessage, Command.SET_TEMPO);
+      break;
+    case TRANSPORT_STOP:
+      configuration.put(shortMessage, Command.STOP);
+      break;
+    default:
+      throw new UnsupportedOperationException(mapping.name());
     }
   }
 

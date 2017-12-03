@@ -150,6 +150,12 @@ public class DeviceHandler extends ServiceTask {
       case OUTPUT:
         doOutput(parameter);
         break;
+      case OUTPUT_MEASURE:
+        setOutputType(OutputType.MEASURE);
+        break;
+      case OUTPUT_TICK:
+        setOutputType(OutputType.TICK);
+        break;
       case MUTE_BACKGROUND:
         doMuteBackground();
         break;
@@ -213,8 +219,7 @@ public class DeviceHandler extends ServiceTask {
 
   private void doOutput(int typeIndex) {
     OutputType outputType = OutputType.values()[typeIndex];
-    player.setOutputType(outputType);
-    createPlayableMap();
+    setOutputType(outputType);
   }
 
   private void doPreviousChannel() {
@@ -311,6 +316,11 @@ public class DeviceHandler extends ServiceTask {
 
   private void selectProgram(int program) {
     player.selectProgram(program);
+  }
+
+  private void setOutputType(OutputType outputType) {
+    player.setOutputType(outputType);
+    createPlayableMap();
   }
 
   private void setPercentVelocity(int velocity) {

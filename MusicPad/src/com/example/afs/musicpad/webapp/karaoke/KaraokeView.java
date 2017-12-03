@@ -216,6 +216,13 @@ public class KaraokeView extends ShadowDom {
     }
   }
 
+  public void updateProgram(int deviceIndex, int programIndex) {
+    Division division = getElementById("device-program-" + deviceIndex);
+    if (division != null) {
+      replaceChildren(division, text(Instruments.getProgramName(programIndex)));
+    }
+  }
+
   private Element createChannelDetails(Song song, int channel) {
     return div() //
         .add(nameValue("Title", song.getTitle())) //
@@ -256,7 +263,7 @@ public class KaraokeView extends ShadowDom {
                   .add(div(".channel-program") //
                       .add(div(".device-channel-" + deviceIndex) //
                           .add(text("Channel " + Value.toNumber(channelIndex) + ":&nbsp;"))) //
-                      .add(div(".device-program-" + deviceIndex) //
+                      .add(div("#device-program-" + deviceIndex) //
                           .add(text(Instruments.getProgramName(programIndex))))) //
                   .add(label() // 
                       .add(checkbox("#background-mute-" + deviceIndex) //
@@ -297,6 +304,7 @@ public class KaraokeView extends ShadowDom {
         .add(nameValue("Time Signature", song.getBeatsPerMeasure(0) + "/" + song.getBeatUnit(0))) //
         .add(nameValue("Predominant Key", getKeyInfo(song))) //
         .add(nameValue("EZ Keyboard Transposition", song.getDistanceToWhiteKeys())) //
+        .add(nameValue("Current Transposition", song.getTransposition())) //
         .add(nameValue("Complexity", getComplexity(song))); //
   }
 

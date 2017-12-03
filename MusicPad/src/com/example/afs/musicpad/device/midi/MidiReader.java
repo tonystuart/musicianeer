@@ -16,8 +16,10 @@ import javax.sound.midi.Receiver;
 import javax.sound.midi.ShortMessage;
 
 import com.example.afs.musicpad.Command;
+import com.example.afs.musicpad.DeviceCommand;
 import com.example.afs.musicpad.device.common.DeviceHandler;
 import com.example.afs.musicpad.message.OnCommand;
+import com.example.afs.musicpad.message.OnDeviceCommand;
 import com.example.afs.musicpad.message.OnShortMessage;
 import com.example.afs.musicpad.task.MessageBroker;
 import com.example.afs.musicpad.util.Range;
@@ -127,9 +129,15 @@ public class MidiReader {
     try {
       if (message instanceof ShortMessage) {
         ShortMessage shortMessage = (ShortMessage) message;
-        Command command = configuration.get(shortMessage);
-        if (command != null) {
-          broker.publish(new OnCommand(command, Range.scaleMidiToPercent(shortMessage.getData2())));
+        Object outputMessage = configuration.get(shortMessage);
+        if (outputMessage != null) {
+          if (outputMessage instanceof Command) {
+            Command command = (Command) outputMessage;
+            broker.publish(new OnCommand(command, Range.scaleMidiToPercent(shortMessage.getData2())));
+          } else if (outputMessage instanceof DeviceCommand) {
+            DeviceCommand deviceCommand = (DeviceCommand) outputMessage;
+            broker.publish(new OnDeviceCommand(deviceCommand, deviceHandler.tsGetDeviceIndex(), Range.scaleMidiToPercent(shortMessage.getData2())));
+          }
         } else {
           processMessage(shortMessage);
         }

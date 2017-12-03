@@ -14,8 +14,6 @@ import java.util.Map;
 
 import javax.sound.midi.ShortMessage;
 
-import com.example.afs.musicpad.Command;
-
 public class Configuration {
 
   public static class InputMessage {
@@ -68,9 +66,9 @@ public class Configuration {
 
   protected InputMap bankMap;
   protected InputMap noteMap;
-  private Map<InputMessage, Command> inputMap = new HashMap<>();
+  private Map<InputMessage, Object> inputMap = new HashMap<>();
 
-  public Command get(ShortMessage shortMessage) {
+  public Object get(ShortMessage shortMessage) {
     return inputMap.get(new InputMessage(shortMessage));
   }
 
@@ -90,8 +88,8 @@ public class Configuration {
     return noteMap.getLegends()[noteIndex];
   }
 
-  public void put(ShortMessage shortMessage, Command command) {
-    inputMap.put(new InputMessage(shortMessage), command);
+  public void put(ShortMessage shortMessage, Object value) {
+    inputMap.put(new InputMessage(shortMessage), value);
   }
 
 }

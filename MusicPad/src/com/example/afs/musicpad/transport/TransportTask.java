@@ -16,7 +16,6 @@ import com.example.afs.musicpad.message.OnRenderSong;
 import com.example.afs.musicpad.message.OnSampleChannel;
 import com.example.afs.musicpad.message.OnSampleSong;
 import com.example.afs.musicpad.message.OnTick;
-import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.service.Services;
 import com.example.afs.musicpad.song.ChannelNotes;
 import com.example.afs.musicpad.song.Default;
@@ -87,14 +86,17 @@ public class TransportTask extends ServiceTask {
     case SET_MASTER_GAIN:
       doSetMidiMasterGain(parameter);
       break;
+    case SET_MASTER_PROGRAM:
+      doSetMasterProgram(parameter);
+      break;
     case SET_TEMPO:
       doSetTempo(parameter);
       break;
     case STOP:
       doStop(parameter);
       break;
-    case TRANSPOSE_TO:
-      doTransposeTo(parameter);
+    case TRANSPOSE_CURRENT_SONG:
+      doTransposeCurrentSong(parameter);
       break;
     default:
       break;
@@ -182,6 +184,11 @@ public class TransportTask extends ServiceTask {
     transport.setPercentVelocity(velocity);
   }
 
+  private void doSetMasterProgram(int masterProgram) {
+    // TODO: Use MIDI values (0-127) for external interfaces
+    transport.setMasterProgram(Range.scalePercentToMidi(masterProgram));
+  }
+
   private void doSetMidiMasterGain(int gain) {
     transport.setPercentGain(gain);
   }
@@ -199,9 +206,11 @@ public class TransportTask extends ServiceTask {
     }
   }
 
-  private void doTransposeTo(int midiTransposition) {
+  private void doTransposeCurrentSong(int percentDistance) {
     // Dynamic transposition for use with rotary control... does not update display
-    int transposition = Range.scale(-24, 24, Midi.MIN_VALUE, Midi.MAX_VALUE, midiTransposition);
+    int minimumTransposition = song.getMinimumTransposition();
+    int maximumTransposition = song.getMaximumTransposition();
+    int transposition = Range.scale(minimumTransposition, maximumTransposition, 0, 100, percentDistance);
     song.transposeTo(transposition);
     transport.allNotesOff(); // turn off notes that were playing before transpose
   }

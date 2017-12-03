@@ -215,19 +215,17 @@ public class Song {
   }
 
   public int getHighestMidiNote() {
-    int highest;
-    if (notes.size() == 0) {
-      highest = -1;
-    } else {
-      highest = 0;
-      for (int channel = 0; channel < Midi.CHANNELS; channel++) {
+    int highestMidiNote = Integer.MIN_VALUE;
+    for (int channel = 0; channel < Midi.CHANNELS; channel++) {
+      if (channel != Midi.DRUM && getChannelNoteCount(channel) > 0) {
         int channelHighest = getHighestMidiNote(channel);
-        if (channelHighest > highest) {
-          highest = channelHighest;
-        }
+        highestMidiNote = Math.max(highestMidiNote, channelHighest);
       }
     }
-    return highest;
+    if (highestMidiNote == Integer.MIN_VALUE) {
+      highestMidiNote = -1;
+    }
+    return highestMidiNote;
   }
 
   public int getHighestMidiNote(int channel) {
@@ -245,23 +243,33 @@ public class Song {
   }
 
   public int getLowestMidiNote() {
-    int lowest;
-    if (notes.size() == 0) {
-      lowest = -1;
-    } else {
-      lowest = Midi.MAX_VALUE;
-      for (int channel = 0; channel < Midi.CHANNELS; channel++) {
+    int lowestMidiNote = Integer.MAX_VALUE;
+    for (int channel = 0; channel < Midi.CHANNELS; channel++) {
+      if (channel != Midi.DRUM && getChannelNoteCount(channel) > 0) {
         int channelLowest = getLowestMidiNote(channel);
-        if (channelLowest != -1 && channelLowest < lowest) {
-          lowest = channelLowest;
-        }
+        lowestMidiNote = Math.min(lowestMidiNote, channelLowest);
       }
     }
-    return lowest;
+    if (lowestMidiNote == Integer.MAX_VALUE) {
+      lowestMidiNote = -1;
+    }
+    return lowestMidiNote;
   }
 
   public int getLowestMidiNote(int channel) {
     return channelFacets.getFacet(channel).getLowestMidiNote();
+  }
+
+  public int getMaximumTransposition() {
+    int highestMidiNote = getHighestMidiNote();
+    int maximumTransposition = (Midi.MAX_VALUE - highestMidiNote) + transposition;
+    return maximumTransposition;
+  }
+
+  public int getMinimumTransposition() {
+    int lowestMidiNote = getLowestMidiNote();
+    int minimumTransposition = transposition - lowestMidiNote;
+    return minimumTransposition;
   }
 
   public int getNoteCount() {
@@ -415,6 +423,7 @@ public class Song {
         newChannelFacets.add(note);
       }
       channelFacets = newChannelFacets;
+      distanceToWhiteKeys = null;
     }
   }
 

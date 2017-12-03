@@ -23,6 +23,42 @@ import com.example.afs.musicpad.task.ControllerTask;
 
 public class MapperView extends ShadowDom {
 
+  public enum Mapping {
+    PLAYER_SELECT_PROGRAM, //
+    PLAYER_PREVIOUS_PROGRAM, //
+    PLAYER_NEXT_PROGRAM, //
+    PLAYER_SELECT_VELOCITY, //
+    PLAYER_DECREASE_VELOCITY, //
+    PLAYER_INCREASE_VELOCITY, //
+    PLAYER_SELECT_CHANNEL, //
+    PLAYER_PREVIOUS_CHANNEL, //
+    PLAYER_NEXT_CHANNEL, //
+    BACKGROUND_MUTE, //
+    BACKGROUND_SELECT_VELOCITY, //
+    BACKGROUND_DECREASE_VELOCITY, //
+    BACKGROUND_INCREASE_VELOCITY, //
+    MASTER_SELECT_VOLUME, //
+    MASTER_DECREASE_VOLUME, //
+    MASTER_INCREASE_VOLUME, //
+    MASTER_INSTRUMENT, //
+    TRANSPORT_PLAY, //
+    TRANSPORT_STOP, //
+    TRANSPORT_SELECT_MEASURE, //
+    TRANSPORT_PREVIOUS_MEASURE, //
+    TRANSPORT_NEXT_MEASURE, //
+    TRANSPORT_SELECT_TEMPO, //
+    TRANSPORT_DECREASE_TEMPO, //
+    TRANSPORT_INCREASE_TEMPO, //
+    LIBRARY_SELECT_SONG, //
+    LIBRARY_PREVIOUS_SONG, //
+    LIBRARY_NEXT_SONG, //
+    LIBRARY_SELECT_TRANSPOSE, //
+    LIBRARY_TRANSPOSE_LOWER, //
+    LIBRARY_TRANSPOSE_HIGHER, //
+    KARAOKE_TYPE_TICK, //
+    KARAOKE_TYPE_MEASURE, //
+  }
+
   public MapperView(ControllerTask controllerTask) {
     super(controllerTask);
     add(div("#mapper", ".tab", ".selected-tab") //
@@ -86,49 +122,49 @@ public class MapperView extends ShadowDom {
     return new Select("#command") //
         .addChangeHandler() //
         .add(optionGroup("Player Settings") //
-            .add(option("Select Instrument", "player-select-program")) //
-            .add(option("Previous Instrument", "player-previous-program")) //
-            .add(option("Next Instrument", "player-next-program")) //
-            .add(option("Select Volume", "player-select-velocity")) //
-            .add(option("Decrease Volume", "player-decrease-velocity")) //
-            .add(option("Increase Volume", "player-increase-velocity")) //
-            .add(option("Select Channel", "player-select-channel")) //
-            .add(option("Previous Channel", "player-previous-channel")) //
-            .add(option("Next Channel", "player-next-channel"))) //
+            .add(option("Select Instrument", Mapping.PLAYER_SELECT_PROGRAM)) //
+            .add(option("Previous Instrument", Mapping.PLAYER_PREVIOUS_PROGRAM)) //
+            .add(option("Next Instrument", Mapping.PLAYER_NEXT_PROGRAM)) //
+            .add(option("Select Volume", Mapping.PLAYER_SELECT_VELOCITY)) //
+            .add(option("Decrease Volume", Mapping.PLAYER_DECREASE_VELOCITY)) //
+            .add(option("Increase Volume", Mapping.PLAYER_INCREASE_VELOCITY)) //
+            .add(option("Select Channel", Mapping.PLAYER_SELECT_CHANNEL)) //
+            .add(option("Previous Channel", Mapping.PLAYER_PREVIOUS_CHANNEL)) //
+            .add(option("Next Channel", Mapping.PLAYER_NEXT_CHANNEL))) //
 
         .add(optionGroup("Background Settings") //
-            .add(option("Mute", "background-mute")) //
-            .add(option("Select Volume", "background-select-velocity")) //
-            .add(option("Decrease Volume", "background-decrease-velocity")) //
-            .add(option("Increase Volume", "background-increase-velocity"))) //
+            .add(option("Mute", Mapping.BACKGROUND_MUTE)) //
+            .add(option("Select Volume", Mapping.BACKGROUND_SELECT_VELOCITY)) //
+            .add(option("Decrease Volume", Mapping.BACKGROUND_DECREASE_VELOCITY)) //
+            .add(option("Increase Volume", Mapping.BACKGROUND_INCREASE_VELOCITY))) //
 
         .add(optionGroup("Master Settings") //
-            .add(option("Select Volume", "master-select-volume")) //
-            .add(option("Decrease Volume", "master-decrease-volume")) //
-            .add(option("Increase Volume", "master-increase-volume")) //
-            .add(option("Map to Piano", "master-override"))) //
+            .add(option("Select Volume", Mapping.MASTER_SELECT_VOLUME)) //
+            .add(option("Decrease Volume", Mapping.MASTER_DECREASE_VOLUME)) //
+            .add(option("Increase Volume", Mapping.MASTER_INCREASE_VOLUME)) //
+            .add(option("Override Instrument", Mapping.MASTER_INSTRUMENT))) //
 
         .add(optionGroup("Transport Settings") //
-            .add(option("Play/Resume", "transport-play")) //
-            .add(option("Stop/Pause", "transport-stop")) //
-            .add(option("Select Measure", "transport-select-measure")) //
-            .add(option("Previous Measure", "transport-previous-measure")) //
-            .add(option("Next Measure", "transport-next-measure")) //
-            .add(option("Select Tempo", "transport-select-tempo")) //
-            .add(option("Decrease Tempo", "transport-decrease-tempo")) //
-            .add(option("Increase Tempo", "transport-increase-tempo"))) //
+            .add(option("Play/Resume", Mapping.TRANSPORT_PLAY)) //
+            .add(option("Stop/Pause", Mapping.TRANSPORT_STOP)) //
+            .add(option("Select Measure", Mapping.TRANSPORT_SELECT_MEASURE)) //
+            .add(option("Previous Measure", Mapping.TRANSPORT_PREVIOUS_MEASURE)) //
+            .add(option("Next Measure", Mapping.TRANSPORT_NEXT_MEASURE)) //
+            .add(option("Select Tempo", Mapping.TRANSPORT_SELECT_TEMPO)) //
+            .add(option("Decrease Tempo", Mapping.TRANSPORT_DECREASE_TEMPO)) //
+            .add(option("Increase Tempo", Mapping.TRANSPORT_INCREASE_TEMPO))) //
 
         .add(optionGroup("Library Settings") //
-            .add(option("Select Song", "library-select-song")) //
-            .add(option("Previous Song", "library-previous-song")) //
-            .add(option("Next Song", "library-next-song")) //
-            .add(option("Select Transpose", "library-select-transpose")) //
-            .add(option("Transpose Lower", "library-transpose-lower")) //
-            .add(option("Transpose Higher", "library-transpose-higher"))) //
+            .add(option("Select Song", Mapping.LIBRARY_SELECT_SONG)) //
+            .add(option("Previous Song", Mapping.LIBRARY_PREVIOUS_SONG)) //
+            .add(option("Next Song", Mapping.LIBRARY_NEXT_SONG)) //
+            .add(option("Select Transpose", Mapping.LIBRARY_SELECT_TRANSPOSE)) //
+            .add(option("Transpose Lower", Mapping.LIBRARY_TRANSPOSE_LOWER)) //
+            .add(option("Transpose Higher", Mapping.LIBRARY_TRANSPOSE_HIGHER))) //
 
         .add(optionGroup("Karaoke Settings") //
-            .add(option("Play Notes at Tick", "karaoke-type-tick")) //
-            .add(option("Play Notes in Measure", "karaoke-type-measure"))); //
+            .add(option("Play Notes at Tick", Mapping.KARAOKE_TYPE_TICK)) //
+            .add(option("Play Notes in Measure", Mapping.KARAOKE_TYPE_MEASURE))); //
   }
 
   private Node createMessageDetails(String messageType, int channel, int data1, int data2) {
@@ -181,6 +217,10 @@ public class MapperView extends ShadowDom {
                 .add(textInput("#sound-label") //
                     .addInputHandler()))) //
     ; //
+  }
+
+  private Node option(String text, Mapping mapping) {
+    return super.option(text, mapping.name());
   }
 
 }

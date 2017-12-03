@@ -36,6 +36,7 @@ public class Transport {
   private static final int DEFAULT_PERCENT_TEMPO = 100;
   private static final int DEFAULT_PERCENT_VELOCITY = 10;
 
+  private int masterProgram = Midi.MAX_VALUE;
   private int percentVelocity = DEFAULT_PERCENT_VELOCITY;
   private int[] currentPrograms = new int[Midi.CHANNELS];
 
@@ -53,6 +54,10 @@ public class Transport {
 
   public void allNotesOff() {
     synthesizer.allNotesOff();
+  }
+
+  public int getMasterProgram() {
+    return masterProgram;
   }
 
   public int getPercentGain() {
@@ -178,6 +183,10 @@ public class Transport {
     }
   }
 
+  public void setMasterProgram(int masterProgram) {
+    this.masterProgram = masterProgram;
+  }
+
   public void setPercentGain(int gain) {
     synthesizer.setGain(Range.scale(Synthesizer.MINIMUM_GAIN, Synthesizer.MAXIMUM_GAIN, 0, 100, gain));
   }
@@ -220,6 +229,9 @@ public class Transport {
       int midiNote = note.getMidiNote();
       int velocity = note.getVelocity();
       int program = note.getProgram();
+      if (channel != Midi.DRUM && masterProgram != Midi.MAX_VALUE) {
+        program = masterProgram;
+      }
       if (currentPrograms[channel] != program) {
         synthesizer.changeProgram(channel, program);
         currentPrograms[channel] = program;

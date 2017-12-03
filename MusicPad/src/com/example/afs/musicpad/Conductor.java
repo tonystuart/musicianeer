@@ -31,11 +31,13 @@ import com.example.afs.musicpad.task.MessageBroker;
 import com.example.afs.musicpad.task.ServiceTask;
 import com.example.afs.musicpad.util.DirectList;
 import com.example.afs.musicpad.util.RandomAccessList;
+import com.example.afs.musicpad.util.Range;
 
 public class Conductor extends ServiceTask {
 
-  private File directory;
   private Song song;
+  private int songIndex;
+  private File directory;
   private RandomAccessList<File> midiFiles;
   private NavigableSet<Integer> deviceIndexes = new TreeSet<>();
   private NavigableMap<Integer, Integer> deviceChannelAssignments = new TreeMap<>();
@@ -53,21 +55,36 @@ public class Conductor extends ServiceTask {
     subscribe(OnConfigurationChange.class, message -> doConfigurationChange(message));
     provide(Services.getMidiFiles, () -> midiFiles);
     provide(Services.getCurrentSong, () -> song);
-    provide(Services.getDeviceIndexes, () -> deviceIndexes);
+    provide(Services.getDeviceIndexes, () -> new TreeSet<>(deviceIndexes)); // Avoid CME
   }
 
   private void doCommand(OnCommand message) {
     Command command = message.getCommand();
     int parameter = message.getParameter();
     switch (command) {
+    case DECREASE_SONG_INDEX:
+      doDecreaseSongIndex();
+      break;
+    case DECREASE_TRANSPOSITION:
+      doDecreaseTransposition();
+      break;
+    case INCREASE_SONG_INDEX:
+      doIncreaseSongIndex();
+      break;
+    case INCREASE_TRANSPOSITION:
+      doIncreaseTransposition();
+      break;
     case SAMPLE_SONG:
       doSampleSong(parameter);
       break;
     case SELECT_SONG:
       doSelectSong(parameter);
       break;
-    case TRANSPOSE:
-      doTranspose(parameter);
+    case SET_SONG_INDEX:
+      doSetSongIndex(parameter);
+      break;
+    case SET_TRANSPOSITION:
+      doSetTransposition(parameter);
       break;
     default:
       break;
@@ -77,6 +94,19 @@ public class Conductor extends ServiceTask {
   private void doConfigurationChange(OnConfigurationChange message) {
     if (deviceIndexes.size() == deviceChannelAssignments.size()) {
       publish(new OnRenderSong(song, deviceChannelAssignments));
+    }
+  }
+
+  private void doDecreaseSongIndex() {
+    if (songIndex > 0) {
+      doSampleSong(songIndex - 1);
+    }
+  }
+
+  private void doDecreaseTransposition() {
+    int transposition = song.getTransposition();
+    if (--transposition >= song.getMinimumTransposition()) {
+      transposeTo(transposition);
     }
   }
 
@@ -117,18 +147,32 @@ public class Conductor extends ServiceTask {
     }
   }
 
+  private void doIncreaseSongIndex() {
+    if (songIndex < (midiFiles.size() - 1)) {
+      doSampleSong(songIndex + 1);
+    }
+  }
+
+  private void doIncreaseTransposition() {
+    int transposition = song.getTransposition();
+    if (++transposition <= song.getMaximumTransposition()) {
+      transposeTo(transposition);
+    }
+  }
+
   private void doSampleChannel(int deviceIndex, int channel) {
     System.out.println("Sampling channel " + channel);
     publish(new OnSampleChannel(song, deviceIndex, channel));
   }
 
   private void doSampleSong(int songIndex) {
+    this.songIndex = songIndex;
     deviceChannelAssignments.clear();
     File midiFile = midiFiles.get(songIndex);
     SongBuilder songBuilder = new SongBuilder();
     song = songBuilder.createSong(midiFile);
     System.out.println("Sampling song " + songIndex + " - " + song.getTitle());
-    publish(new OnSampleSong(song));
+    publish(new OnSampleSong(song, songIndex));
   }
 
   private void doSelectChannel(int deviceIndex, int channel) {
@@ -148,9 +192,16 @@ public class Conductor extends ServiceTask {
     }
   }
 
-  private void doTranspose(int distance) {
-    song.transposeTo(distance);
-    publish(new OnSampleSong(song));
+  private void doSetSongIndex(int percentSong) {
+    int songIndex = Range.scale(0, midiFiles.size(), 0, 100, percentSong);
+    doSampleSong(songIndex);
+  }
+
+  private void doSetTransposition(int percentDistance) {
+    int minimumTransposition = song.getMinimumTransposition();
+    int maximumTransposition = song.getMaximumTransposition();
+    int transposition = Range.scale(minimumTransposition, maximumTransposition, 0, 100, percentDistance);
+    transposeTo(transposition);
   }
 
   private boolean isMidiFile(String name) {
@@ -171,6 +222,11 @@ public class Conductor extends ServiceTask {
         listMidiFiles(midiFiles, file);
       }
     }
+  }
+
+  private void transposeTo(int distance) {
+    song.transposeTo(distance);
+    publish(new OnSampleSong(song, songIndex));
   }
 
 }

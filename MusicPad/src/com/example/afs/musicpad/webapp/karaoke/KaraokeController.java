@@ -159,6 +159,9 @@ public class KaraokeController extends ControllerTask {
     case MUTE_BACKGROUND:
       doSetBackgroundMute(message.getDeviceIndex(), message.getParameter());
       break;
+    case PROGRAM:
+      doProgram(message.getDeviceIndex(), message.getParameter());
+      break;
     case VELOCITY:
       doSetDeviceVelocity(message.getDeviceIndex(), message.getParameter());
       break;
@@ -170,6 +173,10 @@ public class KaraokeController extends ControllerTask {
   private void doPickChannel(OnPickChannel message) {
     karaokeView.renderChannelList(message.getSong(), message.getDeviceIndex(), message.getDeviceChannelAssignments());
     sampleChannel(karaokeView.getChannelIndex());
+  }
+
+  private void doProgram(int deviceIndex, int program) {
+    karaokeView.updateProgram(deviceIndex, program);
   }
 
   private void doRenderSong(OnRenderSong message) {
@@ -196,6 +203,7 @@ public class KaraokeController extends ControllerTask {
 
   private void doSampleSong(OnSampleSong message) {
     karaokeView.renderSongDetails(message.getSong());
+    karaokeView.selectSong(message.getSongIndex());
   }
 
   private void doSetBackgroundMute(int deviceIndex, int mute) {

@@ -16,6 +16,8 @@ public enum DeviceCommand {
   NEXT_CHANNEL, //
   NEXT_PROGRAM, //
   OUTPUT, //
+  OUTPUT_MEASURE, //
+  OUTPUT_TICK, //
   PROGRAM, //
   PREVIOUS_CHANNEL, //
   PREVIOUS_PROGRAM, //

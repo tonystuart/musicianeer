@@ -14,18 +14,24 @@ import com.example.afs.musicpad.song.Song;
 public class OnSampleSong extends TypedMessage {
 
   private Song song;
+  private int songIndex;
 
-  public OnSampleSong(Song song) {
+  public OnSampleSong(Song song, int songIndex) {
     this.song = song;
+    this.songIndex = songIndex;
   }
 
   public Song getSong() {
     return song;
   }
 
+  public int getSongIndex() {
+    return songIndex;
+  }
+
   @Override
   public String toString() {
-    return "OnSampleSong [song=" + song + "]";
+    return "OnSampleSong [song=" + song + ", songIndex=" + songIndex + "]";
   }
 
 }
