@@ -29,6 +29,10 @@ public class FileUtilities {
     return baseName;
   }
 
+  public static String read(File file) {
+    return read(file.getPath());
+  }
+
   public static String read(InputStream inputStream) {
     try {
       int rc;

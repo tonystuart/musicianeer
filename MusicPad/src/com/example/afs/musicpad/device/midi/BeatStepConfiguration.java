@@ -9,13 +9,13 @@
 
 package com.example.afs.musicpad.device.midi;
 
+import com.example.afs.musicpad.device.common.Configuration;
 import com.example.afs.musicpad.device.common.InputMap;
 import com.example.afs.musicpad.task.MessageBroker;
 
-public class BeatStepConfiguration extends MidiConfiguration {
+public class BeatStepConfiguration extends Configuration {
 
   public BeatStepConfiguration(MessageBroker broker, int deviceIndex) {
-    super(broker, deviceIndex);
     this.bankMap = new InputMap( //
         new int[] {
             36, // 9

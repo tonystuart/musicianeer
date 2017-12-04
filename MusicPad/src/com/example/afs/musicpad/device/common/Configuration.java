@@ -9,68 +9,13 @@
 
 package com.example.afs.musicpad.device.common;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.sound.midi.ShortMessage;
-
 public class Configuration {
 
-  public static class InputMessage {
+  // TODO: Move this implementation to QwertyConfiguration and make this an interface
+  // TODO: Don't expect input codes to be an array, request them one at a time, like legends
 
-    private int command;
-    private int channel;
-    private int control;
-
-    public InputMessage(ShortMessage shortMessage) {
-      command = shortMessage.getCommand();
-      channel = shortMessage.getChannel();
-      control = shortMessage.getData1();
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-      if (this == obj) {
-        return true;
-      }
-      if (obj == null) {
-        return false;
-      }
-      if (getClass() != obj.getClass()) {
-        return false;
-      }
-      InputMessage other = (InputMessage) obj;
-      if (channel != other.channel) {
-        return false;
-      }
-      if (command != other.command) {
-        return false;
-      }
-      if (control != other.control) {
-        return false;
-      }
-      return true;
-    }
-
-    @Override
-    public int hashCode() {
-      final int prime = 31;
-      int result = 1;
-      result = prime * result + channel;
-      result = prime * result + command;
-      result = prime * result + control;
-      return result;
-    }
-
-  }
-
-  protected InputMap bankMap;
-  protected InputMap noteMap;
-  private Map<InputMessage, Object> inputMap = new HashMap<>();
-
-  public Object get(ShortMessage shortMessage) {
-    return inputMap.get(new InputMessage(shortMessage));
-  }
+  protected InputMap bankMap = new InputMap("@");
+  protected InputMap noteMap = new InputMap("@");
 
   public int[] getBankInputCodes() {
     return bankMap.getInputCodes();
@@ -86,10 +31,6 @@ public class Configuration {
 
   public String getNoteLegend(int noteIndex) {
     return noteMap.getLegends()[noteIndex];
-  }
-
-  public void put(ShortMessage shortMessage, Object value) {
-    inputMap.put(new InputMessage(shortMessage), value);
   }
 
 }

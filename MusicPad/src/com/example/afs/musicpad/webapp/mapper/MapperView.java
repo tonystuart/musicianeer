@@ -78,7 +78,9 @@ public class MapperView extends ShadowDom {
                     .addClickHandler() //
                     .add(text("Mapper 3"))))) //
         .add(div(".right") //
-            .add(div("#message-details", ".details")))); //
+            .add(div("#message-details", ".details") //
+                .add(div() //
+                    .add(text("Select a MIDI controller on the left, then press, rotate or slide an input on your MIDI controller to configure its action.")))))); //
   }
 
   public void renderDeviceList(NavigableMap<Integer, Controller> deviceControllers) {

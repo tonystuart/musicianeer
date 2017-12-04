@@ -17,8 +17,8 @@ import javax.sound.midi.ShortMessage;
 
 import com.example.afs.musicpad.Command;
 import com.example.afs.musicpad.DeviceCommand;
-import com.example.afs.musicpad.device.common.Configuration;
 import com.example.afs.musicpad.device.common.Controller;
+import com.example.afs.musicpad.device.midi.MidiConfiguration;
 import com.example.afs.musicpad.device.midi.MidiController;
 import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnDeviceCommand;
@@ -29,14 +29,15 @@ import com.example.afs.musicpad.service.DeviceControllerService;
 import com.example.afs.musicpad.service.Services;
 import com.example.afs.musicpad.task.ControllerTask;
 import com.example.afs.musicpad.task.MessageBroker;
+import com.example.afs.musicpad.webapp.karaoke.Utils;
 import com.example.afs.musicpad.webapp.mapper.MapperView.Mapping;
 
 public class MapperController extends ControllerTask {
 
   private int deviceIndex;
   private MapperView mapperView;
-  private NavigableMap<Integer, Controller> deviceControllers = new TreeMap<>();
   private ShortMessage shortMessage;
+  private NavigableMap<Integer, Controller> deviceControllers = new TreeMap<>();
 
   public MapperController(MessageBroker broker) {
     super(broker);
@@ -61,6 +62,16 @@ public class MapperController extends ControllerTask {
       configureCommand(value);
     } else if (id.startsWith("group-")) {
       mapperView.selectGroup();
+      Controller controller = deviceControllers.get(deviceIndex);
+      MidiConfiguration configuration = (MidiConfiguration) controller.getConfiguration();
+      if (id.equals("group-index")) {
+        Integer integerValue = Utils.parseInteger(value, 0, 100, null);
+        if (integerValue != null) {
+          configuration.putGroupIndex(shortMessage, integerValue);
+        }
+      } else {
+        configuration.putGroupLabel(shortMessage, value);
+      }
     } else if (id.startsWith("sound-")) {
       mapperView.selectSound();
     }
@@ -78,13 +89,15 @@ public class MapperController extends ControllerTask {
       }
     }
     mapperView.renderDeviceList(deviceControllers);
-    mapperView.renderMessageDetails("NONE", 0, 0, 0);
+    if (deviceControllers.size() > 0) {
+      doClick("device-" + deviceControllers.firstKey());
+    }
   }
 
   private void configureCommand(String value) {
     mapperView.selectCommand();
     Controller controller = deviceControllers.get(deviceIndex);
-    Configuration configuration = controller.getConfiguration();
+    MidiConfiguration configuration = (MidiConfiguration) controller.getConfiguration();
     Mapping mapping = Mapping.valueOf(value);
     switch (mapping) {
     case BACKGROUND_DECREASE_VELOCITY:

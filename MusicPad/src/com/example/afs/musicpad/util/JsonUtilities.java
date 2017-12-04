@@ -11,6 +11,7 @@ package com.example.afs.musicpad.util;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -21,7 +22,11 @@ import com.google.gson.JsonIOException;
 import com.google.gson.stream.JsonReader;
 
 public class JsonUtilities {
-  private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+
+  private static final Gson GSON = new GsonBuilder() //
+      .setPrettyPrinting() //
+      .enableComplexMapKeySerialization() //
+      .create();
 
   public static <T> T fromJson(String json, Class<T> classOfT) {
     T object = GSON.fromJson(json, classOfT);
@@ -42,6 +47,10 @@ public class JsonUtilities {
   public static String toJson(Object object) {
     String json = GSON.toJson(object);
     return json;
+  }
+
+  public static void toJsonFile(File file, Object value) {
+    toJsonFile(file.getPath(), value);
   }
 
   public static <T> void toJsonFile(String filename, T value) {

@@ -42,6 +42,31 @@ public class Utils {
     return name;
   }
 
+  public static int parseInt(String value, int defaultValue) {
+    int intValue;
+    try {
+      intValue = Integer.parseInt(value);
+    } catch (NumberFormatException e) {
+      intValue = defaultValue;
+    }
+    return intValue;
+  }
+
+  public static Integer parseInteger(String value, int minimum, int maximum, Integer defaultIntegerValue) {
+    Integer integerValue;
+    try {
+      int intValue = Integer.parseInt(value);
+      if (intValue >= minimum && intValue <= maximum) {
+        integerValue = intValue;
+      } else {
+        integerValue = defaultIntegerValue;
+      }
+    } catch (NumberFormatException e) {
+      integerValue = null;
+    }
+    return integerValue;
+  }
+
   public static String toMixedCase(String text) {
     boolean capitalize = true;
     StringBuilder s = new StringBuilder();

@@ -305,6 +305,7 @@ public class DeviceHandler extends ServiceTask {
     if (channel == Midi.DRUM) {
       selectProgram(-1);
     } else {
+      // TODO: Determine how song can be null at this point
       Set<Integer> programs = song.getPrograms(channel);
       if (programs.size() > 0) {
         int program = programs.iterator().next();

@@ -9,15 +9,10 @@
 
 package com.example.afs.musicpad.device.midi;
 
-import java.io.File;
-import java.io.InputStream;
-
 import com.example.afs.musicpad.device.common.Configuration;
 import com.example.afs.musicpad.device.common.Controller;
 import com.example.afs.musicpad.device.common.DeviceHandler;
 import com.example.afs.musicpad.task.MessageBroker;
-import com.example.afs.musicpad.util.FileUtilities;
-import com.example.afs.musicpad.util.JsonUtilities;
 
 public class MidiController implements Controller {
 
@@ -28,9 +23,8 @@ public class MidiController implements Controller {
 
   public MidiController(DeviceHandler deviceHandler, MidiDeviceBundle midiDeviceBundle) {
     this.midiDeviceBundle = midiDeviceBundle;
-    //configuration = initializeConfiguration(deviceHandler.getBroker(), deviceHandler.getDeviceIndex());
     MessageBroker broker = deviceHandler.tsGetBroker();
-    configuration = new BeatStepConfiguration(broker, deviceHandler.tsGetDeviceIndex());
+    configuration = MidiConfiguration.readConfiguration(midiDeviceBundle.getType());
     midiReader = new MidiReader(broker, deviceHandler, midiDeviceBundle, configuration);
     midiWriter = new MidiWriter(broker, midiDeviceBundle, configuration, deviceHandler.tsGetDeviceIndex());
   }
@@ -55,27 +49,6 @@ public class MidiController implements Controller {
   public void terminate() {
     midiReader.terminate();
     midiWriter.tsTerminate();
-  }
-
-  private MidiConfiguration initializeConfiguration(MessageBroker broker, int deviceIndex) {
-    String home = System.getProperty("user.home");
-    String type = midiDeviceBundle.getType();
-    String fileName = type + ".configuration";
-    String overridePathName = home + File.separatorChar + ".musicpad" + File.separatorChar + fileName;
-    File configurationFile = new File(overridePathName);
-    if (configurationFile.isFile() && configurationFile.canRead()) {
-      String contents = FileUtilities.read(fileName);
-      MidiConfiguration configuration = JsonUtilities.fromJson(contents, MidiConfiguration.class);
-      return configuration;
-    }
-    InputStream inputStream = getClass().getClassLoader().getResourceAsStream(fileName);
-    if (inputStream != null) {
-      String contents = FileUtilities.read(inputStream);
-      MidiConfiguration configuration = JsonUtilities.fromJson(contents, MidiConfiguration.class);
-      return configuration;
-    }
-    System.out.println("Cannot find configuration for " + type + ", using default");
-    return new MidiConfiguration(broker, deviceIndex);
   }
 
 }
