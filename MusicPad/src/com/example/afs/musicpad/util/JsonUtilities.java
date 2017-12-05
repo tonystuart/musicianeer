@@ -15,10 +15,13 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.lang.reflect.Type;
+import java.util.Map;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonIOException;
+import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 
 public class JsonUtilities {
@@ -28,10 +31,18 @@ public class JsonUtilities {
       .enableComplexMapKeySerialization() //
       .create();
 
+  private static final Type MAP_TYPE = new TypeToken<Map<String, String>>() {
+  }.getType();
+
   public static <T> T fromJson(String json, Class<T> classOfT) {
     T object = GSON.fromJson(json, classOfT);
     return object;
 
+  }
+
+  public static <T> T fromJson(String json, Type type) {
+    T object = GSON.fromJson(json, type);
+    return object;
   }
 
   public static <T> T fromJsonFile(String filename, Class<T> classOfT) {
@@ -59,6 +70,11 @@ public class JsonUtilities {
     } catch (JsonIOException | IOException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  public static Map<String, String> toMap(String value) {
+    Map<String, String> map = JsonUtilities.fromJson(value, MAP_TYPE);
+    return map;
   }
 
 }

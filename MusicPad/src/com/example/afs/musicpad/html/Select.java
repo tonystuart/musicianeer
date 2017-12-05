@@ -9,6 +9,8 @@
 
 package com.example.afs.musicpad.html;
 
+// NB: Select and Input cannot be derived from a common Field based class because Select is a Parent
+
 public class Select extends Parent {
 
   public Select(String... properties) {
@@ -20,16 +22,19 @@ public class Select extends Parent {
     return (Select) super.add(child);
   }
 
-  public Select addChangeHandler() {
-    if (getId() == null) {
-      throw new IllegalStateException();
-    }
-    setProperty("onclick", "musicPad.onInput(event, this.value)");
+  public Select required() {
+    setProperty("required");
     return this;
   }
 
-  public void setValue(String value) {
+  public Select setName(Object name) {
+    setProperty("name", name);
+    return this;
+  }
+
+  public Select setValue(String value) {
     setProperty("value", value);
+    return this;
   }
 
 }

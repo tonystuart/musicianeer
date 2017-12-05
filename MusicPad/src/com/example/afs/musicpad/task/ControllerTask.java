@@ -34,11 +34,17 @@ public abstract class ControllerTask extends ServiceTask {
     this.webApp = webApp;
   }
 
-  protected abstract void doClick(String id);
+  protected void doClick(String id) {
+  }
 
-  protected abstract void doInput(String id, String value);
+  protected void doInput(String id, String value) {
+  }
 
-  protected abstract void doLoad();
+  protected void doLoad() {
+  }
+
+  protected void doSubmit(String id, String value) {
+  }
 
   private void doBrowserEvent(OnBrowserEvent message) {
     switch (message.getAction()) {
@@ -50,6 +56,9 @@ public abstract class ControllerTask extends ServiceTask {
       break;
     case INPUT:
       doInput(message.getId(), message.getValue());
+      break;
+    case SUBMIT:
+      doSubmit(message.getId(), message.getValue());
       break;
     default:
       throw new UnsupportedOperationException();

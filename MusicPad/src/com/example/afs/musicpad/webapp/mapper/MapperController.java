@@ -9,6 +9,7 @@
 
 package com.example.afs.musicpad.webapp.mapper;
 
+import java.util.Map;
 import java.util.NavigableMap;
 import java.util.NavigableSet;
 import java.util.TreeMap;
@@ -19,6 +20,8 @@ import com.example.afs.musicpad.Command;
 import com.example.afs.musicpad.DeviceCommand;
 import com.example.afs.musicpad.device.common.Controller;
 import com.example.afs.musicpad.device.midi.MidiConfiguration;
+import com.example.afs.musicpad.device.midi.MidiConfiguration.GroupLabelledIndex;
+import com.example.afs.musicpad.device.midi.MidiConfiguration.SoundLabelledIndex;
 import com.example.afs.musicpad.device.midi.MidiController;
 import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnDeviceCommand;
@@ -29,7 +32,7 @@ import com.example.afs.musicpad.service.DeviceControllerService;
 import com.example.afs.musicpad.service.Services;
 import com.example.afs.musicpad.task.ControllerTask;
 import com.example.afs.musicpad.task.MessageBroker;
-import com.example.afs.musicpad.webapp.karaoke.Utils;
+import com.example.afs.musicpad.util.JsonUtilities;
 import com.example.afs.musicpad.webapp.mapper.MapperView.Mapping;
 
 public class MapperController extends ControllerTask {
@@ -56,28 +59,6 @@ public class MapperController extends ControllerTask {
   }
 
   @Override
-  protected void doInput(String id, String value) {
-    System.out.println("id=" + id + ", value=" + value);
-    if (id.equals("command")) {
-      configureCommand(value);
-    } else if (id.startsWith("group-")) {
-      mapperView.selectGroup();
-      Controller controller = deviceControllers.get(deviceIndex);
-      MidiConfiguration configuration = (MidiConfiguration) controller.getConfiguration();
-      if (id.equals("group-index")) {
-        Integer integerValue = Utils.parseInteger(value, 0, 100, null);
-        if (integerValue != null) {
-          configuration.putGroupIndex(shortMessage, integerValue);
-        }
-      } else {
-        configuration.putGroupLabel(shortMessage, value);
-      }
-    } else if (id.startsWith("sound-")) {
-      mapperView.selectSound();
-    }
-  }
-
-  @Override
   protected void doLoad() {
     // Defer processing that could send shadow update messages until here
     addShadowUpdate(new OnShadowUpdate(Action.REPLACE_CHILDREN, "body", mapperView.render()));
@@ -94,10 +75,23 @@ public class MapperController extends ControllerTask {
     }
   }
 
+  @Override
+  protected void doSubmit(String id, String value) {
+    System.out.println("id=" + id + ", value=" + value);
+    if (id.equals("command")) {
+      Map<String, String> map = JsonUtilities.toMap(value);
+      configureCommand(map.get("output"));
+    } else if (id.equals("group")) {
+      Map<String, String> map = JsonUtilities.toMap(value);
+      getConfiguration().put(shortMessage, new GroupLabelledIndex(map.get("group-label"), Integer.parseInt(map.get("group-index"))));
+    } else if (id.equals("sound")) {
+      Map<String, String> map = JsonUtilities.toMap(value);
+      getConfiguration().put(shortMessage, new SoundLabelledIndex(map.get("sound-label"), Integer.parseInt(map.get("sound-index"))));
+    }
+  }
+
   private void configureCommand(String value) {
-    mapperView.selectCommand();
-    Controller controller = deviceControllers.get(deviceIndex);
-    MidiConfiguration configuration = (MidiConfiguration) controller.getConfiguration();
+    MidiConfiguration configuration = getConfiguration();
     Mapping mapping = Mapping.valueOf(value);
     switch (mapping) {
     case BACKGROUND_DECREASE_VELOCITY:
@@ -241,6 +235,12 @@ public class MapperController extends ControllerTask {
         break;
       }
     }
+  }
+
+  private MidiConfiguration getConfiguration() {
+    Controller controller = deviceControllers.get(deviceIndex);
+    MidiConfiguration configuration = (MidiConfiguration) controller.getConfiguration();
+    return configuration;
   }
 
 }

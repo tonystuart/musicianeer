@@ -28,6 +28,12 @@ public class MidiConfiguration extends Configuration {
     SELECTED, ACTIVE, INACTIVE
   }
 
+  public static class GroupLabelledIndex extends LabelledIndex {
+    public GroupLabelledIndex(String label, int index) {
+      super(label, index);
+    }
+  }
+
   public static class InputMessage {
 
     private int command;
@@ -93,54 +99,80 @@ public class MidiConfiguration extends Configuration {
 
   }
 
+  public static class LabelledIndex {
+    private String label;
+    private int index;
+
+    public LabelledIndex(String label, int index) {
+      this.label = label;
+      this.index = index;
+    }
+
+    public int getIndex() {
+      return index;
+    }
+
+    public String getLabel() {
+      return label;
+    }
+
+    @Override
+    public String toString() {
+      return "LabelledIndex [label=" + label + ", index=" + index + "]";
+    }
+
+  }
+
   public static class OutputMessage {
     private Command command;
     private DeviceCommand deviceCommand;
-    private Integer groupIndex;
-    private String groupLabel;
-
-    public OutputMessage() {
-    }
+    private GroupLabelledIndex group;
+    private SoundLabelledIndex sound;
 
     public OutputMessage(Command command) {
       this.command = command;
+    }
+
+    public OutputMessage(Command command, DeviceCommand deviceCommand, GroupLabelledIndex group, SoundLabelledIndex sound) {
+      this.command = command;
+      this.deviceCommand = deviceCommand;
+      this.group = group;
+      this.sound = sound;
     }
 
     public OutputMessage(DeviceCommand deviceCommand) {
       this.deviceCommand = deviceCommand;
     }
 
-    public Integer getGroupIndex() {
-      return groupIndex;
+    public OutputMessage(GroupLabelledIndex group) {
+      this.group = group;
     }
 
-    public String getGroupLabel() {
-      return groupLabel;
+    public OutputMessage(SoundLabelledIndex sound) {
+      this.sound = sound;
     }
 
-    public Object getValue() {
-      Object value;
-      if (command != null) {
-        value = command;
-      } else if (deviceCommand != null) {
-        value = deviceCommand;
-      } else {
-        throw new IllegalStateException();
-      }
-      return value;
+    public Command getCommand() {
+      return command;
     }
 
-    public void setGroupIndex(Integer groupIndex) {
-      this.groupIndex = groupIndex;
+    public DeviceCommand getDeviceCommand() {
+      return deviceCommand;
     }
 
-    public void setGroupLabel(String groupLabel) {
-      this.groupLabel = groupLabel;
+    public GroupLabelledIndex getGroup() {
+      return group;
     }
 
-    @Override
-    public String toString() {
-      return "OutputMessage [command=" + command + ", deviceCommand=" + deviceCommand + "]";
+    public SoundLabelledIndex getSound() {
+      return sound;
+    }
+
+  }
+
+  public static class SoundLabelledIndex extends LabelledIndex {
+    public SoundLabelledIndex(String label, int index) {
+      super(label, index);
     }
   }
 
@@ -181,8 +213,7 @@ public class MidiConfiguration extends Configuration {
   }
 
   public Object get(ShortMessage shortMessage) {
-    OutputMessage outputMessage = inputMap.get(new InputMessage(shortMessage));
-    return outputMessage == null ? null : outputMessage.getValue();
+    return inputMap.get(new InputMessage(shortMessage));
   }
 
   public String getDeviceType() {
@@ -190,22 +221,20 @@ public class MidiConfiguration extends Configuration {
   }
 
   public void put(ShortMessage shortMessage, Command command) {
-    inputMap.put(new InputMessage(shortMessage), new OutputMessage(command));
-    writeConfiguration();
+    put(shortMessage, new OutputMessage(command));
   }
 
   public void put(ShortMessage shortMessage, DeviceCommand deviceCommand) {
-    inputMap.put(new InputMessage(shortMessage), new OutputMessage(deviceCommand));
+    put(shortMessage, new OutputMessage(deviceCommand));
+  }
+
+  public void put(ShortMessage shortMessage, GroupLabelledIndex groupLabelledIndex) {
+    put(shortMessage, new OutputMessage(groupLabelledIndex));
     writeConfiguration();
   }
 
-  public void putGroupIndex(ShortMessage shortMessage, int groupIndex) {
-    realizeOutputMessage(shortMessage).setGroupIndex(groupIndex);
-    writeConfiguration();
-  }
-
-  public void putGroupLabel(ShortMessage shortMessage, String groupLabel) {
-    realizeOutputMessage(shortMessage).setGroupLabel(groupLabel);
+  public void put(ShortMessage shortMessage, SoundLabelledIndex soundLabelledIndex) {
+    put(shortMessage, new OutputMessage(soundLabelledIndex));
     writeConfiguration();
   }
 
@@ -217,14 +246,9 @@ public class MidiConfiguration extends Configuration {
     System.out.println("Updating configuration for " + deviceType);
   }
 
-  private OutputMessage realizeOutputMessage(ShortMessage shortMessage) {
-    InputMessage key = new InputMessage(shortMessage);
-    OutputMessage outputMessage = inputMap.get(key);
-    if (outputMessage == null) {
-      outputMessage = new OutputMessage();
-      inputMap.put(key, outputMessage);
-    }
-    return outputMessage;
+  private void put(ShortMessage shortMessage, OutputMessage outputMessage) {
+    inputMap.put(new InputMessage(shortMessage), outputMessage);
+    writeConfiguration();
   }
 
 }

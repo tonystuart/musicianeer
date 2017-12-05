@@ -9,32 +9,18 @@
 
 package com.example.afs.musicpad.html;
 
-public class Input extends Element {
+public class Form extends Parent {
 
-  public Input(String... properties) {
-    super("input", properties);
+  public Form(String... properties) {
+    super("form", properties);
   }
 
-  public Input addInputHandler() {
+  public Form addSubmitHandler() {
     if (getId() == null) {
       throw new IllegalStateException();
     }
-    setProperty("oninput", "musicPad.onInput(event, this.value)");
+    setProperty("onsubmit", "musicPad.onSubmit(event)");
     return this;
   }
 
-  public Input required() {
-    setProperty("required");
-    return this;
-  }
-
-  public Input setName(Object name) {
-    setProperty("name", name);
-    return this;
-  }
-
-  public Input setValue(Object value) {
-    setProperty("value", value);
-    return this;
-  }
 }

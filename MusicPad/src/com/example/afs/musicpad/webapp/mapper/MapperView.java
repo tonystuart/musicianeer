@@ -122,7 +122,8 @@ public class MapperView extends ShadowDom {
 
   private Select createMapping() {
     return new Select("#command") //
-        .addChangeHandler() //
+        .setName("output") //
+        .required() //
         .add(optionGroup("Player Settings") //
             .add(option("Select Instrument", Mapping.PLAYER_SELECT_PROGRAM)) //
             .add(option("Previous Instrument", Mapping.PLAYER_PREVIOUS_PROGRAM)) //
@@ -185,39 +186,49 @@ public class MapperView extends ShadowDom {
         .add(fieldSet("#output") //
             .add(legend() //
                 .add(text("Output"))) //
-            .add(fieldSet() //
-                .add(legend() //
-                    .add(label() //
-                        .add(radio("#output-command") //
-                            .setName("output-type")) //
-                        .add(text("&nbsp;Command&nbsp;")))) //
-                .add(createMapping())) //
-            .add(fieldSet("#group") //
-                .add(legend() //
-                    .add(label() //
-                        .add(radio("#output-group") //
-                            .setName("output-type")) //
-                        .add(text("&nbsp;Group&nbsp;")))) //
-                .add(text("Index")) //
-                .add(numberInput("#group-index") //
-                    .setMinimum(0) //
-                    .addInputHandler()) //
-                .add(text("Label")) //
-                .add(textInput("#group-label") //
-                    .addInputHandler())) //
-            .add(fieldSet("#sound") //
-                .add(legend() //
-                    .add(label() //
-                        .add(radio("#output-sound") //
-                            .setName("output-type")) //
-                        .add(text("&nbsp;Sound&nbsp;")))) //
-                .add(text("Index")) //
-                .add(numberInput("#sound-index") //
-                    .setMinimum(0) //
-                    .addInputHandler()) //
-                .add(text("Label")) //
-                .add(textInput("#sound-label") //
-                    .addInputHandler()))) //
+            .add(form("#command") //
+                .addSubmitHandler() //
+                .add(fieldSet() //
+                    .add(legend() //
+                        .add(label() //
+                            .add(text("&nbsp;Command&nbsp;")))) //
+                    .add(createMapping()) //
+                    .add(submit() //
+                        .setValue("Set")))) //
+            .add(form("#group") //
+                .addSubmitHandler() //
+                .add(fieldSet() //
+                    .add(legend() //
+                        .add(label() //
+                            .add(text("&nbsp;Group&nbsp;")))) //
+                    .add(text("Index")) //
+                    .add(numberInput() //
+                        .setMinimum(0) //
+                        .setName("group-index") //
+                        .required()) //
+                    .add(text("Label")) //
+                    .add(textInput() //
+                        .setName("group-label") //
+                        .required()) //
+                    .add(submit() //
+                        .setValue("Set")))) //
+            .add(form("#sound") //
+                .addSubmitHandler() //
+                .add(fieldSet() //
+                    .add(legend() //
+                        .add(label() //
+                            .add(text("&nbsp;Sound&nbsp;")))) //
+                    .add(text("Index")) //
+                    .add(numberInput() //
+                        .setMinimum(0) //
+                        .setName("sound-index") //
+                        .required()) //
+                    .add(text("Label")) //
+                    .add(textInput() //
+                        .setName("sound-label") //
+                        .required()) //
+                    .add(submit() //
+                        .setValue("Set"))))) //
     ; //
   }
 

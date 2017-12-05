@@ -79,6 +79,10 @@ public class ShadowDom {
     return null;
   }
 
+  public Form form(String... properties) {
+    return new Form(properties);
+  }
+
   public Element getElementByClassName(String className) {
     Element element;
     Set<Element> elementsWithClass = classes.get(className);
@@ -187,6 +191,10 @@ public class ShadowDom {
   public void setProperty(Element element, String name, Object value) {
     element.setProperty(name, value);
     onSetProperty(element, name, value);
+  }
+
+  public Submit submit(String... properties) {
+    return new Submit(properties);
   }
 
   public Element swapClassName(String id, String className) {

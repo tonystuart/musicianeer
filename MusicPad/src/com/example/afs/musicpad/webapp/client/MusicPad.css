@@ -33,12 +33,15 @@ select {
     color: white;
     background-color: black;
     border: 1px solid white;
-    width: 100%;
+    /* width: 100%; */
+    flex-grow: 1;
 }
 
 fieldset {
 	   color: white;
 	   border: 1px solid white;
+	   /* display: flex; */
+	   /* flex-direction: row; */
 }
 
 .tab {

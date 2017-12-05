@@ -82,6 +82,28 @@ musicPad.onShadowUpdate = function(message) {
     }
 }
 
+musicPad.onSubmit = function(event) {
+    event.preventDefault();
+    let form = event.target.closest('form');
+    if (form) {
+        let fields = form.querySelectorAll('input, select');
+        if (fields) {
+            let values = {};
+            for (let field of fields) {
+                if (field.name) {
+                    values[field.name] = field.value;
+                }
+            }
+            musicPad.send(JSON.stringify({
+                type: 'OnBrowserEvent',
+                action: 'SUBMIT',
+                id: form.id,
+                value: JSON.stringify(values)
+            }));
+        }
+    }
+}
+
 musicPad.send = function(json) {
     if (musicPad.connected) {
         musicPad.ws.send(json);
