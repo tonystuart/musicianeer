@@ -9,28 +9,10 @@
 
 package com.example.afs.musicpad.device.common;
 
-public class Configuration {
+public interface Configuration {
 
-  // TODO: Move this implementation to QwertyConfiguration and make this an interface
-  // TODO: Don't expect input codes to be an array, request them one at a time, like legends
+  InputMap getGroupInputMap();
 
-  protected InputMap bankMap = new InputMap("@");
-  protected InputMap noteMap = new InputMap("@");
-
-  public int[] getBankInputCodes() {
-    return bankMap.getInputCodes();
-  }
-
-  public String getBankLegend(int bankIndex) {
-    return bankMap.getLegends()[bankIndex] + "+";
-  }
-
-  public int[] getNoteInputCodes() {
-    return noteMap.getInputCodes();
-  }
-
-  public String getNoteLegend(int noteIndex) {
-    return noteMap.getLegends()[noteIndex];
-  }
+  InputMap getSoundInputMap();
 
 }

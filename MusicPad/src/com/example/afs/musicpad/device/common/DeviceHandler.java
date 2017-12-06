@@ -19,6 +19,7 @@ import com.example.afs.musicpad.message.OnConfigurationChange;
 import com.example.afs.musicpad.message.OnDeviceCommand;
 import com.example.afs.musicpad.message.OnKeyDown;
 import com.example.afs.musicpad.message.OnKeyUp;
+import com.example.afs.musicpad.message.OnRenderSong;
 import com.example.afs.musicpad.message.OnSampleChannel;
 import com.example.afs.musicpad.message.OnSampleSong;
 import com.example.afs.musicpad.midi.Midi;
@@ -32,6 +33,7 @@ import com.example.afs.musicpad.service.BackgroundMuteService;
 import com.example.afs.musicpad.service.DeviceControllerService;
 import com.example.afs.musicpad.service.PlayerDetailService;
 import com.example.afs.musicpad.service.PlayerVelocityService;
+import com.example.afs.musicpad.song.Note;
 import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.task.MessageBroker;
 import com.example.afs.musicpad.task.ServiceTask;
@@ -58,6 +60,7 @@ public class DeviceHandler extends ServiceTask {
     this.deviceIndex = deviceIndex;
     this.player = new Player(synthesizer, deviceIndex);
     subscribe(OnCommand.class, message -> doCommand(message));
+    subscribe(OnRenderSong.class, message -> doRenderSong(message));
     subscribe(OnSampleSong.class, message -> doSampleSong(message));
     subscribe(OnSampleChannel.class, message -> doSampleChannel(message));
     subscribe(OnDeviceCommand.class, message -> doDeviceCommand(message));
@@ -101,25 +104,21 @@ public class DeviceHandler extends ServiceTask {
   }
 
   private void createPlayableMap() {
-    playableMap = new PlayableMap(controller.getConfiguration(), song.getChannelNotes(channel), player.getOutputType());
+    InputMap groupInputMap = controller.getConfiguration().getGroupInputMap();
+    InputMap soundInputMap = controller.getConfiguration().getSoundInputMap();
+    Iterable<Note> channelNotes = song.getChannelNotes(channel);
+    playableMap = new PlayableMap(groupInputMap, soundInputMap, channelNotes, player.getOutputType());
   }
 
   private void doCommand(OnCommand message) {
     Command command = message.getCommand();
     int parameter = message.getParameter();
     switch (command) {
-    case PLAY:
-      player.setEnabled(true);
-      break;
     case RESET:
       doReset();
       break;
     case SET_TEMPO:
       player.setPercentTempo(parameter);
-      break;
-    case STOP:
-      // TODO: Consider making explicit
-      player.setEnabled(true);
       break;
     default:
       break;
@@ -243,6 +242,10 @@ public class DeviceHandler extends ServiceTask {
       }
       selectProgram(nextProgram);
     }
+  }
+
+  private void doRenderSong(OnRenderSong message) {
+    player.setEnabled(true);
   }
 
   private void doReset() {

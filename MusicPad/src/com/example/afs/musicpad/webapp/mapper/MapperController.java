@@ -14,14 +14,15 @@ import java.util.NavigableMap;
 import java.util.NavigableSet;
 import java.util.TreeMap;
 
+import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.ShortMessage;
 
 import com.example.afs.musicpad.Command;
 import com.example.afs.musicpad.DeviceCommand;
 import com.example.afs.musicpad.device.common.Controller;
 import com.example.afs.musicpad.device.midi.MidiConfiguration;
-import com.example.afs.musicpad.device.midi.MidiConfiguration.GroupLabelledIndex;
-import com.example.afs.musicpad.device.midi.MidiConfiguration.SoundLabelledIndex;
+import com.example.afs.musicpad.device.midi.MidiConfiguration.GroupInputCode;
+import com.example.afs.musicpad.device.midi.MidiConfiguration.SoundInputCode;
 import com.example.afs.musicpad.device.midi.MidiController;
 import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnDeviceCommand;
@@ -83,10 +84,22 @@ public class MapperController extends ControllerTask {
       configureCommand(map.get("output"));
     } else if (id.equals("group")) {
       Map<String, String> map = JsonUtilities.toMap(value);
-      getConfiguration().put(shortMessage, new GroupLabelledIndex(map.get("group-label"), Integer.parseInt(map.get("group-index"))));
+      String label = map.get("group-label");
+      int inputCode = Integer.parseInt(map.get("group-index"));
+      GroupInputCode groupInputCode = new GroupInputCode(label, inputCode);
+      getConfiguration().put(shortMessage, groupInputCode);
+      if (shortMessage.getCommand() == ShortMessage.NOTE_ON) {
+        getConfiguration().put(getNoteOff(shortMessage), groupInputCode);
+      }
     } else if (id.equals("sound")) {
       Map<String, String> map = JsonUtilities.toMap(value);
-      getConfiguration().put(shortMessage, new SoundLabelledIndex(map.get("sound-label"), Integer.parseInt(map.get("sound-index"))));
+      String label = map.get("sound-label");
+      int inputCode = Integer.parseInt(map.get("sound-index"));
+      SoundInputCode soundInputCode = new SoundInputCode(label, inputCode);
+      getConfiguration().put(shortMessage, soundInputCode);
+      if (shortMessage.getCommand() == ShortMessage.NOTE_ON) {
+        getConfiguration().put(getNoteOff(shortMessage), soundInputCode);
+      }
     }
   }
 
@@ -206,7 +219,7 @@ public class MapperController extends ControllerTask {
 
   private void doShortMessage(OnShortMessage message) {
     if (message.getDeviceIndex() == deviceIndex) {
-      shortMessage = message.getShortMessage();
+      ShortMessage shortMessage = message.getShortMessage();
       int command = shortMessage.getCommand();
       int channel = shortMessage.getChannel();
       int data1 = shortMessage.getData1();
@@ -215,23 +228,26 @@ public class MapperController extends ControllerTask {
       case ShortMessage.NOTE_OFF:
         break;
       case ShortMessage.NOTE_ON:
+        this.shortMessage = shortMessage;
         mapperView.renderMessageDetails("NOTE_ON", channel, data1, data2);
         break;
       case ShortMessage.POLY_PRESSURE:
         break;
       case ShortMessage.CONTROL_CHANGE:
+        this.shortMessage = shortMessage;
         mapperView.renderMessageDetails("CONTROL_CHANGE", channel, data1, data2);
         break;
       case ShortMessage.PROGRAM_CHANGE:
+        this.shortMessage = shortMessage;
         mapperView.renderMessageDetails("PROGRAM_CHANGE", channel, data1, data2);
         break;
       case ShortMessage.CHANNEL_PRESSURE:
         break;
       case ShortMessage.PITCH_BEND:
+        this.shortMessage = shortMessage;
         mapperView.renderMessageDetails("PITCH_BEND", channel, data1, data2);
         break;
       default:
-        mapperView.renderMessageDetails("COMMAND_" + command, channel, data1, data2);
         break;
       }
     }
@@ -241,6 +257,14 @@ public class MapperController extends ControllerTask {
     Controller controller = deviceControllers.get(deviceIndex);
     MidiConfiguration configuration = (MidiConfiguration) controller.getConfiguration();
     return configuration;
+  }
+
+  private ShortMessage getNoteOff(ShortMessage shortMessage) {
+    try {
+      return new ShortMessage(ShortMessage.NOTE_OFF, shortMessage.getChannel(), shortMessage.getData1(), shortMessage.getData2());
+    } catch (InvalidMidiDataException e) {
+      throw new RuntimeException(e);
+    }
   }
 
 }

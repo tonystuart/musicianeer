@@ -11,30 +11,55 @@ package com.example.afs.musicpad.device.midi;
 
 import java.io.File;
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.NavigableMap;
+import java.util.TreeMap;
 
 import javax.sound.midi.ShortMessage;
 
 import com.example.afs.musicpad.Command;
 import com.example.afs.musicpad.DeviceCommand;
 import com.example.afs.musicpad.device.common.Configuration;
+import com.example.afs.musicpad.device.common.InputMap;
 import com.example.afs.musicpad.util.FileUtilities;
 import com.example.afs.musicpad.util.JsonUtilities;
 
-public class MidiConfiguration extends Configuration {
+public class MidiConfiguration implements Configuration {
 
   public enum ChannelState {
     SELECTED, ACTIVE, INACTIVE
   }
 
-  public static class GroupLabelledIndex extends LabelledIndex {
-    public GroupLabelledIndex(String label, int index) {
-      super(label, index);
+  public static class GroupInputCode extends InputCode {
+    public GroupInputCode(String label, int inputCode) {
+      super(label, inputCode);
     }
   }
 
-  public static class InputMessage {
+  public static class InputCode {
+    private String label;
+    private int inputCode;
+
+    public InputCode(String label, int inputCode) {
+      this.label = label;
+      this.inputCode = inputCode;
+    }
+
+    public int getInputCode() {
+      return inputCode;
+    }
+
+    public String getLabel() {
+      return label;
+    }
+
+    @Override
+    public String toString() {
+      return "LabelledIndex [label=" + label + ", inputCode=" + inputCode + "]";
+    }
+
+  }
+
+  public static class InputMessage implements Comparable<InputMessage> {
 
     private int command;
     private int channel;
@@ -44,6 +69,20 @@ public class MidiConfiguration extends Configuration {
       command = shortMessage.getCommand();
       channel = shortMessage.getChannel();
       control = shortMessage.getData1();
+    }
+
+    @Override
+    public int compareTo(InputMessage that) {
+      int relation = this.command - that.command;
+      if (relation != 0) {
+        return relation;
+      }
+      relation = this.channel - that.channel;
+      if (relation != 0) {
+        return relation;
+      }
+      relation = this.control - that.control;
+      return relation;
     }
 
     @Override
@@ -99,41 +138,17 @@ public class MidiConfiguration extends Configuration {
 
   }
 
-  public static class LabelledIndex {
-    private String label;
-    private int index;
-
-    public LabelledIndex(String label, int index) {
-      this.label = label;
-      this.index = index;
-    }
-
-    public int getIndex() {
-      return index;
-    }
-
-    public String getLabel() {
-      return label;
-    }
-
-    @Override
-    public String toString() {
-      return "LabelledIndex [label=" + label + ", index=" + index + "]";
-    }
-
-  }
-
   public static class OutputMessage {
     private Command command;
     private DeviceCommand deviceCommand;
-    private GroupLabelledIndex group;
-    private SoundLabelledIndex sound;
+    private GroupInputCode group;
+    private SoundInputCode sound;
 
     public OutputMessage(Command command) {
       this.command = command;
     }
 
-    public OutputMessage(Command command, DeviceCommand deviceCommand, GroupLabelledIndex group, SoundLabelledIndex sound) {
+    public OutputMessage(Command command, DeviceCommand deviceCommand, GroupInputCode group, SoundInputCode sound) {
       this.command = command;
       this.deviceCommand = deviceCommand;
       this.group = group;
@@ -144,11 +159,11 @@ public class MidiConfiguration extends Configuration {
       this.deviceCommand = deviceCommand;
     }
 
-    public OutputMessage(GroupLabelledIndex group) {
+    public OutputMessage(GroupInputCode group) {
       this.group = group;
     }
 
-    public OutputMessage(SoundLabelledIndex sound) {
+    public OutputMessage(SoundInputCode sound) {
       this.sound = sound;
     }
 
@@ -160,19 +175,24 @@ public class MidiConfiguration extends Configuration {
       return deviceCommand;
     }
 
-    public GroupLabelledIndex getGroup() {
+    public GroupInputCode getGroup() {
       return group;
     }
 
-    public SoundLabelledIndex getSound() {
+    public SoundInputCode getSound() {
       return sound;
+    }
+
+    @Override
+    public String toString() {
+      return "OutputMessage [command=" + command + ", deviceCommand=" + deviceCommand + ", group=" + group + ", sound=" + sound + "]";
     }
 
   }
 
-  public static class SoundLabelledIndex extends LabelledIndex {
-    public SoundLabelledIndex(String label, int index) {
-      super(label, index);
+  public static class SoundInputCode extends InputCode {
+    public SoundInputCode(String label, int inputCode) {
+      super(label, inputCode);
     }
   }
 
@@ -206,18 +226,50 @@ public class MidiConfiguration extends Configuration {
   }
 
   private String deviceType;
-  private Map<InputMessage, OutputMessage> inputMap = new HashMap<>();
+  private transient InputMap groupInputMap;
+  private transient InputMap soundInputMap;
+  private NavigableMap<InputMessage, OutputMessage> inputMap = new TreeMap<>();
 
   public MidiConfiguration(String deviceType) {
     this.deviceType = deviceType;
   }
 
-  public Object get(ShortMessage shortMessage) {
+  public OutputMessage get(ShortMessage shortMessage) {
     return inputMap.get(new InputMessage(shortMessage));
   }
 
   public String getDeviceType() {
     return deviceType;
+  }
+
+  @Override
+  public InputMap getGroupInputMap() {
+    if (groupInputMap == null) {
+      TreeMap<Integer, String> map = new TreeMap<>();
+      for (OutputMessage outputMessage : inputMap.values()) {
+        GroupInputCode group = outputMessage.getGroup();
+        if (group != null) {
+          map.put(group.getInputCode(), group.getLabel());
+        }
+      }
+      groupInputMap = new InputMap(map);
+    }
+    return groupInputMap;
+  }
+
+  @Override
+  public InputMap getSoundInputMap() {
+    if (soundInputMap == null) {
+      TreeMap<Integer, String> map = new TreeMap<>();
+      for (OutputMessage outputMessage : inputMap.values()) {
+        SoundInputCode sound = outputMessage.getSound();
+        if (sound != null) {
+          map.put(sound.getInputCode(), sound.getLabel());
+        }
+      }
+      soundInputMap = new InputMap(map);
+    }
+    return soundInputMap;
   }
 
   public void put(ShortMessage shortMessage, Command command) {
@@ -228,14 +280,21 @@ public class MidiConfiguration extends Configuration {
     put(shortMessage, new OutputMessage(deviceCommand));
   }
 
-  public void put(ShortMessage shortMessage, GroupLabelledIndex groupLabelledIndex) {
-    put(shortMessage, new OutputMessage(groupLabelledIndex));
+  public void put(ShortMessage shortMessage, GroupInputCode groupInputCode) {
+    groupInputMap = null;
+    put(shortMessage, new OutputMessage(groupInputCode));
     writeConfiguration();
   }
 
-  public void put(ShortMessage shortMessage, SoundLabelledIndex soundLabelledIndex) {
-    put(shortMessage, new OutputMessage(soundLabelledIndex));
+  public void put(ShortMessage shortMessage, SoundInputCode soundInputCode) {
+    soundInputMap = null;
+    put(shortMessage, new OutputMessage(soundInputCode));
     writeConfiguration();
+  }
+
+  @Override
+  public String toString() {
+    return "MidiConfiguration [deviceType=" + deviceType + ", inputMap=" + inputMap + "]";
   }
 
   public void writeConfiguration() {

@@ -18,6 +18,9 @@ import javax.sound.midi.ShortMessage;
 import com.example.afs.musicpad.Command;
 import com.example.afs.musicpad.DeviceCommand;
 import com.example.afs.musicpad.device.common.DeviceHandler;
+import com.example.afs.musicpad.device.midi.MidiConfiguration.GroupInputCode;
+import com.example.afs.musicpad.device.midi.MidiConfiguration.OutputMessage;
+import com.example.afs.musicpad.device.midi.MidiConfiguration.SoundInputCode;
 import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnDeviceCommand;
 import com.example.afs.musicpad.message.OnShortMessage;
@@ -99,7 +102,38 @@ public class MidiReader {
     return s.toString();
   }
 
-  private void processMessage(ShortMessage shortMessage) {
+  private void processMappedMessage(ShortMessage shortMessage, OutputMessage outputMessage) {
+    SoundInputCode soundInputCode = outputMessage.getSound();
+    if (soundInputCode != null) {
+      if (shortMessage.getCommand() == ShortMessage.NOTE_ON) {
+        deviceHandler.tsOnDown(soundInputCode.getInputCode(), shortMessage.getData2());
+      } else {
+        deviceHandler.tsOnUp(soundInputCode.getInputCode());
+      }
+      return;
+    }
+    GroupInputCode groupInputCode = outputMessage.getGroup();
+    if (groupInputCode != null) {
+      if (shortMessage.getCommand() == ShortMessage.NOTE_ON) {
+        deviceHandler.tsOnDown(groupInputCode.getInputCode(), shortMessage.getData2());
+      } else {
+        deviceHandler.tsOnUp(groupInputCode.getInputCode());
+      }
+      return;
+    }
+    Command command = outputMessage.getCommand();
+    if (command != null) {
+      broker.publish(new OnCommand(command, Range.scaleMidiToPercent(shortMessage.getData2())));
+      return;
+    }
+    DeviceCommand deviceCommand = outputMessage.getDeviceCommand();
+    if (deviceCommand != null) {
+      broker.publish(new OnDeviceCommand(deviceCommand, deviceHandler.tsGetDeviceIndex(), Range.scaleMidiToPercent(shortMessage.getData2())));
+      return;
+    }
+  }
+
+  private void processUnmappedMessage(ShortMessage shortMessage) {
     int command = shortMessage.getCommand();
     int data1 = shortMessage.getData1();
     int data2 = shortMessage.getData2();
@@ -129,17 +163,11 @@ public class MidiReader {
     try {
       if (message instanceof ShortMessage) {
         ShortMessage shortMessage = (ShortMessage) message;
-        Object outputMessage = configuration.get(shortMessage);
+        OutputMessage outputMessage = configuration.get(shortMessage);
         if (outputMessage != null) {
-          if (outputMessage instanceof Command) {
-            Command command = (Command) outputMessage;
-            broker.publish(new OnCommand(command, Range.scaleMidiToPercent(shortMessage.getData2())));
-          } else if (outputMessage instanceof DeviceCommand) {
-            DeviceCommand deviceCommand = (DeviceCommand) outputMessage;
-            broker.publish(new OnDeviceCommand(deviceCommand, deviceHandler.tsGetDeviceIndex(), Range.scaleMidiToPercent(shortMessage.getData2())));
-          }
+          processMappedMessage(shortMessage, outputMessage);
         } else {
-          processMessage(shortMessage);
+          processUnmappedMessage(shortMessage);
         }
         broker.publish(new OnShortMessage(deviceHandler.tsGetDeviceIndex(), shortMessage));
       } else {
