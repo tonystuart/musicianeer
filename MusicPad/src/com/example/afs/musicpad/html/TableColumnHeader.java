@@ -9,15 +9,10 @@
 
 package com.example.afs.musicpad.html;
 
-public class TableHeading extends Parent {
+public class TableColumnHeader extends Parent {
 
-  public TableHeading() {
-    super("th");
-  }
-
-  public TableHeading(Object value) {
-    this();
-    appendChild(new TextElement(value.toString()));
+  public TableColumnHeader(String... properties) {
+    super("th", properties);
   }
 
 }

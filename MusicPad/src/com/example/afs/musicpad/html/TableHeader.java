@@ -11,17 +11,8 @@ package com.example.afs.musicpad.html;
 
 public class TableHeader extends Parent {
 
-  private TableRow tableRow;
-
-  public TableHeader() {
-    super("thead");
-    tableRow = new TableRow();
-    appendChild(tableRow);
+  public TableHeader(String... properties) {
+    super("thead", properties);
   }
 
-  public TableHeading append(Object value) {
-    TableHeading tableHeading = new TableHeading(value);
-    tableRow.appendChild(tableHeading);
-    return tableHeading;
-  }
 }

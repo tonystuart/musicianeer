@@ -12,13 +12,21 @@ package com.example.afs.musicpad.message;
 public class OnShadowUpdate extends TypedMessage {
 
   public enum Action {
-    REPLACE_CHILDREN, ADD_CLASS, REMOVE_CLASS, ENSURE_VISIBLE, SET_PROPERTY
+    REPLACE_CHILDREN, ADD_CLASS, REMOVE_CLASS, ENSURE_VISIBLE, SET_PROPERTY, INSERT_ROW
   }
 
+  private int index;
   private String name;
   private Object value;
   private Action action;
   private String selector;
+
+  public OnShadowUpdate(Action action, String selector, int index, String value) {
+    this.action = action;
+    this.selector = selector;
+    this.index = index;
+    this.value = value;
+  }
 
   public OnShadowUpdate(Action action, String selector, Object value) {
     this(action, selector, null, value);
@@ -33,6 +41,10 @@ public class OnShadowUpdate extends TypedMessage {
 
   public Action getAction() {
     return action;
+  }
+
+  public int getIndex() {
+    return index;
   }
 
   public String getName() {

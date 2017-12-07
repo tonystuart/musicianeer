@@ -9,10 +9,10 @@
 
 package com.example.afs.musicpad.html;
 
-public class TableRow extends Parent {
+public class TableBody extends Parent {
 
-  public TableRow(String... properties) {
-    super("tr", properties);
+  public TableBody(String... properties) {
+    super("tbody", properties);
   }
 
 }

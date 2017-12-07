@@ -11,13 +11,8 @@ package com.example.afs.musicpad.html;
 
 public class TableData extends Parent {
 
-  public TableData() {
+  public TableData(String... properties) {
     super("td");
-  }
-
-  public TableData(Object value) {
-    this();
-    appendChild(new TextElement(value.toString()));
   }
 
 }

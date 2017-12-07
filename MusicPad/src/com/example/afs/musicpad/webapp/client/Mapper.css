@@ -1,10 +1,37 @@
 @CHARSET "UTF-8";
 
-.selected-device {
+.selected-mapping {
     color: black;
     background-color: white;
 }
 
 #input {
 	margin-bottom: 20px;
+}
+
+.tab {
+	flex-direction: column;
+}
+table ,tr td{
+    /* border:1px solid red */
+    text-align: center;
+}
+tbody {
+    display:block;
+    height: 500px;
+    overflow:auto;
+    /* flex-grow: 1; */
+}
+thead, tbody tr {
+    display:table;
+    width:100%;
+    table-layout:fixed;/* even columns width , fix width of table too*/
+}
+thead {
+    width: calc( 100% - 1em )/* scrollbar is average 1em/16px width, remove it from thead width */
+}
+table {
+    /* width: 1400px; */
+    flex-grow: 1;
+    border: 1px solid white;
 }

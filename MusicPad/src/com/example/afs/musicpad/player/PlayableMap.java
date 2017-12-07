@@ -136,15 +136,6 @@ public class PlayableMap {
     return playables;
   }
 
-  private int indexOf(int[] array, int inputCode) {
-    for (int i = 0; i < array.length; i++) {
-      if (array[i] == inputCode) {
-        return i;
-      }
-    }
-    return -1;
-  }
-
   private SoundCount[] sortByFrequency(Map<Sound, SoundCount> sounds) {
     int index = 0;
     SoundCount[] sortedSounds = new SoundCount[sounds.size()];

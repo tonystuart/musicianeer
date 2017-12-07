@@ -12,13 +12,19 @@ package com.example.afs.musicpad.webapp.mapper;
 import java.util.Map.Entry;
 import java.util.NavigableMap;
 
+import javax.sound.midi.ShortMessage;
+
 import com.example.afs.musicpad.device.common.Controller;
+import com.example.afs.musicpad.device.midi.MidiConfiguration.InputMessage;
+import com.example.afs.musicpad.device.midi.MidiConfiguration.OutputMessage;
 import com.example.afs.musicpad.html.Division;
 import com.example.afs.musicpad.html.Node;
 import com.example.afs.musicpad.html.Parent;
 import com.example.afs.musicpad.html.Radio;
 import com.example.afs.musicpad.html.Select;
 import com.example.afs.musicpad.html.ShadowDom;
+import com.example.afs.musicpad.html.TableBody;
+import com.example.afs.musicpad.html.TableRow;
 import com.example.afs.musicpad.task.ControllerTask;
 
 public class MapperView extends ShadowDom {
@@ -59,28 +65,46 @@ public class MapperView extends ShadowDom {
     KARAOKE_TYPE_MEASURE, //
   }
 
+  // Device, Channel, Type, Control, Mapping
+  // 
   public MapperView(ControllerTask controllerTask) {
     super(controllerTask);
     add(div("#mapper", ".tab", ".selected-tab") //
-        .add(div(".left") //
-            .add(div(".title") //
-                .add(text("MIDI Input Mapper"))) //
-            .add(div("#mapper-list", ".list") // renderDeviceList
-                .addClickHandler()) //
-            .add(div(".controls") //
-                .add(div("#mapper-1")//
-                    .addClickHandler() //
-                    .add(text("Mapper 1"))) //
-                .add(div("#mapper-2")//
-                    .addClickHandler() //
-                    .add(text("Mapper 2"))) //
-                .add(div("#mapper-3") //
-                    .addClickHandler() //
-                    .add(text("Mapper 3"))))) //
-        .add(div(".right") //
-            .add(div("#message-details", ".details") //
-                .add(div() //
-                    .add(text("Select a MIDI controller on the left, then press, rotate or slide an input on your MIDI controller to configure its action.")))))); //
+        .add(div(".title") //
+            .add(text("MIDI Input Mapper"))) //
+        .add(table("#mapping-table") //
+            .addClickHandler() //
+            .add(thead() //
+                .add(tr() //
+                    .add(th().add(text("Device"))) //
+                    .add(th().add(text("Channel"))) //
+                    .add(th().add(text("Control"))) //
+                    .add(th().add(text("Type"))) //
+                    .add(th().add(text("Mapping"))))) //
+            .add(tbody("#mapping-body"))) //
+        .add(div("#mapping-details", ".details") //
+            .add(div() //
+                .add(text("Press, rotate or slide an input on your MIDI controller to configure its action.")))) //
+
+    ); //
+  }
+
+  public String displayMapping(String deviceType, InputMessage inputMessage, OutputMessage outputMessage) {
+    int channel = inputMessage.getChannel();
+    int control = inputMessage.getControl();
+    int command = inputMessage.getCommand();
+    String id = "mapping-" + deviceType + "-" + channel + "-" + control + "-" + command;
+    TableRow tableRow = (TableRow) tr("#" + id) //
+        .add(td().add(text(deviceType))) //
+        .add(td().add(text(channel))) //
+        .add(td().add(text(control))) //
+        .add(td().add(text(formatCommand(command)))) //
+        .add(td().add(text(formatOutputMessage(outputMessage)))) //
+    ;
+    TableBody tableBody = getElementById("mapping-body");
+    int index = tableBody.getChildCount();
+    insertRow(tableBody, tableRow, index);
+    return id;
   }
 
   public void renderDeviceList(NavigableMap<Integer, Controller> deviceControllers) {
@@ -89,9 +113,9 @@ public class MapperView extends ShadowDom {
     replaceChildren(songListParent, div);
   }
 
-  public void renderMessageDetails(String messageType, int channel, int data1, int data2) {
-    Parent songsRight = getElementById("message-details");
-    replaceChildren(songsRight, createMessageDetails(messageType, channel, data1, data2));
+  public void renderMappingDetails(String messageType, int channel, int data1, int data2) {
+    Parent mappingDetails = getElementById("mapping-details");
+    replaceChildren(mappingDetails, createMappingDetails(messageType, channel, data1, data2));
   }
 
   public void selectCommand() {
@@ -170,66 +194,89 @@ public class MapperView extends ShadowDom {
             .add(option("Play Notes in Measure", Mapping.KARAOKE_TYPE_MEASURE))); //
   }
 
-  private Node createMessageDetails(String messageType, int channel, int data1, int data2) {
-    return div() //
-        .add(fieldSet("#input") //
-            .add(legend() //
-                .add(text("Input")))
-            .add(nameValue("Input", messageType)) //
-            .add(nameValue("Channel", channel)) //
-            .add(nameValue("Data1", data1)) //
-            .add(nameValue("Data2", data2)) //
-            .add(label() // 
-                .add(checkbox("#all-messages") //
-                    .addCheckHandler()) //
-                .add(text("Show all input messages"))))
-        .add(fieldSet("#output") //
-            .add(legend() //
-                .add(text("Output"))) //
-            .add(form("#command") //
-                .addSubmitHandler() //
-                .add(fieldSet() //
-                    .add(legend() //
-                        .add(label() //
-                            .add(text("&nbsp;Command&nbsp;")))) //
-                    .add(createMapping()) //
-                    .add(submit() //
-                        .setValue("Set")))) //
-            .add(form("#group") //
-                .addSubmitHandler() //
-                .add(fieldSet() //
-                    .add(legend() //
-                        .add(label() //
-                            .add(text("&nbsp;Group&nbsp;")))) //
-                    .add(text("Index")) //
-                    .add(numberInput() //
-                        .setMinimum(0) //
-                        .setName("group-index") //
-                        .required()) //
-                    .add(text("Label")) //
-                    .add(textInput() //
-                        .setName("group-label") //
-                        .required()) //
-                    .add(submit() //
-                        .setValue("Set")))) //
-            .add(form("#sound") //
-                .addSubmitHandler() //
-                .add(fieldSet() //
-                    .add(legend() //
-                        .add(label() //
-                            .add(text("&nbsp;Sound&nbsp;")))) //
-                    .add(text("Index")) //
-                    .add(numberInput() //
-                        .setMinimum(0) //
-                        .setName("sound-index") //
-                        .required()) //
-                    .add(text("Label")) //
-                    .add(textInput() //
-                        .setName("sound-label") //
-                        .required()) //
-                    .add(submit() //
-                        .setValue("Set"))))) //
+  private Node createMappingDetails(String messageType, int channel, int data1, int data2) {
+    // NB: fieldset does not support display: flex;
+    // See https://stackoverflow.com/questions/28078681/why-cant-fieldset-be-flex-containers`
+    return div(".row") //
+        .add(form("#command", ".row") //
+            .addSubmitHandler() //
+            .add(fieldSet() //
+                .add(legend() //
+                    .add(label() //
+                        .add(text("&nbsp;Command&nbsp;")))) //
+                .add(createMapping()) //
+                .add(submit() //
+                    .setValue("Set")))) //
+        .add(form("#group", ".row") //
+            .addSubmitHandler() //
+            .add(fieldSet() //
+                .add(legend() //
+                    .add(label() //
+                        .add(text("&nbsp;Group&nbsp;")))) //
+                .add(text("Index")) //
+                .add(numberInput() //
+                    .setMinimum(0) //
+                    .setName("group-index") //
+                    .required()) //
+                .add(text("Label")) //
+                .add(textInput() //
+                    .setName("group-label") //
+                    .required()) //
+                .add(submit() //
+                    .setValue("Set")))) //
+        .add(form("#sound", ".row") //
+            .addSubmitHandler() //
+            .add(fieldSet() //
+                .add(legend() //
+                    .add(label() //
+                        .add(text("&nbsp;Sound&nbsp;")))) //
+                .add(text("Index")) //
+                .add(numberInput() //
+                    .setMinimum(0) //
+                    .setName("sound-index") //
+                    .required()) //
+                .add(text("Label")) //
+                .add(textInput() //
+                    .setName("sound-label") //
+                    .required()) //
+                .add(submit() //
+                    .setValue("Set")))) //
     ; //
+  }
+
+  private String formatCommand(int command) {
+    String s;
+    switch (command) {
+    case ShortMessage.NOTE_OFF:
+      s = "NOTE_OFF";
+      break;
+    case ShortMessage.NOTE_ON:
+      s = "NOTE_ON";
+      break;
+    case ShortMessage.POLY_PRESSURE:
+      s = "POLY_PRESSURE";
+      break;
+    case ShortMessage.CONTROL_CHANGE:
+      s = "CONTROL_CHANGE";
+      break;
+    case ShortMessage.PROGRAM_CHANGE:
+      s = "PROGRAM_CHANGE";
+      break;
+    case ShortMessage.CHANNEL_PRESSURE:
+      s = "CHANNEL_PRESSURE";
+      break;
+    case ShortMessage.PITCH_BEND:
+      s = "PITCH_BEND";
+      break;
+    default:
+      s = "COMMAND_" + command;
+      break;
+    }
+    return s;
+  }
+
+  private String formatOutputMessage(OutputMessage outputMessage) {
+    return outputMessage == null ? "Default" : outputMessage.asString();
   }
 
   private Node option(String text, Mapping mapping) {

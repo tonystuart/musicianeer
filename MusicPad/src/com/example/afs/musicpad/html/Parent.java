@@ -61,6 +61,10 @@ public class Parent extends Element implements Iterable<Node> {
     return childNodes.size();
   }
 
+  public void insertChild(Node newChild, int index) {
+    childNodes.add(index, newChild);
+  }
+
   @Override
   public Iterator<Node> iterator() {
     return childNodes.iterator();

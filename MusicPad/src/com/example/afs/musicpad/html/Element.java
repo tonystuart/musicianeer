@@ -28,6 +28,9 @@ public class Element extends Node {
   protected Element(String type, String[] properties) {
     this(type);
     for (String property : properties) {
+      if (property.length() == 0) {
+        throw new IllegalArgumentException("Empty property string");
+      }
       char firstChar = property.charAt(0);
       if (firstChar == '#') {
         setId(property.substring(1));

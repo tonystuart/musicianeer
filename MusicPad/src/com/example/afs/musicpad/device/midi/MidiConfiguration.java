@@ -44,6 +44,10 @@ public class MidiConfiguration implements Configuration {
       this.inputCode = inputCode;
     }
 
+    public String asString() {
+      return inputCode + " (" + label + ")";
+    }
+
     public int getInputCode() {
       return inputCode;
     }
@@ -73,16 +77,24 @@ public class MidiConfiguration implements Configuration {
 
     @Override
     public int compareTo(InputMessage that) {
-      int relation = this.command - that.command;
-      if (relation != 0) {
-        return relation;
-      }
-      relation = this.channel - that.channel;
+      int relation = this.channel - that.channel;
       if (relation != 0) {
         return relation;
       }
       relation = this.control - that.control;
-      return relation;
+      if (relation != 0) {
+        return relation;
+      }
+      relation = this.command - that.command;
+      if (relation != 0) {
+        if (this.command == ShortMessage.NOTE_ON && that.command == ShortMessage.NOTE_OFF) {
+          relation = -1;
+        } else if (this.command == ShortMessage.NOTE_OFF && that.command == ShortMessage.NOTE_ON) {
+          relation = +1;
+        }
+        return relation;
+      }
+      return 0;
     }
 
     @Override
@@ -165,6 +177,22 @@ public class MidiConfiguration implements Configuration {
 
     public OutputMessage(SoundInputCode sound) {
       this.sound = sound;
+    }
+
+    public String asString() {
+      if (command != null) {
+        return command.name();
+      }
+      if (deviceCommand != null) {
+        return deviceCommand.name();
+      }
+      if (group != null) {
+        return "GROUP " + group.asString();
+      }
+      if (sound != null) {
+        return "SOUND " + sound.asString();
+      }
+      throw new UnsupportedOperationException();
     }
 
     public Command getCommand() {
@@ -255,6 +283,10 @@ public class MidiConfiguration implements Configuration {
       groupInputMap = new InputMap(map);
     }
     return groupInputMap;
+  }
+
+  public NavigableMap<InputMessage, OutputMessage> getInputMap() {
+    return inputMap;
   }
 
   @Override

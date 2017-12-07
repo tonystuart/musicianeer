@@ -22,6 +22,17 @@ musicPad.createWebSocketClient = function(webSocketUrl, onMessageCallback, onClo
     }
 }
 
+musicPad.getScrollParent = function(node) {
+    if (node == null) {
+        return null;
+    }
+    if (node.scrollHeight > node.clientHeight) {
+        return node;
+    } else {
+        return musicPad.getScrollParent(node.parentNode);
+    }
+}
+
 musicPad.onClick = function(event) {
     let id = event.target.id;
     if (!id) {
@@ -48,7 +59,11 @@ musicPad.onShadowUpdate = function(message) {
     let matches = undefined;
     switch (message.action) {
     case 'REPLACE_CHILDREN':
-        musicPad.setElementHtml(message.selector, message.value);
+        matches = document.querySelectorAll(message.selector);
+        for (const match of matches) {
+            match.scrollTop = 0;
+            match.innerHTML = message.value;
+        }
         break;
     case 'ADD_CLASS':
         matches = document.querySelectorAll(message.selector);
@@ -64,11 +79,13 @@ musicPad.onShadowUpdate = function(message) {
         break;
     case 'ENSURE_VISIBLE':
         let element = document.querySelector(message.selector);
-        let grandparent = element.parentElement.parentElement;
-        let midpoint = grandparent.offsetHeight / 2;
-        let elementTop = element.offsetTop - grandparent.offsetTop;
-        if (elementTop < grandparent.scrollTop || (elementTop + element.offsetHeight) > grandparent.scrollTop + grandparent.offsetHeight) {
-            grandparent.scrollTop = elementTop - midpoint;
+        let scrollParent = musicPad.getScrollParent(element);
+        if (scrollParent) {
+            let midpoint = scrollParent.offsetHeight / 2;
+            let elementTop = element.offsetTop - scrollParent.offsetTop;
+            if (elementTop < scrollParent.scrollTop || (elementTop + element.offsetHeight) > scrollParent.scrollTop + scrollParent.offsetHeight) {
+                scrollParent.scrollTop = elementTop - midpoint;
+            }
         }
         break;
     case 'SET_PROPERTY':
@@ -79,6 +96,16 @@ musicPad.onShadowUpdate = function(message) {
             }
         }
         break;
+    case 'INSERT_ROW':
+        matches = document.querySelectorAll(message.selector);
+        for (const match of matches) {
+            let container = document.createElement('tbody');
+            container.innerHTML = message.value;
+            let content = container.firstElementChild;
+            let row = match.insertRow(message.index);
+            row.innerHTML = content.innerHTML;
+            row.id = content.id;
+        }
     }
 }
 
@@ -117,14 +144,6 @@ musicPad.sendCommand = function(command, parameter) {
         command: command,
         parameter: parameter
     }));
-}
-
-musicPad.setElementHtml = function(selector, value) {
-    let elements = document.querySelectorAll(selector);
-    for (const element of elements) {
-        element.scrollTop = 0;
-        element.innerHTML = value;
-    }
 }
 
 musicPad.setElementProperty = function(selector, property, value) {

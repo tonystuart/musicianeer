@@ -52,13 +52,11 @@ public class ShadowDom {
   }
 
   public CheckBox checkbox(String... properties) {
-    CheckBox checkBox = new CheckBox(properties);
-    return checkBox;
+    return new CheckBox(properties);
   }
 
   public Division div(String... properties) {
-    Division division = new Division(properties);
-    return division;
+    return new Division(properties);
   }
 
   public void ensureVisible(Element element) {
@@ -103,9 +101,22 @@ public class ShadowDom {
     return classes.get(className);
   }
 
+  public TableHeader header(String... properties) {
+    return new TableHeader(properties);
+  }
+
+  public void insertRow(Parent table, TableRow tableRow, int index) {
+    insertRow(table, tableRow, index, true);
+  }
+
+  public void insertRow(Parent table, TableRow tableRow, int index, boolean isManageDeep) {
+    addManagedNode(tableRow, isManageDeep);
+    table.insertChild(tableRow, index);
+    onInsertRow(table, tableRow, index);
+  }
+
   public Label label(String... properties) {
-    Label label = new Label(properties);
-    return label;
+    return new Label(properties);
   }
 
   public Legend legend(String... properties) {
@@ -137,8 +148,7 @@ public class ShadowDom {
   }
 
   public PercentRange range(String... properties) {
-    PercentRange percentRange = new PercentRange(properties);
-    return percentRange;
+    return new PercentRange(properties);
   }
 
   public void removeClass(Element element, String className) {
@@ -182,6 +192,10 @@ public class ShadowDom {
     onReplaceChildren(parent, newChild);
   }
 
+  public TableRow row(String... properties) {
+    return new TableRow(properties);
+  }
+
   public Element selectElement(String id, String className) {
     Element newSelection = swapClassName(id, className);
     ensureVisible(newSelection);
@@ -220,6 +234,18 @@ public class ShadowDom {
     }
   }
 
+  public Table table(String... properties) {
+    return new Table(properties);
+  }
+
+  public TableBody tbody(String... properties) {
+    return new TableBody(properties);
+  }
+
+  public TableData td(String... properties) {
+    return new TableData(properties);
+  }
+
   public TextElement text(Object value) {
     return new TextElement(value);
   }
@@ -228,12 +254,28 @@ public class ShadowDom {
     return new TextInput(properties);
   }
 
+  public TableColumnHeader th(String... properties) {
+    return new TableColumnHeader(properties);
+  }
+
+  public TableHeader thead(String... properties) {
+    return new TableHeader(properties);
+  }
+
+  public TableRow tr(String... properties) {
+    return new TableRow(properties);
+  }
+
   protected void onAddClassName(Element element, String className) {
     controllerTask.addShadowUpdate(new OnShadowUpdate(Action.ADD_CLASS, "#" + element.getId(), className));
   }
 
   protected void onEnsureVisible(Element element) {
     controllerTask.addShadowUpdate(new OnShadowUpdate(Action.ENSURE_VISIBLE, "#" + element.getId(), ""));
+  }
+
+  protected void onInsertRow(Parent table, TableRow tableRow, int index) {
+    controllerTask.addShadowUpdate(new OnShadowUpdate(Action.INSERT_ROW, "#" + table.getId(), index, tableRow.render()));
   }
 
   protected void onRemoveClassName(Element element, String className) {

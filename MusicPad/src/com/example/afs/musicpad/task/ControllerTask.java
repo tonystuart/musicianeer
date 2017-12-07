@@ -41,6 +41,7 @@ public abstract class ControllerTask extends ServiceTask {
   }
 
   protected void doLoad() {
+    // Defer processing that could send shadow update messages until here
   }
 
   protected void doSubmit(String id, String value) {
