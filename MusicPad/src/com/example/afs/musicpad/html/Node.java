@@ -11,6 +11,13 @@ package com.example.afs.musicpad.html;
 
 public abstract class Node {
 
+  private Object data;
+
+  @SuppressWarnings("unchecked")
+  public <T> T getData() {
+    return (T) data;
+  }
+
   public String render() {
     StringBuilder s = new StringBuilder();
     render(s);
@@ -18,6 +25,13 @@ public abstract class Node {
   }
 
   public abstract void render(StringBuilder s);
+
+  @SuppressWarnings("unchecked")
+  public <T> T setData(T data) {
+    T oldData = (T) this.data;
+    this.data = data;
+    return oldData;
+  }
 
   @Override
   public String toString() {

@@ -101,9 +101,24 @@ public class MapperView extends ShadowDom {
         .add(td().add(text(formatCommand(command)))) //
         .add(td().add(text(formatOutputMessage(outputMessage)))) //
     ;
+    tableRow.setData(inputMessage);
     TableBody tableBody = getElementById("mapping-body");
-    int index = tableBody.getChildCount();
-    insertRow(tableBody, tableRow, index);
+    int childCount = tableBody.getChildCount();
+    for (int rowIndex = 0; rowIndex < childCount; rowIndex++) {
+      TableRow existingRow = tableBody.getChild(rowIndex);
+      InputMessage existingMessage = existingRow.getData();
+      int relationship = existingMessage.compareTo(inputMessage);
+      if (relationship == 0) {
+        removeRow(tableBody, rowIndex);
+        insertRow(tableBody, tableRow, rowIndex);
+        return id;
+      }
+      if (relationship > 0) {
+        insertRow(tableBody, tableRow, rowIndex + 1);
+        return id;
+      }
+    }
+    insertRow(tableBody, tableRow, tableBody.getChildCount());
     return id;
   }
 

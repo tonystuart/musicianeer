@@ -105,14 +105,14 @@ public class ShadowDom {
     return new TableHeader(properties);
   }
 
-  public void insertRow(Parent table, TableRow tableRow, int index) {
-    insertRow(table, tableRow, index, true);
+  public void insertRow(TableBody tableBody, TableRow tableRow, int index) {
+    insertRow(tableBody, tableRow, index, true);
   }
 
-  public void insertRow(Parent table, TableRow tableRow, int index, boolean isManageDeep) {
+  public void insertRow(TableBody tableBody, TableRow tableRow, int index, boolean isManageDeep) {
     addManagedNode(tableRow, isManageDeep);
-    table.insertChild(tableRow, index);
-    onInsertRow(table, tableRow, index);
+    tableBody.insertChild(tableRow, index);
+    onInsertRow(tableBody, tableRow, index);
   }
 
   public Label label(String... properties) {
@@ -168,6 +168,17 @@ public class ShadowDom {
     if (element != null) {
       removeClass(element, className);
     }
+  }
+
+  public void removeRow(TableBody tableBody, int rowIndex) {
+    removeRow(tableBody, rowIndex, true);
+  }
+
+  public void removeRow(TableBody tableBody, int rowIndex, boolean isManageDeep) {
+    TableRow tableRow = tableBody.getChild(rowIndex);
+    removeManagedNode(tableRow, isManageDeep);
+    tableBody.removeChild(rowIndex);
+    onRemoveRow(tableBody, rowIndex);
   }
 
   public String render() {
@@ -238,7 +249,7 @@ public class ShadowDom {
     return new Table(properties);
   }
 
-  public TableBody tbody(String... properties) {
+  public Parent tbody(String... properties) {
     return new TableBody(properties);
   }
 
@@ -274,12 +285,16 @@ public class ShadowDom {
     controllerTask.addShadowUpdate(new OnShadowUpdate(Action.ENSURE_VISIBLE, "#" + element.getId(), ""));
   }
 
-  protected void onInsertRow(Parent table, TableRow tableRow, int index) {
-    controllerTask.addShadowUpdate(new OnShadowUpdate(Action.INSERT_ROW, "#" + table.getId(), index, tableRow.render()));
+  protected void onInsertRow(TableBody tableBody, TableRow tableRow, int index) {
+    controllerTask.addShadowUpdate(new OnShadowUpdate(Action.INSERT_ROW, "#" + tableBody.getId(), index, tableRow.render()));
   }
 
   protected void onRemoveClassName(Element element, String className) {
     controllerTask.addShadowUpdate(new OnShadowUpdate(Action.REMOVE_CLASS, "#" + element.getId(), className));
+  }
+
+  protected void onRemoveRow(Parent tableBody, int rowIndex) {
+    controllerTask.addShadowUpdate(new OnShadowUpdate(Action.REMOVE_ROW, "#" + tableBody.getId(), rowIndex, null));
   }
 
   protected void onReplaceChildren(Parent parent, Node newChild) {

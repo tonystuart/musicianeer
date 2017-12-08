@@ -88,6 +88,10 @@ public class Parent extends Element implements Iterable<Node> {
     return new PercentRange(properties);
   }
 
+  public void removeChild(int index) {
+    childNodes.remove(index);
+  }
+
   @Override
   public void render(StringBuilder s) {
     super.render(s);

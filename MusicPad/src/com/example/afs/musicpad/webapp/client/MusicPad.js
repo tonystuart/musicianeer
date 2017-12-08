@@ -106,6 +106,13 @@ musicPad.onShadowUpdate = function(message) {
             row.innerHTML = content.innerHTML;
             row.id = content.id;
         }
+        break;
+    case 'REMOVE_ROW':
+        matches = document.querySelectorAll(message.selector);
+        for (const match of matches) {
+            match.deleteRow(message.index);
+        }
+        break;
     }
 }
 
