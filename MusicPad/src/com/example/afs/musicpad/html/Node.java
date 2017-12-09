@@ -17,8 +17,8 @@ public abstract class Node {
   private Object data;
 
   public void append(Node node) {
-    if (node.getParent() != null) {
-      node.remove();
+    if (node.parent != null || node.previous != null || node.next != null) {
+      throw new IllegalArgumentException("Node is already attached");
     }
     node.parent = parent;
     if (next == null) {
@@ -48,8 +48,8 @@ public abstract class Node {
   }
 
   public void prepend(Node node) {
-    if (node.parent != null) {
-      node.remove();
+    if (node.parent != null || node.previous != null || node.next != null) {
+      throw new IllegalArgumentException("Node is already attached");
     }
     node.parent = parent;
     if (previous == null) {
@@ -72,6 +72,7 @@ public abstract class Node {
     } else {
       previous.next = next;
     }
+    next = previous = parent = null;
   }
 
   public String render() {

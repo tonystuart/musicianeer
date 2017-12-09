@@ -32,12 +32,15 @@ public class Parent extends Element {
     return (Parent) super.addClickHandler();
   }
 
-  public void appendChild(Node childElement) {
+  public void appendChild(Node node) {
+    if (node.getParent() != null || node.getPrevious() != null || node.getNext() != null) {
+      throw new IllegalArgumentException("Node is already attached");
+    }
     if (tail == null) {
-      head = tail = childElement;
-      childElement.setParent(this);
+      head = tail = node;
+      node.setParent(this);
     } else {
-      tail.append(childElement);
+      tail.append(node);
     }
   }
 
