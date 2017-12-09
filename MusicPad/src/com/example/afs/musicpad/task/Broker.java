@@ -48,7 +48,7 @@ public class Broker<B> {
     }
   }
 
-  public <T extends B> void unsubscribe(Class<T> type, Subscriber<T> subscriber) {
+  public <T extends B> void unsubscribe(Class<?> type, Subscriber<?> subscriber) {
     synchronized (subscribers) {
       Queue<Subscriber<T>> queue = findQueue(type);
       if (queue != null) {

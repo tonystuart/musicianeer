@@ -108,6 +108,16 @@ public class ServiceTask extends MessageTask {
     return rendezvous.receive();
   }
 
+  @Override
+  public synchronized void tsTerminate() {
+    synchronized (globalProviders) {
+      for (Service<?> service : localProviders.keySet()) {
+        globalProviders.remove(service, this);
+      }
+    }
+    super.tsTerminate();
+  }
+
   private <T> void doServiceRequested(OnServiceRequested request) {
     @SuppressWarnings("unchecked")
     Provider<T> provider = (Provider<T>) localProviders.get(request.getService());

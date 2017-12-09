@@ -11,6 +11,7 @@ package com.example.afs.musicpad.task;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import com.example.afs.musicpad.task.Broker.Subscriber;
 
@@ -18,6 +19,7 @@ public abstract class BrokerTask<M> extends SimpleTask<M> {
 
   private Broker<M> broker;
   private Map<Class<? extends M>, Subscriber<? extends M>> subscribers = new HashMap<>();
+  private Map<Class<? extends M>, Subscriber<? extends M>> subscriptions = new HashMap<>();
 
   protected BrokerTask(Broker<M> broker) {
     this(broker, 0);
@@ -26,6 +28,14 @@ public abstract class BrokerTask<M> extends SimpleTask<M> {
   protected BrokerTask(Broker<M> broker, long timeoutMillis) {
     super(timeoutMillis);
     this.broker = broker;
+  }
+
+  @Override
+  public synchronized void tsTerminate() {
+    for (Entry<Class<? extends M>, Subscriber<? extends M>> subscription : subscriptions.entrySet()) {
+      broker.unsubscribe(subscription.getKey(), subscription.getValue());
+    }
+    super.tsTerminate();
   }
 
   protected <T extends M> void delegate(Class<T> type, Subscriber<T> subscriber) {
@@ -58,7 +68,9 @@ public abstract class BrokerTask<M> extends SimpleTask<M> {
   }
 
   protected <T extends M> void subscribe(Class<T> type, Subscriber<T> subscriber) {
-    broker.subscribe(type, message -> tsGetInputQueue().add(message));
+    Subscriber<T> queueAdder = message -> tsGetInputQueue().add(message);
+    subscriptions.put(type, queueAdder);
+    broker.subscribe(type, queueAdder);
     delegate(type, subscriber);
   }
 
