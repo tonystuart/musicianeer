@@ -10,7 +10,6 @@
 package com.example.afs.musicpad.webapp.karaoke;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.NavigableMap;
@@ -58,8 +57,8 @@ public class KaraokeNotator {
   }
 
   private Division convertToInterlude(Division line) {
-    if (line.getChildCount() > 0) {
-      Division prompt = (Division) line.getChild(0);
+    Division prompt = (Division) line.getHead();
+    if (prompt != null) {
       String id = prompt.getId();
       long tick = Long.parseLong(id.substring(TICK.length()));
       line.clear();
@@ -161,7 +160,7 @@ public class KaraokeNotator {
   }
 
   private boolean isSignificant(Division parent) {
-    for (Node node : parent) {
+    for (Node node = parent.getHead(); node != null; node = node.getNext()) {
       if (node instanceof Division) {
         Division division = (Division) node;
         if (isSignificant(division)) {
@@ -180,14 +179,15 @@ public class KaraokeNotator {
 
   private void optimize(Division division) {
     Division interlude = null;
-    Iterator<Node> iterator = division.iterator();
-    while (iterator.hasNext()) {
-      Division line = (Division) iterator.next();
+    Node next;
+    for (Node node = division.getHead(); node != null; node = next) {
+      next = node.getNext();
+      Division line = (Division) node;
       if (!isSignificant(line)) {
         if (interlude == null) {
           interlude = convertToInterlude(line);
         } else {
-          iterator.remove();
+          node.remove();
         }
       } else {
         interlude = null;

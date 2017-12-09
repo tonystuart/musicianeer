@@ -51,6 +51,16 @@ public class ShadowDom {
     }
   }
 
+  public void appendChild(Parent parent, Node newNode) {
+    appendChild(parent, newNode, true);
+  }
+
+  public void appendChild(Parent parent, Node newNode, boolean isManageDeep) {
+    addManagedNode(newNode, isManageDeep);
+    parent.appendChild(newNode);
+    onAppendChild(parent, newNode.render());
+  }
+
   public CheckBox checkbox(String... properties) {
     return new CheckBox(properties);
   }
@@ -105,14 +115,14 @@ public class ShadowDom {
     return new TableHeader(properties);
   }
 
-  public void insertRow(TableBody tableBody, TableRow tableRow, int index) {
-    insertRow(tableBody, tableRow, index, true);
+  public void insertBefore(Node newNode, Element existingElement) {
+    insertBefore(newNode, existingElement, true);
   }
 
-  public void insertRow(TableBody tableBody, TableRow tableRow, int index, boolean isManageDeep) {
-    addManagedNode(tableRow, isManageDeep);
-    tableBody.insertChild(tableRow, index);
-    onInsertRow(tableBody, tableRow, index);
+  public void insertBefore(Node newNode, Element existingElement, boolean isManageDeep) {
+    addManagedNode(newNode, isManageDeep);
+    existingElement.prepend(newNode);
+    onInsertBefore(existingElement, newNode.render());
   }
 
   public Label label(String... properties) {
@@ -151,6 +161,16 @@ public class ShadowDom {
     return new PercentRange(properties);
   }
 
+  public void remove(Element element) {
+    remove(element, true);
+  }
+
+  public void remove(Element element, boolean isManageDeep) {
+    removeManagedNode(element, isManageDeep);
+    element.remove();
+    onRemoveChild(element);
+  }
+
   public void removeClass(Element element, String className) {
     Set<String> classList = element.getClassList();
     if (classList != null) {
@@ -170,17 +190,6 @@ public class ShadowDom {
     }
   }
 
-  public void removeRow(TableBody tableBody, int rowIndex) {
-    removeRow(tableBody, rowIndex, true);
-  }
-
-  public void removeRow(TableBody tableBody, int rowIndex, boolean isManageDeep) {
-    TableRow tableRow = tableBody.getChild(rowIndex);
-    removeManagedNode(tableRow, isManageDeep);
-    tableBody.removeChild(rowIndex);
-    onRemoveRow(tableBody, rowIndex);
-  }
-
   public String render() {
     return root.render();
   }
@@ -190,9 +199,7 @@ public class ShadowDom {
   }
 
   public void replaceChildren(Parent parent, Node newChild, boolean isManageDeep) {
-    int childCount = parent.getChildCount();
-    for (int childIndex = 0; childIndex < childCount; childIndex++) {
-      Node oldChild = parent.getChild(childIndex);
+    for (Node oldChild = parent.getHead(); oldChild != null; oldChild = oldChild.getNext()) {
       removeManagedNode(oldChild, isManageDeep);
     }
     if (newChild instanceof Element) {
@@ -281,20 +288,24 @@ public class ShadowDom {
     controllerTask.addShadowUpdate(new OnShadowUpdate(Action.ADD_CLASS, "#" + element.getId(), className));
   }
 
-  protected void onEnsureVisible(Element element) {
-    controllerTask.addShadowUpdate(new OnShadowUpdate(Action.ENSURE_VISIBLE, "#" + element.getId(), ""));
+  protected void onAppendChild(Parent parent, String value) {
+    controllerTask.addShadowUpdate(new OnShadowUpdate(Action.APPEND_CHILD, "#" + parent.getId(), value));
   }
 
-  protected void onInsertRow(TableBody tableBody, TableRow tableRow, int index) {
-    controllerTask.addShadowUpdate(new OnShadowUpdate(Action.INSERT_ROW, "#" + tableBody.getId(), index, tableRow.render()));
+  protected void onEnsureVisible(Element element) {
+    controllerTask.addShadowUpdate(new OnShadowUpdate(Action.ENSURE_VISIBLE, "#" + element.getId()));
+  }
+
+  protected void onInsertBefore(Element existingNode, String value) {
+    controllerTask.addShadowUpdate(new OnShadowUpdate(Action.INSERT_BEFORE, "#" + existingNode.getId(), value));
+  }
+
+  protected void onRemoveChild(Element element) {
+    controllerTask.addShadowUpdate(new OnShadowUpdate(Action.REMOVE_CHILD, "#" + element.getId()));
   }
 
   protected void onRemoveClassName(Element element, String className) {
     controllerTask.addShadowUpdate(new OnShadowUpdate(Action.REMOVE_CLASS, "#" + element.getId(), className));
-  }
-
-  protected void onRemoveRow(Parent tableBody, int rowIndex) {
-    controllerTask.addShadowUpdate(new OnShadowUpdate(Action.REMOVE_ROW, "#" + tableBody.getId(), rowIndex, null));
   }
 
   protected void onReplaceChildren(Parent parent, Node newChild) {
@@ -320,9 +331,7 @@ public class ShadowDom {
       }
       if (isManageDeep && node instanceof Parent) {
         Parent parent = (Parent) node;
-        int childCount = parent.getChildCount();
-        for (int childIndex = 0; childIndex < childCount; childIndex++) {
-          Node child = parent.getChild(childIndex);
+        for (Node child = parent.getHead(); child != null; child = child.getNext()) {
           addManagedNode(child, isManageDeep);
         }
       }
@@ -353,9 +362,7 @@ public class ShadowDom {
       }
       if (isManageDeep && node instanceof Parent) {
         Parent parent = (Parent) node;
-        int childCount = parent.getChildCount();
-        for (int childIndex = 0; childIndex < childCount; childIndex++) {
-          Node child = parent.getChild(childIndex);
+        for (Node child = parent.getHead(); child != null; child = child.getNext()) {
           removeManagedNode(child, isManageDeep);
         }
       }

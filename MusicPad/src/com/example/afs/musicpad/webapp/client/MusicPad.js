@@ -1,6 +1,14 @@
 "use strict";
 var musicPad = musicPad || {};
 
+musicPad.createNode = function(html) {
+    let template = document.createElement('template');
+    template.innerHTML = html;
+    let fragment = document.importNode(template.content, true);
+    let newNode = fragment.firstChild;
+    return newNode;
+}
+
 musicPad.createWebSocketClient = function(webSocketUrl, onMessageCallback, onCloseCallback) {
     musicPad.ws = new WebSocket(webSocketUrl);
     musicPad.ws.onopen = function() {
@@ -58,13 +66,6 @@ musicPad.onInput = function(event, value) {
 musicPad.onShadowUpdate = function(message) {
     let matches = undefined;
     switch (message.action) {
-    case 'REPLACE_CHILDREN':
-        matches = document.querySelectorAll(message.selector);
-        for (const match of matches) {
-            match.scrollTop = 0;
-            match.innerHTML = message.value;
-        }
-        break;
     case 'ADD_CLASS':
         matches = document.querySelectorAll(message.selector);
         for (const match of matches) {
@@ -96,21 +97,31 @@ musicPad.onShadowUpdate = function(message) {
             }
         }
         break;
-    case 'INSERT_ROW':
+    case 'APPEND_CHILD':
         matches = document.querySelectorAll(message.selector);
         for (const match of matches) {
-            let container = document.createElement('tbody');
-            container.innerHTML = message.value;
-            let content = container.firstElementChild;
-            let row = match.insertRow(message.index);
-            row.innerHTML = content.innerHTML;
-            row.id = content.id;
+            let newNode = musicPad.createNode(message.value);
+            match.appendChild(newNode);
         }
         break;
-    case 'REMOVE_ROW':
+    case 'INSERT_BEFORE':
         matches = document.querySelectorAll(message.selector);
         for (const match of matches) {
-            match.deleteRow(message.index);
+            let newNode = musicPad.createNode(message.value);
+            match.parentElement.insertBefore(newNode, match);
+        }
+        break;
+    case 'REMOVE_CHILD':
+        matches = document.querySelectorAll(message.selector);
+        for (const match of matches) {
+            match.parentElement.removeChild(match);
+        }
+        break;
+    case 'REPLACE_CHILDREN':
+        matches = document.querySelectorAll(message.selector);
+        for (const match of matches) {
+            match.scrollTop = 0;
+            match.innerHTML = message.value;
         }
         break;
     }

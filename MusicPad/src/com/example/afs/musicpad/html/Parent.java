@@ -9,14 +9,10 @@
 
 package com.example.afs.musicpad.html;
 
-import java.util.Iterator;
+public class Parent extends Element {
 
-import com.example.afs.musicpad.util.DirectList;
-import com.example.afs.musicpad.util.RandomAccessList;
-
-public class Parent extends Element implements Iterable<Node> {
-
-  private RandomAccessList<Node> childNodes = new DirectList<>();
+  private Node head;
+  private Node tail;
 
   protected Parent(String type) {
     super(type);
@@ -37,7 +33,12 @@ public class Parent extends Element implements Iterable<Node> {
   }
 
   public void appendChild(Node childElement) {
-    childNodes.add(childElement);
+    if (tail == null) {
+      head = tail = childElement;
+      childElement.setParent(this);
+    } else {
+      tail.append(childElement);
+    }
   }
 
   public CheckBox checkbox(String... properties) {
@@ -45,29 +46,22 @@ public class Parent extends Element implements Iterable<Node> {
   }
 
   public void clear() {
-    childNodes.clear();
+    for (Node child = head; child != null; child = child.getNext()) {
+      child.setParent(null);
+    }
+    head = tail = null;
   }
 
   public Division div(String... properties) {
     return new Division(properties);
   }
 
-  @SuppressWarnings("unchecked")
-  public <T> T getChild(int childIndex) {
-    return (T) childNodes.get(childIndex);
+  public Node getHead() {
+    return head;
   }
 
-  public int getChildCount() {
-    return childNodes.size();
-  }
-
-  public void insertChild(Node newChild, int index) {
-    childNodes.add(index, newChild);
-  }
-
-  @Override
-  public Iterator<Node> iterator() {
-    return childNodes.iterator();
+  public Node getTail() {
+    return tail;
   }
 
   public Label label(String... properties) {
@@ -88,17 +82,11 @@ public class Parent extends Element implements Iterable<Node> {
     return new PercentRange(properties);
   }
 
-  public void removeChild(int index) {
-    childNodes.remove(index);
-  }
-
   @Override
   public void render(StringBuilder s) {
     super.render(s);
-    if (childNodes != null) {
-      for (Node node : childNodes) {
-        node.render(s);
-      }
+    for (Node child = head; child != null; child = child.getNext()) {
+      child.render(s);
     }
     s.append(format("</%s>\n", getType()));
   }
@@ -106,6 +94,14 @@ public class Parent extends Element implements Iterable<Node> {
   public void replaceChildren(Node node) {
     clear();
     appendChild(node);
+  }
+
+  public void setHead(Node head) {
+    this.head = head;
+  }
+
+  public void setTail(Node tail) {
+    this.tail = tail;
   }
 
   public TextElement text(String text) {

@@ -11,6 +11,7 @@ package com.example.afs.musicpad.webapp.mapper;
 
 import java.util.Map.Entry;
 import java.util.NavigableMap;
+import java.util.TreeMap;
 
 import javax.sound.midi.ShortMessage;
 
@@ -65,8 +66,36 @@ public class MapperView extends ShadowDom {
     KARAOKE_TYPE_MEASURE, //
   }
 
-  // Device, Channel, Type, Control, Mapping
-  // 
+  private static class RowKey implements Comparable<RowKey> {
+    private String deviceType;
+    private InputMessage inputMessage;
+
+    public RowKey(String deviceType, InputMessage inputMessage) {
+      this.deviceType = deviceType;
+      this.inputMessage = inputMessage;
+    }
+
+    @Override
+    public int compareTo(RowKey that) {
+      int relationship = this.deviceType.compareTo(that.deviceType);
+      if (relationship != 0) {
+        return relationship;
+      }
+      relationship = this.inputMessage.compareTo(that.inputMessage);
+      if (relationship != 0) {
+        return relationship;
+      }
+      return 0;
+    }
+
+    @Override
+    public String toString() {
+      return "RowKey [deviceType=" + deviceType + ", inputMessage=" + inputMessage + "]";
+    }
+  }
+
+  private NavigableMap<RowKey, TableRow> rows = new TreeMap<>();
+
   public MapperView(ControllerTask controllerTask) {
     super(controllerTask);
     add(div("#mapper", ".tab", ".selected-tab") //
@@ -101,24 +130,24 @@ public class MapperView extends ShadowDom {
         .add(td().add(text(formatCommand(command)))) //
         .add(td().add(text(formatOutputMessage(outputMessage)))) //
     ;
-    tableRow.setData(inputMessage);
-    TableBody tableBody = getElementById("mapping-body");
-    int childCount = tableBody.getChildCount();
-    for (int rowIndex = 0; rowIndex < childCount; rowIndex++) {
-      TableRow existingRow = tableBody.getChild(rowIndex);
-      InputMessage existingMessage = existingRow.getData();
-      int relationship = existingMessage.compareTo(inputMessage);
-      if (relationship == 0) {
-        removeRow(tableBody, rowIndex);
-        insertRow(tableBody, tableRow, rowIndex);
+    tableRow.setData(outputMessage);
+    RowKey rowKey = new RowKey(deviceType, inputMessage);
+    TableRow existingTableRow = rows.get(rowKey);
+    if (existingTableRow != null) {
+      OutputMessage existingOutputMessage = existingTableRow.getData();
+      if (existingOutputMessage == null && outputMessage == null || existingOutputMessage != null && existingOutputMessage.equals(outputMessage)) {
         return id;
       }
-      if (relationship > 0) {
-        insertRow(tableBody, tableRow, rowIndex + 1);
-        return id;
-      }
+      remove(existingTableRow);
     }
-    insertRow(tableBody, tableRow, tableBody.getChildCount());
+    rows.put(rowKey, tableRow);
+    TableBody tableBody = getElementById("mapping-body");
+    RowKey nextRowKey = rows.higherKey(rowKey);
+    if (nextRowKey == null) {
+      appendChild(tableBody, tableRow);
+    } else {
+      insertBefore(tableRow, rows.get(nextRowKey));
+    }
     return id;
   }
 
