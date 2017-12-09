@@ -101,6 +101,7 @@ public class MapperView extends ShadowDom {
     add(div("#mapper", ".tab", ".selected-tab") //
         .add(div(".title") //
             .add(text("MIDI Input Mapper"))) //
+        .add(div("#input-details")) //
         .add(table("#mapping-table") //
             .addClickHandler() //
             .add(thead() //
@@ -151,15 +152,29 @@ public class MapperView extends ShadowDom {
     return id;
   }
 
+  @Override
+  public Parent nameValue(String name, Object value) {
+    return div(".row") //
+        .add(div(".name") //
+            .add(text(name))) //
+        .add(div(".value") //
+            .add(text("&nbsp;" + value))); //
+  }
+
   public void renderDeviceList(NavigableMap<Integer, Controller> deviceControllers) {
     Division div = createDeviceList(deviceControllers);
     Parent songListParent = getElementById("mapper-list");
     replaceChildren(songListParent, div);
   }
 
-  public void renderMappingDetails(String messageType, int channel, int data1, int data2) {
+  public void renderInputDetails(String deviceType, String messageType, int channel, int data1, int data2) {
+    Parent inputDetails = getElementById("input-details");
+    replaceChildren(inputDetails, createInputDetails(deviceType, messageType, channel, data1, data2));
+  }
+
+  public void renderMappingDetails(OutputMessage outputMessage) {
     Parent mappingDetails = getElementById("mapping-details");
-    replaceChildren(mappingDetails, createMappingDetails(messageType, channel, data1, data2));
+    replaceChildren(mappingDetails, createMappingDetails(outputMessage));
   }
 
   public void selectCommand() {
@@ -186,6 +201,19 @@ public class MapperView extends ShadowDom {
           .add(text(controller.getDeviceName())));
     }
     return div;
+  }
+
+  private Node createInputDetails(String deviceType, String messageType, int channel, int data1, int data2) {
+    return fieldSet("#input") //
+        .add(legend() //
+            .add(text("Input"))) //
+        .add(div(".row") //
+            .add(nameValue("Device", deviceType)) //
+            .add(nameValue("Channel", channel)) //
+            .add(nameValue("Control", data1)) //
+            .add(nameValue("Type", messageType)) //
+            .add(nameValue("Value", data2))) //
+    ;
   }
 
   private Select createMapping() {
@@ -238,7 +266,7 @@ public class MapperView extends ShadowDom {
             .add(option("Play Notes in Measure", Mapping.KARAOKE_TYPE_MEASURE))); //
   }
 
-  private Node createMappingDetails(String messageType, int channel, int data1, int data2) {
+  private Node createMappingDetails(OutputMessage outputMessage) {
     // NB: fieldset does not support display: flex;
     // See https://stackoverflow.com/questions/28078681/why-cant-fieldset-be-flex-containers`
     return div(".row") //

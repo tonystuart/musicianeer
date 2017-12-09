@@ -247,33 +247,41 @@ public class MapperController extends ControllerTask {
     int data2 = shortMessage.getData2();
 
     MidiConfiguration configuration = (MidiConfiguration) deviceControllers.get(deviceIndex).getConfiguration();
+    String deviceType = configuration.getDeviceType();
     InputMessage inputMessage = new InputMessage(shortMessage);
     OutputMessage outputMessage = configuration.get(shortMessage);
-    String id = mapperView.displayMapping(configuration.getDeviceType(), inputMessage, outputMessage);
-    doClick(id);
+    if (outputMessage != null) {
+      // TODO: Find a simpler way to select the existing mapping
+      String id = mapperView.displayMapping(configuration.getDeviceType(), inputMessage, outputMessage);
+      doClick(id);
+    }
 
     switch (command) {
     case ShortMessage.NOTE_OFF:
       break;
     case ShortMessage.NOTE_ON:
       this.shortMessage = shortMessage;
-      mapperView.renderMappingDetails("NOTE_ON", channel, data1, data2);
+      mapperView.renderInputDetails(deviceType, "NOTE", channel, data1, data2);
+      mapperView.renderMappingDetails(outputMessage);
       break;
     case ShortMessage.POLY_PRESSURE:
       break;
     case ShortMessage.CONTROL_CHANGE:
       this.shortMessage = shortMessage;
-      mapperView.renderMappingDetails("CONTROL_CHANGE", channel, data1, data2);
+      mapperView.renderInputDetails(deviceType, "CONTROL", channel, data1, data2);
+      mapperView.renderMappingDetails(outputMessage);
       break;
     case ShortMessage.PROGRAM_CHANGE:
       this.shortMessage = shortMessage;
-      mapperView.renderMappingDetails("PROGRAM_CHANGE", channel, data1, data2);
+      mapperView.renderInputDetails(deviceType, "PROGRAM_CHANGE", channel, data1, data2);
+      mapperView.renderMappingDetails(outputMessage);
       break;
     case ShortMessage.CHANNEL_PRESSURE:
       break;
     case ShortMessage.PITCH_BEND:
       this.shortMessage = shortMessage;
-      mapperView.renderMappingDetails("PITCH_BEND", channel, data1, data2);
+      mapperView.renderInputDetails(deviceType, "PITCH_BEND", channel, data1, data2);
+      mapperView.renderMappingDetails(outputMessage);
       break;
     default:
       break;

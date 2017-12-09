@@ -78,6 +78,14 @@ fieldset {
     visibility: visible;
 }
 
+.name {
+    font-weight: bold;
+}
+
+.name::after {
+    content: ':';
+}
+
 .details {
     flex-grow: 1;
     margin-top: auto;
@@ -101,12 +109,7 @@ fieldset {
 .detail .name {
     text-align: right;
     width: 25%;
-    font-weight: bold;
     vertical-align: top;
-}
-
-.detail .name::after {
-    content: ':';
 }
 
 .detail .value {
