@@ -204,6 +204,7 @@ public class KaraokeController extends ControllerTask {
   private void doSampleSong(OnSampleSong message) {
     karaokeView.renderSongDetails(message.getSong());
     karaokeView.selectSong(message.getSongIndex());
+    karaokeView.selectSongsTab();
   }
 
   private void doSetBackgroundMute(int deviceIndex, int mute) {
