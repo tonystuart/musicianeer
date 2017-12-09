@@ -41,6 +41,11 @@ public class ServiceTask extends MessageTask {
       return service;
     }
 
+    @Override
+    public String toString() {
+      return "OnServiceRequested [service=" + service + "]";
+    }
+
   }
 
   private class Rendezvous {

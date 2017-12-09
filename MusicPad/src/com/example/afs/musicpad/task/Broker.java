@@ -26,7 +26,9 @@ public class Broker<B> {
     subscribers = new ConcurrentHashMap<>();
   }
 
-  public <T extends B> void publish(T message) {
+  // Synchronized so that we publish message A to all subscribers before one of those subscribes publishes message B.
+  public synchronized <T extends B> void publish(T message) {
+    //System.out.println("Broker.publish: thread=" + Thread.currentThread().getName() + ", message=" + message);
     Queue<Subscriber<T>> queue = findQueue(message.getClass());
     if (queue != null) {
       for (Subscriber<T> subscriber : queue) {
@@ -39,7 +41,7 @@ public class Broker<B> {
     synchronized (subscribers) {
       Queue<Subscriber<T>> queue = findQueue(type);
       if (queue == null) {
-        queue = new ConcurrentLinkedQueue<Subscriber<T>>();
+        queue = new ConcurrentLinkedQueue<>();
         subscribers.put(type, queue);
       }
       queue.add(subscriber);

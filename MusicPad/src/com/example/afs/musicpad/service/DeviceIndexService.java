@@ -32,4 +32,9 @@ public class DeviceIndexService {
     result = prime * result + deviceIndex;
     return result;
   }
+
+  @Override
+  public String toString() {
+    return "DeviceIndexService [deviceIndex=" + deviceIndex + ", class=" + getClass() + "]";
+  }
 }

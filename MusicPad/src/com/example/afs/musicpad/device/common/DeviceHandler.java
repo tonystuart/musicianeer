@@ -21,7 +21,6 @@ import com.example.afs.musicpad.message.OnKeyDown;
 import com.example.afs.musicpad.message.OnKeyUp;
 import com.example.afs.musicpad.message.OnRenderSong;
 import com.example.afs.musicpad.message.OnSampleChannel;
-import com.example.afs.musicpad.message.OnSampleSong;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.player.PlayableMap;
 import com.example.afs.musicpad.player.PlayableMap.OutputType;
@@ -61,7 +60,6 @@ public class DeviceHandler extends ServiceTask {
     this.player = new Player(synthesizer, deviceIndex);
     subscribe(OnCommand.class, message -> doCommand(message));
     subscribe(OnRenderSong.class, message -> doRenderSong(message));
-    subscribe(OnSampleSong.class, message -> doSampleSong(message));
     subscribe(OnSampleChannel.class, message -> doSampleChannel(message));
     subscribe(OnDeviceCommand.class, message -> doDeviceCommand(message));
     subscribe(OnConfigurationChange.class, message -> doConfigurationChange(message));
@@ -256,15 +254,12 @@ public class DeviceHandler extends ServiceTask {
 
   private void doSampleChannel(OnSampleChannel message) {
     if (message.getDeviceIndex() == deviceIndex) {
+      song = message.getSong();
       selectChannel(message.getChannel());
       player.setEnabled(true);
     } else {
       player.setEnabled(false);
     }
-  }
-
-  private void doSampleSong(OnSampleSong message) {
-    song = message.getSong();
   }
 
   private int getPercentVelocity() {
@@ -308,7 +303,7 @@ public class DeviceHandler extends ServiceTask {
     if (channel == Midi.DRUM) {
       selectProgram(-1);
     } else {
-      // TODO: Determine how song can be null at this point
+      // TODO: Request current song rather than maintaining state
       Set<Integer> programs = song.getPrograms(channel);
       if (programs.size() > 0) {
         int program = programs.iterator().next();
