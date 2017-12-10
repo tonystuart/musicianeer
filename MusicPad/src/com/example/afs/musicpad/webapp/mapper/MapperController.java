@@ -246,7 +246,12 @@ public class MapperController extends ControllerTask {
     int data1 = shortMessage.getData1();
     int data2 = shortMessage.getData2();
 
-    MidiConfiguration configuration = (MidiConfiguration) deviceControllers.get(deviceIndex).getConfiguration();
+    Controller controller = deviceControllers.get(deviceIndex);
+    if (controller == null) {
+      // We don't have the mapping yet
+      return;
+    }
+    MidiConfiguration configuration = (MidiConfiguration) controller.getConfiguration();
     String deviceType = configuration.getDeviceType();
     InputMessage inputMessage = new InputMessage(shortMessage);
     OutputMessage outputMessage = configuration.get(shortMessage);
