@@ -22,6 +22,14 @@ public class Select extends Parent {
     return (Select) super.add(child);
   }
 
+  public Select addInputHandler() {
+    if (getId() == null) {
+      throw new IllegalStateException();
+    }
+    setProperty("onclick", "musicPad.onInput(event, this.value)");
+    return this;
+  }
+
   public Select required() {
     setProperty("required");
     return this;

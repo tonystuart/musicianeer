@@ -11,26 +11,26 @@ package com.example.afs.musicpad.webapp.mapper;
 
 import java.util.Map.Entry;
 import java.util.NavigableMap;
-import java.util.TreeMap;
-
-import javax.sound.midi.ShortMessage;
 
 import com.example.afs.musicpad.device.common.Controller;
+import com.example.afs.musicpad.device.midi.MidiConfiguration;
+import com.example.afs.musicpad.device.midi.MidiConfiguration.DeviceType;
 import com.example.afs.musicpad.device.midi.MidiConfiguration.InputMessage;
+import com.example.afs.musicpad.device.midi.MidiConfiguration.InputType;
 import com.example.afs.musicpad.device.midi.MidiConfiguration.OutputMessage;
 import com.example.afs.musicpad.html.Division;
 import com.example.afs.musicpad.html.Node;
+import com.example.afs.musicpad.html.Option;
 import com.example.afs.musicpad.html.Parent;
 import com.example.afs.musicpad.html.Radio;
 import com.example.afs.musicpad.html.Select;
 import com.example.afs.musicpad.html.ShadowDom;
-import com.example.afs.musicpad.html.TableBody;
-import com.example.afs.musicpad.html.TableRow;
 import com.example.afs.musicpad.task.ControllerTask;
 
 public class MapperView extends ShadowDom {
 
-  public enum Mapping {
+  public enum OutputType {
+    DEFAULT, //
     PLAYER_SELECT_PROGRAM, //
     PLAYER_PREVIOUS_PROGRAM, //
     PLAYER_NEXT_PROGRAM, //
@@ -64,91 +64,74 @@ public class MapperView extends ShadowDom {
     LIBRARY_TRANSPOSE_HIGHER, //
     KARAOKE_TYPE_TICK, //
     KARAOKE_TYPE_MEASURE, //
+    KARAOKE_SELECT_GROUP, //
+    KARAOKE_SELECT_SOUND, //
   }
-
-  private static class RowKey implements Comparable<RowKey> {
-    private String deviceType;
-    private InputMessage inputMessage;
-
-    public RowKey(String deviceType, InputMessage inputMessage) {
-      this.deviceType = deviceType;
-      this.inputMessage = inputMessage;
-    }
-
-    @Override
-    public int compareTo(RowKey that) {
-      int relationship = this.deviceType.compareTo(that.deviceType);
-      if (relationship != 0) {
-        return relationship;
-      }
-      relationship = this.inputMessage.compareTo(that.inputMessage);
-      if (relationship != 0) {
-        return relationship;
-      }
-      return 0;
-    }
-
-    @Override
-    public String toString() {
-      return "RowKey [deviceType=" + deviceType + ", inputMessage=" + inputMessage + "]";
-    }
-  }
-
-  private NavigableMap<RowKey, TableRow> rows = new TreeMap<>();
 
   public MapperView(ControllerTask controllerTask) {
     super(controllerTask);
     add(div("#mapper", ".tab", ".selected-tab") //
         .add(div(".title") //
             .add(text("MIDI Input Mapper"))) //
-        .add(div("#input-details")) //
-        .add(table("#mapping-table") //
-            .addClickHandler() //
-            .add(thead() //
-                .add(tr() //
-                    .add(th().add(text("Device"))) //
-                    .add(th().add(text("Channel"))) //
-                    .add(th().add(text("Control"))) //
-                    .add(th().add(text("Type"))) //
-                    .add(th().add(text("Mapping"))))) //
-            .add(tbody("#mapping-body"))) //
-        .add(div("#mapping-details", ".details") //
-            .add(div() //
-                .add(text("Press, rotate or slide an input on your MIDI controller to configure its action.")))) //
-
-    ); //
+        .add(div() //
+            .add(text("Select Input Device:")) //
+            .add(div("#device-type-container"))) //
+        .add(div("#mapper-diagram")//
+            .addMoveTarget() //
+            .add(text("Select an input device, then press, rotate or slide an input on your MIDI controller to configure its action.")))) //
+    ; //
   }
 
-  public String displayMapping(String deviceType, InputMessage inputMessage, OutputMessage outputMessage) {
+  public Parent createMapping(InputMessage inputMessage, OutputMessage outputMessage) {
     int channel = inputMessage.getChannel();
     int control = inputMessage.getControl();
-    int command = inputMessage.getCommand();
-    String id = "mapping-" + deviceType + "-" + channel + "-" + control + "-" + command;
-    TableRow tableRow = (TableRow) tr("#" + id) //
-        .add(td().add(text(deviceType))) //
-        .add(td().add(text(channel))) //
-        .add(td().add(text(control))) //
-        .add(td().add(text(formatCommand(command)))) //
-        .add(td().add(text(formatOutputMessage(outputMessage)))) //
-    ;
-    tableRow.setData(outputMessage);
-    RowKey rowKey = new RowKey(deviceType, inputMessage);
-    TableRow existingTableRow = rows.get(rowKey);
-    if (existingTableRow != null) {
-      OutputMessage existingOutputMessage = existingTableRow.getData();
-      if (existingOutputMessage == null && outputMessage == null || existingOutputMessage != null && existingOutputMessage.equals(outputMessage)) {
-        return id;
+    InputType inputType = inputMessage.getInputType();
+    MidiConfiguration.DeviceType deviceType;
+    if (outputMessage == null) {
+      switch (inputType) {
+      case CONTROL:
+        deviceType = MidiConfiguration.DeviceType.Rotary;
+        break;
+      case KEY:
+        deviceType = MidiConfiguration.DeviceType.Key;
+        break;
+      default:
+        throw new UnsupportedOperationException(inputType.toString());
       }
-      remove(existingTableRow);
-    }
-    rows.put(rowKey, tableRow);
-    TableBody tableBody = getElementById("mapping-body");
-    RowKey nextRowKey = rows.higherKey(rowKey);
-    if (nextRowKey == null) {
-      appendChild(tableBody, tableRow);
     } else {
-      insertBefore(tableRow, rows.get(nextRowKey));
+      deviceType = outputMessage.getDeviceType();
     }
+    String id = getMappingId(inputMessage);
+    Parent mapping = new Division("#" + id, ".mapping") //
+        .addMoveSource() //
+        .add(div("Input (" + channel + "/" + control + ")")) //
+        .add(createInputSelect(deviceType)) //
+        .add(div() //
+            .add(div("Output")) //
+            .add(createOutputSelect(OutputType.DEFAULT))) //
+        .add(div(".mapper-index-label") //
+            .add(div("Index")) //
+            .add(numberInput().setMinimum(0).setValue(control).required()) //
+            .add(div("Label")) //
+            .add(textInput().setValue(control).required())); //
+    return mapping;
+  }
+
+  public void displayDeviceSelector(NavigableMap<Integer, Controller> deviceControllers) {
+    Select select = createDeviceSelector(deviceControllers);
+    Division deviceTypeContainer = getElementById("device-type-container");
+    replaceChildren(deviceTypeContainer, select);
+  }
+
+  public String displayMapping(InputMessage inputMessage, OutputMessage outputMessage) {
+    Parent mapping = createMapping(inputMessage, outputMessage);
+    Division diagram = getElementById("mapper-diagram");
+    appendChild(diagram, mapping);
+    return mapping.getId();
+  }
+
+  public String getMappingId(InputMessage inputMessage) {
+    String id = "mapping-" + inputMessage.getChannel() + "-" + inputMessage.getControl();
     return id;
   }
 
@@ -167,16 +150,6 @@ public class MapperView extends ShadowDom {
     replaceChildren(songListParent, div);
   }
 
-  public void renderInputDetails(String deviceType, String messageType, int channel, int data1, int data2) {
-    Parent inputDetails = getElementById("input-details");
-    replaceChildren(inputDetails, createInputDetails(deviceType, messageType, channel, data1, data2));
-  }
-
-  public void renderMappingDetails(OutputMessage outputMessage) {
-    Parent mappingDetails = getElementById("mapping-details");
-    replaceChildren(mappingDetails, createMappingDetails(outputMessage));
-  }
-
   public void selectCommand() {
     Radio outputCommand = getElementById("output-command");
     setProperty(outputCommand, "checked", true);
@@ -185,6 +158,9 @@ public class MapperView extends ShadowDom {
   public void selectGroup() {
     Radio outputGroup = getElementById("output-group");
     setProperty(outputGroup, "checked", true);
+  }
+
+  public void selectMapping(String id) {
   }
 
   public void selectSound() {
@@ -203,156 +179,81 @@ public class MapperView extends ShadowDom {
     return div;
   }
 
-  private Node createInputDetails(String deviceType, String messageType, int channel, int data1, int data2) {
-    return fieldSet("#input") //
-        .add(legend() //
-            .add(text("Input"))) //
-        .add(div(".row") //
-            .add(nameValue("Device", deviceType)) //
-            .add(nameValue("Channel", channel)) //
-            .add(nameValue("Control", data1)) //
-            .add(nameValue("Type", messageType)) //
-            .add(nameValue("Value", data2))) //
-    ;
+  private Select createDeviceSelector(NavigableMap<Integer, Controller> deviceControllers) {
+    Select select = new Select("#device-type");
+    select.addInputHandler();
+    for (Entry<Integer, Controller> entry : deviceControllers.entrySet()) {
+      Option option = new Option(entry.getValue().getDeviceName(), entry.getKey());
+      select.appendChild(option);
+    }
+    return select;
   }
 
-  private Select createMapping() {
-    return new Select("#command") //
-        .setName("output") //
+  private Select createInputSelect(DeviceType deviceType) {
+    Select select = new Select("#input-select");
+    for (DeviceType value : DeviceType.values()) {
+      Option option = new Option(value.name(), value.name(), value.equals(deviceType));
+      select.appendChild(option);
+    }
+    return select;
+  }
+
+  private Select createOutputSelect(OutputType outputType) {
+    return new Select("#output-select") //
+        .addInputHandler() //
+        .setValue(outputType.name()) //
         .required() //
         .add(optionGroup("Player Settings") //
-            .add(option("Select Instrument", Mapping.PLAYER_SELECT_PROGRAM)) //
-            .add(option("Previous Instrument", Mapping.PLAYER_PREVIOUS_PROGRAM)) //
-            .add(option("Next Instrument", Mapping.PLAYER_NEXT_PROGRAM)) //
-            .add(option("Select Volume", Mapping.PLAYER_SELECT_VELOCITY)) //
-            .add(option("Decrease Volume", Mapping.PLAYER_DECREASE_VELOCITY)) //
-            .add(option("Increase Volume", Mapping.PLAYER_INCREASE_VELOCITY)) //
-            .add(option("Select Channel", Mapping.PLAYER_SELECT_CHANNEL)) //
-            .add(option("Previous Channel", Mapping.PLAYER_PREVIOUS_CHANNEL)) //
-            .add(option("Next Channel", Mapping.PLAYER_NEXT_CHANNEL))) //
+            .add(option("Default", OutputType.DEFAULT)) //
+            .add(option("Select Instrument", OutputType.PLAYER_SELECT_PROGRAM)) //
+            .add(option("Previous Instrument", OutputType.PLAYER_PREVIOUS_PROGRAM)) //
+            .add(option("Next Instrument", OutputType.PLAYER_NEXT_PROGRAM)) //
+            .add(option("Select Volume", OutputType.PLAYER_SELECT_VELOCITY)) //
+            .add(option("Decrease Volume", OutputType.PLAYER_DECREASE_VELOCITY)) //
+            .add(option("Increase Volume", OutputType.PLAYER_INCREASE_VELOCITY)) //
+            .add(option("Select Channel", OutputType.PLAYER_SELECT_CHANNEL)) //
+            .add(option("Previous Channel", OutputType.PLAYER_PREVIOUS_CHANNEL)) //
+            .add(option("Next Channel", OutputType.PLAYER_NEXT_CHANNEL))) //
 
         .add(optionGroup("Background Settings") //
-            .add(option("Mute", Mapping.BACKGROUND_MUTE)) //
-            .add(option("Select Volume", Mapping.BACKGROUND_SELECT_VELOCITY)) //
-            .add(option("Decrease Volume", Mapping.BACKGROUND_DECREASE_VELOCITY)) //
-            .add(option("Increase Volume", Mapping.BACKGROUND_INCREASE_VELOCITY))) //
+            .add(option("Mute", OutputType.BACKGROUND_MUTE)) //
+            .add(option("Select Volume", OutputType.BACKGROUND_SELECT_VELOCITY)) //
+            .add(option("Decrease Volume", OutputType.BACKGROUND_DECREASE_VELOCITY)) //
+            .add(option("Increase Volume", OutputType.BACKGROUND_INCREASE_VELOCITY))) //
 
         .add(optionGroup("Master Settings") //
-            .add(option("Select Volume", Mapping.MASTER_SELECT_VOLUME)) //
-            .add(option("Decrease Volume", Mapping.MASTER_DECREASE_VOLUME)) //
-            .add(option("Increase Volume", Mapping.MASTER_INCREASE_VOLUME)) //
-            .add(option("Override Instrument", Mapping.MASTER_INSTRUMENT))) //
+            .add(option("Select Volume", OutputType.MASTER_SELECT_VOLUME)) //
+            .add(option("Decrease Volume", OutputType.MASTER_DECREASE_VOLUME)) //
+            .add(option("Increase Volume", OutputType.MASTER_INCREASE_VOLUME)) //
+            .add(option("Override Instrument", OutputType.MASTER_INSTRUMENT))) //
 
         .add(optionGroup("Transport Settings") //
-            .add(option("Play/Resume", Mapping.TRANSPORT_PLAY)) //
-            .add(option("Stop/Pause", Mapping.TRANSPORT_STOP)) //
-            .add(option("Select Measure", Mapping.TRANSPORT_SELECT_MEASURE)) //
-            .add(option("Previous Measure", Mapping.TRANSPORT_PREVIOUS_MEASURE)) //
-            .add(option("Next Measure", Mapping.TRANSPORT_NEXT_MEASURE)) //
-            .add(option("Select Tempo", Mapping.TRANSPORT_SELECT_TEMPO)) //
-            .add(option("Decrease Tempo", Mapping.TRANSPORT_DECREASE_TEMPO)) //
-            .add(option("Increase Tempo", Mapping.TRANSPORT_INCREASE_TEMPO))) //
+            .add(option("Play/Resume", OutputType.TRANSPORT_PLAY)) //
+            .add(option("Stop/Pause", OutputType.TRANSPORT_STOP)) //
+            .add(option("Select Measure", OutputType.TRANSPORT_SELECT_MEASURE)) //
+            .add(option("Previous Measure", OutputType.TRANSPORT_PREVIOUS_MEASURE)) //
+            .add(option("Next Measure", OutputType.TRANSPORT_NEXT_MEASURE)) //
+            .add(option("Select Tempo", OutputType.TRANSPORT_SELECT_TEMPO)) //
+            .add(option("Decrease Tempo", OutputType.TRANSPORT_DECREASE_TEMPO)) //
+            .add(option("Increase Tempo", OutputType.TRANSPORT_INCREASE_TEMPO))) //
 
         .add(optionGroup("Library Settings") //
-            .add(option("Select Song", Mapping.LIBRARY_SELECT_SONG)) //
-            .add(option("Previous Song", Mapping.LIBRARY_PREVIOUS_SONG)) //
-            .add(option("Next Song", Mapping.LIBRARY_NEXT_SONG)) //
-            .add(option("Select Transpose", Mapping.LIBRARY_SELECT_TRANSPOSE)) //
-            .add(option("Transpose Lower", Mapping.LIBRARY_TRANSPOSE_LOWER)) //
-            .add(option("Transpose Higher", Mapping.LIBRARY_TRANSPOSE_HIGHER))) //
+            .add(option("Select Song", OutputType.LIBRARY_SELECT_SONG)) //
+            .add(option("Previous Song", OutputType.LIBRARY_PREVIOUS_SONG)) //
+            .add(option("Next Song", OutputType.LIBRARY_NEXT_SONG)) //
+            .add(option("Select Transpose", OutputType.LIBRARY_SELECT_TRANSPOSE)) //
+            .add(option("Transpose Lower", OutputType.LIBRARY_TRANSPOSE_LOWER)) //
+            .add(option("Transpose Higher", OutputType.LIBRARY_TRANSPOSE_HIGHER))) //
 
         .add(optionGroup("Karaoke Settings") //
-            .add(option("Play Notes at Tick", Mapping.KARAOKE_TYPE_TICK)) //
-            .add(option("Play Notes in Measure", Mapping.KARAOKE_TYPE_MEASURE))); //
+            .add(option("Play Notes at Tick", OutputType.KARAOKE_TYPE_TICK)) //
+            .add(option("Play Notes in Measure", OutputType.KARAOKE_TYPE_MEASURE)) //
+            .add(option("Select Group", OutputType.KARAOKE_SELECT_GROUP)) //
+            .add(option("Select Sound", OutputType.KARAOKE_SELECT_SOUND))); //
   }
 
-  private Node createMappingDetails(OutputMessage outputMessage) {
-    // NB: fieldset does not support display: flex;
-    // See https://stackoverflow.com/questions/28078681/why-cant-fieldset-be-flex-containers`
-    return div(".row") //
-        .add(form("#command", ".row") //
-            .addSubmitHandler() //
-            .add(fieldSet() //
-                .add(legend() //
-                    .add(label() //
-                        .add(text("&nbsp;Command&nbsp;")))) //
-                .add(createMapping()) //
-                .add(submit() //
-                    .setValue("Set")))) //
-        .add(form("#group", ".row") //
-            .addSubmitHandler() //
-            .add(fieldSet() //
-                .add(legend() //
-                    .add(label() //
-                        .add(text("&nbsp;Group&nbsp;")))) //
-                .add(text("Index")) //
-                .add(numberInput() //
-                    .setMinimum(0) //
-                    .setName("group-index") //
-                    .required()) //
-                .add(text("Label")) //
-                .add(textInput() //
-                    .setName("group-label") //
-                    .required()) //
-                .add(submit() //
-                    .setValue("Set")))) //
-        .add(form("#sound", ".row") //
-            .addSubmitHandler() //
-            .add(fieldSet() //
-                .add(legend() //
-                    .add(label() //
-                        .add(text("&nbsp;Sound&nbsp;")))) //
-                .add(text("Index")) //
-                .add(numberInput() //
-                    .setMinimum(0) //
-                    .setName("sound-index") //
-                    .required()) //
-                .add(text("Label")) //
-                .add(textInput() //
-                    .setName("sound-label") //
-                    .required()) //
-                .add(submit() //
-                    .setValue("Set")))) //
-    ; //
-  }
-
-  private String formatCommand(int command) {
-    String s;
-    switch (command) {
-    case ShortMessage.NOTE_OFF:
-      s = "NOTE_OFF";
-      break;
-    case ShortMessage.NOTE_ON:
-      s = "NOTE_ON";
-      break;
-    case ShortMessage.POLY_PRESSURE:
-      s = "POLY_PRESSURE";
-      break;
-    case ShortMessage.CONTROL_CHANGE:
-      s = "CONTROL_CHANGE";
-      break;
-    case ShortMessage.PROGRAM_CHANGE:
-      s = "PROGRAM_CHANGE";
-      break;
-    case ShortMessage.CHANNEL_PRESSURE:
-      s = "CHANNEL_PRESSURE";
-      break;
-    case ShortMessage.PITCH_BEND:
-      s = "PITCH_BEND";
-      break;
-    default:
-      s = "COMMAND_" + command;
-      break;
-    }
-    return s;
-  }
-
-  private String formatOutputMessage(OutputMessage outputMessage) {
-    return outputMessage == null ? "Default" : outputMessage.asString();
-  }
-
-  private Node option(String text, Mapping mapping) {
-    return super.option(text, mapping.name());
+  private Node option(String text, OutputType outputType) {
+    return super.option(text, outputType.name());
   }
 
 }

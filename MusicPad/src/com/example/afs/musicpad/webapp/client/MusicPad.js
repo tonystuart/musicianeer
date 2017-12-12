@@ -1,5 +1,9 @@
 "use strict";
+
 var musicPad = musicPad || {};
+
+musicPad.moveData = {};
+musicPad.zIndex = 0;
 
 musicPad.createNode = function(html) {
     let template = document.createElement('template');
@@ -61,6 +65,51 @@ musicPad.onInput = function(event, value) {
         id: id,
         value: value
     }));
+}
+
+musicPad.onMoveDrop = function(event) {
+    event.preventDefault();
+    if (musicPad.moveData.element) {
+        const moveData = musicPad.moveData;
+        const deltaX = event.x - moveData.x;
+        const deltaY = event.y - moveData.y;
+        const element = moveData.element;
+        const target = event.target;
+        const percentX = ((element.offsetLeft + deltaX) * 100) / target.offsetWidth;
+        const percentY = ((element.offsetTop + deltaY) * 100) / target.offsetHeight;
+        element.style.left = percentX + "%";
+        element.style.top = percentY + "%";
+        musicPad.send(JSON.stringify({
+            type: 'OnBrowserEvent',
+            action: 'MOVE',
+            id: element.id,
+            value: JSON.stringify({
+                percentX: percentX,
+                percentY: percentY
+            })
+        }));
+    }
+}
+
+musicPad.onMoveEnd = function(event) {
+    musicPad.moveData.element.style.visibility = "visible";
+    console.log("Making " + musicPad.moveData.element.id + " visible");
+}
+
+musicPad.onMoveOver = function(event) {
+    event.preventDefault();
+}
+
+musicPad.onMoveStart = function(event) {
+    musicPad.moveData = {
+        x: event.x,
+        y: event.y,
+        element: event.target
+    }
+    musicPad.moveData.element.style.zIndex = ++musicPad.zIndex;
+    window.requestAnimationFrame(function() {
+        musicPad.moveData.element.style.visibility = "hidden";
+    });
 }
 
 musicPad.onShadowUpdate = function(message) {

@@ -44,6 +44,9 @@ public abstract class ControllerTask extends ServiceTask {
     // Defer processing that could send shadow update messages until here
   }
 
+  protected void doMove(String id, String value) {
+  }
+
   protected void doSubmit(String id, String value) {
   }
 
@@ -60,6 +63,9 @@ public abstract class ControllerTask extends ServiceTask {
       break;
     case SUBMIT:
       doSubmit(message.getId(), message.getValue());
+      break;
+    case MOVE:
+      doMove(message.getId(), message.getValue());
       break;
     default:
       throw new UnsupportedOperationException();

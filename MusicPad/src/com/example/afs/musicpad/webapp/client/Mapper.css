@@ -12,26 +12,26 @@
 .tab {
 	flex-direction: column;
 }
-table ,tr td{
-    /* border:1px solid red */
-    text-align: center;
+
+#mapper-diagram {
+  font-size: 2vh;
+  flex: 1;
+  position: relative;
 }
-tbody {
-    display:block;
-    height: 500px;
-    overflow:auto;
-    /* flex-grow: 1; */
+
+.mapping {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid white;
+  width: fit-content;
+  background-color: gray;
+  padding: 5px;
+  align-items: stretch;
+  position: absolute;
 }
-thead, tbody tr {
-    display:table;
-    width:100%;
-    table-layout:fixed;/* even columns width , fix width of table too*/
-}
-thead {
-    width: calc( 100% - 1em )/* scrollbar is average 1em/16px width, remove it from thead width */
-}
-table {
-    /* width: 1400px; */
-    flex-grow: 1;
-    border: 1px solid white;
+
+.mapper-index-label {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
 }

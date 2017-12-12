@@ -29,6 +29,10 @@ public class MidiConfiguration implements Configuration {
     SELECTED, ACTIVE, INACTIVE
   }
 
+  public enum DeviceType {
+    Key, Pad, Rotary, Slider, Wheel, Button
+  }
+
   public static class GroupInputCode extends InputCode {
     public GroupInputCode(String label, int inputCode) {
       super(label, inputCode);
@@ -65,14 +69,25 @@ public class MidiConfiguration implements Configuration {
 
   public static class InputMessage implements Comparable<InputMessage> {
 
-    private int command;
     private int channel;
     private int control;
+    private InputType inputType;
 
     public InputMessage(ShortMessage shortMessage) {
-      command = shortMessage.getCommand();
+      int command = shortMessage.getCommand();
       channel = shortMessage.getChannel();
       control = shortMessage.getData1();
+      switch (command) {
+      case ShortMessage.NOTE_OFF:
+      case ShortMessage.NOTE_ON:
+      case ShortMessage.POLY_PRESSURE:
+      case ShortMessage.CHANNEL_PRESSURE:
+        inputType = InputType.KEY;
+        break;
+      default:
+        inputType = InputType.CONTROL;
+        break;
+      }
     }
 
     @Override
@@ -85,13 +100,8 @@ public class MidiConfiguration implements Configuration {
       if (relation != 0) {
         return relation;
       }
-      relation = this.command - that.command;
+      relation = this.inputType.compareTo(that.inputType);
       if (relation != 0) {
-        if (this.command == ShortMessage.NOTE_ON && that.command == ShortMessage.NOTE_OFF) {
-          relation = -1;
-        } else if (this.command == ShortMessage.NOTE_OFF && that.command == ShortMessage.NOTE_ON) {
-          relation = +1;
-        }
         return relation;
       }
       return 0;
@@ -112,10 +122,10 @@ public class MidiConfiguration implements Configuration {
       if (channel != other.channel) {
         return false;
       }
-      if (command != other.command) {
+      if (control != other.control) {
         return false;
       }
-      if (control != other.control) {
+      if (inputType != other.inputType) {
         return false;
       }
       return true;
@@ -125,12 +135,12 @@ public class MidiConfiguration implements Configuration {
       return channel;
     }
 
-    public int getCommand() {
-      return command;
-    }
-
     public int getControl() {
       return control;
+    }
+
+    public InputType getInputType() {
+      return inputType;
     }
 
     @Override
@@ -138,21 +148,26 @@ public class MidiConfiguration implements Configuration {
       final int prime = 31;
       int result = 1;
       result = prime * result + channel;
-      result = prime * result + command;
       result = prime * result + control;
+      result = prime * result + ((inputType == null) ? 0 : inputType.hashCode());
       return result;
     }
 
     @Override
     public String toString() {
-      return "InputMessage [command=" + command + ", channel=" + channel + ", control=" + control + "]";
+      return "InputMessage [channel=" + channel + ", control=" + control + ", inputType=" + inputType + "]";
     }
 
+  }
+
+  public enum InputType {
+    CONTROL, KEY
   }
 
   public static class OutputMessage {
     private Command command;
     private DeviceCommand deviceCommand;
+    private DeviceType deviceType;
     private GroupInputCode group;
     private SoundInputCode sound;
 
@@ -201,6 +216,10 @@ public class MidiConfiguration implements Configuration {
 
     public DeviceCommand getDeviceCommand() {
       return deviceCommand;
+    }
+
+    public DeviceType getDeviceType() {
+      return deviceType;
     }
 
     public GroupInputCode getGroup() {

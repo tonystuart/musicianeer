@@ -27,6 +27,7 @@ import com.example.afs.musicpad.device.midi.MidiConfiguration.InputMessage;
 import com.example.afs.musicpad.device.midi.MidiConfiguration.OutputMessage;
 import com.example.afs.musicpad.device.midi.MidiConfiguration.SoundInputCode;
 import com.example.afs.musicpad.device.midi.MidiController;
+import com.example.afs.musicpad.html.Parent;
 import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnDeviceAttached;
 import com.example.afs.musicpad.message.OnDeviceCommand;
@@ -39,7 +40,7 @@ import com.example.afs.musicpad.service.Services;
 import com.example.afs.musicpad.task.ControllerTask;
 import com.example.afs.musicpad.task.MessageBroker;
 import com.example.afs.musicpad.util.JsonUtilities;
-import com.example.afs.musicpad.webapp.mapper.MapperView.Mapping;
+import com.example.afs.musicpad.webapp.mapper.MapperView.OutputType;
 
 public class MapperController extends ControllerTask {
 
@@ -61,20 +62,33 @@ public class MapperController extends ControllerTask {
   @Override
   protected void doClick(String id) {
     if (id.startsWith("mapping-")) {
-      mapperView.selectElement(id, "selected-mapping");
-      //deviceIndex = Integer.parseInt(id.substring("device-".length()));
+      mapperView.selectMapping(id);
+    }
+  }
+
+  @Override
+  protected void doInput(String id, String value) {
+    if (id.startsWith("device-type")) {
+      displayMappings(Integer.parseInt(value));
     }
   }
 
   @Override
   protected void doLoad() {
-    // Defer processing that could send shadow update messages until here
     addShadowUpdate(new OnShadowUpdate(Action.REPLACE_CHILDREN, "body", mapperView.render()));
     NavigableSet<Integer> devices = request(Services.getDeviceIndexes);
     for (Integer deviceIndex : devices) {
       addDevice(deviceIndex);
     }
-    // TODO: Select first item, e.g. doClick(firstId)
+    mapperView.displayDeviceSelector(deviceControllers);
+    if (deviceControllers.size() > 0) {
+      displayMappings(deviceControllers.firstKey());
+    }
+  }
+
+  @Override
+  protected void doMove(String id, String value) {
+    System.out.println("doMove: id=" + id + ", value=" + value);
   }
 
   @Override
@@ -108,18 +122,13 @@ public class MapperController extends ControllerTask {
     Controller controller = request(new DeviceControllerService(deviceIndex));
     if (controller instanceof MidiController) {
       deviceControllers.put(deviceIndex, controller);
-      MidiConfiguration configuration = (MidiConfiguration) controller.getConfiguration();
-      NavigableMap<InputMessage, OutputMessage> inputMap = configuration.getInputMap();
-      for (Entry<InputMessage, OutputMessage> entry : inputMap.entrySet()) {
-        mapperView.displayMapping(configuration.getDeviceType(), entry.getKey(), entry.getValue());
-      }
     }
   }
 
   private void configureCommand(String value) {
     MidiConfiguration configuration = getConfiguration();
-    Mapping mapping = Mapping.valueOf(value);
-    switch (mapping) {
+    OutputType outputType = OutputType.valueOf(value);
+    switch (outputType) {
     case BACKGROUND_DECREASE_VELOCITY:
       configuration.put(shortMessage, Command.DECREASE_BACKGROUND_VELOCITY);
       break;
@@ -220,7 +229,17 @@ public class MapperController extends ControllerTask {
       configuration.put(shortMessage, Command.STOP);
       break;
     default:
-      throw new UnsupportedOperationException(mapping.name());
+      throw new UnsupportedOperationException(outputType.name());
+    }
+  }
+
+  private void displayMappings(int deviceIndex) {
+    this.deviceIndex = deviceIndex;
+    Controller controller = deviceControllers.get(deviceIndex);
+    MidiConfiguration configuration = (MidiConfiguration) controller.getConfiguration();
+    NavigableMap<InputMessage, OutputMessage> inputMap = configuration.getInputMap();
+    for (Entry<InputMessage, OutputMessage> entry : inputMap.entrySet()) {
+      mapperView.displayMapping(entry.getKey(), entry.getValue());
     }
   }
 
@@ -229,6 +248,7 @@ public class MapperController extends ControllerTask {
 
   private void doDeviceAttached(OnDeviceAttached message) {
     addDevice(message.getDeviceIndex());
+    mapperView.displayDeviceSelector(deviceControllers);
   }
 
   private void doDeviceCommand(OnDeviceCommand message) {
@@ -239,57 +259,22 @@ public class MapperController extends ControllerTask {
   }
 
   private void doShortMessage(OnShortMessage message) {
-    deviceIndex = message.getDeviceIndex();
-    ShortMessage shortMessage = message.getShortMessage();
-    int command = shortMessage.getCommand();
-    int channel = shortMessage.getChannel();
-    int data1 = shortMessage.getData1();
-    int data2 = shortMessage.getData2();
-
-    Controller controller = deviceControllers.get(deviceIndex);
-    if (controller == null) {
-      // We don't have the mapping yet
-      return;
-    }
-    MidiConfiguration configuration = (MidiConfiguration) controller.getConfiguration();
-    String deviceType = configuration.getDeviceType();
-    InputMessage inputMessage = new InputMessage(shortMessage);
-    OutputMessage outputMessage = configuration.get(shortMessage);
-    if (outputMessage != null) {
-      // TODO: Find a simpler way to select the existing mapping
-      String id = mapperView.displayMapping(configuration.getDeviceType(), inputMessage, outputMessage);
-      doClick(id);
-    }
-
-    switch (command) {
-    case ShortMessage.NOTE_OFF:
-      break;
-    case ShortMessage.NOTE_ON:
-      this.shortMessage = shortMessage;
-      mapperView.renderInputDetails(deviceType, "NOTE", channel, data1, data2);
-      mapperView.renderMappingDetails(outputMessage);
-      break;
-    case ShortMessage.POLY_PRESSURE:
-      break;
-    case ShortMessage.CONTROL_CHANGE:
-      this.shortMessage = shortMessage;
-      mapperView.renderInputDetails(deviceType, "CONTROL", channel, data1, data2);
-      mapperView.renderMappingDetails(outputMessage);
-      break;
-    case ShortMessage.PROGRAM_CHANGE:
-      this.shortMessage = shortMessage;
-      mapperView.renderInputDetails(deviceType, "PROGRAM_CHANGE", channel, data1, data2);
-      mapperView.renderMappingDetails(outputMessage);
-      break;
-    case ShortMessage.CHANNEL_PRESSURE:
-      break;
-    case ShortMessage.PITCH_BEND:
-      this.shortMessage = shortMessage;
-      mapperView.renderInputDetails(deviceType, "PITCH_BEND", channel, data1, data2);
-      mapperView.renderMappingDetails(outputMessage);
-      break;
-    default:
-      break;
+    if (message.getDeviceIndex() == deviceIndex) {
+      ShortMessage shortMessage = message.getShortMessage();
+      int command = shortMessage.getCommand();
+      if (command == ShortMessage.NOTE_ON || command == ShortMessage.CONTROL_CHANGE || command == ShortMessage.PITCH_BEND) {
+        InputMessage inputMessage = new InputMessage(shortMessage);
+        Controller controller = deviceControllers.get(deviceIndex);
+        MidiConfiguration configuration = (MidiConfiguration) controller.getConfiguration();
+        OutputMessage outputMessage = configuration.get(shortMessage);
+        String id = mapperView.getMappingId(inputMessage);
+        Parent mapping = mapperView.getElementById(id);
+        if (mapping != null) {
+          doClick(id);
+        } else {
+          mapperView.displayMapping(inputMessage, outputMessage);
+        }
+      }
     }
   }
 

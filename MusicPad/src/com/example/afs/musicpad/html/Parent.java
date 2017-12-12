@@ -32,6 +32,25 @@ public class Parent extends Element {
     return (Parent) super.addClickHandler();
   }
 
+  public Parent addMoveSource() {
+    if (getId() == null) {
+      throw new IllegalStateException();
+    }
+    setProperty("draggable", "true");
+    setProperty("ondragstart", "musicPad.onMoveStart(event)");
+    setProperty("ondragend", "musicPad.onMoveEnd(event)");
+    return this;
+  }
+
+  public Parent addMoveTarget() {
+    if (getId() == null) {
+      throw new IllegalStateException();
+    }
+    setProperty("ondragover", "musicPad.onMoveOver(event)");
+    setProperty("ondrop", "musicPad.onMoveDrop(event)");
+    return this;
+  }
+
   public void appendChild(Node node) {
     if (node.getParent() != null || node.getPrevious() != null || node.getNext() != null) {
       throw new IllegalArgumentException("Node is already attached");
@@ -113,11 +132,7 @@ public class Parent extends Element {
 
   @Override
   protected void processProperty(String property) {
-    if (property.startsWith("$")) {
-      appendChild(new TextElement(property.substring(1)));
-    } else {
-      throw new IllegalArgumentException(property);
-    }
+    appendChild(new TextElement(property));
   }
 
 }
