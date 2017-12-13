@@ -11,68 +11,11 @@ package com.example.afs.musicpad.html;
 
 public abstract class Node {
 
-  private Node next;
-  private Node previous;
-  private Parent parent;
   private Object data;
-
-  public void append(Node node) {
-    if (node.parent != null || node.previous != null || node.next != null) {
-      throw new IllegalArgumentException("Node is already attached");
-    }
-    node.parent = parent;
-    if (next == null) {
-      parent.setTail(node);
-    } else {
-      next.previous = node;
-    }
-    node.next = next;
-    next = node;
-  }
 
   @SuppressWarnings("unchecked")
   public <T> T getData() {
     return (T) data;
-  }
-
-  public Node getNext() {
-    return next;
-  }
-
-  public Parent getParent() {
-    return parent;
-  }
-
-  public Node getPrevious() {
-    return previous;
-  }
-
-  public void prepend(Node node) {
-    if (node.parent != null || node.previous != null || node.next != null) {
-      throw new IllegalArgumentException("Node is already attached");
-    }
-    node.parent = parent;
-    if (previous == null) {
-      parent.setHead(node);
-    } else {
-      previous.next = node;
-    }
-    node.previous = previous;
-    previous = node;
-  }
-
-  public void remove() {
-    if (next == null) {
-      parent.setTail(previous);
-    } else {
-      next.previous = previous;
-    }
-    if (previous == null) {
-      parent.setHead(next);
-    } else {
-      previous.next = next;
-    }
-    next = previous = parent = null;
   }
 
   public String render() {
@@ -88,10 +31,6 @@ public abstract class Node {
     T oldData = (T) this.data;
     this.data = data;
     return oldData;
-  }
-
-  public void setParent(Parent parent) {
-    this.parent = parent;
   }
 
   @Override

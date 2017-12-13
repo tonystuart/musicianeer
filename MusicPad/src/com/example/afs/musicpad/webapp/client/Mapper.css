@@ -1,37 +1,34 @@
-@CHARSET "UTF-8";
-
-.selected-mapping {
+@CHARSET "UTF-8"; .selected-mapping {
     color: black;
     background-color: white;
 }
 
 #input {
-	margin-bottom: 20px;
+    margin-bottom: 20px;
 }
 
 .tab {
-	flex-direction: column;
+    flex-direction: column;
 }
 
 #mapper-diagram {
-  font-size: 2vh;
-  flex: 1;
-  position: relative;
+    font-size: 2vh;
+    flex: 1;
+    position: relative;
 }
 
 .mapping {
-  display: flex;
-  flex-direction: column;
-  border: 1px solid white;
-  width: fit-content;
-  background-color: gray;
-  padding: 5px;
-  align-items: stretch;
-  position: absolute;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid white;
+    width: fit-content;
+    background-color: gray;
+    padding: 5px;
+    position: absolute;
 }
 
 .mapper-index-label {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
 }

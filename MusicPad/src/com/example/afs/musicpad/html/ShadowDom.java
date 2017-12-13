@@ -61,6 +61,10 @@ public class ShadowDom {
     onAppendChild(parent, newNode.render());
   }
 
+  public Button button(String... properties) {
+    return new Button(properties);
+  }
+
   public CheckBox checkbox(String... properties) {
     return new CheckBox(properties);
   }
@@ -115,14 +119,17 @@ public class ShadowDom {
     return new TableHeader(properties);
   }
 
-  public void insertBefore(Node newNode, Element existingElement) {
-    insertBefore(newNode, existingElement, true);
+  public void insertBefore(Parent parent, Node newNode, Element existingElement) {
+    insertBefore(parent, newNode, existingElement, true);
   }
 
-  public void insertBefore(Node newNode, Element existingElement, boolean isManageDeep) {
+  public void insertBefore(Parent parent, Node newNode, Element existingElement, boolean isManageDeep) {
     addManagedNode(newNode, isManageDeep);
-    existingElement.prepend(newNode);
-    onInsertBefore(existingElement, newNode.render());
+    int index = parent.indexOf(existingElement);
+    if (index != -1) {
+      parent.insertChild(newNode, index);
+      onInsertBefore(existingElement, newNode.render());
+    }
   }
 
   public Label label(String... properties) {
@@ -145,7 +152,7 @@ public class ShadowDom {
     return new NumberInput(properties);
   }
 
-  public Option option(String text, String value) {
+  public Option option(String text, Object value) {
     return new Option(text, value);
   }
 
@@ -161,14 +168,17 @@ public class ShadowDom {
     return new PercentRange(properties);
   }
 
-  public void remove(Element element) {
-    remove(element, true);
+  public void remove(Parent parent, Element element) {
+    remove(parent, element, true);
   }
 
-  public void remove(Element element, boolean isManageDeep) {
+  public void remove(Parent parent, Element element, boolean isManageDeep) {
     removeManagedNode(element, isManageDeep);
-    element.remove();
-    onRemoveChild(element);
+    int index = parent.indexOf(element);
+    if (index != -1) {
+      parent.removeChild(index);
+      onRemoveChild(element);
+    }
   }
 
   public void removeClass(Element element, String className) {
@@ -199,7 +209,9 @@ public class ShadowDom {
   }
 
   public void replaceChildren(Parent parent, Node newChild, boolean isManageDeep) {
-    for (Node oldChild = parent.getHead(); oldChild != null; oldChild = oldChild.getNext()) {
+    int childCount = parent.getChildCount();
+    for (int childIndex = 0; childIndex < childCount; childIndex++) {
+      Node oldChild = parent.getChild(childIndex);
       removeManagedNode(oldChild, isManageDeep);
     }
     if (newChild instanceof Element) {
@@ -331,7 +343,9 @@ public class ShadowDom {
       }
       if (isManageDeep && node instanceof Parent) {
         Parent parent = (Parent) node;
-        for (Node child = parent.getHead(); child != null; child = child.getNext()) {
+        int childCount = parent.getChildCount();
+        for (int childIndex = 0; childIndex < childCount; childIndex++) {
+          Node child = parent.getChild(childIndex);
           addManagedNode(child, isManageDeep);
         }
       }
@@ -362,7 +376,9 @@ public class ShadowDom {
       }
       if (isManageDeep && node instanceof Parent) {
         Parent parent = (Parent) node;
-        for (Node child = parent.getHead(); child != null; child = child.getNext()) {
+        int childCount = parent.getChildCount();
+        for (int childIndex = 0; childIndex < childCount; childIndex++) {
+          Node child = parent.getChild(childIndex);
           removeManagedNode(child, isManageDeep);
         }
       }

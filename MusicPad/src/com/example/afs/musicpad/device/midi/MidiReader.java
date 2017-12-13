@@ -18,9 +18,6 @@ import javax.sound.midi.ShortMessage;
 import com.example.afs.musicpad.Command;
 import com.example.afs.musicpad.DeviceCommand;
 import com.example.afs.musicpad.device.common.DeviceHandler;
-import com.example.afs.musicpad.device.midi.MidiConfiguration.GroupInputCode;
-import com.example.afs.musicpad.device.midi.MidiConfiguration.OutputMessage;
-import com.example.afs.musicpad.device.midi.MidiConfiguration.SoundInputCode;
 import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnDeviceCommand;
 import com.example.afs.musicpad.message.OnShortMessage;
@@ -102,34 +99,137 @@ public class MidiReader {
     return s.toString();
   }
 
+  private Object getCommandType(OutputType outputType) {
+    Object commandType;
+    switch (outputType) {
+    case BACKGROUND_DECREASE_VELOCITY:
+      commandType = Command.DECREASE_BACKGROUND_VELOCITY;
+      break;
+    case BACKGROUND_INCREASE_VELOCITY:
+      commandType = Command.INCREASE_BACKGROUND_VELOCITY;
+      break;
+    case BACKGROUND_MUTE:
+      commandType = DeviceCommand.MUTE_BACKGROUND;
+      break;
+    case BACKGROUND_SELECT_VELOCITY:
+      commandType = Command.SET_BACKGROUND_VELOCITY;
+      break;
+    case KARAOKE_TYPE_MEASURE:
+      commandType = DeviceCommand.OUTPUT_MEASURE;
+      break;
+    case KARAOKE_TYPE_TICK:
+      commandType = DeviceCommand.OUTPUT_TICK;
+      break;
+    case LIBRARY_NEXT_SONG:
+      commandType = Command.INCREASE_SONG_INDEX;
+      break;
+    case LIBRARY_PREVIOUS_SONG:
+      commandType = Command.DECREASE_SONG_INDEX;
+      break;
+    case LIBRARY_SELECT_SONG:
+      commandType = Command.SET_SONG_INDEX;
+      break;
+    case LIBRARY_SELECT_TRANSPOSE:
+      commandType = Command.SET_TRANSPOSITION;
+      break;
+    case LIBRARY_TRANSPOSE_HIGHER:
+      commandType = Command.INCREASE_TRANSPOSITION;
+      break;
+    case LIBRARY_TRANSPOSE_LOWER:
+      commandType = Command.DECREASE_TRANSPOSITION;
+      break;
+    case MASTER_DECREASE_VOLUME:
+      commandType = Command.DECREASE_MASTER_GAIN;
+      break;
+    case MASTER_INCREASE_VOLUME:
+      commandType = Command.INCREASE_MASTER_GAIN;
+      break;
+    case MASTER_INSTRUMENT:
+      commandType = Command.SET_MASTER_PROGRAM;
+      break;
+    case MASTER_SELECT_VOLUME:
+      commandType = Command.SET_MASTER_GAIN;
+      break;
+    case PLAYER_DECREASE_VELOCITY:
+      commandType = DeviceCommand.DECREASE_PLAYER_VELOCITY;
+      break;
+    case PLAYER_INCREASE_VELOCITY:
+      commandType = DeviceCommand.INCREASE_PLAYER_VELOCITY;
+      break;
+    case PLAYER_NEXT_CHANNEL:
+      commandType = DeviceCommand.NEXT_CHANNEL;
+      break;
+    case PLAYER_NEXT_PROGRAM:
+      commandType = DeviceCommand.NEXT_PROGRAM;
+      break;
+    case PLAYER_PREVIOUS_CHANNEL:
+      commandType = DeviceCommand.PREVIOUS_CHANNEL;
+      break;
+    case PLAYER_PREVIOUS_PROGRAM:
+      commandType = DeviceCommand.PREVIOUS_PROGRAM;
+      break;
+    case PLAYER_SELECT_CHANNEL:
+      commandType = DeviceCommand.SELECT_CHANNEL;
+      break;
+    case PLAYER_SELECT_PROGRAM:
+      commandType = DeviceCommand.PROGRAM;
+      break;
+    case PLAYER_SELECT_VELOCITY:
+      commandType = DeviceCommand.VELOCITY;
+      break;
+    case TRANSPORT_DECREASE_TEMPO:
+      commandType = Command.DECREASE_TEMPO;
+      break;
+    case TRANSPORT_INCREASE_TEMPO:
+      commandType = Command.INCREASE_TEMPO;
+      break;
+    case TRANSPORT_NEXT_MEASURE:
+      commandType = Command.MOVE_FORWARD;
+      break;
+    case TRANSPORT_PLAY:
+      commandType = Command.PLAY;
+      break;
+    case TRANSPORT_PREVIOUS_MEASURE:
+      commandType = Command.MOVE_BACKWARD;
+      break;
+    case TRANSPORT_SELECT_MEASURE:
+      commandType = Command.SEEK;
+      break;
+    case TRANSPORT_SELECT_TEMPO:
+      commandType = Command.SET_TEMPO;
+      break;
+    case TRANSPORT_STOP:
+      commandType = Command.STOP;
+      break;
+    default:
+      throw new UnsupportedOperationException(outputType.name());
+    }
+    return commandType;
+  }
+
   private void processMappedMessage(ShortMessage shortMessage, OutputMessage outputMessage) {
-    SoundInputCode soundInputCode = outputMessage.getSound();
-    if (soundInputCode != null) {
+    OutputType outputType = outputMessage.getOutputType();
+    if (outputType == OutputType.KARAOKE_SELECT_GROUP) {
       if (shortMessage.getCommand() == ShortMessage.NOTE_ON) {
-        deviceHandler.tsOnDown(soundInputCode.getInputCode(), shortMessage.getData2());
+        deviceHandler.tsOnDown(outputMessage.getIndex(), shortMessage.getData2());
       } else {
-        deviceHandler.tsOnUp(soundInputCode.getInputCode());
+        deviceHandler.tsOnUp(outputMessage.getIndex());
       }
-      return;
-    }
-    GroupInputCode groupInputCode = outputMessage.getGroup();
-    if (groupInputCode != null) {
+    } else if (outputType == OutputType.KARAOKE_SELECT_SOUND) {
       if (shortMessage.getCommand() == ShortMessage.NOTE_ON) {
-        deviceHandler.tsOnDown(groupInputCode.getInputCode(), shortMessage.getData2());
+        deviceHandler.tsOnDown(outputMessage.getIndex(), shortMessage.getData2());
       } else {
-        deviceHandler.tsOnUp(groupInputCode.getInputCode());
+        deviceHandler.tsOnUp(outputMessage.getIndex());
       }
-      return;
-    }
-    Command command = outputMessage.getCommand();
-    if (command != null) {
-      broker.publish(new OnCommand(command, Range.scaleMidiToPercent(shortMessage.getData2())));
-      return;
-    }
-    DeviceCommand deviceCommand = outputMessage.getDeviceCommand();
-    if (deviceCommand != null) {
-      broker.publish(new OnDeviceCommand(deviceCommand, deviceHandler.tsGetDeviceIndex(), Range.scaleMidiToPercent(shortMessage.getData2())));
-      return;
+    } else {
+      Object commandType = getCommandType(outputType);
+      if (commandType instanceof Command) {
+        Command command = (Command) commandType;
+        broker.publish(new OnCommand(command, Range.scaleMidiToPercent(shortMessage.getData2())));
+      } else if (commandType instanceof DeviceCommand) {
+        DeviceCommand deviceCommand = (DeviceCommand) commandType;
+        broker.publish(new OnDeviceCommand(deviceCommand, deviceHandler.tsGetDeviceIndex(), Range.scaleMidiToPercent(shortMessage.getData2())));
+      }
     }
   }
 
@@ -163,11 +263,12 @@ public class MidiReader {
     try {
       if (message instanceof ShortMessage) {
         ShortMessage shortMessage = (ShortMessage) message;
-        OutputMessage outputMessage = configuration.get(shortMessage);
-        if (outputMessage != null) {
-          processMappedMessage(shortMessage, outputMessage);
-        } else {
+        InputMessage inputMessage = new InputMessage(shortMessage);
+        OutputMessage outputMessage = configuration.get(inputMessage);
+        if (outputMessage == null) {
           processUnmappedMessage(shortMessage);
+        } else {
+          processMappedMessage(shortMessage, outputMessage);
         }
         broker.publish(new OnShortMessage(deviceHandler.tsGetDeviceIndex(), shortMessage));
       } else {

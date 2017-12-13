@@ -13,12 +13,12 @@ import java.util.Map.Entry;
 import java.util.NavigableMap;
 
 import com.example.afs.musicpad.device.common.Controller;
-import com.example.afs.musicpad.device.midi.MidiConfiguration;
-import com.example.afs.musicpad.device.midi.MidiConfiguration.DeviceType;
-import com.example.afs.musicpad.device.midi.MidiConfiguration.InputMessage;
-import com.example.afs.musicpad.device.midi.MidiConfiguration.InputType;
-import com.example.afs.musicpad.device.midi.MidiConfiguration.OutputMessage;
+import com.example.afs.musicpad.device.midi.InputMessage;
+import com.example.afs.musicpad.device.midi.InputType;
+import com.example.afs.musicpad.device.midi.OutputMessage;
+import com.example.afs.musicpad.device.midi.OutputType;
 import com.example.afs.musicpad.html.Division;
+import com.example.afs.musicpad.html.Form;
 import com.example.afs.musicpad.html.Node;
 import com.example.afs.musicpad.html.Option;
 import com.example.afs.musicpad.html.Parent;
@@ -28,45 +28,6 @@ import com.example.afs.musicpad.html.ShadowDom;
 import com.example.afs.musicpad.task.ControllerTask;
 
 public class MapperView extends ShadowDom {
-
-  public enum OutputType {
-    DEFAULT, //
-    PLAYER_SELECT_PROGRAM, //
-    PLAYER_PREVIOUS_PROGRAM, //
-    PLAYER_NEXT_PROGRAM, //
-    PLAYER_SELECT_VELOCITY, //
-    PLAYER_DECREASE_VELOCITY, //
-    PLAYER_INCREASE_VELOCITY, //
-    PLAYER_SELECT_CHANNEL, //
-    PLAYER_PREVIOUS_CHANNEL, //
-    PLAYER_NEXT_CHANNEL, //
-    BACKGROUND_MUTE, //
-    BACKGROUND_SELECT_VELOCITY, //
-    BACKGROUND_DECREASE_VELOCITY, //
-    BACKGROUND_INCREASE_VELOCITY, //
-    MASTER_SELECT_VOLUME, //
-    MASTER_DECREASE_VOLUME, //
-    MASTER_INCREASE_VOLUME, //
-    MASTER_INSTRUMENT, //
-    TRANSPORT_PLAY, //
-    TRANSPORT_STOP, //
-    TRANSPORT_SELECT_MEASURE, //
-    TRANSPORT_PREVIOUS_MEASURE, //
-    TRANSPORT_NEXT_MEASURE, //
-    TRANSPORT_SELECT_TEMPO, //
-    TRANSPORT_DECREASE_TEMPO, //
-    TRANSPORT_INCREASE_TEMPO, //
-    LIBRARY_SELECT_SONG, //
-    LIBRARY_PREVIOUS_SONG, //
-    LIBRARY_NEXT_SONG, //
-    LIBRARY_SELECT_TRANSPOSE, //
-    LIBRARY_TRANSPOSE_LOWER, //
-    LIBRARY_TRANSPOSE_HIGHER, //
-    KARAOKE_TYPE_TICK, //
-    KARAOKE_TYPE_MEASURE, //
-    KARAOKE_SELECT_GROUP, //
-    KARAOKE_SELECT_SOUND, //
-  }
 
   public MapperView(ControllerTask controllerTask) {
     super(controllerTask);
@@ -85,35 +46,47 @@ public class MapperView extends ShadowDom {
   public Parent createMapping(InputMessage inputMessage, OutputMessage outputMessage) {
     int channel = inputMessage.getChannel();
     int control = inputMessage.getControl();
-    InputType inputType = inputMessage.getInputType();
-    MidiConfiguration.DeviceType deviceType;
+    InputType inputType;
+    OutputType outputType;
     if (outputMessage == null) {
-      switch (inputType) {
-      case CONTROL:
-        deviceType = MidiConfiguration.DeviceType.Rotary;
-        break;
-      case KEY:
-        deviceType = MidiConfiguration.DeviceType.Key;
-        break;
-      default:
-        throw new UnsupportedOperationException(inputType.toString());
+      if (inputMessage.isKey()) {
+        inputType = InputType.Key;
+      } else {
+        inputType = InputType.Rotary;
       }
+      outputType = OutputType.DEFAULT;
     } else {
-      deviceType = outputMessage.getDeviceType();
+      inputType = outputMessage.getDeviceType();
+      outputType = outputMessage.getOutputType();
     }
     String id = getMappingId(inputMessage);
-    Parent mapping = new Division("#" + id, ".mapping") //
+    Parent mapping = new Form("#" + id, ".mapping") //
+        .addSubmitHandler() //
         .addMoveSource() //
-        .add(div("Input (" + channel + "/" + control + ")")) //
-        .add(createInputSelect(deviceType)) //
+        .add(div(".row") //
+            .add(text("Input (" + channel + "/" + control + ")")) //
+            .add(submit() //
+                .setValue("Set"))) //
+        .add(createInputType(inputType)) //
         .add(div() //
-            .add(div("Output")) //
-            .add(createOutputSelect(OutputType.DEFAULT))) //
-        .add(div(".mapper-index-label") //
-            .add(div("Index")) //
-            .add(numberInput().setMinimum(0).setValue(control).required()) //
-            .add(div("Label")) //
-            .add(textInput().setValue(control).required())); //
+            .add(div() //
+                .add(text("Output"))) //
+            .add(createOutputType(outputType))) //
+        .add(div(".column") //
+            .add(div() //
+                .add(text("Index"))) //
+            .add(numberInput() //
+                .setMinimum(0) //
+                .setName("index") //
+                .setValue(control) //
+                .required()) //
+            .add(div() //
+                .add(text("Label"))) //
+            .add(textInput() //
+                .setName("label") //
+                .setValue(control) //
+                .required())); //
+    mapping.setData(inputMessage);
     return mapping;
   }
 
@@ -189,18 +162,19 @@ public class MapperView extends ShadowDom {
     return select;
   }
 
-  private Select createInputSelect(DeviceType deviceType) {
-    Select select = new Select("#input-select");
-    for (DeviceType value : DeviceType.values()) {
-      Option option = new Option(value.name(), value.name(), value.equals(deviceType));
+  private Select createInputType(InputType inputType) {
+    Select select = new Select();
+    select.setName("input-type");
+    for (InputType value : InputType.values()) {
+      Option option = new Option(value.name(), value.ordinal(), value.equals(inputType));
       select.appendChild(option);
     }
     return select;
   }
 
-  private Select createOutputSelect(OutputType outputType) {
-    return new Select("#output-select") //
-        .addInputHandler() //
+  private Select createOutputType(OutputType outputType) {
+    return new Select() //
+        .setName("output-type") //
         .setValue(outputType.name()) //
         .required() //
         .add(optionGroup("Player Settings") //
@@ -253,7 +227,7 @@ public class MapperView extends ShadowDom {
   }
 
   private Node option(String text, OutputType outputType) {
-    return super.option(text, outputType.name());
+    return super.option(text, outputType.ordinal());
   }
 
 }

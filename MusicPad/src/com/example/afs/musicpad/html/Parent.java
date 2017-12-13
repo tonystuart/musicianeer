@@ -9,10 +9,14 @@
 
 package com.example.afs.musicpad.html;
 
-public class Parent extends Element {
+import java.util.Iterator;
 
-  private Node head;
-  private Node tail;
+import com.example.afs.musicpad.util.DirectList;
+import com.example.afs.musicpad.util.RandomAccessList;
+
+public class Parent extends Element implements Iterable<Node> {
+
+  private RandomAccessList<Node> childNodes = new DirectList<>();
 
   protected Parent(String type) {
     super(type);
@@ -20,6 +24,9 @@ public class Parent extends Element {
 
   protected Parent(String type, String[] properties) {
     super(type, properties);
+    if (childNodes == null) {
+      childNodes = new DirectList<>();
+    }
   }
 
   public Parent add(Node child) {
@@ -51,43 +58,34 @@ public class Parent extends Element {
     return this;
   }
 
-  public void appendChild(Node node) {
-    if (node.getParent() != null || node.getPrevious() != null || node.getNext() != null) {
-      throw new IllegalArgumentException("Node is already attached");
-    }
-    if (tail == null) {
-      head = tail = node;
-      node.setParent(this);
-    } else {
-      tail.append(node);
-    }
-  }
-
-  public CheckBox checkbox(String... properties) {
-    return new CheckBox(properties);
+  public void appendChild(Node childElement) {
+    childNodes.add(childElement);
   }
 
   public void clear() {
-    for (Node child = head; child != null; child = child.getNext()) {
-      child.setParent(null);
-    }
-    head = tail = null;
+    childNodes.clear();
   }
 
-  public Division div(String... properties) {
-    return new Division(properties);
+  @SuppressWarnings("unchecked")
+  public <T> T getChild(int childIndex) {
+    return (T) childNodes.get(childIndex);
   }
 
-  public Node getHead() {
-    return head;
+  public int getChildCount() {
+    return childNodes.size();
   }
 
-  public Node getTail() {
-    return tail;
+  public int indexOf(Node node) {
+    return childNodes.indexOf(node);
   }
 
-  public Label label(String... properties) {
-    return new Label(properties);
+  public void insertChild(Node newChild, int index) {
+    childNodes.add(index, newChild);
+  }
+
+  @Override
+  public Iterator<Node> iterator() {
+    return childNodes.iterator();
   }
 
   public Parent onClick(String handler) {
@@ -95,20 +93,17 @@ public class Parent extends Element {
     return this;
   }
 
-  @Override
-  public Parent property(String name, Object value) {
-    return (Parent) super.property(name, value);
-  }
-
-  public PercentRange range(String... properties) {
-    return new PercentRange(properties);
+  public void removeChild(int index) {
+    childNodes.remove(index);
   }
 
   @Override
   public void render(StringBuilder s) {
     super.render(s);
-    for (Node child = head; child != null; child = child.getNext()) {
-      child.render(s);
+    if (childNodes != null) {
+      for (Node node : childNodes) {
+        node.render(s);
+      }
     }
     s.append(format("</%s>\n", getType()));
   }
@@ -116,23 +111,6 @@ public class Parent extends Element {
   public void replaceChildren(Node node) {
     clear();
     appendChild(node);
-  }
-
-  public void setHead(Node head) {
-    this.head = head;
-  }
-
-  public void setTail(Node tail) {
-    this.tail = tail;
-  }
-
-  public TextElement text(String text) {
-    return new TextElement(text);
-  }
-
-  @Override
-  protected void processProperty(String property) {
-    appendChild(new TextElement(property));
   }
 
 }

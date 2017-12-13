@@ -66,11 +66,6 @@ public class Element extends Node {
     return type;
   }
 
-  public Element property(String name, Object value) {
-    setProperty(name, value);
-    return this;
-  }
-
   public Set<String> realizeClassList() {
     if (classList == null) {
       classList = new HashSet<>();
@@ -129,6 +124,8 @@ public class Element extends Node {
   }
 
   protected void processProperty(String property) {
+    // NB: Beware of order of instance initialization:
+    // https://docs.oracle.com/javase/specs/jls/se8/html/jls-12.html#jls-12.5
     throw new IllegalArgumentException(property);
   }
 

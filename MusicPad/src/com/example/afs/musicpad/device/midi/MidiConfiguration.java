@@ -14,10 +14,6 @@ import java.io.InputStream;
 import java.util.NavigableMap;
 import java.util.TreeMap;
 
-import javax.sound.midi.ShortMessage;
-
-import com.example.afs.musicpad.Command;
-import com.example.afs.musicpad.DeviceCommand;
 import com.example.afs.musicpad.device.common.Configuration;
 import com.example.afs.musicpad.device.common.InputMap;
 import com.example.afs.musicpad.util.FileUtilities;
@@ -27,220 +23,6 @@ public class MidiConfiguration implements Configuration {
 
   public enum ChannelState {
     SELECTED, ACTIVE, INACTIVE
-  }
-
-  public enum DeviceType {
-    Key, Pad, Rotary, Slider, Wheel, Button
-  }
-
-  public static class GroupInputCode extends InputCode {
-    public GroupInputCode(String label, int inputCode) {
-      super(label, inputCode);
-    }
-  }
-
-  public static class InputCode {
-    private String label;
-    private int inputCode;
-
-    public InputCode(String label, int inputCode) {
-      this.label = label;
-      this.inputCode = inputCode;
-    }
-
-    public String asString() {
-      return inputCode + " (" + label + ")";
-    }
-
-    public int getInputCode() {
-      return inputCode;
-    }
-
-    public String getLabel() {
-      return label;
-    }
-
-    @Override
-    public String toString() {
-      return "LabelledIndex [label=" + label + ", inputCode=" + inputCode + "]";
-    }
-
-  }
-
-  public static class InputMessage implements Comparable<InputMessage> {
-
-    private int channel;
-    private int control;
-    private InputType inputType;
-
-    public InputMessage(ShortMessage shortMessage) {
-      int command = shortMessage.getCommand();
-      channel = shortMessage.getChannel();
-      control = shortMessage.getData1();
-      switch (command) {
-      case ShortMessage.NOTE_OFF:
-      case ShortMessage.NOTE_ON:
-      case ShortMessage.POLY_PRESSURE:
-      case ShortMessage.CHANNEL_PRESSURE:
-        inputType = InputType.KEY;
-        break;
-      default:
-        inputType = InputType.CONTROL;
-        break;
-      }
-    }
-
-    @Override
-    public int compareTo(InputMessage that) {
-      int relation = this.channel - that.channel;
-      if (relation != 0) {
-        return relation;
-      }
-      relation = this.control - that.control;
-      if (relation != 0) {
-        return relation;
-      }
-      relation = this.inputType.compareTo(that.inputType);
-      if (relation != 0) {
-        return relation;
-      }
-      return 0;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-      if (this == obj) {
-        return true;
-      }
-      if (obj == null) {
-        return false;
-      }
-      if (getClass() != obj.getClass()) {
-        return false;
-      }
-      InputMessage other = (InputMessage) obj;
-      if (channel != other.channel) {
-        return false;
-      }
-      if (control != other.control) {
-        return false;
-      }
-      if (inputType != other.inputType) {
-        return false;
-      }
-      return true;
-    }
-
-    public int getChannel() {
-      return channel;
-    }
-
-    public int getControl() {
-      return control;
-    }
-
-    public InputType getInputType() {
-      return inputType;
-    }
-
-    @Override
-    public int hashCode() {
-      final int prime = 31;
-      int result = 1;
-      result = prime * result + channel;
-      result = prime * result + control;
-      result = prime * result + ((inputType == null) ? 0 : inputType.hashCode());
-      return result;
-    }
-
-    @Override
-    public String toString() {
-      return "InputMessage [channel=" + channel + ", control=" + control + ", inputType=" + inputType + "]";
-    }
-
-  }
-
-  public enum InputType {
-    CONTROL, KEY
-  }
-
-  public static class OutputMessage {
-    private Command command;
-    private DeviceCommand deviceCommand;
-    private DeviceType deviceType;
-    private GroupInputCode group;
-    private SoundInputCode sound;
-
-    public OutputMessage(Command command) {
-      this.command = command;
-    }
-
-    public OutputMessage(Command command, DeviceCommand deviceCommand, GroupInputCode group, SoundInputCode sound) {
-      this.command = command;
-      this.deviceCommand = deviceCommand;
-      this.group = group;
-      this.sound = sound;
-    }
-
-    public OutputMessage(DeviceCommand deviceCommand) {
-      this.deviceCommand = deviceCommand;
-    }
-
-    public OutputMessage(GroupInputCode group) {
-      this.group = group;
-    }
-
-    public OutputMessage(SoundInputCode sound) {
-      this.sound = sound;
-    }
-
-    public String asString() {
-      if (command != null) {
-        return command.name();
-      }
-      if (deviceCommand != null) {
-        return deviceCommand.name();
-      }
-      if (group != null) {
-        return "GROUP " + group.asString();
-      }
-      if (sound != null) {
-        return "SOUND " + sound.asString();
-      }
-      throw new UnsupportedOperationException();
-    }
-
-    public Command getCommand() {
-      return command;
-    }
-
-    public DeviceCommand getDeviceCommand() {
-      return deviceCommand;
-    }
-
-    public DeviceType getDeviceType() {
-      return deviceType;
-    }
-
-    public GroupInputCode getGroup() {
-      return group;
-    }
-
-    public SoundInputCode getSound() {
-      return sound;
-    }
-
-    @Override
-    public String toString() {
-      return "OutputMessage [command=" + command + ", deviceCommand=" + deviceCommand + ", group=" + group + ", sound=" + sound + "]";
-    }
-
-  }
-
-  public static class SoundInputCode extends InputCode {
-    public SoundInputCode(String label, int inputCode) {
-      super(label, inputCode);
-    }
   }
 
   public static MidiConfiguration readConfiguration(String deviceType) {
@@ -281,8 +63,8 @@ public class MidiConfiguration implements Configuration {
     this.deviceType = deviceType;
   }
 
-  public OutputMessage get(ShortMessage shortMessage) {
-    return inputMap.get(new InputMessage(shortMessage));
+  public OutputMessage get(InputMessage inputMessage) {
+    return inputMap.get(inputMessage);
   }
 
   public String getDeviceType() {
@@ -292,14 +74,7 @@ public class MidiConfiguration implements Configuration {
   @Override
   public InputMap getGroupInputMap() {
     if (groupInputMap == null) {
-      TreeMap<Integer, String> map = new TreeMap<>();
-      for (OutputMessage outputMessage : inputMap.values()) {
-        GroupInputCode group = outputMessage.getGroup();
-        if (group != null) {
-          map.put(group.getInputCode(), group.getLabel());
-        }
-      }
-      groupInputMap = new InputMap(map);
+      groupInputMap = new InputMap(getMap(OutputType.KARAOKE_SELECT_GROUP));
     }
     return groupInputMap;
   }
@@ -311,35 +86,15 @@ public class MidiConfiguration implements Configuration {
   @Override
   public InputMap getSoundInputMap() {
     if (soundInputMap == null) {
-      TreeMap<Integer, String> map = new TreeMap<>();
-      for (OutputMessage outputMessage : inputMap.values()) {
-        SoundInputCode sound = outputMessage.getSound();
-        if (sound != null) {
-          map.put(sound.getInputCode(), sound.getLabel());
-        }
-      }
-      soundInputMap = new InputMap(map);
+      soundInputMap = new InputMap(getMap(OutputType.KARAOKE_SELECT_SOUND));
     }
     return soundInputMap;
   }
 
-  public void put(ShortMessage shortMessage, Command command) {
-    put(shortMessage, new OutputMessage(command));
-  }
-
-  public void put(ShortMessage shortMessage, DeviceCommand deviceCommand) {
-    put(shortMessage, new OutputMessage(deviceCommand));
-  }
-
-  public void put(ShortMessage shortMessage, GroupInputCode groupInputCode) {
+  public void put(InputMessage inputMessage, OutputMessage outputMessage) {
     groupInputMap = null;
-    put(shortMessage, new OutputMessage(groupInputCode));
-    writeConfiguration();
-  }
-
-  public void put(ShortMessage shortMessage, SoundInputCode soundInputCode) {
     soundInputMap = null;
-    put(shortMessage, new OutputMessage(soundInputCode));
+    inputMap.put(inputMessage, outputMessage);
     writeConfiguration();
   }
 
@@ -348,17 +103,23 @@ public class MidiConfiguration implements Configuration {
     return "MidiConfiguration [deviceType=" + deviceType + ", inputMap=" + inputMap + "]";
   }
 
-  public void writeConfiguration() {
+  private TreeMap<Integer, String> getMap(OutputType desiredOutputType) {
+    TreeMap<Integer, String> map = new TreeMap<>();
+    for (OutputMessage outputMessage : inputMap.values()) {
+      OutputType outputType = outputMessage.getOutputType();
+      if (outputType == desiredOutputType) {
+        map.put(outputMessage.getIndex(), outputMessage.getLabel());
+      }
+    }
+    return map;
+  }
+
+  private void writeConfiguration() {
     String fileName = getConfigurationFilename(deviceType);
     File configurationFile = getOverrideFile(fileName);
     configurationFile.getParentFile().mkdirs();
     JsonUtilities.toJsonFile(configurationFile, this);
     System.out.println("Updating configuration for " + deviceType);
-  }
-
-  private void put(ShortMessage shortMessage, OutputMessage outputMessage) {
-    inputMap.put(new InputMessage(shortMessage), outputMessage);
-    writeConfiguration();
   }
 
 }
