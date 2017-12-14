@@ -162,9 +162,10 @@ public class MapperController extends ControllerTask {
   private void doShortMessage(OnShortMessage message) {
     if (message.getDeviceIndex() == deviceIndex) {
       ShortMessage shortMessage = message.getShortMessage();
-      int command = shortMessage.getCommand();
-      if (command == ShortMessage.NOTE_ON || command == ShortMessage.CONTROL_CHANGE || command == ShortMessage.PITCH_BEND) {
-        InputMessage inputMessage = new InputMessage(shortMessage);
+      InputMessage inputMessage = new InputMessage(shortMessage);
+      String id = mapperView.getMappingId(inputMessage);
+      Parent mapping = mapperView.getElementById(id);
+      if (mapping == null) {
         Controller controller = deviceControllers.get(deviceIndex);
         MidiConfiguration configuration = (MidiConfiguration) controller.getConfiguration();
         OutputMessage outputMessage = configuration.get(inputMessage);
@@ -181,14 +182,9 @@ public class MapperController extends ControllerTask {
           outputMessage = new OutputMessage(inputType, outputType, control, label);
           getConfiguration().put(inputMessage, outputMessage);
         }
-        String id = mapperView.getMappingId(inputMessage);
-        Parent mapping = mapperView.getElementById(id);
-        if (mapping != null) {
-          doClick(id);
-        } else {
-          mapperView.displayMapping(inputMessage, outputMessage);
-        }
+        mapperView.displayMapping(inputMessage, outputMessage);
       }
+      mapperView.selectMapping(id, inputMessage, shortMessage);
     }
   }
 

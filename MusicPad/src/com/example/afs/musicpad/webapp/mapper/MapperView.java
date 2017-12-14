@@ -12,6 +12,8 @@ package com.example.afs.musicpad.webapp.mapper;
 import java.util.Map.Entry;
 import java.util.NavigableMap;
 
+import javax.sound.midi.ShortMessage;
+
 import com.example.afs.musicpad.device.common.Controller;
 import com.example.afs.musicpad.device.midi.InputMessage;
 import com.example.afs.musicpad.device.midi.InputType;
@@ -20,7 +22,6 @@ import com.example.afs.musicpad.device.midi.OutputType;
 import com.example.afs.musicpad.html.Division;
 import com.example.afs.musicpad.html.Option;
 import com.example.afs.musicpad.html.Parent;
-import com.example.afs.musicpad.html.Radio;
 import com.example.afs.musicpad.html.Select;
 import com.example.afs.musicpad.html.ShadowDom;
 import com.example.afs.musicpad.task.ControllerTask;
@@ -49,7 +50,8 @@ public class MapperView extends ShadowDom {
     String id = getMappingId(inputMessage);
     Parent mapping = new Division("#" + id, ".mapping") //
         .addMoveSource() //
-        .add(div() //
+        .addClickHandler() //
+        .add(div("#input-" + id) //
             .add(text("Input (" + channel + "/" + control + ")"))) //
         .add(createInputType("input-type-" + id, inputType)) //
         .add(div() //
@@ -108,22 +110,20 @@ public class MapperView extends ShadowDom {
     replaceChildren(songListParent, div);
   }
 
-  public void selectCommand() {
-    Radio outputCommand = getElementById("output-command");
-    setProperty(outputCommand, "checked", true);
-  }
-
-  public void selectGroup() {
-    Radio outputGroup = getElementById("output-group");
-    setProperty(outputGroup, "checked", true);
-  }
-
   public void selectMapping(String id) {
+    selectElement(id, "selected-mapping");
   }
 
-  public void selectSound() {
-    Radio outputSound = getElementById("output-sound");
-    setProperty(outputSound, "checked", true);
+  public void selectMapping(String id, InputMessage inputMessage, ShortMessage shortMessage) {
+    int channel = inputMessage.getChannel();
+    int control = inputMessage.getControl();
+    int command = shortMessage.getCommand();
+    int value = shortMessage.getData2();
+    Parent labelElement = getElementById("input-" + id);
+    String label = "Input (" + channel + "/" + control + "/" + command + "/" + value + ")";
+    replaceChildren(labelElement, div("#input-" + id) //
+        .add(text(label))); //
+    selectMapping(id);
   }
 
   private Division createDeviceList(NavigableMap<Integer, Controller> deviceControllers) {
