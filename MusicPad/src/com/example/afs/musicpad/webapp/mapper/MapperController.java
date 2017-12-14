@@ -15,9 +15,9 @@ import java.util.NavigableMap;
 import java.util.NavigableSet;
 import java.util.TreeMap;
 
-import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.ShortMessage;
 
+import com.example.afs.musicpad.analyzer.Names;
 import com.example.afs.musicpad.device.common.Controller;
 import com.example.afs.musicpad.device.midi.InputMessage;
 import com.example.afs.musicpad.device.midi.InputType;
@@ -67,6 +67,34 @@ public class MapperController extends ControllerTask {
   protected void doInput(String id, String value) {
     if (id.startsWith("device-type")) {
       displayMappings(Integer.parseInt(value));
+    } else if (id.startsWith("input-type-mapping-")) {
+      String mappingId = id.substring("input-type-".length());
+      Parent parent = mapperView.getElementById(mappingId);
+      Mapping mapping = parent.getData();
+      OutputMessage outputMessage = mapping.getOutputMessage();
+      outputMessage.setInputType(InputType.values()[Integer.parseInt(value)]);
+      getConfiguration().put(mapping.getInputMessage(), outputMessage);
+    } else if (id.startsWith("output-type-mapping-")) {
+      String mappingId = id.substring("output-type-".length());
+      Parent parent = mapperView.getElementById(mappingId);
+      Mapping mapping = parent.getData();
+      OutputMessage outputMessage = mapping.getOutputMessage();
+      outputMessage.setOutputType(OutputType.values()[Integer.parseInt(value)]);
+      getConfiguration().put(mapping.getInputMessage(), outputMessage);
+    } else if (id.startsWith("index-mapping-")) {
+      String mappingId = id.substring("index-type-".length());
+      Parent parent = mapperView.getElementById(mappingId);
+      Mapping mapping = parent.getData();
+      OutputMessage outputMessage = mapping.getOutputMessage();
+      outputMessage.setIndex(Integer.parseInt(value));
+      getConfiguration().put(mapping.getInputMessage(), outputMessage);
+    } else if (id.startsWith("label-mapping-")) {
+      String mappingId = id.substring("label-type-".length());
+      Parent parent = mapperView.getElementById(mappingId);
+      Mapping mapping = parent.getData();
+      OutputMessage outputMessage = mapping.getOutputMessage();
+      outputMessage.setLabel(value);
+      getConfiguration().put(mapping.getInputMessage(), outputMessage);
     }
   }
 
@@ -86,21 +114,16 @@ public class MapperController extends ControllerTask {
   @Override
   protected void doMove(String id, String value) {
     System.out.println("doMove: id=" + id + ", value=" + value);
-  }
-
-  @Override
-  protected void doSubmit(String id, String value) {
-    System.out.println("id=" + id + ", value=" + value);
     if (id.startsWith("mapping-")) {
-      Parent mapping = mapperView.getElementById(id);
+      Parent parent = mapperView.getElementById(id);
+      Mapping mapping = parent.getData();
+      OutputMessage outputMessage = mapping.getOutputMessage();
       Map<String, String> map = JsonUtilities.toMap(value);
-      InputType inputType = InputType.values()[Integer.parseInt(map.get("input-type"))];
-      OutputType outputType = OutputType.values()[Integer.parseInt(map.get("output-type"))];
-      int index = Integer.parseInt(map.get("index"));
-      String label = map.get("label");
-      InputMessage inputMessage = mapping.getData();
-      OutputMessage outputMessage = new OutputMessage(inputType, outputType, index, label);
-      getConfiguration().put(inputMessage, outputMessage);
+      double x = Double.parseDouble(map.get("x"));
+      outputMessage.setX(x);
+      double y = Double.parseDouble(map.get("y"));
+      outputMessage.setY(y);
+      getConfiguration().put(mapping.getInputMessage(), outputMessage);
     }
   }
 
@@ -145,6 +168,19 @@ public class MapperController extends ControllerTask {
         Controller controller = deviceControllers.get(deviceIndex);
         MidiConfiguration configuration = (MidiConfiguration) controller.getConfiguration();
         OutputMessage outputMessage = configuration.get(inputMessage);
+        if (outputMessage == null) {
+          int control = inputMessage.getControl();
+          InputType inputType;
+          if (inputMessage.isKey()) {
+            inputType = InputType.KEY;
+          } else {
+            inputType = InputType.ROTARY;
+          }
+          OutputType outputType = OutputType.DEFAULT;
+          String label = Names.formatNoteName(control);
+          outputMessage = new OutputMessage(inputType, outputType, control, label);
+          getConfiguration().put(inputMessage, outputMessage);
+        }
         String id = mapperView.getMappingId(inputMessage);
         Parent mapping = mapperView.getElementById(id);
         if (mapping != null) {
@@ -160,14 +196,6 @@ public class MapperController extends ControllerTask {
     Controller controller = deviceControllers.get(deviceIndex);
     MidiConfiguration configuration = (MidiConfiguration) controller.getConfiguration();
     return configuration;
-  }
-
-  private ShortMessage getNoteOff(ShortMessage shortMessage) {
-    try {
-      return new ShortMessage(ShortMessage.NOTE_OFF, shortMessage.getChannel(), shortMessage.getData1(), shortMessage.getData2());
-    } catch (InvalidMidiDataException e) {
-      throw new RuntimeException(e);
-    }
   }
 
 }

@@ -10,5 +10,5 @@
 package com.example.afs.musicpad.device.midi;
 
 public enum InputType {
-  Key, Pad, Rotary, Slider, Wheel, Button
+  KEY, PAD, ROTARY, SLIDER, WHEEL, BUTTON
 }

@@ -209,13 +209,7 @@ public class MidiReader {
 
   private void processMappedMessage(ShortMessage shortMessage, OutputMessage outputMessage) {
     OutputType outputType = outputMessage.getOutputType();
-    if (outputType == OutputType.KARAOKE_SELECT_GROUP) {
-      if (shortMessage.getCommand() == ShortMessage.NOTE_ON) {
-        deviceHandler.tsOnDown(outputMessage.getIndex(), shortMessage.getData2());
-      } else {
-        deviceHandler.tsOnUp(outputMessage.getIndex());
-      }
-    } else if (outputType == OutputType.KARAOKE_SELECT_SOUND) {
+    if (outputType == OutputType.KARAOKE_SELECT_GROUP || outputType == OutputType.KARAOKE_SELECT_SOUND) {
       if (shortMessage.getCommand() == ShortMessage.NOTE_ON) {
         deviceHandler.tsOnDown(outputMessage.getIndex(), shortMessage.getData2());
       } else {
@@ -265,7 +259,7 @@ public class MidiReader {
         ShortMessage shortMessage = (ShortMessage) message;
         InputMessage inputMessage = new InputMessage(shortMessage);
         OutputMessage outputMessage = configuration.get(inputMessage);
-        if (outputMessage == null) {
+        if (outputMessage == null || outputMessage.getOutputType() == OutputType.DEFAULT) {
           processUnmappedMessage(shortMessage);
         } else {
           processMappedMessage(shortMessage, outputMessage);

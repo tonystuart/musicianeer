@@ -18,8 +18,6 @@ import com.example.afs.musicpad.device.midi.InputType;
 import com.example.afs.musicpad.device.midi.OutputMessage;
 import com.example.afs.musicpad.device.midi.OutputType;
 import com.example.afs.musicpad.html.Division;
-import com.example.afs.musicpad.html.Form;
-import com.example.afs.musicpad.html.Node;
 import com.example.afs.musicpad.html.Option;
 import com.example.afs.musicpad.html.Parent;
 import com.example.afs.musicpad.html.Radio;
@@ -46,47 +44,34 @@ public class MapperView extends ShadowDom {
   public Parent createMapping(InputMessage inputMessage, OutputMessage outputMessage) {
     int channel = inputMessage.getChannel();
     int control = inputMessage.getControl();
-    InputType inputType;
-    OutputType outputType;
-    if (outputMessage == null) {
-      if (inputMessage.isKey()) {
-        inputType = InputType.Key;
-      } else {
-        inputType = InputType.Rotary;
-      }
-      outputType = OutputType.DEFAULT;
-    } else {
-      inputType = outputMessage.getDeviceType();
-      outputType = outputMessage.getOutputType();
-    }
+    InputType inputType = outputMessage.getInputType();
+    OutputType outputType = outputMessage.getOutputType();
     String id = getMappingId(inputMessage);
-    Parent mapping = new Form("#" + id, ".mapping") //
-        .addSubmitHandler() //
+    Parent mapping = new Division("#" + id, ".mapping") //
         .addMoveSource() //
-        .add(div(".row") //
-            .add(text("Input (" + channel + "/" + control + ")")) //
-            .add(submit() //
-                .setValue("Set"))) //
-        .add(createInputType(inputType)) //
+        .add(div() //
+            .add(text("Input (" + channel + "/" + control + ")"))) //
+        .add(createInputType("input-type-" + id, inputType)) //
         .add(div() //
             .add(div() //
                 .add(text("Output"))) //
-            .add(createOutputType(outputType))) //
+            .add(createOutputType("output-type-" + id, outputType))) //
         .add(div(".column") //
             .add(div() //
                 .add(text("Index"))) //
-            .add(numberInput() //
+            .add(numberInput("#index-" + id) //
                 .setMinimum(0) //
-                .setName("index") //
-                .setValue(control) //
+                .setValue(outputMessage.getIndex()) //
+                .addInputHandler() //
                 .required()) //
             .add(div() //
                 .add(text("Label"))) //
-            .add(textInput() //
-                .setName("label") //
-                .setValue(control) //
+            .add(textInput("#label-" + id) //
+                .setValue(outputMessage.getLabel()) //
+                .addInputHandler() //
                 .required())); //
-    mapping.setData(inputMessage);
+    mapping.setData(new Mapping(inputMessage, outputMessage));
+    mapping.setProperty("style", "left: " + outputMessage.getX() + "%; top: " + outputMessage.getY() + "%");
     return mapping;
   }
 
@@ -162,72 +147,81 @@ public class MapperView extends ShadowDom {
     return select;
   }
 
-  private Select createInputType(InputType inputType) {
-    Select select = new Select();
-    select.setName("input-type");
-    for (InputType value : InputType.values()) {
-      Option option = new Option(value.name(), value.ordinal(), value.equals(inputType));
-      select.appendChild(option);
-    }
-    return select;
+  private Select createInputType(String id, InputType inputType) {
+    int selected = inputType.ordinal();
+    return new Select("#" + id) //
+        .addInputHandler() //
+        .required() //
+        .add(option("Button", InputType.BUTTON, selected)) //
+        .add(option("Key", InputType.KEY, selected)) //
+        .add(option("Pad", InputType.PAD, selected)) //
+        .add(option("Rotary", InputType.ROTARY, selected)) //
+        .add(option("Slider", InputType.SLIDER, selected)) //
+        .add(option("Wheel", InputType.WHEEL, selected)) //
+    ;
   }
 
-  private Select createOutputType(OutputType outputType) {
-    return new Select() //
-        .setName("output-type") //
-        .setValue(outputType.name()) //
+  private Select createOutputType(String id, OutputType outputType) {
+    int selected = outputType.ordinal();
+    return new Select("#" + id) //
+        .addInputHandler() //
         .required() //
         .add(optionGroup("Player Settings") //
-            .add(option("Default", OutputType.DEFAULT)) //
-            .add(option("Select Instrument", OutputType.PLAYER_SELECT_PROGRAM)) //
-            .add(option("Previous Instrument", OutputType.PLAYER_PREVIOUS_PROGRAM)) //
-            .add(option("Next Instrument", OutputType.PLAYER_NEXT_PROGRAM)) //
-            .add(option("Select Volume", OutputType.PLAYER_SELECT_VELOCITY)) //
-            .add(option("Decrease Volume", OutputType.PLAYER_DECREASE_VELOCITY)) //
-            .add(option("Increase Volume", OutputType.PLAYER_INCREASE_VELOCITY)) //
-            .add(option("Select Channel", OutputType.PLAYER_SELECT_CHANNEL)) //
-            .add(option("Previous Channel", OutputType.PLAYER_PREVIOUS_CHANNEL)) //
-            .add(option("Next Channel", OutputType.PLAYER_NEXT_CHANNEL))) //
+            .add(option("Default", OutputType.DEFAULT, selected)) //
+            .add(option("Select Instrument", OutputType.PLAYER_SELECT_PROGRAM, selected)) //
+            .add(option("Previous Instrument", OutputType.PLAYER_PREVIOUS_PROGRAM, selected)) //
+            .add(option("Next Instrument", OutputType.PLAYER_NEXT_PROGRAM, selected)) //
+            .add(option("Select Volume", OutputType.PLAYER_SELECT_VELOCITY, selected)) //
+            .add(option("Decrease Volume", OutputType.PLAYER_DECREASE_VELOCITY, selected)) //
+            .add(option("Increase Volume", OutputType.PLAYER_INCREASE_VELOCITY, selected)) //
+            .add(option("Select Channel", OutputType.PLAYER_SELECT_CHANNEL, selected)) //
+            .add(option("Previous Channel", OutputType.PLAYER_PREVIOUS_CHANNEL, selected)) //
+            .add(option("Next Channel", OutputType.PLAYER_NEXT_CHANNEL, selected))) //
 
         .add(optionGroup("Background Settings") //
-            .add(option("Mute", OutputType.BACKGROUND_MUTE)) //
-            .add(option("Select Volume", OutputType.BACKGROUND_SELECT_VELOCITY)) //
-            .add(option("Decrease Volume", OutputType.BACKGROUND_DECREASE_VELOCITY)) //
-            .add(option("Increase Volume", OutputType.BACKGROUND_INCREASE_VELOCITY))) //
+            .add(option("Mute", OutputType.BACKGROUND_MUTE, selected)) //
+            .add(option("Select Volume", OutputType.BACKGROUND_SELECT_VELOCITY, selected)) //
+            .add(option("Decrease Volume", OutputType.BACKGROUND_DECREASE_VELOCITY, selected)) //
+            .add(option("Increase Volume", OutputType.BACKGROUND_INCREASE_VELOCITY, selected))) //
 
         .add(optionGroup("Master Settings") //
-            .add(option("Select Volume", OutputType.MASTER_SELECT_VOLUME)) //
-            .add(option("Decrease Volume", OutputType.MASTER_DECREASE_VOLUME)) //
-            .add(option("Increase Volume", OutputType.MASTER_INCREASE_VOLUME)) //
-            .add(option("Override Instrument", OutputType.MASTER_INSTRUMENT))) //
+            .add(option("Select Volume", OutputType.MASTER_SELECT_VOLUME, selected)) //
+            .add(option("Decrease Volume", OutputType.MASTER_DECREASE_VOLUME, selected)) //
+            .add(option("Increase Volume", OutputType.MASTER_INCREASE_VOLUME, selected)) //
+            .add(option("Override Instrument", OutputType.MASTER_INSTRUMENT, selected))) //
 
         .add(optionGroup("Transport Settings") //
-            .add(option("Play/Resume", OutputType.TRANSPORT_PLAY)) //
-            .add(option("Stop/Pause", OutputType.TRANSPORT_STOP)) //
-            .add(option("Select Measure", OutputType.TRANSPORT_SELECT_MEASURE)) //
-            .add(option("Previous Measure", OutputType.TRANSPORT_PREVIOUS_MEASURE)) //
-            .add(option("Next Measure", OutputType.TRANSPORT_NEXT_MEASURE)) //
-            .add(option("Select Tempo", OutputType.TRANSPORT_SELECT_TEMPO)) //
-            .add(option("Decrease Tempo", OutputType.TRANSPORT_DECREASE_TEMPO)) //
-            .add(option("Increase Tempo", OutputType.TRANSPORT_INCREASE_TEMPO))) //
+            .add(option("Play/Resume", OutputType.TRANSPORT_PLAY, selected)) //
+            .add(option("Stop/Pause", OutputType.TRANSPORT_STOP, selected)) //
+            .add(option("Select Measure", OutputType.TRANSPORT_SELECT_MEASURE, selected)) //
+            .add(option("Previous Measure", OutputType.TRANSPORT_PREVIOUS_MEASURE, selected)) //
+            .add(option("Next Measure", OutputType.TRANSPORT_NEXT_MEASURE, selected)) //
+            .add(option("Select Tempo", OutputType.TRANSPORT_SELECT_TEMPO, selected)) //
+            .add(option("Decrease Tempo", OutputType.TRANSPORT_DECREASE_TEMPO, selected)) //
+            .add(option("Increase Tempo", OutputType.TRANSPORT_INCREASE_TEMPO, selected))) //
 
         .add(optionGroup("Library Settings") //
-            .add(option("Select Song", OutputType.LIBRARY_SELECT_SONG)) //
-            .add(option("Previous Song", OutputType.LIBRARY_PREVIOUS_SONG)) //
-            .add(option("Next Song", OutputType.LIBRARY_NEXT_SONG)) //
-            .add(option("Select Transpose", OutputType.LIBRARY_SELECT_TRANSPOSE)) //
-            .add(option("Transpose Lower", OutputType.LIBRARY_TRANSPOSE_LOWER)) //
-            .add(option("Transpose Higher", OutputType.LIBRARY_TRANSPOSE_HIGHER))) //
+            .add(option("Select Song", OutputType.LIBRARY_SELECT_SONG, selected)) //
+            .add(option("Previous Song", OutputType.LIBRARY_PREVIOUS_SONG, selected)) //
+            .add(option("Next Song", OutputType.LIBRARY_NEXT_SONG, selected)) //
+            .add(option("Select Transpose", OutputType.LIBRARY_SELECT_TRANSPOSE, selected)) //
+            .add(option("Transpose Lower", OutputType.LIBRARY_TRANSPOSE_LOWER, selected)) //
+            .add(option("Transpose Higher", OutputType.LIBRARY_TRANSPOSE_HIGHER, selected))) //
 
         .add(optionGroup("Karaoke Settings") //
-            .add(option("Play Notes at Tick", OutputType.KARAOKE_TYPE_TICK)) //
-            .add(option("Play Notes in Measure", OutputType.KARAOKE_TYPE_MEASURE)) //
-            .add(option("Select Group", OutputType.KARAOKE_SELECT_GROUP)) //
-            .add(option("Select Sound", OutputType.KARAOKE_SELECT_SOUND))); //
+            .add(option("Play Notes at Tick", OutputType.KARAOKE_TYPE_TICK, selected)) //
+            .add(option("Play Notes in Measure", OutputType.KARAOKE_TYPE_MEASURE, selected)) //
+            .add(option("Select Group", OutputType.KARAOKE_SELECT_GROUP, selected)) //
+            .add(option("Select Sound", OutputType.KARAOKE_SELECT_SOUND, selected))); //
   }
 
-  private Node option(String text, OutputType outputType) {
-    return super.option(text, outputType.ordinal());
+  private Option option(String text, Enum<?> optionEnum, int selected) {
+    int ordinal = optionEnum.ordinal();
+    Option option = super.option(text, ordinal);
+    if (ordinal == selected) {
+      option.setProperty("selected");
+    }
+    return option;
   }
 
 }

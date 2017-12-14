@@ -84,8 +84,8 @@ musicPad.onMoveDrop = function(event) {
             action: 'MOVE',
             id: element.id,
             value: JSON.stringify({
-                percentX: percentX,
-                percentY: percentY
+                x: percentX,
+                y: percentY
             })
         }));
     }
