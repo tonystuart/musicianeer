@@ -36,10 +36,15 @@ public class MapperView extends ShadowDom {
         .add(div() //
             .add(text("Select Input Device:")) //
             .add(div("#device-type-container"))) //
-        .add(div("#mapper-diagram")//
-            .addMoveTarget() //
-            .add(text("Select an input device, then press, rotate or slide an input on your MIDI controller to configure its action.")))) //
-    ; //
+        .add(div("#mapper-diagram-container") //
+            .add(div("#mapper-diagram-instructions") //
+                .add(orderedList() //
+                    .add(listItem() //
+                        .add(text("Select an input device")))
+                    .add(listItem() //
+                        .add(text("Press, rotate or slide an input on your MIDI controller to configure its action")))
+                    .add(listItem() //
+                        .add(text("Drag the new action to its correct position relative to other mappings"))))))); //
   }
 
   public Parent createMapping(InputMessage inputMessage, OutputMessage outputMessage) {
@@ -88,6 +93,16 @@ public class MapperView extends ShadowDom {
     Division diagram = getElementById("mapper-diagram");
     appendChild(diagram, mapping);
     return mapping.getId();
+  }
+
+  public void displayMappings(NavigableMap<InputMessage, OutputMessage> inputMap) {
+    Parent mapperDiagram = createMapperDiagram();
+    for (Entry<InputMessage, OutputMessage> entry : inputMap.entrySet()) {
+      Parent mapping = createMapping(entry.getKey(), entry.getValue());
+      mapperDiagram.appendChild(mapping);
+    }
+    Parent mapperDiagramContainer = getElementById("mapper-diagram-container");
+    replaceChildren(mapperDiagramContainer, mapperDiagram);
   }
 
   public String getMappingId(InputMessage inputMessage) {
@@ -159,6 +174,12 @@ public class MapperView extends ShadowDom {
         .add(option("Slider", InputType.SLIDER, selected)) //
         .add(option("Wheel", InputType.WHEEL, selected)) //
     ;
+  }
+
+  private Parent createMapperDiagram() {
+    Parent mapperDiagram = div("#mapper-diagram")//
+        .addMoveTarget();
+    return mapperDiagram;
   }
 
   private Select createOutputType(String id, OutputType outputType) {

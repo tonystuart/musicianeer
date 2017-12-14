@@ -10,7 +10,6 @@
 package com.example.afs.musicpad.webapp.mapper;
 
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.NavigableMap;
 import java.util.NavigableSet;
 import java.util.TreeMap;
@@ -139,9 +138,7 @@ public class MapperController extends ControllerTask {
     Controller controller = deviceControllers.get(deviceIndex);
     MidiConfiguration configuration = (MidiConfiguration) controller.getConfiguration();
     NavigableMap<InputMessage, OutputMessage> inputMap = configuration.getInputMap();
-    for (Entry<InputMessage, OutputMessage> entry : inputMap.entrySet()) {
-      mapperView.displayMapping(entry.getKey(), entry.getValue());
-    }
+    mapperView.displayMappings(inputMap);
   }
 
   private void doCommand(OnCommand message) {

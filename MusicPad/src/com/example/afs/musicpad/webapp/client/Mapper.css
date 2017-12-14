@@ -6,6 +6,11 @@
     flex-direction: column;
 }
 
+#mapper-diagram-container {
+    display: flex;
+    flex: 1;
+}
+
 #mapper-diagram {
     font-size: 2vh;
     flex: 1;

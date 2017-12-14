@@ -140,6 +140,10 @@ public class ShadowDom {
     return new Legend(properties);
   }
 
+  public ListItem listItem(String... properties) {
+    return new ListItem(properties);
+  }
+
   public Parent nameValue(String name, Object value) {
     return div(".detail") //
         .add(div(".name") //
@@ -158,6 +162,10 @@ public class ShadowDom {
 
   public OptionGroup optionGroup(String label) {
     return new OptionGroup(label);
+  }
+
+  public OrderedList orderedList(String... properties) {
+    return new OrderedList(properties);
   }
 
   public Radio radio(String... properties) {
@@ -294,6 +302,10 @@ public class ShadowDom {
 
   public TableRow tr(String... properties) {
     return new TableRow(properties);
+  }
+
+  public UnorderedList unorderedList(String... properties) {
+    return new UnorderedList(properties);
   }
 
   protected void onAddClassName(Element element, String className) {
