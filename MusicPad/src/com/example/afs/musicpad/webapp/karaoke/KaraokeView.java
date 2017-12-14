@@ -24,7 +24,7 @@ import com.example.afs.musicpad.html.Division;
 import com.example.afs.musicpad.html.Element;
 import com.example.afs.musicpad.html.Parent;
 import com.example.afs.musicpad.html.Range;
-import com.example.afs.musicpad.html.ShadowDom;
+import com.example.afs.musicpad.html.ShadowDomBuilder;
 import com.example.afs.musicpad.midi.Instruments;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.player.PlayableMap.OutputType;
@@ -41,7 +41,7 @@ import com.example.afs.musicpad.util.FileUtilities;
 import com.example.afs.musicpad.util.RandomAccessList;
 import com.example.afs.musicpad.util.Value;
 
-public class KaraokeView extends ShadowDom {
+public class KaraokeView extends ShadowDomBuilder {
 
   private int songIndex;
   private int deviceIndex;

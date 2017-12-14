@@ -23,10 +23,10 @@ import com.example.afs.musicpad.html.Division;
 import com.example.afs.musicpad.html.Option;
 import com.example.afs.musicpad.html.Parent;
 import com.example.afs.musicpad.html.Select;
-import com.example.afs.musicpad.html.ShadowDom;
+import com.example.afs.musicpad.html.ShadowDomBuilder;
 import com.example.afs.musicpad.task.ControllerTask;
 
-public class MapperView extends ShadowDom {
+public class MapperView extends ShadowDomBuilder {
 
   public MapperView(ControllerTask controllerTask) {
     super(controllerTask);

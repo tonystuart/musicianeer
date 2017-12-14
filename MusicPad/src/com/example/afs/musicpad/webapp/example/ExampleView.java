@@ -9,10 +9,10 @@
 
 package com.example.afs.musicpad.webapp.example;
 
-import com.example.afs.musicpad.html.ShadowDom;
+import com.example.afs.musicpad.html.ShadowDomBuilder;
 import com.example.afs.musicpad.task.ControllerTask;
 
-public class ExampleView extends ShadowDom {
+public class ExampleView extends ShadowDomBuilder {
 
   public ExampleView(ControllerTask controllerTask) {
     super(controllerTask);

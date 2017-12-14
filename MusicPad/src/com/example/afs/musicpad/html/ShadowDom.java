@@ -18,13 +18,10 @@ import com.example.afs.musicpad.message.OnShadowUpdate;
 import com.example.afs.musicpad.message.OnShadowUpdate.Action;
 import com.example.afs.musicpad.task.ControllerTask;
 
-// https://www.w3schools.com/jsref/dom_obj_document.asp
-// https://www.w3schools.com/jsref/dom_obj_all.asp
-
 public class ShadowDom {
 
-  private ControllerTask controllerTask;
-  private Division root = new Division();
+  protected ControllerTask controllerTask;
+  protected Division root = new Division();
   private Map<String, Element> ids = new HashMap<>();
   private Map<String, Set<Element>> classes = new HashMap<>();
 
@@ -61,24 +58,8 @@ public class ShadowDom {
     onAppendChild(parent, newNode.render());
   }
 
-  public Button button(String... properties) {
-    return new Button(properties);
-  }
-
-  public CheckBox checkbox(String... properties) {
-    return new CheckBox(properties);
-  }
-
-  public Division div(String... properties) {
-    return new Division(properties);
-  }
-
   public void ensureVisible(Element element) {
     onEnsureVisible(element);
-  }
-
-  public FieldSet fieldSet(String... properties) {
-    return new FieldSet(properties);
   }
 
   public String findClassNameByPrefix(Parent parent, String prefix) {
@@ -89,10 +70,6 @@ public class ShadowDom {
       }
     }
     return null;
-  }
-
-  public Form form(String... properties) {
-    return new Form(properties);
   }
 
   public Element getElementByClassName(String className) {
@@ -115,10 +92,6 @@ public class ShadowDom {
     return classes.get(className);
   }
 
-  public TableHeader header(String... properties) {
-    return new TableHeader(properties);
-  }
-
   public void insertBefore(Parent parent, Node newNode, Element existingElement) {
     insertBefore(parent, newNode, existingElement, true);
   }
@@ -130,50 +103,6 @@ public class ShadowDom {
       parent.insertChild(newNode, index);
       onInsertBefore(existingElement, newNode.render());
     }
-  }
-
-  public Label label(String... properties) {
-    return new Label(properties);
-  }
-
-  public Legend legend(String... properties) {
-    return new Legend(properties);
-  }
-
-  public ListItem listItem(String... properties) {
-    return new ListItem(properties);
-  }
-
-  public Parent nameValue(String name, Object value) {
-    return div(".detail") //
-        .add(div(".name") //
-            .add(text(name))) //
-        .add(div(".value") //
-            .add(text(value))); //
-  }
-
-  public NumberInput numberInput(String... properties) {
-    return new NumberInput(properties);
-  }
-
-  public Option option(String text, Object value) {
-    return new Option(text, value);
-  }
-
-  public OptionGroup optionGroup(String label) {
-    return new OptionGroup(label);
-  }
-
-  public OrderedList orderedList(String... properties) {
-    return new OrderedList(properties);
-  }
-
-  public Radio radio(String... properties) {
-    return new Radio(properties);
-  }
-
-  public PercentRange range(String... properties) {
-    return new PercentRange(properties);
   }
 
   public void remove(Parent parent, Element element) {
@@ -230,10 +159,6 @@ public class ShadowDom {
     onReplaceChildren(parent, newChild);
   }
 
-  public TableRow row(String... properties) {
-    return new TableRow(properties);
-  }
-
   public Element selectElement(String id, String className) {
     Element newSelection = swapClassName(id, className);
     ensureVisible(newSelection);
@@ -243,10 +168,6 @@ public class ShadowDom {
   public void setProperty(Element element, String name, Object value) {
     element.setProperty(name, value);
     onSetProperty(element, name, value);
-  }
-
-  public Submit submit(String... properties) {
-    return new Submit(properties);
   }
 
   public Element swapClassName(String id, String className) {
@@ -272,40 +193,28 @@ public class ShadowDom {
     }
   }
 
-  public Table table(String... properties) {
-    return new Table(properties);
-  }
-
-  public Parent tbody(String... properties) {
-    return new TableBody(properties);
-  }
-
-  public TableData td(String... properties) {
-    return new TableData(properties);
-  }
-
-  public TextElement text(Object value) {
-    return new TextElement(value);
-  }
-
-  public TextInput textInput(String... properties) {
-    return new TextInput(properties);
-  }
-
-  public TableColumnHeader th(String... properties) {
-    return new TableColumnHeader(properties);
-  }
-
-  public TableHeader thead(String... properties) {
-    return new TableHeader(properties);
-  }
-
-  public TableRow tr(String... properties) {
-    return new TableRow(properties);
-  }
-
-  public UnorderedList unorderedList(String... properties) {
-    return new UnorderedList(properties);
+  protected void addManagedNode(Node node, boolean isManageDeep) {
+    if (node instanceof Element) {
+      Element element = (Element) node;
+      String id = element.getId();
+      if (id != null) {
+        ids.put(id, element);
+      }
+      Set<String> classList = element.getClassList();
+      if (classList != null) {
+        for (String className : classList) {
+          realizeClass(className).add(element);
+        }
+      }
+      if (isManageDeep && node instanceof Parent) {
+        Parent parent = (Parent) node;
+        int childCount = parent.getChildCount();
+        for (int childIndex = 0; childIndex < childCount; childIndex++) {
+          Node child = parent.getChild(childIndex);
+          addManagedNode(child, isManageDeep);
+        }
+      }
+    }
   }
 
   protected void onAddClassName(Element element, String className) {
@@ -338,30 +247,6 @@ public class ShadowDom {
 
   protected void onSetProperty(Element element, String name, Object value) {
     controllerTask.addShadowUpdate(new OnShadowUpdate(Action.SET_PROPERTY, "#" + element.getId(), name, value));
-  }
-
-  private void addManagedNode(Node node, boolean isManageDeep) {
-    if (node instanceof Element) {
-      Element element = (Element) node;
-      String id = element.getId();
-      if (id != null) {
-        ids.put(id, element);
-      }
-      Set<String> classList = element.getClassList();
-      if (classList != null) {
-        for (String className : classList) {
-          realizeClass(className).add(element);
-        }
-      }
-      if (isManageDeep && node instanceof Parent) {
-        Parent parent = (Parent) node;
-        int childCount = parent.getChildCount();
-        for (int childIndex = 0; childIndex < childCount; childIndex++) {
-          Node child = parent.getChild(childIndex);
-          addManagedNode(child, isManageDeep);
-        }
-      }
-    }
   }
 
   private Set<Element> realizeClass(String className) {
