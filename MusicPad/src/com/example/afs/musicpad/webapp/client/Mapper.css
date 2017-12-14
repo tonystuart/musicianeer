@@ -36,3 +36,11 @@
 .selected-mapping {
     border: 1px solid red;
 }
+
+.index-label {
+	display: none;
+}
+
+.index-label-visible .index-label {
+	display: flex;
+}

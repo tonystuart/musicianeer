@@ -68,32 +68,34 @@ public class MapperController extends ControllerTask {
       displayMappings(Integer.parseInt(value));
     } else if (id.startsWith("input-type-mapping-")) {
       String mappingId = id.substring("input-type-".length());
-      Parent parent = mapperView.getElementById(mappingId);
-      Mapping mapping = parent.getData();
-      OutputMessage outputMessage = mapping.getOutputMessage();
+      Parent mapping = mapperView.getElementById(mappingId);
+      MappingData mappingData = mapping.getData();
+      OutputMessage outputMessage = mappingData.getOutputMessage();
       outputMessage.setInputType(InputType.values()[Integer.parseInt(value)]);
-      getConfiguration().put(mapping.getInputMessage(), outputMessage);
+      getConfiguration().put(mappingData.getInputMessage(), outputMessage);
     } else if (id.startsWith("output-type-mapping-")) {
       String mappingId = id.substring("output-type-".length());
-      Parent parent = mapperView.getElementById(mappingId);
-      Mapping mapping = parent.getData();
-      OutputMessage outputMessage = mapping.getOutputMessage();
-      outputMessage.setOutputType(OutputType.values()[Integer.parseInt(value)]);
-      getConfiguration().put(mapping.getInputMessage(), outputMessage);
+      Parent mapping = mapperView.getElementById(mappingId);
+      MappingData mappingData = mapping.getData();
+      OutputMessage outputMessage = mappingData.getOutputMessage();
+      OutputType outputType = OutputType.values()[Integer.parseInt(value)];
+      outputMessage.setOutputType(outputType);
+      mapperView.setOutputType(mappingId, outputType);
+      getConfiguration().put(mappingData.getInputMessage(), outputMessage);
     } else if (id.startsWith("index-mapping-")) {
-      String mappingId = id.substring("index-type-".length());
-      Parent parent = mapperView.getElementById(mappingId);
-      Mapping mapping = parent.getData();
-      OutputMessage outputMessage = mapping.getOutputMessage();
+      String mappingId = id.substring("index-".length());
+      Parent mapping = mapperView.getElementById(mappingId);
+      MappingData mappingData = mapping.getData();
+      OutputMessage outputMessage = mappingData.getOutputMessage();
       outputMessage.setIndex(Integer.parseInt(value));
-      getConfiguration().put(mapping.getInputMessage(), outputMessage);
-    } else if (id.startsWith("label-mapping-")) {
-      String mappingId = id.substring("label-type-".length());
-      Parent parent = mapperView.getElementById(mappingId);
-      Mapping mapping = parent.getData();
-      OutputMessage outputMessage = mapping.getOutputMessage();
+      getConfiguration().put(mappingData.getInputMessage(), outputMessage);
+    } else if (id.startsWith("label-")) {
+      String mappingId = id.substring("label-".length());
+      Parent mapping = mapperView.getElementById(mappingId);
+      MappingData mappingData = mapping.getData();
+      OutputMessage outputMessage = mappingData.getOutputMessage();
       outputMessage.setLabel(value);
-      getConfiguration().put(mapping.getInputMessage(), outputMessage);
+      getConfiguration().put(mappingData.getInputMessage(), outputMessage);
     }
   }
 
@@ -105,24 +107,24 @@ public class MapperController extends ControllerTask {
       addDevice(deviceIndex);
     }
     mapperView.displayDeviceSelector(deviceControllers);
-    if (deviceControllers.size() > 0) {
-      displayMappings(deviceControllers.firstKey());
-    }
+    //    if (deviceControllers.size() > 0) {
+    //      displayMappings(deviceControllers.firstKey());
+    //    }
   }
 
   @Override
   protected void doMove(String id, String value) {
     System.out.println("doMove: id=" + id + ", value=" + value);
     if (id.startsWith("mapping-")) {
-      Parent parent = mapperView.getElementById(id);
-      Mapping mapping = parent.getData();
-      OutputMessage outputMessage = mapping.getOutputMessage();
+      Parent mapping = mapperView.getElementById(id);
+      MappingData mappingData = mapping.getData();
+      OutputMessage outputMessage = mappingData.getOutputMessage();
       Map<String, String> map = JsonUtilities.toMap(value);
       double x = Double.parseDouble(map.get("x"));
       outputMessage.setX(x);
       double y = Double.parseDouble(map.get("y"));
       outputMessage.setY(y);
-      getConfiguration().put(mapping.getInputMessage(), outputMessage);
+      getConfiguration().put(mappingData.getInputMessage(), outputMessage);
     }
   }
 

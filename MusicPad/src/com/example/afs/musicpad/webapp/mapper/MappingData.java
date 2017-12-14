@@ -12,11 +12,11 @@ package com.example.afs.musicpad.webapp.mapper;
 import com.example.afs.musicpad.device.midi.InputMessage;
 import com.example.afs.musicpad.device.midi.OutputMessage;
 
-public class Mapping {
+public class MappingData {
   private InputMessage inputMessage;
   private OutputMessage outputMessage;
 
-  public Mapping(InputMessage inputMessage, OutputMessage outputMessage) {
+  public MappingData(InputMessage inputMessage, OutputMessage outputMessage) {
     this.inputMessage = inputMessage;
     this.outputMessage = outputMessage;
   }

@@ -60,10 +60,9 @@ public class MapperView extends ShadowDomBuilder {
             .add(text("Input (" + channel + "/" + control + ")"))) //
         .add(createInputType("input-type-" + id, inputType)) //
         .add(div() //
-            .add(div() //
-                .add(text("Output"))) //
-            .add(createOutputType("output-type-" + id, outputType))) //
-        .add(div(".column") //
+            .add(text("Output"))) //
+        .add(createOutputType("output-type-" + id, outputType)) //
+        .add(div(".index-label", ".column") //
             .add(div() //
                 .add(text("Index"))) //
             .add(numberInput("#index-" + id) //
@@ -77,8 +76,11 @@ public class MapperView extends ShadowDomBuilder {
                 .setValue(outputMessage.getLabel()) //
                 .addInputHandler() //
                 .required())); //
-    mapping.setData(new Mapping(inputMessage, outputMessage));
+    mapping.setData(new MappingData(inputMessage, outputMessage));
     mapping.setProperty("style", "left: " + outputMessage.getX() + "%; top: " + outputMessage.getY() + "%");
+    if (isGroupOrSound(outputType)) {
+      mapping.addClassName("index-label-visible");
+    }
     return mapping;
   }
 
@@ -139,6 +141,14 @@ public class MapperView extends ShadowDomBuilder {
     replaceChildren(labelElement, div("#input-" + id) //
         .add(text(label))); //
     selectMapping(id);
+  }
+
+  public void setOutputType(String mappingId, OutputType outputType) {
+    if (isGroupOrSound(outputType)) {
+      addClass(mappingId, "index-label-visible");
+    } else {
+      removeClass(mappingId, "index-label-visible");
+    }
   }
 
   private Division createDeviceList(NavigableMap<Integer, Controller> deviceControllers) {
@@ -234,6 +244,10 @@ public class MapperView extends ShadowDomBuilder {
             .add(option("Play Notes in Measure", OutputType.KARAOKE_TYPE_MEASURE, selected)) //
             .add(option("Select Group", OutputType.KARAOKE_SELECT_GROUP, selected)) //
             .add(option("Select Sound", OutputType.KARAOKE_SELECT_SOUND, selected))); //
+  }
+
+  private boolean isGroupOrSound(OutputType outputType) {
+    return outputType == OutputType.KARAOKE_SELECT_GROUP || outputType == OutputType.KARAOKE_SELECT_SOUND;
   }
 
   private Option option(String text, Enum<?> optionEnum, int selected) {
