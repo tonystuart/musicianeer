@@ -75,8 +75,8 @@ musicPad.onMoveDrop = function(event) {
         const deltaY = event.y - moveData.y;
         const element = moveData.element;
         const target = event.target;
-        const percentX = ((element.offsetLeft + deltaX) * 100) / target.offsetWidth;
-        const percentY = ((element.offsetTop + deltaY) * 100) / target.offsetHeight;
+        const percentX = ((element.offsetLeft + deltaX) * 100) / element.parentElement.offsetWidth;
+        const percentY = ((element.offsetTop + deltaY) * 100) / element.parentElement.offsetHeight;
         element.style.left = percentX + "%";
         element.style.top = percentY + "%";
         musicPad.send(JSON.stringify({
