@@ -184,8 +184,11 @@ public class KaraokeView extends ShadowDomBuilder {
     }
   }
 
-  public void setBackgroundMute(Integer deviceIndex, Boolean value) {
-    setBackgroundMute(deviceIndex, value ? 1 : 0);
+  public void setBackgroundMuteOnInitialRender(Integer deviceIndex, boolean value) {
+    // NB: HTML input checked attribute is boolean and is set if present regardless of value
+    if (value) {
+      setBackgroundMute(deviceIndex, 1);
+    }
   }
 
   public void setBackgroundVelocity(int value) {

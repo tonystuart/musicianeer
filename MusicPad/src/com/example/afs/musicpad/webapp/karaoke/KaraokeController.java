@@ -190,7 +190,7 @@ public class KaraokeController extends ControllerTask {
     karaokeView.renderSong(message.getSong(), devicePlayerDetail);
     for (Integer deviceIndex : deviceChannelAssignments.keySet()) {
       karaokeView.setDeviceVelocity(deviceIndex, request(new PlayerVelocityService(deviceIndex)));
-      karaokeView.setBackgroundMute(deviceIndex, request(new BackgroundMuteService(deviceIndex)));
+      karaokeView.setBackgroundMuteOnInitialRender(deviceIndex, request(new BackgroundMuteService(deviceIndex)));
     }
     karaokeView.setBackgroundVelocity(request(Services.getBackgroundVelocity));
     karaokeView.setMasterGain(request(Services.getMasterGain));
