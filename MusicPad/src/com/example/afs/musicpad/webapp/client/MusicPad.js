@@ -67,50 +67,28 @@ musicPad.onInput = function(event, value) {
     }));
 }
 
-musicPad.getDragCoordinates = function(event) {
-    if (musicPad.moveData.element) {
-        const moveData = musicPad.moveData;
-        const deltaX = event.x - moveData.x;
-        const deltaY = event.y - moveData.y;
-        const element = moveData.element;
-        let x = element.offsetLeft + deltaX;
-        let y = element.offsetTop + deltaY;
-        moveData.x = event.x;
-        moveData.y = event.y;
-        return {
-            x: x,
-            y: y
-        };
-    }
-}
-
-musicPad.onMoveDrag = function(event) {
-    if (musicPad.moveData.element) {
-        const position = musicPad.getDragCoordinates(event);
-        const element = musicPad.moveData.element;
-        element.style.left = position.x + "px";
-        element.style.top = position.y + "px";
-        const scrollParent = element.closest(".scrollable");
-        if (scrollParent) {
-            scrollParent.scrollLeft = element.offsetLeft - element.parentElement.offsetWidth;
-            scrollParent.scrollTop = element.offsetTop - element.parentElement.offsetHeight;
-            console.log("onMoveDrag: scrollLeft=" + scrollParent.scrollLeft + ", left=" + element.offsetLeft + ", width=" + element.offsetWidth + ", parent width=" + element.parentElement.offsetWidth);
-        }
-    }
-}
-
 musicPad.onMoveDrop = function(event) {
     event.preventDefault();
-    if (musicPad.moveData.element) {
-        const position = musicPad.getDragCoordinates(event);
-        console.log("onMoveDrop: dropping at " + JSON.stringify(position));
-        musicPad.send(JSON.stringify({
-            type: 'OnBrowserEvent',
-            action: 'MOVE',
-            id: musicPad.moveData.element.id,
-            value: JSON.stringify(position)
-        }));
-    }
+    const moveData = musicPad.moveData;
+    const deltaX = event.x - moveData.x;
+    const deltaY = event.y - moveData.y;
+    const element = moveData.element;
+    let x = element.offsetLeft + deltaX;
+    let y = element.offsetTop + deltaY;
+    element.style.left = x + "px";
+    element.style.top = y + "px";
+    event.target.scrollLeft = element.offsetLeft + element.offsetWidth - event.target.offsetWidth;
+    event.target.scrollTop = element.offsetTop + element.offsetHeight - event.target.offsetHeight;
+    console.log("onMoveDrop: dropping at x=" + x + ", y=" + y);
+    musicPad.send(JSON.stringify({
+        type: 'OnBrowserEvent',
+        action: 'MOVE',
+        id: musicPad.moveData.element.id,
+        value: JSON.stringify({
+            x: x,
+            y: y
+        })
+    }));
 }
 
 musicPad.onMoveEnd = function(event) {
@@ -129,7 +107,8 @@ musicPad.onMoveStart = function(event) {
         element: event.target
     }
     musicPad.moveData.element.style.zIndex = ++musicPad.zIndex;
-    window.requestAnimationFrame(function() {//musicPad.moveData.element.style.visibility = "hidden";
+    window.requestAnimationFrame(function() {
+        musicPad.moveData.element.style.visibility = "hidden";
     });
 }
 
