@@ -45,6 +45,7 @@ public class Parent extends Element implements Iterable<Node> {
     }
     setProperty("draggable", "true");
     setProperty("ondragstart", "musicPad.onMoveStart(event)");
+    setProperty("ondrag", "musicPad.onMoveDrag(event)");
     setProperty("ondragend", "musicPad.onMoveEnd(event)");
     return this;
   }

@@ -19,6 +19,7 @@ input, textarea, select, button {
     font-size: 1.5vh;
     flex: 1;
     position: relative;
+    background-color: red;
 }
 
 .mapping {

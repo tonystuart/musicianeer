@@ -67,33 +67,55 @@ musicPad.onInput = function(event, value) {
     }));
 }
 
-musicPad.onMoveDrop = function(event) {
-    event.preventDefault();
+musicPad.getDragCoordinates = function(event) {
     if (musicPad.moveData.element) {
         const moveData = musicPad.moveData;
         const deltaX = event.x - moveData.x;
         const deltaY = event.y - moveData.y;
         const element = moveData.element;
-        const target = event.target;
-        const percentX = ((element.offsetLeft + deltaX) * 100) / element.parentElement.offsetWidth;
-        const percentY = ((element.offsetTop + deltaY) * 100) / element.parentElement.offsetHeight;
-        element.style.left = percentX + "%";
-        element.style.top = percentY + "%";
+        let x = element.offsetLeft + deltaX;
+        let y = element.offsetTop + deltaY;
+        moveData.x = event.x;
+        moveData.y = event.y;
+        return {
+            x: x,
+            y: y
+        };
+    }
+}
+
+musicPad.onMoveDrag = function(event) {
+    if (musicPad.moveData.element) {
+        const position = musicPad.getDragCoordinates(event);
+        const element = musicPad.moveData.element;
+        element.style.left = position.x + "px";
+        element.style.top = position.y + "px";
+        const scrollParent = element.closest(".scrollable");
+        if (scrollParent) {
+            scrollParent.scrollLeft = element.offsetLeft - element.parentElement.offsetWidth;
+            scrollParent.scrollTop = element.offsetTop - element.parentElement.offsetHeight;
+            console.log("onMoveDrag: scrollLeft=" + scrollParent.scrollLeft + ", left=" + element.offsetLeft + ", width=" + element.offsetWidth + ", parent width=" + element.parentElement.offsetWidth);
+        }
+    }
+}
+
+musicPad.onMoveDrop = function(event) {
+    event.preventDefault();
+    if (musicPad.moveData.element) {
+        const position = musicPad.getDragCoordinates(event);
+        console.log("onMoveDrop: dropping at " + JSON.stringify(position));
         musicPad.send(JSON.stringify({
             type: 'OnBrowserEvent',
             action: 'MOVE',
-            id: element.id,
-            value: JSON.stringify({
-                x: percentX,
-                y: percentY
-            })
+            id: musicPad.moveData.element.id,
+            value: JSON.stringify(position)
         }));
     }
 }
 
 musicPad.onMoveEnd = function(event) {
     musicPad.moveData.element.style.visibility = "visible";
-    console.log("Making " + musicPad.moveData.element.id + " visible");
+    console.log("Making " + musicPad.moveData.element.id + " visible, left=" + musicPad.moveData.element.offsetLeft);
 }
 
 musicPad.onMoveOver = function(event) {
@@ -107,8 +129,7 @@ musicPad.onMoveStart = function(event) {
         element: event.target
     }
     musicPad.moveData.element.style.zIndex = ++musicPad.zIndex;
-    window.requestAnimationFrame(function() {
-        musicPad.moveData.element.style.visibility = "hidden";
+    window.requestAnimationFrame(function() {//musicPad.moveData.element.style.visibility = "hidden";
     });
 }
 

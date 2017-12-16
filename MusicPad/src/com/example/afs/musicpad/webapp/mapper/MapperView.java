@@ -77,7 +77,7 @@ public class MapperView extends ShadowDomBuilder {
                 .addInputHandler() //
                 .required())); //
     mapping.setData(new MappingData(inputMessage, outputMessage));
-    mapping.setProperty("style", "left: " + outputMessage.getX() + "%; top: " + outputMessage.getY() + "%");
+    mapping.setProperty("style", "left: " + outputMessage.getX() + "px; top: " + outputMessage.getY() + "px;");
     if (isGroupOrSound(outputType)) {
       mapping.addClassName("index-label-visible");
     }
@@ -187,7 +187,7 @@ public class MapperView extends ShadowDomBuilder {
   }
 
   private Parent createMapperDiagram() {
-    Parent mapperDiagram = div("#mapper-diagram")//
+    Parent mapperDiagram = div("#mapper-diagram", ".scrollable")//
         .addMoveTarget();
     return mapperDiagram;
   }
