@@ -1,0 +1,1445 @@
+{
+  "deviceType": "L49",
+  "inputMap": [
+    [
+      {
+        "channel": 0,
+        "control": 0,
+        "isKey": false
+      },
+      {
+        "inputType": "WHEEL",
+        "outputType": "DEFAULT",
+        "index": 0,
+        "label": "C0",
+        "x": 0.0,
+        "y": 300.0
+      }
+    ],
+    [
+      {
+        "channel": 0,
+        "control": 1,
+        "isKey": false
+      },
+      {
+        "inputType": "ROTARY",
+        "outputType": "DEFAULT",
+        "index": 1,
+        "label": "C#0",
+        "x": 0.0,
+        "y": 430.0
+      }
+    ],
+    [
+      {
+        "channel": 0,
+        "control": 7,
+        "isKey": false
+      },
+      {
+        "inputType": "SLIDER",
+        "outputType": "MASTER_SELECT_VOLUME",
+        "index": 7,
+        "label": "G0",
+        "x": 1720.0,
+        "y": 160.0
+      }
+    ],
+    [
+      {
+        "channel": 0,
+        "control": 21,
+        "isKey": false
+      },
+      {
+        "inputType": "ROTARY",
+        "outputType": "LIBRARY_SELECT_SONG",
+        "index": 21,
+        "label": "A1",
+        "x": 1920.0,
+        "y": 30.0
+      }
+    ],
+    [
+      {
+        "channel": 0,
+        "control": 22,
+        "isKey": false
+      },
+      {
+        "inputType": "ROTARY",
+        "outputType": "LIBRARY_SELECT_TRANSPOSE",
+        "index": 22,
+        "label": "A#1",
+        "x": 2110.0,
+        "y": 30.0
+      }
+    ],
+    [
+      {
+        "channel": 0,
+        "control": 23,
+        "isKey": false
+      },
+      {
+        "inputType": "ROTARY",
+        "outputType": "MASTER_INSTRUMENT",
+        "index": 23,
+        "label": "B1",
+        "x": 2295.0,
+        "y": 30.0
+      }
+    ],
+    [
+      {
+        "channel": 0,
+        "control": 24,
+        "isKey": false
+      },
+      {
+        "inputType": "ROTARY",
+        "outputType": "PLAYER_SELECT_PROGRAM",
+        "index": 24,
+        "label": "C2",
+        "x": 2480.0,
+        "y": 30.0
+      }
+    ],
+    [
+      {
+        "channel": 0,
+        "control": 25,
+        "isKey": false
+      },
+      {
+        "inputType": "ROTARY",
+        "outputType": "PLAYER_SELECT_CHANNEL",
+        "index": 25,
+        "label": "C#2",
+        "x": 2665.0,
+        "y": 30.0
+      }
+    ],
+    [
+      {
+        "channel": 0,
+        "control": 26,
+        "isKey": false
+      },
+      {
+        "inputType": "ROTARY",
+        "outputType": "DEFAULT",
+        "index": 26,
+        "label": "D2",
+        "x": 2855.0,
+        "y": 30.0
+      }
+    ],
+    [
+      {
+        "channel": 0,
+        "control": 27,
+        "isKey": false
+      },
+      {
+        "inputType": "ROTARY",
+        "outputType": "TRANSPORT_SELECT_MEASURE",
+        "index": 27,
+        "label": "D#2",
+        "x": 3040.0,
+        "y": 30.0
+      }
+    ],
+    [
+      {
+        "channel": 0,
+        "control": 28,
+        "isKey": false
+      },
+      {
+        "inputType": "ROTARY",
+        "outputType": "TRANSPORT_SELECT_TEMPO",
+        "index": 28,
+        "label": "E2",
+        "x": 3225.0,
+        "y": 30.0
+      }
+    ],
+    [
+      {
+        "channel": 0,
+        "control": 36,
+        "isKey": true
+      },
+      {
+        "inputType": "KEY",
+        "outputType": "DEFAULT",
+        "index": 36,
+        "label": "C3",
+        "x": 260.0,
+        "y": 730.0
+      }
+    ],
+    [
+      {
+        "channel": 0,
+        "control": 37,
+        "isKey": true
+      },
+      {
+        "inputType": "KEY",
+        "outputType": "DEFAULT",
+        "index": 37,
+        "label": "C#3",
+        "x": 360.0,
+        "y": 605.0
+      }
+    ],
+    [
+      {
+        "channel": 0,
+        "control": 38,
+        "isKey": true
+      },
+      {
+        "inputType": "KEY",
+        "outputType": "DEFAULT",
+        "index": 38,
+        "label": "D3",
+        "x": 450.0,
+        "y": 730.0
+      }
+    ],
+    [
+      {
+        "channel": 0,
+        "control": 39,
+        "isKey": true
+      },
+      {
+        "inputType": "KEY",
+        "outputType": "DEFAULT",
+        "index": 39,
+        "label": "D#3",
+        "x": 545.0,
+        "y": 605.0
+      }
+    ],
+    [
+      {
+        "channel": 0,
+        "control": 40,
+        "isKey": true
+      },
+      {
+        "inputType": "KEY",
+        "outputType": "DEFAULT",
+        "index": 40,
+        "label": "E3",
+        "x": 635.0,
+        "y": 730.0
+      }
+    ],
+    [
+      {
+        "channel": 0,
+        "control": 41,
+        "isKey": false
+      },
+      {
+        "inputType": "SLIDER",
+        "outputType": "BACKGROUND_SELECT_VELOCITY",
+        "index": 41,
+        "label": "F3",
+        "x": 250.0,
+        "y": 160.0
+      }
+    ],
+    [
+      {
+        "channel": 0,
+        "control": 41,
+        "isKey": true
+      },
+      {
+        "inputType": "KEY",
+        "outputType": "DEFAULT",
+        "index": 41,
+        "label": "F3",
+        "x": 820.0,
+        "y": 730.0
+      }
+    ],
+    [
+      {
+        "channel": 0,
+        "control": 42,
+        "isKey": false
+      },
+      {
+        "inputType": "SLIDER",
+        "outputType": "PLAYER_SELECT_VELOCITY",
+        "index": 42,
+        "label": "F#3",
+        "x": 430.0,
+        "y": 160.0
+      }
+    ],
+    [
+      {
+        "channel": 0,
+        "control": 42,
+        "isKey": true
+      },
+      {
+        "inputType": "KEY",
+        "outputType": "DEFAULT",
+        "index": 42,
+        "label": "F#3",
+        "x": 915.0,
+        "y": 605.0
+      }
+    ],
+    [
+      {
+        "channel": 0,
+        "control": 43,
+        "isKey": false
+      },
+      {
+        "inputType": "SLIDER",
+        "outputType": "DEFAULT",
+        "index": 43,
+        "label": "G3",
+        "x": 615.0,
+        "y": 160.0
+      }
+    ],
+    [
+      {
+        "channel": 0,
+        "control": 43,
+        "isKey": true
+      },
+      {
+        "inputType": "KEY",
+        "outputType": "DEFAULT",
+        "index": 43,
+        "label": "G3",
+        "x": 1005.0,
+        "y": 730.0
+      }
+    ],
+    [
+      {
+        "channel": 0,
+        "control": 44,
+        "isKey": false
+      },
+      {
+        "inputType": "SLIDER",
+        "outputType": "DEFAULT",
+        "index": 44,
+        "label": "G#3",
+        "x": 795.0,
+        "y": 160.0
+      }
+    ],
+    [
+      {
+        "channel": 0,
+        "control": 44,
+        "isKey": true
+      },
+      {
+        "inputType": "KEY",
+        "outputType": "DEFAULT",
+        "index": 44,
+        "label": "G#3",
+        "x": 1100.0,
+        "y": 605.0
+      }
+    ],
+    [
+      {
+        "channel": 0,
+        "control": 45,
+        "isKey": false
+      },
+      {
+        "inputType": "SLIDER",
+        "outputType": "DEFAULT",
+        "index": 45,
+        "label": "A3",
+        "x": 980.0,
+        "y": 160.0
+      }
+    ],
+    [
+      {
+        "channel": 0,
+        "control": 45,
+        "isKey": true
+      },
+      {
+        "inputType": "KEY",
+        "outputType": "DEFAULT",
+        "index": 45,
+        "label": "A3",
+        "x": 1190.0,
+        "y": 730.0
+      }
+    ],
+    [
+      {
+        "channel": 0,
+        "control": 46,
+        "isKey": false
+      },
+      {
+        "inputType": "SLIDER",
+        "outputType": "DEFAULT",
+        "index": 46,
+        "label": "A#3",
+        "x": 1165.0,
+        "y": 160.0
+      }
+    ],
+    [
+      {
+        "channel": 0,
+        "control": 46,
+        "isKey": true
+      },
+      {
+        "inputType": "KEY",
+        "outputType": "DEFAULT",
+        "index": 46,
+        "label": "A#3",
+        "x": 1285.0,
+        "y": 605.0
+      }
+    ],
+    [
+      {
+        "channel": 0,
+        "control": 47,
+        "isKey": false
+      },
+      {
+        "inputType": "SLIDER",
+        "outputType": "DEFAULT",
+        "index": 47,
+        "label": "B3",
+        "x": 1350.0,
+        "y": 160.0
+      }
+    ],
+    [
+      {
+        "channel": 0,
+        "control": 47,
+        "isKey": true
+      },
+      {
+        "inputType": "KEY",
+        "outputType": "DEFAULT",
+        "index": 47,
+        "label": "B3",
+        "x": 1375.0,
+        "y": 730.0
+      }
+    ],
+    [
+      {
+        "channel": 0,
+        "control": 48,
+        "isKey": false
+      },
+      {
+        "inputType": "SLIDER",
+        "outputType": "DEFAULT",
+        "index": 48,
+        "label": "C4",
+        "x": 1535.0,
+        "y": 160.0
+      }
+    ],
+    [
+      {
+        "channel": 0,
+        "control": 48,
+        "isKey": true
+      },
+      {
+        "inputType": "KEY",
+        "outputType": "DEFAULT",
+        "index": 48,
+        "label": "C4",
+        "x": 1560.0,
+        "y": 730.0
+      }
+    ],
+    [
+      {
+        "channel": 0,
+        "control": 49,
+        "isKey": true
+      },
+      {
+        "inputType": "KEY",
+        "outputType": "DEFAULT",
+        "index": 49,
+        "label": "C#4",
+        "x": 1640.0,
+        "y": 605.0
+      }
+    ],
+    [
+      {
+        "channel": 0,
+        "control": 50,
+        "isKey": true
+      },
+      {
+        "inputType": "KEY",
+        "outputType": "DEFAULT",
+        "index": 50,
+        "label": "D4",
+        "x": 1745.0,
+        "y": 730.0
+      }
+    ],
+    [
+      {
+        "channel": 0,
+        "control": 51,
+        "isKey": false
+      },
+      {
+        "inputType": "BUTTON",
+        "outputType": "BACKGROUND_MUTE",
+        "index": 51,
+        "label": "D#4",
+        "x": 250.0,
+        "y": 285.0
+      }
+    ],
+    [
+      {
+        "channel": 0,
+        "control": 51,
+        "isKey": true
+      },
+      {
+        "inputType": "KEY",
+        "outputType": "DEFAULT",
+        "index": 51,
+        "label": "D#4",
+        "x": 1830.0,
+        "y": 605.0
+      }
+    ],
+    [
+      {
+        "channel": 0,
+        "control": 52,
+        "isKey": false
+      },
+      {
+        "inputType": "BUTTON",
+        "outputType": "DEFAULT",
+        "index": 52,
+        "label": "E4",
+        "x": 430.0,
+        "y": 285.0
+      }
+    ],
+    [
+      {
+        "channel": 0,
+        "control": 52,
+        "isKey": true
+      },
+      {
+        "inputType": "KEY",
+        "outputType": "DEFAULT",
+        "index": 52,
+        "label": "E4",
+        "x": 1930.0,
+        "y": 730.0
+      }
+    ],
+    [
+      {
+        "channel": 0,
+        "control": 53,
+        "isKey": false
+      },
+      {
+        "inputType": "BUTTON",
+        "outputType": "DEFAULT",
+        "index": 53,
+        "label": "F4",
+        "x": 615.0,
+        "y": 285.0
+      }
+    ],
+    [
+      {
+        "channel": 0,
+        "control": 53,
+        "isKey": true
+      },
+      {
+        "inputType": "KEY",
+        "outputType": "DEFAULT",
+        "index": 53,
+        "label": "F4",
+        "x": 2115.0,
+        "y": 730.0
+      }
+    ],
+    [
+      {
+        "channel": 0,
+        "control": 54,
+        "isKey": false
+      },
+      {
+        "inputType": "ROTARY",
+        "outputType": "DEFAULT",
+        "index": 54,
+        "label": "F#4",
+        "x": 795.0,
+        "y": 285.0
+      }
+    ],
+    [
+      {
+        "channel": 0,
+        "control": 54,
+        "isKey": true
+      },
+      {
+        "inputType": "KEY",
+        "outputType": "DEFAULT",
+        "index": 54,
+        "label": "F#4",
+        "x": 2205.0,
+        "y": 605.0
+      }
+    ],
+    [
+      {
+        "channel": 0,
+        "control": 55,
+        "isKey": true
+      },
+      {
+        "inputType": "KEY",
+        "outputType": "DEFAULT",
+        "index": 55,
+        "label": "G4",
+        "x": 2300.0,
+        "y": 730.0
+      }
+    ],
+    [
+      {
+        "channel": 0,
+        "control": 56,
+        "isKey": true
+      },
+      {
+        "inputType": "KEY",
+        "outputType": "DEFAULT",
+        "index": 56,
+        "label": "G#4",
+        "x": 2390.0,
+        "y": 605.0
+      }
+    ],
+    [
+      {
+        "channel": 0,
+        "control": 57,
+        "isKey": true
+      },
+      {
+        "inputType": "KEY",
+        "outputType": "DEFAULT",
+        "index": 57,
+        "label": "A4",
+        "x": 2485.0,
+        "y": 730.0
+      }
+    ],
+    [
+      {
+        "channel": 0,
+        "control": 58,
+        "isKey": true
+      },
+      {
+        "inputType": "KEY",
+        "outputType": "DEFAULT",
+        "index": 58,
+        "label": "A#4",
+        "x": 2575.0,
+        "y": 605.0
+      }
+    ],
+    [
+      {
+        "channel": 0,
+        "control": 59,
+        "isKey": true
+      },
+      {
+        "inputType": "KEY",
+        "outputType": "DEFAULT",
+        "index": 59,
+        "label": "B4",
+        "x": 2665.0,
+        "y": 730.0
+      }
+    ],
+    [
+      {
+        "channel": 0,
+        "control": 60,
+        "isKey": true
+      },
+      {
+        "inputType": "KEY",
+        "outputType": "DEFAULT",
+        "index": 60,
+        "label": "C5",
+        "x": 2850.0,
+        "y": 730.0
+      }
+    ],
+    [
+      {
+        "channel": 0,
+        "control": 61,
+        "isKey": true
+      },
+      {
+        "inputType": "KEY",
+        "outputType": "DEFAULT",
+        "index": 61,
+        "label": "C#5",
+        "x": 2940.0,
+        "y": 605.0
+      }
+    ],
+    [
+      {
+        "channel": 0,
+        "control": 62,
+        "isKey": true
+      },
+      {
+        "inputType": "KEY",
+        "outputType": "DEFAULT",
+        "index": 62,
+        "label": "D5",
+        "x": 3035.0,
+        "y": 730.0
+      }
+    ],
+    [
+      {
+        "channel": 0,
+        "control": 63,
+        "isKey": true
+      },
+      {
+        "inputType": "KEY",
+        "outputType": "DEFAULT",
+        "index": 63,
+        "label": "D#5",
+        "x": 3125.0,
+        "y": 605.0
+      }
+    ],
+    [
+      {
+        "channel": 0,
+        "control": 64,
+        "isKey": true
+      },
+      {
+        "inputType": "KEY",
+        "outputType": "DEFAULT",
+        "index": 64,
+        "label": "E5",
+        "x": 3220.0,
+        "y": 730.0
+      }
+    ],
+    [
+      {
+        "channel": 0,
+        "control": 65,
+        "isKey": true
+      },
+      {
+        "inputType": "KEY",
+        "outputType": "DEFAULT",
+        "index": 65,
+        "label": "F5",
+        "x": 3405.0,
+        "y": 730.0
+      }
+    ],
+    [
+      {
+        "channel": 0,
+        "control": 66,
+        "isKey": true
+      },
+      {
+        "inputType": "KEY",
+        "outputType": "DEFAULT",
+        "index": 66,
+        "label": "F#5",
+        "x": 3490.0,
+        "y": 605.0
+      }
+    ],
+    [
+      {
+        "channel": 0,
+        "control": 67,
+        "isKey": true
+      },
+      {
+        "inputType": "KEY",
+        "outputType": "DEFAULT",
+        "index": 67,
+        "label": "G5",
+        "x": 3590.0,
+        "y": 730.0
+      }
+    ],
+    [
+      {
+        "channel": 0,
+        "control": 68,
+        "isKey": true
+      },
+      {
+        "inputType": "KEY",
+        "outputType": "DEFAULT",
+        "index": 68,
+        "label": "G#5",
+        "x": 3675.0,
+        "y": 605.0
+      }
+    ],
+    [
+      {
+        "channel": 0,
+        "control": 69,
+        "isKey": true
+      },
+      {
+        "inputType": "KEY",
+        "outputType": "DEFAULT",
+        "index": 69,
+        "label": "A5",
+        "x": 3775.0,
+        "y": 730.0
+      }
+    ],
+    [
+      {
+        "channel": 0,
+        "control": 70,
+        "isKey": true
+      },
+      {
+        "inputType": "KEY",
+        "outputType": "DEFAULT",
+        "index": 70,
+        "label": "A#5",
+        "x": 3860.0,
+        "y": 605.0
+      }
+    ],
+    [
+      {
+        "channel": 0,
+        "control": 71,
+        "isKey": true
+      },
+      {
+        "inputType": "KEY",
+        "outputType": "DEFAULT",
+        "index": 71,
+        "label": "B5",
+        "x": 3960.0,
+        "y": 730.0
+      }
+    ],
+    [
+      {
+        "channel": 0,
+        "control": 72,
+        "isKey": true
+      },
+      {
+        "inputType": "KEY",
+        "outputType": "DEFAULT",
+        "index": 72,
+        "label": "C6",
+        "x": 4145.0,
+        "y": 730.0
+      }
+    ],
+    [
+      {
+        "channel": 0,
+        "control": 73,
+        "isKey": true
+      },
+      {
+        "inputType": "KEY",
+        "outputType": "DEFAULT",
+        "index": 73,
+        "label": "C#6",
+        "x": 4230.0,
+        "y": 605.0
+      }
+    ],
+    [
+      {
+        "channel": 0,
+        "control": 74,
+        "isKey": true
+      },
+      {
+        "inputType": "KEY",
+        "outputType": "DEFAULT",
+        "index": 74,
+        "label": "D6",
+        "x": 4330.0,
+        "y": 730.0
+      }
+    ],
+    [
+      {
+        "channel": 0,
+        "control": 75,
+        "isKey": true
+      },
+      {
+        "inputType": "KEY",
+        "outputType": "DEFAULT",
+        "index": 75,
+        "label": "D#6",
+        "x": 4415.0,
+        "y": 605.0
+      }
+    ],
+    [
+      {
+        "channel": 0,
+        "control": 76,
+        "isKey": true
+      },
+      {
+        "inputType": "KEY",
+        "outputType": "DEFAULT",
+        "index": 76,
+        "label": "E6",
+        "x": 4515.0,
+        "y": 730.0
+      }
+    ],
+    [
+      {
+        "channel": 0,
+        "control": 77,
+        "isKey": true
+      },
+      {
+        "inputType": "KEY",
+        "outputType": "DEFAULT",
+        "index": 77,
+        "label": "F6",
+        "x": 4700.0,
+        "y": 730.0
+      }
+    ],
+    [
+      {
+        "channel": 0,
+        "control": 78,
+        "isKey": true
+      },
+      {
+        "inputType": "KEY",
+        "outputType": "DEFAULT",
+        "index": 78,
+        "label": "F#6",
+        "x": 4785.0,
+        "y": 605.0
+      }
+    ],
+    [
+      {
+        "channel": 0,
+        "control": 79,
+        "isKey": true
+      },
+      {
+        "inputType": "KEY",
+        "outputType": "DEFAULT",
+        "index": 79,
+        "label": "G6",
+        "x": 4885.0,
+        "y": 730.0
+      }
+    ],
+    [
+      {
+        "channel": 0,
+        "control": 80,
+        "isKey": true
+      },
+      {
+        "inputType": "KEY",
+        "outputType": "DEFAULT",
+        "index": 80,
+        "label": "G#6",
+        "x": 4970.0,
+        "y": 605.0
+      }
+    ],
+    [
+      {
+        "channel": 0,
+        "control": 81,
+        "isKey": true
+      },
+      {
+        "inputType": "KEY",
+        "outputType": "DEFAULT",
+        "index": 81,
+        "label": "A6",
+        "x": 5070.0,
+        "y": 730.0
+      }
+    ],
+    [
+      {
+        "channel": 0,
+        "control": 82,
+        "isKey": true
+      },
+      {
+        "inputType": "KEY",
+        "outputType": "DEFAULT",
+        "index": 82,
+        "label": "A#6",
+        "x": 5160.0,
+        "y": 605.0
+      }
+    ],
+    [
+      {
+        "channel": 0,
+        "control": 83,
+        "isKey": true
+      },
+      {
+        "inputType": "KEY",
+        "outputType": "DEFAULT",
+        "index": 83,
+        "label": "B6",
+        "x": 5255.0,
+        "y": 730.0
+      }
+    ],
+    [
+      {
+        "channel": 0,
+        "control": 84,
+        "isKey": true
+      },
+      {
+        "inputType": "KEY",
+        "outputType": "DEFAULT",
+        "index": 84,
+        "label": "C7",
+        "x": 5510.0,
+        "y": 805.0
+      }
+    ],
+    [
+      {
+        "channel": 0,
+        "control": 104,
+        "isKey": false
+      },
+      {
+        "inputType": "BUTTON",
+        "outputType": "KARAOKE_TYPE_TICK",
+        "index": 104,
+        "label": "G#8",
+        "x": 3410.0,
+        "y": 210.0
+      }
+    ],
+    [
+      {
+        "channel": 0,
+        "control": 105,
+        "isKey": false
+      },
+      {
+        "inputType": "BUTTON",
+        "outputType": "KARAOKE_TYPE_MEASURE",
+        "index": 105,
+        "label": "A8",
+        "x": 3410.0,
+        "y": 435.0
+      }
+    ],
+    [
+      {
+        "channel": 0,
+        "control": 112,
+        "isKey": false
+      },
+      {
+        "inputType": "BUTTON",
+        "outputType": "LIBRARY_PREVIOUS_SONG",
+        "index": 112,
+        "label": "E9",
+        "x": 3630.0,
+        "y": 435.0
+      }
+    ],
+    [
+      {
+        "channel": 0,
+        "control": 113,
+        "isKey": false
+      },
+      {
+        "inputType": "BUTTON",
+        "outputType": "LIBRARY_NEXT_SONG",
+        "index": 113,
+        "label": "F9",
+        "x": 3815.0,
+        "y": 435.0
+      }
+    ],
+    [
+      {
+        "channel": 0,
+        "control": 114,
+        "isKey": false
+      },
+      {
+        "inputType": "BUTTON",
+        "outputType": "TRANSPORT_STOP",
+        "index": 114,
+        "label": "F#9",
+        "x": 4000.0,
+        "y": 435.0
+      }
+    ],
+    [
+      {
+        "channel": 0,
+        "control": 115,
+        "isKey": false
+      },
+      {
+        "inputType": "BUTTON",
+        "outputType": "TRANSPORT_PLAY",
+        "index": 115,
+        "label": "G9",
+        "x": 4190.0,
+        "y": 435.0
+      }
+    ],
+    [
+      {
+        "channel": 0,
+        "control": 116,
+        "isKey": false
+      },
+      {
+        "inputType": "BUTTON",
+        "outputType": "DEFAULT",
+        "index": 116,
+        "label": "G#9",
+        "x": 4375.0,
+        "y": 435.0
+      }
+    ],
+    [
+      {
+        "channel": 0,
+        "control": 117,
+        "isKey": false
+      },
+      {
+        "inputType": "BUTTON",
+        "outputType": "DEFAULT",
+        "index": 117,
+        "label": "A9",
+        "x": 4560.0,
+        "y": 435.0
+      }
+    ],
+    [
+      {
+        "channel": 9,
+        "control": 36,
+        "isKey": true
+      },
+      {
+        "inputType": "PAD",
+        "outputType": "KARAOKE_SELECT_GROUP",
+        "index": 5,
+        "label": "5",
+        "x": 1920.0,
+        "y": 380.0
+      }
+    ],
+    [
+      {
+        "channel": 9,
+        "control": 37,
+        "isKey": true
+      },
+      {
+        "inputType": "PAD",
+        "outputType": "KARAOKE_SELECT_GROUP",
+        "index": 6,
+        "label": "6",
+        "x": 2110.0,
+        "y": 380.0
+      }
+    ],
+    [
+      {
+        "channel": 9,
+        "control": 38,
+        "isKey": true
+      },
+      {
+        "inputType": "PAD",
+        "outputType": "KARAOKE_SELECT_GROUP",
+        "index": 7,
+        "label": "7",
+        "x": 2295.0,
+        "y": 380.0
+      }
+    ],
+    [
+      {
+        "channel": 9,
+        "control": 39,
+        "isKey": true
+      },
+      {
+        "inputType": "PAD",
+        "outputType": "KARAOKE_SELECT_GROUP",
+        "index": 8,
+        "label": "8",
+        "x": 2480.0,
+        "y": 380.0
+      }
+    ],
+    [
+      {
+        "channel": 9,
+        "control": 40,
+        "isKey": true
+      },
+      {
+        "inputType": "PAD",
+        "outputType": "KARAOKE_SELECT_GROUP",
+        "index": 1,
+        "label": "1",
+        "x": 1920.0,
+        "y": 155.0
+      }
+    ],
+    [
+      {
+        "channel": 9,
+        "control": 41,
+        "isKey": true
+      },
+      {
+        "inputType": "PAD",
+        "outputType": "KARAOKE_SELECT_GROUP",
+        "index": 2,
+        "label": "2",
+        "x": 2110.0,
+        "y": 155.0
+      }
+    ],
+    [
+      {
+        "channel": 9,
+        "control": 42,
+        "isKey": true
+      },
+      {
+        "inputType": "PAD",
+        "outputType": "KARAOKE_SELECT_GROUP",
+        "index": 3,
+        "label": "3",
+        "x": 2295.0,
+        "y": 155.0
+      }
+    ],
+    [
+      {
+        "channel": 9,
+        "control": 43,
+        "isKey": true
+      },
+      {
+        "inputType": "PAD",
+        "outputType": "KARAOKE_SELECT_GROUP",
+        "index": 4,
+        "label": "4",
+        "x": 2480.0,
+        "y": 155.0
+      }
+    ],
+    [
+      {
+        "channel": 9,
+        "control": 44,
+        "isKey": true
+      },
+      {
+        "inputType": "PAD",
+        "outputType": "KARAOKE_SELECT_SOUND",
+        "index": 5,
+        "label": "5",
+        "x": 2665.0,
+        "y": 380.0
+      }
+    ],
+    [
+      {
+        "channel": 9,
+        "control": 45,
+        "isKey": true
+      },
+      {
+        "inputType": "PAD",
+        "outputType": "KARAOKE_SELECT_SOUND",
+        "index": 6,
+        "label": "6",
+        "x": 2855.0,
+        "y": 380.0
+      }
+    ],
+    [
+      {
+        "channel": 9,
+        "control": 46,
+        "isKey": true
+      },
+      {
+        "inputType": "PAD",
+        "outputType": "KARAOKE_SELECT_SOUND",
+        "index": 7,
+        "label": "7",
+        "x": 3040.0,
+        "y": 380.0
+      }
+    ],
+    [
+      {
+        "channel": 9,
+        "control": 47,
+        "isKey": true
+      },
+      {
+        "inputType": "PAD",
+        "outputType": "KARAOKE_SELECT_SOUND",
+        "index": 8,
+        "label": "8",
+        "x": 3225.0,
+        "y": 380.0
+      }
+    ],
+    [
+      {
+        "channel": 9,
+        "control": 48,
+        "isKey": true
+      },
+      {
+        "inputType": "PAD",
+        "outputType": "KARAOKE_SELECT_SOUND",
+        "index": 1,
+        "label": "1",
+        "x": 2665.0,
+        "y": 155.0
+      }
+    ],
+    [
+      {
+        "channel": 9,
+        "control": 49,
+        "isKey": true
+      },
+      {
+        "inputType": "PAD",
+        "outputType": "KARAOKE_SELECT_SOUND",
+        "index": 2,
+        "label": "2",
+        "x": 2855.0,
+        "y": 155.0
+      }
+    ],
+    [
+      {
+        "channel": 9,
+        "control": 50,
+        "isKey": true
+      },
+      {
+        "inputType": "PAD",
+        "outputType": "KARAOKE_SELECT_SOUND",
+        "index": 3,
+        "label": "3",
+        "x": 3040.0,
+        "y": 155.0
+      }
+    ],
+    [
+      {
+        "channel": 9,
+        "control": 51,
+        "isKey": true
+      },
+      {
+        "inputType": "PAD",
+        "outputType": "KARAOKE_SELECT_SOUND",
+        "index": 4,
+        "label": "4",
+        "x": 3225.0,
+        "y": 155.0
+      }
+    ]
+  ]
+}

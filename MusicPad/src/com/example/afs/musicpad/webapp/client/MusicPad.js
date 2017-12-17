@@ -34,11 +34,31 @@ musicPad.createWebSocketClient = function(webSocketUrl, onMessageCallback, onClo
     }
 }
 
+musicPad.ensureVisible = function(element) {
+    const scrollParent = musicPad.getScrollParent(element);
+    if (scrollParent) {
+        const elementRight = element.offsetLeft + element.offsetWidth;
+        const screenRight = scrollParent.scrollLeft + scrollParent.offsetWidth;
+        if (element.offsetLeft < scrollParent.scrollLeft) {
+            scrollParent.scrollLeft = element.offsetLeft;
+        } else if (elementRight > screenRight) {
+            scrollParent.scrollLeft = element.offsetLeft + element.offsetWidth - (scrollParent.offsetWidth - 20);
+        }
+        const elementBottom = element.offsetTop + element.offsetHeight;
+        const screenBottom = scrollParent.scrollTop + scrollParent.offsetHeight;
+        if (element.offsetTop < scrollParent.scrollTop) {
+            scrollParent.scrollTop = element.offsetTop;
+        } else if (elementBottom > screenBottom) {
+            scrollParent.scrollTop = element.offsetTop + element.offsetHeight - (scrollParent.offsetHeight - 20);
+        }
+    }
+}
+
 musicPad.getScrollParent = function(node) {
     if (node == null) {
         return null;
     }
-    if (node.scrollHeight > node.clientHeight) {
+    if (node.scrollHeight > node.clientHeight || node.scrollWidth > node.clientWidth) {
         return node;
     } else {
         return musicPad.getScrollParent(node.parentNode);
@@ -70,15 +90,18 @@ musicPad.onInput = function(event, value) {
 musicPad.onMoveDrop = function(event) {
     event.preventDefault();
     const moveData = musicPad.moveData;
-    const deltaX = event.x - moveData.x;
-    const deltaY = event.y - moveData.y;
+    const currentX = event.currentTarget.scrollLeft + event.x;
+    const currentY = event.currentTarget.scrollTop + event.y;
+    const deltaX = currentX - moveData.x;
+    const deltaY = currentY - moveData.y;
     const element = moveData.element;
     let x = element.offsetLeft + deltaX;
     let y = element.offsetTop + deltaY;
+    x = Math.round(x / 5) * 5;
+    y = Math.round(y / 5) * 5;
     element.style.left = x + "px";
     element.style.top = y + "px";
-    event.target.scrollLeft = element.offsetLeft + element.offsetWidth - event.target.offsetWidth;
-    event.target.scrollTop = element.offsetTop + element.offsetHeight - event.target.offsetHeight;
+    musicPad.ensureVisible(element);
     console.log("onMoveDrop: dropping at x=" + x + ", y=" + y);
     musicPad.send(JSON.stringify({
         type: 'OnBrowserEvent',
@@ -101,14 +124,16 @@ musicPad.onMoveOver = function(event) {
 }
 
 musicPad.onMoveStart = function(event) {
+    const element = event.target;
+    const scrollParent = element.closest(".scrollable");
     musicPad.moveData = {
-        x: event.x,
-        y: event.y,
-        element: event.target
+        x: scrollParent.scrollLeft + event.x,
+        y: scrollParent.scrollTop + event.y,
+        element: element
     }
-    musicPad.moveData.element.style.zIndex = ++musicPad.zIndex;
+    element.style.zIndex = ++musicPad.zIndex;
     window.requestAnimationFrame(function() {
-        musicPad.moveData.element.style.visibility = "hidden";
+        element.style.visibility = "hidden";
     });
 }
 
@@ -129,14 +154,7 @@ musicPad.onShadowUpdate = function(message) {
         break;
     case 'ENSURE_VISIBLE':
         let element = document.querySelector(message.selector);
-        let scrollParent = musicPad.getScrollParent(element);
-        if (scrollParent) {
-            let midpoint = scrollParent.offsetHeight / 2;
-            let elementTop = element.offsetTop - scrollParent.offsetTop;
-            if (elementTop < scrollParent.scrollTop || (elementTop + element.offsetHeight) > scrollParent.scrollTop + scrollParent.offsetHeight) {
-                scrollParent.scrollTop = elementTop - midpoint;
-            }
-        }
+        musicPad.ensureVisible(element);
         break;
     case 'SET_PROPERTY':
         matches = document.querySelectorAll(message.selector);

@@ -37,12 +37,12 @@ import com.example.afs.musicpad.service.Services;
 import com.example.afs.musicpad.task.ControllerTask;
 import com.example.afs.musicpad.task.MessageBroker;
 import com.example.afs.musicpad.util.JsonUtilities;
+import com.example.afs.musicpad.webapp.karaoke.Utils;
 
 public class MapperController extends ControllerTask {
 
   private int deviceIndex;
   private MapperView mapperView;
-  private ShortMessage shortMessage;
   private NavigableMap<Integer, Controller> deviceControllers = new TreeMap<>();
 
   public MapperController(MessageBroker broker) {
@@ -87,15 +87,20 @@ public class MapperController extends ControllerTask {
       Parent mapping = mapperView.getElementById(mappingId);
       MappingData mappingData = mapping.getData();
       OutputMessage outputMessage = mappingData.getOutputMessage();
-      outputMessage.setIndex(Integer.parseInt(value));
-      getConfiguration().put(mappingData.getInputMessage(), outputMessage);
+      int index = Utils.parseInt(value, -1);
+      if (index >= 0) {
+        outputMessage.setIndex(Integer.parseInt(value));
+        getConfiguration().put(mappingData.getInputMessage(), outputMessage);
+      }
     } else if (id.startsWith("label-")) {
       String mappingId = id.substring("label-".length());
       Parent mapping = mapperView.getElementById(mappingId);
       MappingData mappingData = mapping.getData();
       OutputMessage outputMessage = mappingData.getOutputMessage();
-      outputMessage.setLabel(value);
-      getConfiguration().put(mappingData.getInputMessage(), outputMessage);
+      if (value.length() > 0) {
+        outputMessage.setLabel(value);
+        getConfiguration().put(mappingData.getInputMessage(), outputMessage);
+      }
     }
   }
 

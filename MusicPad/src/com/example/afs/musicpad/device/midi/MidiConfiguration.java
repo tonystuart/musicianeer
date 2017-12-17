@@ -16,6 +16,7 @@ import java.util.TreeMap;
 
 import com.example.afs.musicpad.device.common.Configuration;
 import com.example.afs.musicpad.device.common.InputMap;
+import com.example.afs.musicpad.util.DelayTimer;
 import com.example.afs.musicpad.util.FileUtilities;
 import com.example.afs.musicpad.util.JsonUtilities;
 
@@ -25,19 +26,31 @@ public class MidiConfiguration implements Configuration {
     SELECTED, ACTIVE, INACTIVE
   }
 
+  public static class ConfigurationData {
+    private String deviceType;
+    private NavigableMap<InputMessage, OutputMessage> inputMap = new TreeMap<>();
+
+    public ConfigurationData(String deviceType, NavigableMap<InputMessage, OutputMessage> inputMap) {
+      this.deviceType = deviceType;
+      this.inputMap = inputMap;
+    }
+  }
+
+  private static final int WRITE_BEHIND_DELAY_MS = 15000;
+
   public static MidiConfiguration readConfiguration(String deviceType) {
     String fileName = getConfigurationFilename(deviceType);
     File configurationFile = getOverrideFile(fileName);
     if (configurationFile.isFile() && configurationFile.canRead()) {
       String contents = FileUtilities.read(configurationFile);
-      MidiConfiguration configuration = JsonUtilities.fromJson(contents, MidiConfiguration.class);
-      return configuration;
+      ConfigurationData configurationData = JsonUtilities.fromJson(contents, ConfigurationData.class);
+      return new MidiConfiguration(configurationData);
     }
     InputStream inputStream = Configuration.class.getClassLoader().getResourceAsStream(fileName);
     if (inputStream != null) {
       String contents = FileUtilities.read(inputStream);
-      MidiConfiguration configuration = JsonUtilities.fromJson(contents, MidiConfiguration.class);
-      return configuration;
+      ConfigurationData configurationData = JsonUtilities.fromJson(contents, ConfigurationData.class);
+      return new MidiConfiguration(configurationData);
     }
     System.out.println("Cannot find configuration for " + deviceType + ", using default");
     return new MidiConfiguration(deviceType);
@@ -55,12 +68,20 @@ public class MidiConfiguration implements Configuration {
   }
 
   private String deviceType;
-  private transient InputMap groupInputMap;
-  private transient InputMap soundInputMap;
-  private NavigableMap<InputMessage, OutputMessage> inputMap = new TreeMap<>();
+  private NavigableMap<InputMessage, OutputMessage> inputMap;
+
+  private InputMap groupInputMap;
+  private InputMap soundInputMap;
+  private DelayTimer delayTimer = new DelayTimer(() -> writeConfiguration());
+
+  public MidiConfiguration(ConfigurationData configurationData) {
+    this.deviceType = configurationData.deviceType;
+    this.inputMap = configurationData.inputMap;
+  }
 
   public MidiConfiguration(String deviceType) {
     this.deviceType = deviceType;
+    this.inputMap = new TreeMap<>();
   }
 
   public OutputMessage get(InputMessage inputMessage) {
@@ -95,7 +116,7 @@ public class MidiConfiguration implements Configuration {
     groupInputMap = null;
     soundInputMap = null;
     inputMap.put(inputMessage, outputMessage);
-    writeConfiguration();
+    delayTimer.delay(WRITE_BEHIND_DELAY_MS);
   }
 
   @Override
@@ -118,7 +139,7 @@ public class MidiConfiguration implements Configuration {
     String fileName = getConfigurationFilename(deviceType);
     File configurationFile = getOverrideFile(fileName);
     configurationFile.getParentFile().mkdirs();
-    JsonUtilities.toJsonFile(configurationFile, this);
+    JsonUtilities.toJsonFile(configurationFile, new ConfigurationData(deviceType, inputMap));
     System.out.println("Updating configuration for " + deviceType);
   }
 

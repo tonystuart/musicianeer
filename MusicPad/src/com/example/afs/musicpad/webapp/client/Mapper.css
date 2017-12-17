@@ -10,6 +10,12 @@ input, textarea, select, button {
     flex-direction: column;
 }
 
+#device-prompt {
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+}
+
 #mapper-diagram-container {
     display: flex;
     flex: 1;
@@ -19,7 +25,6 @@ input, textarea, select, button {
     font-size: 1.5vh;
     flex: 1;
     position: relative;
-    background-color: red;
 }
 
 .mapping {

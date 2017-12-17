@@ -33,7 +33,7 @@ public class MapperView extends ShadowDomBuilder {
     add(div("#mapper", ".tab", ".selected-tab") //
         .add(div(".title") //
             .add(text("MIDI Input Mapper"))) //
-        .add(div() //
+        .add(div("#device-prompt") //
             .add(text("Select Input Device:")) //
             .add(div("#device-type-container"))) //
         .add(div("#mapper-diagram-container") //
@@ -108,7 +108,7 @@ public class MapperView extends ShadowDomBuilder {
   }
 
   public String getMappingId(InputMessage inputMessage) {
-    String id = "mapping-" + inputMessage.getChannel() + "-" + inputMessage.getControl();
+    String id = "mapping-" + inputMessage.getChannel() + "-" + inputMessage.getControl() + (inputMessage.isKey() ? "-k" : "-c");
     return id;
   }
 
