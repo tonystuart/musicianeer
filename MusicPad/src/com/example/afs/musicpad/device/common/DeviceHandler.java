@@ -89,6 +89,14 @@ public class DeviceHandler extends ServiceTask {
     processDown(inputCode, Range.scale(this.velocity / 2, Midi.MAX_VALUE, 0, Midi.MAX_VALUE, velocity));
   }
 
+  public void tsOnNoteOff(int midiNote) {
+    player.noteOff(midiNote, 0);
+  }
+
+  public void tsOnNoteOn(int midiNote, int velocity) {
+    player.noteOn(midiNote, velocity);
+  }
+
   public void tsOnPitchBend(int pitchBend) {
     player.bendPitch(pitchBend);
   }

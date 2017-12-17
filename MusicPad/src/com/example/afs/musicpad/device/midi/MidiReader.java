@@ -232,9 +232,9 @@ public class MidiReader {
     int data1 = shortMessage.getData1();
     int data2 = shortMessage.getData2();
     if (command == ShortMessage.NOTE_ON) {
-      deviceHandler.tsOnDown(data1, data2);
+      deviceHandler.tsOnNoteOn(data1, data2);
     } else if (command == ShortMessage.NOTE_OFF) {
-      deviceHandler.tsOnUp(data1);
+      deviceHandler.tsOnNoteOff(data1);
     } else if (command == ShortMessage.POLY_PRESSURE) {
       deviceHandler.tsOnChannelPressure(data1, data2);
     } else if (command == ShortMessage.CONTROL_CHANGE) {

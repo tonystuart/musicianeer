@@ -59,6 +59,14 @@ public class Player {
     return program;
   }
 
+  public void noteOff(int midiNote, int velocity) {
+    synthesizer.releaseKey(playerChannel, midiNote);
+  }
+
+  public void noteOn(int midiNote, int velocity) {
+    synthesizer.pressKey(playerChannel, midiNote, velocity);
+  }
+
   public void play(Action action, Sound sound, int velocity) {
     if (isEnabled) {
       if (action == Action.PRESS && Trace.isTracePlay()) {
@@ -109,20 +117,16 @@ public class Player {
     }
   }
 
-  private void press(int midiNote, int velocity) {
-    synthesizer.pressKey(playerChannel, midiNote, velocity);
-  }
-
   private synchronized void processNoteEvent(NoteEvent noteEvent) {
     Note note = noteEvent.getNote();
     int midiNote = note.getMidiNote();
     int velocity = note.getVelocity();
     switch (noteEvent.getType()) {
     case NOTE_OFF:
-      release(midiNote, velocity);
+      noteOff(midiNote, velocity);
       break;
     case NOTE_ON:
-      press(midiNote, velocity);
+      noteOn(midiNote, velocity);
       break;
     case TICK:
       // TICK fills to end-of-measure
@@ -138,10 +142,6 @@ public class Player {
         queuedArpeggiation = null;
       }
     }
-  }
-
-  private void release(int midiNote, int velocity) {
-    synthesizer.releaseKey(playerChannel, midiNote);
   }
 
   private synchronized void sendToArpeggiator(Action action, Sound sound) {
@@ -173,10 +173,10 @@ public class Player {
   private void synthesizeNote(Action action, int midiNote, int velocity) {
     switch (action) {
     case PRESS:
-      press(midiNote, velocity);
+      noteOn(midiNote, velocity);
       break;
     case RELEASE:
-      release(midiNote, velocity);
+      noteOff(midiNote, velocity);
       break;
     default:
       throw new UnsupportedOperationException();
