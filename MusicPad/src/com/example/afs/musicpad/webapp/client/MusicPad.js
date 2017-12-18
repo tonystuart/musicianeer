@@ -154,7 +154,14 @@ musicPad.onShadowUpdate = function(message) {
         break;
     case 'ENSURE_VISIBLE':
         let element = document.querySelector(message.selector);
-        musicPad.ensureVisible(element);
+        let scrollParent = musicPad.getScrollParent(element);
+        if (scrollParent) {
+            let midpoint = scrollParent.offsetHeight / 2;
+            let elementTop = element.offsetTop - scrollParent.offsetTop;
+            if (elementTop < scrollParent.scrollTop || (elementTop + element.offsetHeight) > scrollParent.scrollTop + scrollParent.offsetHeight) {
+                scrollParent.scrollTop = elementTop - midpoint;
+            }
+        }
         break;
     case 'SET_PROPERTY':
         matches = document.querySelectorAll(message.selector);
