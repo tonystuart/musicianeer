@@ -217,12 +217,23 @@ public class MidiReader {
       }
     } else {
       Object commandType = getCommandType(outputType);
+      int value;
       if (commandType instanceof Command) {
         Command command = (Command) commandType;
-        broker.publish(new OnCommand(command, Range.scaleMidiToPercent(shortMessage.getData2())));
+        if (command == Command.SET_MASTER_PROGRAM) {
+          value = shortMessage.getData2();
+        } else {
+          value = Range.scaleMidiToPercent(shortMessage.getData2());
+        }
+        broker.publish(new OnCommand(command, value));
       } else if (commandType instanceof DeviceCommand) {
         DeviceCommand deviceCommand = (DeviceCommand) commandType;
-        broker.publish(new OnDeviceCommand(deviceCommand, deviceHandler.tsGetDeviceIndex(), Range.scaleMidiToPercent(shortMessage.getData2())));
+        if (deviceCommand == DeviceCommand.PROGRAM) {
+          value = shortMessage.getData2();
+        } else {
+          value = Range.scaleMidiToPercent(shortMessage.getData2());
+        }
+        broker.publish(new OnDeviceCommand(deviceCommand, deviceHandler.tsGetDeviceIndex(), value));
       }
     }
   }

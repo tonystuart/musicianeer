@@ -184,9 +184,8 @@ public class TransportTask extends ServiceTask {
     transport.setPercentVelocity(velocity);
   }
 
-  private void doSetMasterProgram(int masterProgram) {
-    // TODO: Use MIDI values (0-127) for external interfaces
-    transport.setMasterProgram(Range.scalePercentToMidi(masterProgram));
+  private void doSetMasterProgram(int program) {
+    transport.setMasterProgram(program);
   }
 
   private void doSetMidiMasterGain(int gain) {
