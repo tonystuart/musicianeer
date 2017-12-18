@@ -32,6 +32,7 @@ import com.example.afs.musicpad.message.OnDeviceDetached;
 import com.example.afs.musicpad.message.OnShadowUpdate;
 import com.example.afs.musicpad.message.OnShadowUpdate.Action;
 import com.example.afs.musicpad.message.OnShortMessage;
+import com.example.afs.musicpad.player.PlayableMap;
 import com.example.afs.musicpad.service.DeviceControllerService;
 import com.example.afs.musicpad.service.Services;
 import com.example.afs.musicpad.task.ControllerTask;
@@ -88,7 +89,7 @@ public class MapperController extends ControllerTask {
       MappingData mappingData = mapping.getData();
       OutputMessage outputMessage = mappingData.getOutputMessage();
       int index = Utils.parseInt(value, -1);
-      if (index >= 0) {
+      if (index > PlayableMap.DEFAULT_GROUP) {
         outputMessage.setIndex(Integer.parseInt(value));
         getConfiguration().put(mappingData.getInputMessage(), outputMessage);
       }

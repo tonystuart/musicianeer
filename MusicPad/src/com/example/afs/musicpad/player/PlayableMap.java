@@ -25,29 +25,29 @@ public class PlayableMap {
     TICK, MEASURE
   }
 
+  public static final int DEFAULT_GROUP = 0;
+
   private int autoGroup;
   private int groupDown;
 
   private final int groupCount;
   private final int soundCount;
-  private final int supportedSounds;
 
   private final Sounds sounds;
   private final Sound[][] inputIndexToSound;
   private final RandomAccessList<Playable> playables;
-  private InputMap groupInputMap;
-  private InputMap soundInputMap;
+  private final InputMap groupInputMap;
+  private final InputMap soundInputMap;
 
   public PlayableMap(InputMap groupInputMap, InputMap soundInputMap, Iterable<Note> notes, OutputType outputType) {
     this.groupInputMap = groupInputMap;
     this.soundInputMap = soundInputMap;
     this.groupCount = groupInputMap.size();
     this.soundCount = soundInputMap.size();
-    this.supportedSounds = soundCount * groupCount;
     this.sounds = new Sounds(outputType, notes);
     Map<Sound, SoundCount> uniqueSoundCounts = sounds.getUniqueSoundCounts();
     SoundCount[] sortedSounds = sortByFrequency(uniqueSoundCounts);
-    int maxSounds = Math.min(uniqueSoundCounts.size(), supportedSounds);
+    int maxSounds = Math.min(uniqueSoundCounts.size(), soundCount * groupCount);
     inputIndexToSound = assignSoundsToGroups(sortedSounds, maxSounds);
     sortByPitch(inputIndexToSound, maxSounds);
     Map<Sound, String> soundToLegend = assignSoundsToLegend(maxSounds);
@@ -64,8 +64,7 @@ public class PlayableMap {
     if (soundIndex != -1) {
       int thisGroup = groupDown != 0 ? groupDown : autoGroup;
       sound = inputIndexToSound[thisGroup][soundIndex];
-      //System.out.println("inputCode=" + inputCode + ", soundIndex=" + soundIndex + ", sound=" + sound);
-      autoGroup = 0;
+      autoGroup = DEFAULT_GROUP;
     } else {
       sound = null;
       int index = groupInputMap.indexOf(inputCode);

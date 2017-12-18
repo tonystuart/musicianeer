@@ -24,6 +24,7 @@ import com.example.afs.musicpad.html.Option;
 import com.example.afs.musicpad.html.Parent;
 import com.example.afs.musicpad.html.Select;
 import com.example.afs.musicpad.html.ShadowDomBuilder;
+import com.example.afs.musicpad.player.PlayableMap;
 import com.example.afs.musicpad.task.ControllerTask;
 
 public class MapperView extends ShadowDomBuilder {
@@ -66,7 +67,7 @@ public class MapperView extends ShadowDomBuilder {
             .add(div() //
                 .add(text("Index"))) //
             .add(numberInput("#index-" + id) //
-                .setMinimum(0) //
+                .setMinimum(PlayableMap.DEFAULT_GROUP + 1) //
                 .setValue(outputMessage.getIndex()) //
                 .addInputHandler() //
                 .required()) //

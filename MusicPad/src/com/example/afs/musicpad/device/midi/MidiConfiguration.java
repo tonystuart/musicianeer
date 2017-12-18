@@ -16,6 +16,7 @@ import java.util.TreeMap;
 
 import com.example.afs.musicpad.device.common.Configuration;
 import com.example.afs.musicpad.device.common.InputMap;
+import com.example.afs.musicpad.player.PlayableMap;
 import com.example.afs.musicpad.util.DelayTimer;
 import com.example.afs.musicpad.util.FileUtilities;
 import com.example.afs.musicpad.util.JsonUtilities;
@@ -95,7 +96,9 @@ public class MidiConfiguration implements Configuration {
   @Override
   public InputMap getGroupInputMap() {
     if (groupInputMap == null) {
-      groupInputMap = new InputMap(getMap(OutputType.KARAOKE_SELECT_GROUP));
+      TreeMap<Integer, String> map = getMap(OutputType.KARAOKE_SELECT_GROUP);
+      map.put(PlayableMap.DEFAULT_GROUP, "");
+      groupInputMap = new InputMap(map);
     }
     return groupInputMap;
   }
