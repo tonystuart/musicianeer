@@ -40,11 +40,11 @@ import com.example.afs.musicpad.util.Range;
 
 public class DeviceHandler extends ServiceTask {
 
-  private static final int DEFAULT_VELOCITY = 64;
+  public static final int DEFAULT_PERCENT_VELOCITY = 50;
 
   private int channel;
   private int deviceIndex;
-  private int velocity = DEFAULT_VELOCITY;
+  private int velocity = Range.scalePercentToMidi(DEFAULT_PERCENT_VELOCITY);
 
   private Song song;
   private Player player;
@@ -162,7 +162,7 @@ public class DeviceHandler extends ServiceTask {
         setOutputType(OutputType.TICK);
         break;
       case MUTE_BACKGROUND:
-        doMuteBackground();
+        doMuteBackground(parameter);
         break;
       case NEXT_CHANNEL:
         doNextChannel();
@@ -195,8 +195,8 @@ public class DeviceHandler extends ServiceTask {
     publish(new OnDeviceCommand(DeviceCommand.VELOCITY, deviceIndex, Math.min(100, getPercentVelocity() + 5)));
   }
 
-  private void doMuteBackground() {
-    synthesizer.muteChannel(channel, !synthesizer.isMuted(channel));
+  private void doMuteBackground(int parameter) {
+    synthesizer.muteChannel(channel, parameter != 0);
   }
 
   private void doNextChannel() {
@@ -255,9 +255,8 @@ public class DeviceHandler extends ServiceTask {
   }
 
   private void doReset() {
-    velocity = DEFAULT_VELOCITY;
-    player.reset();
-    synthesizer.muteChannel(channel, false);
+    publish(new OnDeviceCommand(DeviceCommand.MUTE_BACKGROUND, deviceIndex, 0));
+    publish(new OnDeviceCommand(DeviceCommand.VELOCITY, deviceIndex, DEFAULT_PERCENT_VELOCITY));
   }
 
   private void doSampleChannel(OnSampleChannel message) {

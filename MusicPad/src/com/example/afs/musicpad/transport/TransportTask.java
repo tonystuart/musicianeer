@@ -108,7 +108,7 @@ public class TransportTask extends ServiceTask {
   }
 
   private void doDecreaseMasterGain() {
-    publish(new OnCommand(Command.SET_BACKGROUND_VELOCITY, Math.max(0, transport.getPercentGain() - 10)));
+    publish(new OnCommand(Command.SET_MASTER_GAIN, Math.max(0, transport.getPercentGain() - 10)));
   }
 
   private void doDecreaseTempo() {
@@ -154,7 +154,9 @@ public class TransportTask extends ServiceTask {
   }
 
   private void doReset() {
-    transport.reset();
+    publish(new OnCommand(Command.SET_MASTER_GAIN, Transport.DEFAULT_PERCENT_GAIN));
+    publish(new OnCommand(Command.SET_BACKGROUND_VELOCITY, Transport.DEFAULT_PERCENT_VELOCITY));
+    publish(new OnCommand(Command.SET_TEMPO, Transport.DEFAULT_PERCENT_TEMPO));
   }
 
   private void doSampleChannel(OnSampleChannel message) {

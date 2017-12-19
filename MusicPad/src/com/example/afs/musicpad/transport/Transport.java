@@ -32,9 +32,9 @@ public class Transport {
     RELATIVE, ABSOLUTE
   }
 
-  private static final int DEFAULT_PERCENT_GAIN = 10;
-  private static final int DEFAULT_PERCENT_TEMPO = 100;
-  private static final int DEFAULT_PERCENT_VELOCITY = 10;
+  public static final int DEFAULT_PERCENT_GAIN = 10;
+  public static final int DEFAULT_PERCENT_TEMPO = 50;
+  public static final int DEFAULT_PERCENT_VELOCITY = 10;
 
   private int masterProgram = Midi.MAX_VALUE;
   private int percentVelocity = DEFAULT_PERCENT_VELOCITY;
@@ -128,12 +128,6 @@ public class Transport {
       metronomeTick = ((metronomeTick + Default.RESOLUTION + 1) / Default.RESOLUTION) * Default.RESOLUTION;
       inputQueue.add(new NoteEvent(Type.TICK, metronomeTick, beatsPerMinute));
     }
-  }
-
-  public void reset() {
-    synthesizer.setGain(DEFAULT_PERCENT_GAIN);
-    setPercentTempo(DEFAULT_PERCENT_TEMPO);
-    setPercentVelocity(DEFAULT_PERCENT_VELOCITY);
   }
 
   public void resume() {
