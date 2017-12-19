@@ -181,6 +181,7 @@ public class MapperView extends ShadowDomBuilder {
         .add(option("Button", InputType.BUTTON, selected)) //
         .add(option("Key", InputType.KEY, selected)) //
         .add(option("Pad", InputType.PAD, selected)) //
+        .add(option("Pedal", InputType.PEDAL, selected)) //
         .add(option("Rotary", InputType.ROTARY, selected)) //
         .add(option("Slider", InputType.SLIDER, selected)) //
         .add(option("Wheel", InputType.WHEEL, selected)) //
