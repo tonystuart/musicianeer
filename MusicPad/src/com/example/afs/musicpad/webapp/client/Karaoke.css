@@ -72,12 +72,12 @@ body {
 }
 
 .device-5 {
-    color: chartreuse;
+    color: darkgoldenrod;
 }
 
 .device-5 .selected-channel {
     color: black;
-    background-color: chartreuse;
+    background-color: darkgoldenrod;
 }
 
 .device-6 {
@@ -96,6 +96,78 @@ body {
 .device-7 .selected-channel {
     color: black;
     background-color: darkorange;
+}
+
+.device-8 {
+	color: blueviolet;
+}
+
+.device-8 .selected-channel {
+	color: black;
+	background-color: blueviolet;
+}
+
+.device-9 {
+    color: brown;
+}
+
+.device-9 .selected-channel {
+    color: black;
+    background-color: brown;
+}
+
+.device-10 {
+    color: burlywood;
+}
+
+.device-10 .selected-channel {
+    color: black;
+    background-color: burlywood;
+}
+
+.device-11 {
+    color: silver;
+}
+
+.device-11 .selected-channel {
+    color: black;
+    background-color: silver;
+}
+
+.device-12 {
+    color: khaki;
+}
+
+.device-12 .selected-channel {
+    color: black;
+    background-color: khaki;
+}
+
+.device-13 {
+    color: plum;
+}
+
+.device-13 .selected-channel {
+    color: black;
+    background-color: plum;
+}
+
+.device-14 {
+    color: sienna;
+}
+
+.device-14 .selected-channel {
+    color: black;
+    background-color: sienna;
+}
+
+.device-15 {
+    color: orangered;
+}
+
+.device-15 .selected-channel {
+    color: black;
+    background-color: orangered;
 }
 
 .words, .channel {
