@@ -1,18 +1,11 @@
 'use strict';
 var staff = staff || {};
 
-// NB: ticksPerPixel is initialized when the prompter is received
-
-staff.ticksPerPixel = null;
+staff.ticksPerPixel = 5;
 
 staff.onLoad = function() {
     let url = 'ws://' + location.host + '/v1/staff';
     musicPad.createWebSocketClient(url, staff.onWebSocketMessage, staff.onWebSocketClose);
-}
-
-staff.onPrompter = function(message) {
-    musicPad.replaceTab('prompter', message.html);
-    staff.onTick(0);
 }
 
 staff.onTick = function(tick) {
@@ -37,9 +30,8 @@ staff.onWebSocketClose = function() {
 staff.onWebSocketMessage = function(json) {
     let message = JSON.parse(json);
     switch (message.type) {
-    case 'OnStaffPrompter':
-        staff.ticksPerPixel = message.ticksPerPixel;
-        staff.onPrompter(message);
+    case 'OnShadowUpdate':
+        musicPad.onShadowUpdate(message);
         break;
     case 'OnTick':
         staff.onTick(message.tick);

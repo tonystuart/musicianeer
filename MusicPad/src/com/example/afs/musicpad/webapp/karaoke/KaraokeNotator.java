@@ -44,7 +44,7 @@ public class KaraokeNotator {
     }
   }
 
-  public Division createPrompterList() {
+  public Division createPrompter() {
     Division division = new Division();
     long tick = 0;
     while (tick < song.getDuration()) {

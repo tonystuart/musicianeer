@@ -138,9 +138,9 @@ public class KaraokeView extends ShadowDomBuilder {
 
   public void renderSong(Song song, NavigableMap<Integer, PlayerDetail> devicePlayerDetail) {
     KaraokeNotator karaokeNotator = new KaraokeNotator(song, devicePlayerDetail);
-    Division prompterList = karaokeNotator.createPrompterList();
+    Division prompter = karaokeNotator.createPrompter();
     Parent prompterListParent = getElementById("prompter-list");
-    replaceChildren(prompterListParent, prompterList, false);
+    replaceChildren(prompterListParent, prompter, false);
     Division prompterDetails = createPrompterDetails(devicePlayerDetail);
     Parent prompterDetailsParent = getElementById("prompter-details");
     replaceChildren(prompterDetailsParent, prompterDetails);

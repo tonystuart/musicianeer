@@ -1,19 +1,7 @@
 @CHARSET "UTF-8";
 
-html {
-    height: 100%;
-    width: 100%;
-    font-family: Sans-Serif;
-}
-
 body {
-    height: 100%;
-    margin: 0px;
-    width: 100%;
-    font-size: 3vh;
     color: black;
-    cursor: default;
-    user-select: none;
     background-color: white;
 }
 
@@ -84,4 +72,9 @@ text {
     position: absolute;
     right: 0;
     top: 0;
+}
+
+#prompter-title {
+	border-bottom: 1px solid black;
+	color:  black;
 }
