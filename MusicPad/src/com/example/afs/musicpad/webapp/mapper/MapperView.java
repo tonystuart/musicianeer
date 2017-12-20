@@ -60,7 +60,7 @@ public class MapperView extends ShadowDomBuilder {
         .addClickHandler() //
         .add(div(".header") //
             .add(div("#input-" + id) //
-                .add(text("Input (" + channel + "/" + control + ")"))) //
+                .add(text("Input " + channel + "/" + control))) //
             .add(div("#close-" + id, ".close-button") //
                 .add(text("X")))) //
         .add(createInputType("input-type-" + id, inputType)) //
@@ -150,7 +150,7 @@ public class MapperView extends ShadowDomBuilder {
     int command = shortMessage.getCommand();
     int value = shortMessage.getData2();
     Parent inputTextContainer = getElementById("input-" + id);
-    TextElement inputText = text("Input (" + channel + "/" + control + "/" + command + "/" + value + ")");
+    TextElement inputText = text("Input " + channel + "/" + control + "/" + command + "/" + value);
     replaceChildren(inputTextContainer, inputText); //
     selectMapping(id);
   }
