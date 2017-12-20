@@ -60,6 +60,10 @@ public class MapperController extends ControllerTask {
   protected void doClick(String id) {
     if (id.startsWith("mapping-")) {
       mapperView.selectMapping(id);
+    } else if (id.startsWith("close-mapping-")) {
+      String mappingId = id.substring("close-".length());
+      MappingData mappingData = mapperView.removeMapping(mappingId);
+      getConfiguration().remove(mappingData.getInputMessage());
     }
   }
 

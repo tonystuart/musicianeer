@@ -37,6 +37,24 @@ input, textarea, select, button {
     position: absolute;
 }
 
+.header {
+	justify-content: space-between;
+	display: flex;
+}
+
+.close-button {
+	padding: 0px 2px;
+}
+
+.close-button:hover {
+    background-color: black;
+}
+
+.close-button:active {
+    color: black;
+    background-color: white;
+}
+
 .mapper-index-label {
     display: flex;
     flex-direction: column;

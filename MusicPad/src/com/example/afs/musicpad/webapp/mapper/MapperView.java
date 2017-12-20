@@ -57,8 +57,10 @@ public class MapperView extends ShadowDomBuilder {
     Parent mapping = new Division("#" + id, ".mapping") //
         .addMoveSource() //
         .addClickHandler() //
-        .add(div("#input-" + id) //
-            .add(text("Input (" + channel + "/" + control + ")"))) //
+        .add(div("#input-" + id, ".header") //
+            .add(text("Input (" + channel + "/" + control + ")")) //
+            .add(div("#close-" + id, ".close-button") //
+                .add(text("X")))) //
         .add(createInputType("input-type-" + id, inputType)) //
         .add(div() //
             .add(text("Output"))) //
@@ -120,6 +122,14 @@ public class MapperView extends ShadowDomBuilder {
             .add(text(name))) //
         .add(div(".value") //
             .add(text("&nbsp;" + value))); //
+  }
+
+  public MappingData removeMapping(String mappingId) {
+    Parent mapping = getElementById(mappingId);
+    MappingData mappingData = mapping.getData();
+    Division diagram = getElementById("mapper-diagram");
+    remove(diagram, mapping);
+    return mappingData;
   }
 
   public void renderDeviceList(NavigableMap<Integer, Controller> deviceControllers) {

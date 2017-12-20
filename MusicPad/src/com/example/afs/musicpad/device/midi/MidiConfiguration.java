@@ -116,15 +116,24 @@ public class MidiConfiguration implements Configuration {
   }
 
   public void put(InputMessage inputMessage, OutputMessage outputMessage) {
-    groupInputMap = null;
-    soundInputMap = null;
     inputMap.put(inputMessage, outputMessage);
-    delayTimer.delay(WRITE_BEHIND_DELAY_MS);
+    applyChanges();
+  }
+
+  public void remove(InputMessage inputMessage) {
+    inputMap.remove(inputMessage);
+    applyChanges();
   }
 
   @Override
   public String toString() {
     return "MidiConfiguration [deviceType=" + deviceType + ", inputMap=" + inputMap + "]";
+  }
+
+  private void applyChanges() {
+    groupInputMap = null;
+    soundInputMap = null;
+    delayTimer.delay(WRITE_BEHIND_DELAY_MS);
   }
 
   private TreeMap<Integer, String> getMap(OutputType desiredOutputType) {
