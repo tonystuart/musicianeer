@@ -162,13 +162,13 @@ public class TransportTask extends ServiceTask {
   private void doSampleChannel(OnSampleChannel message) {
     transport.stop();
     this.song = message.getSong();
-    transport.play(new ChannelNotes(song.getNotes(), message.getChannel()));
+    transport.play(new ChannelNotes(song.getNotes(), message.getChannel()), tick -> publishTick(tick));
   }
 
   private void doSampleSong(OnSampleSong message) {
     song = message.getSong();
     transport.stop();
-    transport.play(song.getNotes());
+    transport.play(song.getNotes(), tick -> publishTick(tick));
     seekPosition = 0;
   }
 

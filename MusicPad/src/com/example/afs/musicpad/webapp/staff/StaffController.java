@@ -13,15 +13,23 @@ import java.util.Map.Entry;
 import java.util.NavigableMap;
 import java.util.TreeMap;
 
+import com.example.afs.musicpad.device.common.InputMap;
 import com.example.afs.musicpad.message.OnRenderSong;
 import com.example.afs.musicpad.message.OnSampleChannel;
 import com.example.afs.musicpad.message.OnSampleSong;
 import com.example.afs.musicpad.message.OnShadowUpdate;
 import com.example.afs.musicpad.message.OnShadowUpdate.Action;
+import com.example.afs.musicpad.midi.Midi;
+import com.example.afs.musicpad.player.Playable;
+import com.example.afs.musicpad.player.PlayableMap;
+import com.example.afs.musicpad.player.PlayableMap.OutputType;
 import com.example.afs.musicpad.player.PlayerDetail;
 import com.example.afs.musicpad.service.PlayerDetailService;
+import com.example.afs.musicpad.song.Note;
+import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.task.ControllerTask;
 import com.example.afs.musicpad.task.MessageBroker;
+import com.example.afs.musicpad.util.RandomAccessList;
 
 public class StaffController extends ControllerTask {
 
@@ -56,9 +64,32 @@ public class StaffController extends ControllerTask {
   }
 
   private void doSampleChannel(OnSampleChannel message) {
+    Song song = message.getSong();
+    int channel = message.getChannel();
+    if (channel != Midi.DRUM && song.getChannelNoteCount(channel) > 0) {
+      NavigableMap<Integer, PlayerDetail> devicePlayerDetail = new TreeMap<>();
+      InputMap inputMap = new InputMap("");
+      Iterable<Note> channelNotes = song.getChannelNotes(channel);
+      PlayableMap playableMap = new PlayableMap(inputMap, inputMap, channelNotes, OutputType.TICK);
+      RandomAccessList<Playable> playables = playableMap.getPlayables();
+      devicePlayerDetail.put(channel, new PlayerDetail(playables, channel, 0));
+      staffView.renderSong(message.getSong(), devicePlayerDetail);
+    }
   }
 
   private void doSampleSong(OnSampleSong message) {
+    Song song = message.getSong();
+    NavigableMap<Integer, PlayerDetail> devicePlayerDetail = new TreeMap<>();
+    InputMap inputMap = new InputMap("");
+    for (int channel = 0; channel < Midi.CHANNELS; channel++) {
+      if (channel != Midi.DRUM && song.getChannelNoteCount(channel) > 0) {
+        Iterable<Note> channelNotes = song.getChannelNotes(channel);
+        PlayableMap playableMap = new PlayableMap(inputMap, inputMap, channelNotes, OutputType.TICK);
+        RandomAccessList<Playable> playables = playableMap.getPlayables();
+        devicePlayerDetail.put(channel, new PlayerDetail(playables, channel, 0));
+      }
+    }
+    staffView.renderSong(message.getSong(), devicePlayerDetail);
   }
 
 }

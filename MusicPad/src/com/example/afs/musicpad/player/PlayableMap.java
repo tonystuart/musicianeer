@@ -26,6 +26,7 @@ public class PlayableMap {
   }
 
   public static final int DEFAULT_GROUP = 0;
+  public static final String DEFAULT_UNMAPPED_SOUND_LEGEND = "";
 
   private int autoGroup;
   private int groupDown;
@@ -34,14 +35,20 @@ public class PlayableMap {
   private final int soundCount;
 
   private final Sounds sounds;
-  private final Sound[][] inputIndexToSound;
-  private final RandomAccessList<Playable> playables;
   private final InputMap groupInputMap;
   private final InputMap soundInputMap;
+  private final String unmappedSoundLegend;
+  private final Sound[][] inputIndexToSound;
+  private final RandomAccessList<Playable> playables;
 
   public PlayableMap(InputMap groupInputMap, InputMap soundInputMap, Iterable<Note> notes, OutputType outputType) {
+    this(groupInputMap, soundInputMap, notes, outputType, DEFAULT_UNMAPPED_SOUND_LEGEND);
+  }
+
+  public PlayableMap(InputMap groupInputMap, InputMap soundInputMap, Iterable<Note> notes, OutputType outputType, String unmappedSoundLegend) {
     this.groupInputMap = groupInputMap;
     this.soundInputMap = soundInputMap;
+    this.unmappedSoundLegend = unmappedSoundLegend;
     this.groupCount = groupInputMap.size();
     this.soundCount = soundInputMap.size();
     this.sounds = new Sounds(outputType, notes);
@@ -127,7 +134,7 @@ public class PlayableMap {
     for (Sound sound : sounds) {
       String legend = soundToLegend.get(sound);
       if (legend == null) {
-        legend = "?";
+        legend = unmappedSoundLegend;
       }
       Playable playable = new Playable(sound, legend);
       playables.add(playable);

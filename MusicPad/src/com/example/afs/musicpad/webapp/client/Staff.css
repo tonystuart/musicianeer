@@ -61,6 +61,7 @@ text {
     flex-shrink: 1;
     position: relative;
     display: flex;
+    max-height: 500px;
 }
 
 .notator svg {
