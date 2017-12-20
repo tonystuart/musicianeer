@@ -24,6 +24,7 @@ import com.example.afs.musicpad.html.Option;
 import com.example.afs.musicpad.html.Parent;
 import com.example.afs.musicpad.html.Select;
 import com.example.afs.musicpad.html.ShadowDomBuilder;
+import com.example.afs.musicpad.html.TextElement;
 import com.example.afs.musicpad.player.PlayableMap;
 import com.example.afs.musicpad.task.ControllerTask;
 
@@ -57,8 +58,9 @@ public class MapperView extends ShadowDomBuilder {
     Parent mapping = new Division("#" + id, ".mapping") //
         .addMoveSource() //
         .addClickHandler() //
-        .add(div("#input-" + id, ".header") //
-            .add(text("Input (" + channel + "/" + control + ")")) //
+        .add(div(".header") //
+            .add(div("#input-" + id) //
+                .add(text("Input (" + channel + "/" + control + ")"))) //
             .add(div("#close-" + id, ".close-button") //
                 .add(text("X")))) //
         .add(createInputType("input-type-" + id, inputType)) //
@@ -147,10 +149,9 @@ public class MapperView extends ShadowDomBuilder {
     int control = inputMessage.getControl();
     int command = shortMessage.getCommand();
     int value = shortMessage.getData2();
-    Parent labelElement = getElementById("input-" + id);
-    String label = "Input (" + channel + "/" + control + "/" + command + "/" + value + ")";
-    replaceChildren(labelElement, div("#input-" + id) //
-        .add(text(label))); //
+    Parent inputTextContainer = getElementById("input-" + id);
+    TextElement inputText = text("Input (" + channel + "/" + control + "/" + command + "/" + value + ")");
+    replaceChildren(inputTextContainer, inputText); //
     selectMapping(id);
   }
 
