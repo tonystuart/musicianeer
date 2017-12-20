@@ -41,6 +41,7 @@ import com.example.afs.musicpad.util.RandomAccessList;
 
 public class KaraokeController extends ControllerTask {
 
+  private boolean initialized;
   private KaraokeView karaokeView;
   private Random random = new Random();
 
@@ -53,14 +54,6 @@ public class KaraokeController extends ControllerTask {
     subscribe(OnSampleSong.class, message -> doSampleSong(message));
     subscribe(OnPickChannel.class, message -> doPickChannel(message));
     subscribe(OnSampleChannel.class, message -> doSampleChannel(message));
-  }
-
-  @Override
-  public void tsStart() {
-    super.tsStart();
-    RandomAccessList<File> midiFiles = request(Services.getMidiFiles);
-    karaokeView.renderSongList(midiFiles);
-    pickRandomSong(midiFiles);
   }
 
   @Override
@@ -127,7 +120,13 @@ public class KaraokeController extends ControllerTask {
   }
 
   @Override
-  protected void doLoad() {
+  protected synchronized void doLoad() {
+    if (!initialized) {
+      initialized = true;
+      RandomAccessList<File> midiFiles = request(Services.getMidiFiles);
+      karaokeView.renderSongList(midiFiles);
+      pickRandomSong(midiFiles);
+    }
     addShadowUpdate(new OnShadowUpdate(Action.REPLACE_CHILDREN, "body", karaokeView.render()));
     karaokeView.selectSong(karaokeView.getSongIndex()); // refresh highlight on current song
   }

@@ -36,7 +36,7 @@ public class SingletonWebApp extends WebApp {
 
   protected void doMessage(Message message) {
     if (webSockets.size() == 0) {
-      throw new IllegalStateException("WebSocket is not open until doLoad is invoked, discard message " + message);
+      throw new IllegalStateException("WebSocket is not open until doLoad is invoked, discarding message " + message);
     }
     for (WebSocket webSocket : webSockets) {
       webSocket.write(message);
