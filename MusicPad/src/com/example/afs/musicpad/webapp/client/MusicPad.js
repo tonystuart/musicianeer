@@ -39,17 +39,17 @@ musicPad.ensureVisible = function(element) {
     if (scrollParent) {
         const elementRight = element.offsetLeft + element.offsetWidth;
         const screenRight = scrollParent.scrollLeft + scrollParent.offsetWidth;
-        if (element.offsetLeft < scrollParent.scrollLeft) {
-            scrollParent.scrollLeft = element.offsetLeft;
-        } else if (elementRight > screenRight) {
-            scrollParent.scrollLeft = element.offsetLeft + element.offsetWidth - (scrollParent.offsetWidth - 20);
+        if (element.offsetLeft < scrollParent.scrollLeft || elementRight > screenRight) {
+            const elementCenter = element.offsetWidth / 2;
+            const parentCenter = scrollParent.offsetWidth / 2;
+            scrollParent.scrollLeft = (element.offsetLeft + elementCenter) - parentCenter;
         }
         const elementBottom = element.offsetTop + element.offsetHeight;
         const screenBottom = scrollParent.scrollTop + scrollParent.offsetHeight;
-        if (element.offsetTop < scrollParent.scrollTop) {
-            scrollParent.scrollTop = element.offsetTop;
-        } else if (elementBottom > screenBottom) {
-            scrollParent.scrollTop = element.offsetTop + element.offsetHeight - (scrollParent.offsetHeight - 20);
+        if (element.offsetTop < scrollParent.scrollTop || elementBottom > screenBottom) {
+            const elementMiddle = element.offsetHeight / 2;
+            const parentMiddle = scrollParent.offsetHeight / 2;
+            scrollParent.scrollTop = (element.offsetTop + elementMiddle) - parentMiddle;
         }
     }
 }
@@ -154,14 +154,7 @@ musicPad.onShadowUpdate = function(message) {
         break;
     case 'ENSURE_VISIBLE':
         let element = document.querySelector(message.selector);
-        let scrollParent = musicPad.getScrollParent(element);
-        if (scrollParent) {
-            let midpoint = scrollParent.offsetHeight / 2;
-            let elementTop = element.offsetTop - scrollParent.offsetTop;
-            if (elementTop < scrollParent.scrollTop || (elementTop + element.offsetHeight) > scrollParent.scrollTop + scrollParent.offsetHeight) {
-                scrollParent.scrollTop = elementTop - midpoint;
-            }
-        }
+        musicPad.ensureVisible(element);
         break;
     case 'SET_PROPERTY':
         matches = document.querySelectorAll(message.selector);

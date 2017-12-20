@@ -121,18 +121,16 @@ karaoke.onWebSocketMessage = function(json) {
     }
 }
 
-karaoke.selectPrompt = function(promptDivision) {
+karaoke.selectPrompt = function(prompt) {
     if (karaoke.lastPrompt) {
         karaoke.lastPrompt.classList.remove('current-prompt');
     }
-    promptDivision.classList.add('current-prompt');
-    let prompterList = document.getElementById('prompter-list');
-    let midpoint = prompterList.offsetHeight / 2;
-    let promptTop = promptDivision.offsetTop - prompterList.offsetTop;
-    let promptMidpoint = promptTop + promptDivision.offsetHeight / 2;
-    prompterList.scrollTop = promptMidpoint - midpoint;
-
-    karaoke.lastPrompt = promptDivision;
+    prompt.classList.add('current-prompt');
+    const parent = document.getElementById('prompter-list');
+    const parentMiddle = parent.offsetHeight / 2;
+    const promptMiddle = prompt.offsetHeight / 2;
+    parent.scrollTop = (prompt.offsetTop + promptMiddle) - parentMiddle;
+    karaoke.lastPrompt = prompt;
 }
 
 karaoke.showTickCountdown = function(tick) {
