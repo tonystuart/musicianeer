@@ -86,7 +86,16 @@ public class DeviceHandler extends ServiceTask {
   }
 
   public void tsOnDown(int inputCode, int velocity) {
-    processDown(inputCode, Range.scale(this.velocity / 2, Midi.MAX_VALUE, 0, Midi.MAX_VALUE, velocity));
+    int value;
+    // If input is not velocity sensitive
+    if (velocity == Midi.MAX_VALUE) {
+      // Use preset velocity for this device
+      value = this.velocity;
+    } else {
+      // Otherwise use half of preset velocity as floor and scale input velocity above that
+      value = Range.scale(this.velocity / 2, Midi.MAX_VALUE, 0, Midi.MAX_VALUE, velocity);
+    }
+    processDown(inputCode, value);
   }
 
   public void tsOnNoteOff(int midiNote) {
