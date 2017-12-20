@@ -18,7 +18,6 @@ staff.onTick = function(tick) {
             let width = scroller.offsetWidth;
             let midPoint = width / 2;
             scroller.scrollLeft += screenX - midPoint;
-            console.log('x1=' + scaledTick + ', x2=' + screenX);
         }
     }
 }
