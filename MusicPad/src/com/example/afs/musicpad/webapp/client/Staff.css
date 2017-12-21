@@ -1,90 +1,6 @@
 @CHARSET "UTF-8";
 
 body {
-    color: black;
-    background-color: white;
-}
-
-line {
-    stroke: black;
-    stroke-width: 1;
-}
-
-circle {
-    stroke: black;
-    stroke-width: 1;
-}
-
-text {
-    font-size: 10pt;
-    stroke: black;
-    fill: black;
-}
-
-.open {
-    fill: white;
-}
-
-.closed {
-    fill: black;
-}
-
-.channel-notators {
-    background-color: white;
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-    position: relative;
-    width: 100%;
-    height: 100%;
-}
-
-#notator-cursor {
-    position: absolute;
-    left: 50%;
-    height: 100%;
-    z-index: 100;
-    border-left: 1px solid red;
-}
-
-#notator-scroller {
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-    height: 100%;
-    overflow-x: auto;
-    width: 100%;
-}
-
-.notator {
-    flex-grow: 1;
-    flex-shrink: 1;
-    position: relative;
-    display: flex;
-    max-height: 500px;
-}
-
-.notator svg {
-    bottom: 0;
-    height: 100%;
-    left: 0;
-    padding-left: calc(50%);
-    padding-right: calc(50%);
-    position: absolute;
-    right: 0;
-    top: 0;
-}
-
-#prompter-title {
-	border-bottom: 1px solid black;
-	color:  black;
-}
-
-
-
-/**/
-
-body {
     color: silver;
     background-color: black;
 }
@@ -94,13 +10,15 @@ svg {
 }
 
 line {
-    stroke: black;
-    stroke-width: 1;
+    stroke-width: 2;
 }
 
 circle {
-    stroke: black;
     stroke-width: 1;
+}
+
+text {
+    font-size: 11pt;
 }
 
 .device-0 line, .device-0 circle, .device-0 text, .device-0 .closed {
@@ -183,16 +101,37 @@ circle {
     stroke: orangered;
 }
 
-#prompter-title {
-	color: silver;
+.title {
+    color: silver;
+    border-bottom: 1px solid silver;
 }
 
-#notator-scroller {
-    background-color: black;
+.staff {
+    flex: 1;
 }
 
-.list {
-    border: none;
+#prompter-list {
+    flex: 1;
+    display: flex;
 }
 
-/**/
+#notator {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    position: relative;
+    overflow: auto;
+}
+
+#notator-cursor {
+    position: fixed;
+    left: 50%;
+    height: 100%;
+    z-index: 100;
+    border-left: 1px solid silver;
+}
+
+#notator svg {
+    padding-left: calc(50% + 7px);
+    padding-right: calc(50% - 7px);
+}

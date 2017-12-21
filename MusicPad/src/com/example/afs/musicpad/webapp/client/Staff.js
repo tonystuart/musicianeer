@@ -9,7 +9,7 @@ staff.onLoad = function() {
 }
 
 staff.onTick = function(tick) {
-    let scroller = document.getElementById('notator-scroller');
+    let scroller = document.getElementById('notator');
     if (scroller) {
         let svg = scroller.querySelector('svg');
         if (svg) {

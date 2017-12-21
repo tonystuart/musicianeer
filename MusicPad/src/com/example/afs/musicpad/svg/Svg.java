@@ -13,10 +13,24 @@ import com.example.afs.musicpad.html.Parent;
 
 public class Svg extends Parent {
 
-  public Svg(int left, int top, int width, int height, String... properties) {
+  public enum Type {
+    ACTUAL_SIZE, SCALE_TO_FIT
+  }
+
+  public Svg(Type type, int left, int top, int width, int height, String... properties) {
     super("svg", properties);
-    setProperty("viewBox", left + " " + top + " " + width + " " + height);
-    setProperty("preserveAspectRatio", "xMinYMin meet");
+    switch (type) {
+    case ACTUAL_SIZE:
+      setProperty("width", String.valueOf(width));
+      setProperty("height", String.valueOf(height));
+      break;
+    case SCALE_TO_FIT:
+      setProperty("viewBox", left + " " + top + " " + width + " " + height);
+      setProperty("preserveAspectRatio", "xMinYMin meet");
+      break;
+    default:
+      throw new UnsupportedOperationException(type.name());
+    }
   }
 
 }

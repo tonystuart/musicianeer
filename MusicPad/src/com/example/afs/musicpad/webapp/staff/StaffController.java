@@ -72,7 +72,7 @@ public class StaffController extends ControllerTask {
       Iterable<Note> channelNotes = song.getChannelNotes(channel);
       PlayableMap playableMap = new PlayableMap(inputMap, inputMap, channelNotes, OutputType.TICK);
       RandomAccessList<Playable> playables = playableMap.getPlayables();
-      devicePlayerDetail.put(channel, new PlayerDetail(playables, channel, 0));
+      devicePlayerDetail.put(message.getDeviceIndex(), new PlayerDetail(playables, channel, 0));
       staffView.renderSong(message.getSong(), devicePlayerDetail);
     }
   }

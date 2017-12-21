@@ -25,6 +25,7 @@ import com.example.afs.musicpad.song.Word;
 import com.example.afs.musicpad.svg.Circle;
 import com.example.afs.musicpad.svg.Line;
 import com.example.afs.musicpad.svg.Svg;
+import com.example.afs.musicpad.svg.Svg.Type;
 import com.example.afs.musicpad.svg.Text;
 import com.example.afs.musicpad.util.DirectList;
 import com.example.afs.musicpad.util.RandomAccessList;
@@ -173,10 +174,16 @@ public class StaffNotator {
     this.devicePlayerDetail = devicePlayerDetail;
   }
 
-  public Division createPrompter() {
-    Division division = new Division("#prompter", ".content", ".tab", ".channel-notators");
+  public Division createNotator() {
+    Division division = new Division("#notator");
     division.appendChild(new Division("#notator-cursor"));
-    division.appendChild(getNotatorScroller());
+    for (Entry<Integer, PlayerDetail> entry : devicePlayerDetail.entrySet()) {
+      PlayerDetail playerDetail = entry.getValue();
+      if (playerDetail.getChannelIndex() != Midi.DRUM) {
+        int deviceIndex = entry.getKey();
+        division.appendChild(getStaffContainer(deviceIndex, playerDetail.getPlayables()));
+      }
+    }
     return division;
   }
 
@@ -306,7 +313,7 @@ public class StaffNotator {
   private Svg drawStaff(long duration) {
     int bottom = getY(POSITION[LOWEST]);
     int width = getX(duration);
-    Svg staff = new Svg(0, 0, width, bottom);
+    Svg staff = new Svg(Type.ACTUAL_SIZE, 0, 0, width, bottom);
     for (int i = 0; i < TREBLE_MIDI_NOTES.length; i++) {
       int y = getY(TREBLE_MIDI_NOTES[i]);
       staff.add(new Line(0, y, width, y));
@@ -393,24 +400,6 @@ public class StaffNotator {
     return context;
   }
 
-  private Division getNotator(int deviceIndex, RandomAccessList<Playable> playables) {
-    Division division = new Division(".notator", ".device-" + deviceIndex);
-    division.appendChild(getStaff(playables));
-    return division;
-  }
-
-  private Division getNotatorScroller() {
-    Division division = new Division("#notator-scroller");
-    for (Entry<Integer, PlayerDetail> entry : devicePlayerDetail.entrySet()) {
-      PlayerDetail playerDetail = entry.getValue();
-      if (playerDetail.getChannelIndex() != Midi.DRUM) {
-        int deviceIndex = entry.getKey();
-        division.appendChild(getNotator(deviceIndex, playerDetail.getPlayables()));
-      }
-    }
-    return division;
-  }
-
   private Svg getStaff(RandomAccessList<Playable> playables) {
     long duration = song.getDuration();
     Svg staff = drawStaff(duration);
@@ -419,6 +408,12 @@ public class StaffNotator {
     drawNoteNames(staff, playables);
     drawWords(staff);
     return staff;
+  }
+
+  private Division getStaffContainer(int deviceIndex, RandomAccessList<Playable> playables) {
+    Division division = new Division(".staff", ".device-" + deviceIndex);
+    division.appendChild(getStaff(playables));
+    return division;
   }
 
   private int getX(long tick) {
