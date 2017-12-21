@@ -39,6 +39,10 @@ public class StaffController extends ControllerTask {
     private Song song;
     private DelayTimer delayTimer = new DelayTimer(() -> onTimeout());
 
+    public void cancel() {
+      song = null;
+    }
+
     public void defer(Song song) {
       this.song = song;
       System.out.println("Deferring sampling of " + song);
@@ -46,8 +50,10 @@ public class StaffController extends ControllerTask {
     }
 
     private void onTimeout() {
-      System.out.println("Sampling " + song);
-      sampleSong(song);
+      if (song != null) {
+        System.out.println("Sampling " + song);
+        sampleSong(song);
+      }
     }
 
   }
@@ -73,6 +79,7 @@ public class StaffController extends ControllerTask {
   }
 
   private void doRenderSong(OnRenderSong message) {
+    deferredSongSampler.cancel();
     NavigableMap<Integer, PlayerDetail> devicePlayerDetail = new TreeMap<>();
     NavigableMap<Integer, Integer> deviceChannelAssignments = message.getDeviceChannelAssignments();
     for (Entry<Integer, Integer> entry : deviceChannelAssignments.entrySet()) {
@@ -84,6 +91,7 @@ public class StaffController extends ControllerTask {
   }
 
   private void doSampleChannel(OnSampleChannel message) {
+    deferredSongSampler.cancel();
     Song song = message.getSong();
     int channel = message.getChannel();
     if (song.getChannelNoteCount(channel) > 0) {
