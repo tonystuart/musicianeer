@@ -179,10 +179,8 @@ public class StaffNotator {
     division.appendChild(new Division("#notator-cursor"));
     for (Entry<Integer, PlayerDetail> entry : devicePlayerDetail.entrySet()) {
       PlayerDetail playerDetail = entry.getValue();
-      if (playerDetail.getChannelIndex() != Midi.DRUM) {
-        int deviceIndex = entry.getKey();
-        division.appendChild(getStaffContainer(deviceIndex, playerDetail.getPlayables()));
-      }
+      int deviceIndex = entry.getKey();
+      division.appendChild(getStaffContainer(deviceIndex, playerDetail.getPlayables()));
     }
     return division;
   }

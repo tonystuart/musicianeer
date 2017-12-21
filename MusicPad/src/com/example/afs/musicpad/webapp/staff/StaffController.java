@@ -66,7 +66,7 @@ public class StaffController extends ControllerTask {
   private void doSampleChannel(OnSampleChannel message) {
     Song song = message.getSong();
     int channel = message.getChannel();
-    if (channel != Midi.DRUM && song.getChannelNoteCount(channel) > 0) {
+    if (song.getChannelNoteCount(channel) > 0) {
       NavigableMap<Integer, PlayerDetail> devicePlayerDetail = new TreeMap<>();
       InputMap inputMap = new InputMap("");
       Iterable<Note> channelNotes = song.getChannelNotes(channel);
@@ -82,7 +82,7 @@ public class StaffController extends ControllerTask {
     NavigableMap<Integer, PlayerDetail> devicePlayerDetail = new TreeMap<>();
     InputMap inputMap = new InputMap("");
     for (int channel = 0; channel < Midi.CHANNELS; channel++) {
-      if (channel != Midi.DRUM && song.getChannelNoteCount(channel) > 0) {
+      if (song.getChannelNoteCount(channel) > 0) {
         Iterable<Note> channelNotes = song.getChannelNotes(channel);
         PlayableMap playableMap = new PlayableMap(inputMap, inputMap, channelNotes, OutputType.TICK);
         RandomAccessList<Playable> playables = playableMap.getPlayables();
