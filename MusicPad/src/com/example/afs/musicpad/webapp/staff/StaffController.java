@@ -29,12 +29,32 @@ import com.example.afs.musicpad.song.Note;
 import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.task.ControllerTask;
 import com.example.afs.musicpad.task.MessageBroker;
+import com.example.afs.musicpad.util.DelayTimer;
 import com.example.afs.musicpad.util.RandomAccessList;
 
 public class StaffController extends ControllerTask {
 
+  private class DeferredSongSampler {
+
+    private Song song;
+    private DelayTimer delayTimer = new DelayTimer(() -> onTimeout());
+
+    public void defer(Song song) {
+      this.song = song;
+      System.out.println("Deferring sampling of " + song);
+      delayTimer.delay(2000);
+    }
+
+    private void onTimeout() {
+      System.out.println("Sampling " + song);
+      sampleSong(song);
+    }
+
+  }
+
   private boolean initialized;
   private StaffView staffView;
+  private DeferredSongSampler deferredSongSampler = new DeferredSongSampler();
 
   public StaffController(MessageBroker broker) {
     super(broker);
@@ -73,12 +93,15 @@ public class StaffController extends ControllerTask {
       PlayableMap playableMap = new PlayableMap(inputMap, inputMap, channelNotes, OutputType.TICK);
       RandomAccessList<Playable> playables = playableMap.getPlayables();
       devicePlayerDetail.put(message.getDeviceIndex(), new PlayerDetail(playables, channel, 0));
-      staffView.renderSong(message.getSong(), devicePlayerDetail);
+      staffView.renderSong(song, devicePlayerDetail);
     }
   }
 
   private void doSampleSong(OnSampleSong message) {
-    Song song = message.getSong();
+    deferredSongSampler.defer(message.getSong());
+  }
+
+  private void sampleSong(Song song) {
     NavigableMap<Integer, PlayerDetail> devicePlayerDetail = new TreeMap<>();
     InputMap inputMap = new InputMap("");
     for (int channel = 0; channel < Midi.CHANNELS; channel++) {
@@ -89,7 +112,7 @@ public class StaffController extends ControllerTask {
         devicePlayerDetail.put(channel, new PlayerDetail(playables, channel, 0));
       }
     }
-    staffView.renderSong(message.getSong(), devicePlayerDetail);
+    staffView.renderSong(song, devicePlayerDetail);
   }
 
 }
