@@ -26,13 +26,15 @@ public class StaffView extends ShadowDomBuilder {
         .add(div(".left") //
             .add(div("#prompter-title", ".title") //
                 .add(text("Prompter Title"))) //
-            .add(div("#prompter-list")))); //
+            .add(div("#prompter-container") //
+                .add(div("#prompter-cursor")) //
+                .add(div("#staff-scroller"))))); //
   }
 
   public void renderSong(Song song, NavigableMap<Integer, PlayerDetail> devicePlayerDetail) {
     StaffNotator staffNotator = new StaffNotator(song, devicePlayerDetail);
     Division prompter = staffNotator.createNotator();
-    Parent prompterListParent = getElementById("prompter-list");
+    Parent prompterListParent = getElementById("staff-scroller");
     replaceChildren(prompterListParent, prompter, false);
     Parent prompterTitle = getElementById("prompter-title");
     replaceChildren(prompterTitle, text(song.getTitle()));

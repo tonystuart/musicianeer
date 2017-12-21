@@ -175,12 +175,11 @@ public class StaffNotator {
   }
 
   public Division createNotator() {
-    Division division = new Division("#notator");
-    division.appendChild(new Division("#notator-cursor"));
+    Division division = new Division("#staff-list");
     for (Entry<Integer, PlayerDetail> entry : devicePlayerDetail.entrySet()) {
       PlayerDetail playerDetail = entry.getValue();
       int deviceIndex = entry.getKey();
-      division.appendChild(getStaffContainer(deviceIndex, playerDetail.getPlayables()));
+      division.appendChild(getStaff(deviceIndex, playerDetail.getPlayables()));
     }
     return division;
   }
@@ -308,10 +307,10 @@ public class StaffNotator {
     drawNotes(staff, sound.getBeginTick(), bassNotes, BASS_MIDI_NOTES[2]);
   }
 
-  private Svg drawStaff(long duration) {
+  private Svg drawStaff(int deviceIndex, long duration) {
     int bottom = getY(POSITION[LOWEST]);
     int width = getX(duration);
-    Svg staff = new Svg(Type.ACTUAL_SIZE, 0, 0, width, bottom);
+    Svg staff = new Svg(Type.ACTUAL_SIZE, 0, 0, width, bottom, ".device-" + deviceIndex);
     for (int i = 0; i < TREBLE_MIDI_NOTES.length; i++) {
       int y = getY(TREBLE_MIDI_NOTES[i]);
       staff.add(new Line(0, y, width, y));
@@ -398,20 +397,14 @@ public class StaffNotator {
     return context;
   }
 
-  private Svg getStaff(RandomAccessList<Playable> playables) {
+  private Svg getStaff(int deviceIndex, RandomAccessList<Playable> playables) {
     long duration = song.getDuration();
-    Svg staff = drawStaff(duration);
+    Svg staff = drawStaff(deviceIndex, duration);
     drawMeasures(staff, duration);
     drawNotes(staff, playables);
     drawNoteNames(staff, playables);
     drawWords(staff);
     return staff;
-  }
-
-  private Division getStaffContainer(int deviceIndex, RandomAccessList<Playable> playables) {
-    Division division = new Division(".staff", ".device-" + deviceIndex);
-    division.appendChild(getStaff(playables));
-    return division;
   }
 
   private int getX(long tick) {

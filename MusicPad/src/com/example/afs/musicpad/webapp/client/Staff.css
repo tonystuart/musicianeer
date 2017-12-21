@@ -5,10 +5,6 @@ body {
     background-color: black;
 }
 
-svg {
-    background-color: black;
-}
-
 line {
     stroke-width: 2;
 }
@@ -21,82 +17,82 @@ text {
     font-size: 11pt;
 }
 
-.device-0 line, .device-0 circle, .device-0 text, .device-0 .closed {
+svg.device-0, .device-0 .closed {
     fill: red;
     stroke: red;
 }
 
-.device-1 line, .device-1 circle, .device-1 text, .device-1 .closed {
+svg.device-1, .device-1 .closed {
     fill: lime;
     stroke: lime;
 }
 
-.device-2 line, .device-2 circle, .device-2 text, .device-2 .closed {
+svg.device-2, .device-2 .closed {
     fill: cyan;
     stroke: cyan;
 }
 
-.device-3 line, .device-3 circle, .device-3 text, .device-3 .closed {
+svg.device-3, .device-3 .closed {
     fill: yellow;
     stroke: yellow;
 }
 
-.device-4 line, .device-4 circle, .device-4 text, .device-4 .closed {
+svg.device-4, .device-4 .closed {
     fill: salmon;
     stroke: salmon;
 }
 
-.device-5 line, .device-5 circle, .device-5 text, .device-5 .closed {
+svg.device-5, .device-5 .closed {
     fill: darkgoldenrod;
     stroke: darkgoldenrod;
 }
 
-.device-6 line, .device-6 circle, .device-6 text, .device-6 .closed {
+svg.device-6, .device-6 .closed {
     fill: aqua;
     stroke: aqua;
 }
 
-.device-7 line, .device-7 circle, .device-7 text, .device-7 .closed {
+svg.device-7, .device-7 .closed {
     fill: darkorange;
     stroke: darkorange;
 }
 
-.device-8 line, .device-8 circle, .device-8 text, .device-8 .closed {
+svg.device-8, .device-8 .closed {
     fill: blueviolet;
     stroke: blueviolet;
 }
 
-.device-9 line, .device-9 circle, .device-9 text, .device-9 .closed {
+svg.device-9, .device-9 .closed {
     fill: brown;
     stroke: brown;
 }
 
-.device-10 line, .device-10 circle, .device-10 text, .device-10 .closed {
+svg.device-10, .device-10 .closed { 
     fill: burlywood;
     stroke: burlywood;
 }
 
-.device-11 line, .device-11 circle, .device-11 text, .device-11 .closed {
+svg.device-11, .device-11 .closed {
     fill: silver;
     stroke: silver;
 }
 
-.device-12 line, .device-12 circle, .device-12 text, .device-12 .closed {
+svg.device-12, .device-12 .closed {
     fill: khaki;
     stroke: khaki;
 }
 
-.device-13 line, .device-13 circle, .device-13 text, .device-13 .closed {
+svg.device-13, .device-13 .closed {
     fill: plum;
     stroke: plum;
 }
 
-.device-14 line, .device-14 circle, .device-14 text, .device-14 .closed {
+svg.device-14, .device-14 .closed {
     fill: sienna;
     stroke: sienna;
 }
 
-.device-15 line, .device-15 circle, .device-15 text, .device-15 .closed {
+svg.device-15, .device-15 .closed {
     fill: orangered;
     stroke: orangered;
 }
@@ -106,32 +102,28 @@ text {
     border-bottom: 1px solid silver;
 }
 
-.staff {
-    flex: 1;
+#prompter-container {
+	flex: 1;
+	display: flex;
 }
 
-#prompter-list {
-    flex: 1;
-    display: flex;
-}
-
-#notator {
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-    position: relative;
-    overflow: auto;
-}
-
-#notator-cursor {
+#prompter-cursor {
     position: fixed;
     left: 50%;
     height: 100%;
     z-index: 100;
-    border-left: 1px solid silver;
+    border-left: 2px solid silver;
 }
 
-#notator svg {
-    padding-left: calc(50% + 7px);
-    padding-right: calc(50% - 7px);
+#staff-scroller {
+    flex: 1;
+    display: flex;
+    overflow: auto;
+    /* transform: scale(0.5); */
 }
+
+#staff-list {
+    padding-left: calc(50% + 7px);
+    padding-right:  calc(50% - 7px);
+}
+
