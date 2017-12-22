@@ -174,7 +174,7 @@ public class StaffNotator {
     this.devicePlayerDetail = devicePlayerDetail;
   }
 
-  public Division createNotator() {
+  public Division createStaffList() {
     Division division = new Division("#staff-list");
     for (Entry<Integer, PlayerDetail> entry : devicePlayerDetail.entrySet()) {
       PlayerDetail playerDetail = entry.getValue();

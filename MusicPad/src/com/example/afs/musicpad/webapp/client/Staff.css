@@ -119,11 +119,25 @@ svg.device-15, .device-15 .closed {
     flex: 1;
     display: flex;
     overflow: auto;
-    /* transform: scale(0.5); */
 }
 
 #staff-list {
-    padding-left: calc(50% + 7px);
-    padding-right:  calc(50% - 7px);
+    transform-origin: 0 0;
 }
 
+#zoom-container {
+	position: absolute;
+	right: 0px;
+	display: flex;
+	flex-direction: column;
+	width: 200px;
+	border: 1px solid silver;
+	margin: 5px;
+	font-size: 1.5vh;
+	padding: 5px;
+	background-color: black;
+}
+
+#zoom-label {
+	margin: auto;
+}

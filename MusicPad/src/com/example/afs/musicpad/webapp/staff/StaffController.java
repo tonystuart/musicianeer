@@ -71,6 +71,13 @@ public class StaffController extends ControllerTask {
   }
 
   @Override
+  protected void doInput(String id, String value) {
+    if (id.equals("zoom-slider")) {
+      staffView.zoom(Integer.parseInt(value));
+    }
+  }
+
+  @Override
   protected synchronized void doLoad() {
     if (!initialized) {
       initialized = true;
