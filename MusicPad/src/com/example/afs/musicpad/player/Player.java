@@ -23,20 +23,25 @@ public class Player {
     PRESS, RELEASE
   }
 
+  public static final int DRUM_CHANNEL_PROGRAM = -1;
+  private static final int UNDEFINED_CHANNEL_PROGRAM = -2;
+
   private static final int PLAYER_BASE = Midi.CHANNELS;
   private static final int PLAYER_CHANNELS = Midi.CHANNELS;
   public static final int TOTAL_CHANNELS = PLAYER_BASE + PLAYER_CHANNELS;
 
-  private int program;
   private int playerChannel;
   private int percentTempo;
+  private int currentProgram;
   private boolean isEnabled = true;
+  private int masterProgram = Midi.MAX_VALUE;
+  private int channelProgram = UNDEFINED_CHANNEL_PROGRAM;
 
   private Synthesizer synthesizer;
   private Arpeggiator arpeggiator;
   private Sound repeatArpeggiation;
-  private OutputType outputType = OutputType.TICK;
   private Sound queuedArpeggiation;
+  private OutputType outputType = OutputType.TICK;
 
   public Player(Synthesizer synthesizer, int deviceIndex) {
     this.synthesizer = synthesizer;
@@ -51,12 +56,12 @@ public class Player {
     synthesizer.changeControl(playerChannel, control, value);
   }
 
-  public OutputType getOutputType() {
-    return outputType;
+  public int getChannelProgram() {
+    return channelProgram;
   }
 
-  public int getProgram() {
-    return program;
+  public OutputType getOutputType() {
+    return outputType;
   }
 
   public void noteOff(int midiNote, int velocity) {
@@ -64,6 +69,16 @@ public class Player {
   }
 
   public void noteOn(int midiNote, int velocity) {
+    int program;
+    if (channelProgram != DRUM_CHANNEL_PROGRAM && masterProgram != Midi.MAX_VALUE) {
+      program = masterProgram;
+    } else {
+      program = channelProgram;
+    }
+    if (program != currentProgram) {
+      selectProgram(program);
+      currentProgram = program;
+    }
     synthesizer.pressKey(playerChannel, midiNote, velocity);
   }
 
@@ -91,19 +106,16 @@ public class Player {
     }
   }
 
-  public void selectProgram(int program) {
-    this.program = program;
-    if (program == -1) {
-      synthesizer.setChannelType(playerChannel, FluidSynth.CHANNEL_TYPE_DRUM);
-      synthesizer.changeProgram(playerChannel, 0); // initialize fluid_synth.c channel
-    } else {
-      synthesizer.setChannelType(playerChannel, FluidSynth.CHANNEL_TYPE_MELODIC);
-      synthesizer.changeProgram(playerChannel, program);
-    }
+  public void setChannelProgram(int program) {
+    this.channelProgram = program;
   }
 
   public void setEnabled(boolean isEnabled) {
     this.isEnabled = isEnabled;
+  }
+
+  public void setMasterProgram(int masterProgram) {
+    this.masterProgram = masterProgram;
   }
 
   public void setOutputType(OutputType outputType) {
@@ -141,6 +153,16 @@ public class Player {
         arpeggiator.play(queuedArpeggiation);
         queuedArpeggiation = null;
       }
+    }
+  }
+
+  private void selectProgram(int program) {
+    if (program == DRUM_CHANNEL_PROGRAM) {
+      synthesizer.setChannelType(playerChannel, FluidSynth.CHANNEL_TYPE_DRUM);
+      synthesizer.changeProgram(playerChannel, 0); // initialize fluid_synth.c channel
+    } else {
+      synthesizer.setChannelType(playerChannel, FluidSynth.CHANNEL_TYPE_MELODIC);
+      synthesizer.changeProgram(playerChannel, program);
     }
   }
 

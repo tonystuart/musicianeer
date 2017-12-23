@@ -186,8 +186,8 @@ public class TransportTask extends ServiceTask {
     transport.setPercentVelocity(velocity);
   }
 
-  private void doSetMasterProgram(int program) {
-    transport.setMasterProgram(program);
+  private void doSetMasterProgram(int masterProgram) {
+    transport.setMasterProgram(masterProgram);
   }
 
   private void doSetMidiMasterGain(int gain) {

@@ -129,6 +129,9 @@ public class DeviceHandler extends ServiceTask {
     Command command = message.getCommand();
     int parameter = message.getParameter();
     switch (command) {
+    case SET_MASTER_PROGRAM:
+      doSetMasterProgram(parameter);
+      break;
     case RESET:
       doReset();
       break;
@@ -186,7 +189,7 @@ public class DeviceHandler extends ServiceTask {
         doPreviousProgram();
         break;
       case PROGRAM:
-        selectProgram(parameter);
+        doProgram(parameter);
         break;
       case SELECT_CHANNEL:
         selectChannel(parameter);
@@ -222,12 +225,12 @@ public class DeviceHandler extends ServiceTask {
 
   private void doNextProgram() {
     if (channel != Midi.DRUM) {
-      int currentProgram = player.getProgram();
+      int currentProgram = player.getChannelProgram();
       int nextProgram = currentProgram + 1;
       if (nextProgram == Midi.PROGRAMS) {
         nextProgram = 0;
       }
-      selectProgram(nextProgram);
+      player.setChannelProgram(nextProgram);
     }
   }
 
@@ -250,13 +253,17 @@ public class DeviceHandler extends ServiceTask {
 
   private void doPreviousProgram() {
     if (channel != Midi.DRUM) {
-      int currentProgram = player.getProgram();
+      int currentProgram = player.getChannelProgram();
       int nextProgram = currentProgram - 1;
       if (nextProgram < 0) {
         nextProgram = Midi.PROGRAMS - 1;
       }
-      selectProgram(nextProgram);
+      player.setChannelProgram(nextProgram);
     }
+  }
+
+  private void doProgram(int program) {
+    player.setChannelProgram(program);
   }
 
   private void doRenderSong(OnRenderSong message) {
@@ -278,6 +285,10 @@ public class DeviceHandler extends ServiceTask {
     }
   }
 
+  private void doSetMasterProgram(int masterProgram) {
+    player.setMasterProgram(masterProgram);
+  }
+
   private int getPercentVelocity() {
     return Range.scaleMidiToPercent(velocity);
   }
@@ -286,7 +297,7 @@ public class DeviceHandler extends ServiceTask {
     if (playableMap == null) {
       createPlayableMap();
     }
-    return new PlayerDetail(playableMap.getPlayables(), channel, player.getProgram());
+    return new PlayerDetail(playableMap.getPlayables(), channel, player.getChannelProgram());
   }
 
   private void processDown(int inputCode, int velocity) {
@@ -317,20 +328,16 @@ public class DeviceHandler extends ServiceTask {
   private void selectChannel(int channel) {
     this.channel = channel;
     if (channel == Midi.DRUM) {
-      selectProgram(-1);
+      player.setChannelProgram(Player.DRUM_CHANNEL_PROGRAM);
     } else {
       // TODO: Request current song rather than maintaining state
       Set<Integer> programs = song.getPrograms(channel);
       if (programs.size() > 0) {
         int program = programs.iterator().next();
-        selectProgram(program);
+        player.setChannelProgram(program);
       }
     }
     createPlayableMap();
-  }
-
-  private void selectProgram(int program) {
-    player.selectProgram(program);
   }
 
   private void setOutputType(OutputType outputType) {
