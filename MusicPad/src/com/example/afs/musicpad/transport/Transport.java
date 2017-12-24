@@ -35,8 +35,9 @@ public class Transport {
   public static final int DEFAULT_PERCENT_GAIN = 10;
   public static final int DEFAULT_PERCENT_TEMPO = 50;
   public static final int DEFAULT_PERCENT_VELOCITY = 10;
+  public static final int DEFAULT_MASTER_PROGRAM_OFF = Midi.MAX_VALUE;
 
-  private int masterProgram = Midi.MAX_VALUE;
+  private int masterProgram = DEFAULT_MASTER_PROGRAM_OFF;
   private int percentVelocity = DEFAULT_PERCENT_VELOCITY;
   private int[] currentPrograms = new int[Midi.CHANNELS];
 
@@ -223,7 +224,7 @@ public class Transport {
       int midiNote = note.getMidiNote();
       int velocity = note.getVelocity();
       int program = note.getProgram();
-      if (channel != Midi.DRUM && masterProgram != Midi.MAX_VALUE) {
+      if (channel != Midi.DRUM && masterProgram != DEFAULT_MASTER_PROGRAM_OFF) {
         program = masterProgram;
       }
       if (currentPrograms[channel] != program) {

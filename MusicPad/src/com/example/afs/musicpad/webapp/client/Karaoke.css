@@ -26,11 +26,16 @@ body {
     position: relative;
 }
 
+.piano-mode.piano-mode-selected {
+    color: black;
+    background-color: magenta;
+}
+
 .device-0 {
     color: red;
 }
 
-.device-0 .selected-channel {
+.device-0 .selected-channel, .device-0 .piano-mode-selected {
     color: black;
     background-color: red;
 }
@@ -39,7 +44,7 @@ body {
     color: lime;
 }
 
-.device-1 .selected-channel {
+.device-1 .selected-channel, .device-1 .piano-mode-selected {
     color: black;
     background-color: lime;
 }
@@ -48,7 +53,7 @@ body {
     color: cyan;
 }
 
-.device-2 .selected-channel {
+.device-2 .selected-channel, .device-2 .piano-mode-selected {
     color: black;
     background-color: cyan;
 }
@@ -57,7 +62,7 @@ body {
     color: yellow;
 }
 
-.device-3 .selected-channel {
+.device-3 .selected-channel, .device-3 .piano-mode-selected {
     color: black;
     background-color: yellow;
 }
@@ -66,7 +71,7 @@ body {
     color: salmon;
 }
 
-.device-4 .selected-channel {
+.device-4 .selected-channel, .device-4 .piano-mode-selected {
     color: black;
     background-color: salmon;
 }
@@ -75,7 +80,7 @@ body {
     color: darkgoldenrod;
 }
 
-.device-5 .selected-channel {
+.device-5 .selected-channel, .device-5 .piano-mode-selected {
     color: black;
     background-color: darkgoldenrod;
 }
@@ -84,7 +89,7 @@ body {
     color: aqua;
 }
 
-.device-6 .selected-channel {
+.device-6 .selected-channel, .device-6 .piano-mode-selected {
     color: black;
     background-color: aqua;
 }
@@ -93,7 +98,7 @@ body {
     color: darkorange;
 }
 
-.device-7 .selected-channel {
+.device-7 .selected-channel, .device-7 .piano-mode-selected {
     color: black;
     background-color: darkorange;
 }
@@ -102,7 +107,7 @@ body {
 	color: blueviolet;
 }
 
-.device-8 .selected-channel {
+.device-8 .selected-channel, .device-8 .piano-mode-selected {
 	color: black;
 	background-color: blueviolet;
 }
@@ -111,7 +116,7 @@ body {
     color: brown;
 }
 
-.device-9 .selected-channel {
+.device-9 .selected-channel, .device-9 .piano-mode-selected {
     color: black;
     background-color: brown;
 }
@@ -120,7 +125,7 @@ body {
     color: burlywood;
 }
 
-.device-10 .selected-channel {
+.device-10 .selected-channel, .device-10 .piano-mode-selected {
     color: black;
     background-color: burlywood;
 }
@@ -129,7 +134,7 @@ body {
     color: silver;
 }
 
-.device-11 .selected-channel {
+.device-11 .selected-channel, .device-11 .piano-mode-selected {
     color: black;
     background-color: silver;
 }
@@ -138,7 +143,7 @@ body {
     color: khaki;
 }
 
-.device-12 .selected-channel {
+.device-12 .selected-channel, .device-12 .piano-mode-selected {
     color: black;
     background-color: khaki;
 }
@@ -147,7 +152,7 @@ body {
     color: plum;
 }
 
-.device-13 .selected-channel {
+.device-13 .selected-channel, .device-13 .piano-mode-selected {
     color: black;
     background-color: plum;
 }
@@ -156,7 +161,7 @@ body {
     color: sienna;
 }
 
-.device-14 .selected-channel {
+.device-14 .selected-channel, .device-14 .piano-mode-selected {
     color: black;
     background-color: sienna;
 }
@@ -165,7 +170,7 @@ body {
     color: orangered;
 }
 
-.device-15 .selected-channel {
+.device-15 .selected-channel, .device-15 .piano-mode-selected {
     color: black;
     background-color: orangered;
 }

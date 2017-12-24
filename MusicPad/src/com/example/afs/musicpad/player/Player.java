@@ -16,6 +16,7 @@ import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.player.PlayableMap.OutputType;
 import com.example.afs.musicpad.song.Note;
 import com.example.afs.musicpad.transport.NoteEvent;
+import com.example.afs.musicpad.transport.Transport;
 
 public class Player {
 
@@ -34,7 +35,7 @@ public class Player {
   private int percentTempo;
   private int currentProgram;
   private boolean isEnabled = true;
-  private int masterProgram = Midi.MAX_VALUE;
+  private int masterProgram = Transport.DEFAULT_MASTER_PROGRAM_OFF;
   private int channelProgram = UNDEFINED_CHANNEL_PROGRAM;
 
   private Synthesizer synthesizer;
@@ -70,7 +71,7 @@ public class Player {
 
   public void noteOn(int midiNote, int velocity) {
     int program;
-    if (channelProgram != DRUM_CHANNEL_PROGRAM && masterProgram != Midi.MAX_VALUE) {
+    if (channelProgram != DRUM_CHANNEL_PROGRAM && masterProgram != Transport.DEFAULT_MASTER_PROGRAM_OFF) {
       program = masterProgram;
     } else {
       program = channelProgram;

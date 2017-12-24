@@ -60,6 +60,9 @@ public class KaraokeView extends ShadowDomBuilder {
                 .add(div("#song-roulette")//
                     .addClickHandler() //
                     .add(text("Roulette"))) //
+                .add(div("#song-piano-mode", ".piano-mode") //
+                    .addClickHandler() //
+                    .add(text("Piano Mode"))) //
                 .add(div("#song-stop")//
                     .addClickHandler() //
                     .add(text("Stop"))) //
@@ -78,6 +81,9 @@ public class KaraokeView extends ShadowDomBuilder {
                 .add(div("#channel-to-song")//
                     .addClickHandler() //
                     .add(text("Back to Songs"))) //
+                .add(div("#channel-piano-mode", ".piano-mode") //
+                    .addClickHandler() //
+                    .add(text("Piano Mode"))) //
                 .add(div("#channel-stop")//
                     .addClickHandler() //
                     .add(text("Stop"))) //
@@ -96,6 +102,9 @@ public class KaraokeView extends ShadowDomBuilder {
                 .add(div("#prompter-to-song") //
                     .addClickHandler() //
                     .add(text("Back to Songs"))) //
+                .add(div("#prompter-piano-mode", ".piano-mode") //
+                    .addClickHandler() //
+                    .add(text("Piano Mode"))) //
                 .add(div("#prompter-stop") //
                     .addClickHandler() //
                     .add(text("Stop"))) //
@@ -209,6 +218,14 @@ public class KaraokeView extends ShadowDomBuilder {
     Range masterGain = getElementById("master-gain");
     if (masterGain != null) {
       setProperty(masterGain, "value", value);
+    }
+  }
+
+  public void setPianoMode(boolean isPianoMode) {
+    if (isPianoMode) {
+      addClassByClass("piano-mode", "piano-mode-selected");
+    } else {
+      removeClassByClass("piano-mode", "piano-mode-selected");
     }
   }
 

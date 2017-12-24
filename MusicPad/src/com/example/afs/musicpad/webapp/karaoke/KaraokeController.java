@@ -37,11 +37,14 @@ import com.example.afs.musicpad.service.Services;
 import com.example.afs.musicpad.song.ChannelNotes;
 import com.example.afs.musicpad.task.ControllerTask;
 import com.example.afs.musicpad.task.MessageBroker;
+import com.example.afs.musicpad.transport.Transport;
 import com.example.afs.musicpad.util.RandomAccessList;
 
 public class KaraokeController extends ControllerTask {
 
   private boolean initialized;
+  private boolean isPianoMode;
+
   private KaraokeView karaokeView;
   private Random random = new Random();
 
@@ -63,8 +66,9 @@ public class KaraokeController extends ControllerTask {
     } else if (id.startsWith("channel-index-")) {
       sampleChannel(Integer.parseInt(id.substring("channel-index-".length())));
     } else if (id.startsWith("tick-")) {
-      System.out.println("doClick: id=" + id);
       seek(Integer.parseInt(id.substring("tick-".length())));
+    } else if (id.endsWith("-piano-mode")) {
+      togglePianoMode();
     } else {
       switch (id) {
       case "song-roulette":
@@ -275,6 +279,16 @@ public class KaraokeController extends ControllerTask {
 
   private void stop() {
     publish(new OnCommand(Command.STOP, 0));
+  }
+
+  private void togglePianoMode() {
+    isPianoMode = !isPianoMode;
+    if (isPianoMode) {
+      publish(new OnCommand(Command.SET_MASTER_PROGRAM, 0));
+    } else {
+      publish(new OnCommand(Command.SET_MASTER_PROGRAM, Transport.DEFAULT_MASTER_PROGRAM_OFF));
+    }
+    karaokeView.setPianoMode(isPianoMode);
   }
 
 }

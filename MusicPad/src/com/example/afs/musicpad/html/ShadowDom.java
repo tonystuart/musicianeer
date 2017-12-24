@@ -9,6 +9,7 @@
 
 package com.example.afs.musicpad.html;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -45,6 +46,12 @@ public class ShadowDom {
     Element element = getElementById(id);
     if (element != null) {
       addClass(element, className);
+    }
+  }
+
+  public void addClassByClass(String oldClassName, String newClassName) {
+    for (Element element : getElementsByClassName(oldClassName)) {
+      addClass(element, newClassName);
     }
   }
 
@@ -89,7 +96,11 @@ public class ShadowDom {
   }
 
   public Set<Element> getElementsByClassName(String className) {
-    return classes.get(className);
+    Set<Element> elementsWithClass = classes.get(className);
+    if (elementsWithClass == null) {
+      elementsWithClass = Collections.emptySet();
+    }
+    return elementsWithClass;
   }
 
   public void insertBefore(Parent parent, Node newNode, Element existingElement) {
@@ -134,6 +145,12 @@ public class ShadowDom {
     Element element = getElementById(id);
     if (element != null) {
       removeClass(element, className);
+    }
+  }
+
+  public void removeClassByClass(String oldClassName, String newClassName) {
+    for (Element element : getElementsByClassName(oldClassName)) {
+      removeClass(element, newClassName);
     }
   }
 
