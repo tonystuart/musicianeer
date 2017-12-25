@@ -19,18 +19,18 @@ public class Utils {
       "Green", // 1
       "Blue", // 2
       "Yellow", // 3
-      "Salmon", // 4
-      "Goldenrod", // 5
-      "Aqua", // 6
-      "Orange", // 7
+      "Orange", // 4
+      "Teal", // 5
+      "Purple", // 6
+      "Goldenrod", // 7
       "Violet", // 8
-      "Brown", // 9
-      "Burl", // 10
-      "Silver", // 11
-      "Khaki", // 12
-      "Plum", // 13
+      "Beige", // 9
+      "Sky", // 10
+      "Pumpkin", // 11
+      "Salmon", // 12
+      "Khaki", // 13
       "Sienna", // 14
-      "Pumpkin", // 15
+      "Gold", // 15
   };
 
   public static Node createPair(String name, Object value) {

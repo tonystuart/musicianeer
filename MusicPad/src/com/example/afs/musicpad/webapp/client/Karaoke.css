@@ -68,93 +68,93 @@ body {
 }
 
 .device-4 {
-    color: salmon;
+    color: orangered;
 }
 
 .device-4 .selected-channel, .device-4 .piano-mode-selected {
     color: black;
-    background-color: salmon;
+    background-color: orangered;
 }
 
 .device-5 {
-    color: darkgoldenrod;
+    color: darkseagreen;
 }
 
 .device-5 .selected-channel, .device-5 .piano-mode-selected {
     color: black;
-    background-color: darkgoldenrod;
+    background-color: darkseagreen;
 }
 
 .device-6 {
-    color: aqua;
+    color: blueviolet;
 }
 
 .device-6 .selected-channel, .device-6 .piano-mode-selected {
     color: black;
-    background-color: aqua;
+    background-color: blueviolet;
 }
 
 .device-7 {
-    color: darkorange;
+    color: darkgoldenrod;
 }
 
 .device-7 .selected-channel, .device-7 .piano-mode-selected {
     color: black;
-    background-color: darkorange;
+    background-color: darkgoldenrod;
 }
 
 .device-8 {
-	color: blueviolet;
+	color: violet;
 }
 
 .device-8 .selected-channel, .device-8 .piano-mode-selected {
 	color: black;
-	background-color: blueviolet;
+	background-color: violet;
 }
 
 .device-9 {
-    color: brown;
+    color: burlywood;
 }
 
 .device-9 .selected-channel, .device-9 .piano-mode-selected {
     color: black;
-    background-color: brown;
+    background-color: burlywood;
 }
 
 .device-10 {
-    color: burlywood;
+    color: dodgerblue;
 }
 
 .device-10 .selected-channel, .device-10 .piano-mode-selected {
     color: black;
-    background-color: burlywood;
+    background-color: dodgerblue;
 }
 
 .device-11 {
-    color: silver;
+    color: darkorange;
 }
 
 .device-11 .selected-channel, .device-11 .piano-mode-selected {
     color: black;
-    background-color: silver;
+    background-color: darkorange;
 }
 
 .device-12 {
-    color: khaki;
+    color: salmon;
 }
 
 .device-12 .selected-channel, .device-12 .piano-mode-selected {
     color: black;
-    background-color: khaki;
+    background-color: salmon;
 }
 
 .device-13 {
-    color: plum;
+    color: khaki;
 }
 
 .device-13 .selected-channel, .device-13 .piano-mode-selected {
     color: black;
-    background-color: plum;
+    background-color: khaki;
 }
 
 .device-14 {
@@ -167,12 +167,12 @@ body {
 }
 
 .device-15 {
-    color: orangered;
+    color: gold;
 }
 
 .device-15 .selected-channel, .device-15 .piano-mode-selected {
     color: black;
-    background-color: orangered;
+    background-color: gold;
 }
 
 .words, .channel {

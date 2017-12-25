@@ -38,53 +38,53 @@ svg.device-3, .device-3 .closed {
 }
 
 svg.device-4, .device-4 .closed {
-    fill: salmon;
-    stroke: salmon;
+    fill: orangered;
+    stroke: orangered;
 }
 
 svg.device-5, .device-5 .closed {
-    fill: darkgoldenrod;
-    stroke: darkgoldenrod;
+    fill: darkseagreen;
+    stroke: darkseagreen;
 }
 
 svg.device-6, .device-6 .closed {
-    fill: aqua;
-    stroke: aqua;
-}
-
-svg.device-7, .device-7 .closed {
-    fill: darkorange;
-    stroke: darkorange;
-}
-
-svg.device-8, .device-8 .closed {
     fill: blueviolet;
     stroke: blueviolet;
 }
 
-svg.device-9, .device-9 .closed {
-    fill: brown;
-    stroke: brown;
+svg.device-7, .device-7 .closed {
+    fill: darkgoldenrod;
+    stroke: darkgoldenrod;
 }
 
-svg.device-10, .device-10 .closed { 
+svg.device-8, .device-8 .closed {
+    fill: violet;
+    stroke: violet;
+}
+
+svg.device-9, .device-9 .closed {
     fill: burlywood;
     stroke: burlywood;
 }
 
+svg.device-10, .device-10 .closed { 
+    fill: dodgerblue;
+    stroke: dodgerblue;
+}
+
 svg.device-11, .device-11 .closed {
-    fill: silver;
-    stroke: silver;
+    fill: darkorange;
+    stroke: darkorange;
 }
 
 svg.device-12, .device-12 .closed {
-    fill: khaki;
-    stroke: khaki;
+    fill: salmon;
+    stroke: salmon;
 }
 
 svg.device-13, .device-13 .closed {
-    fill: plum;
-    stroke: plum;
+    fill: khaki;
+    stroke: khaki;
 }
 
 svg.device-14, .device-14 .closed {
@@ -93,8 +93,8 @@ svg.device-14, .device-14 .closed {
 }
 
 svg.device-15, .device-15 .closed {
-    fill: orangered;
-    stroke: orangered;
+    fill: gold;
+    stroke: gold;
 }
 
 .title {
