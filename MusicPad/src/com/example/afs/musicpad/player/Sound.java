@@ -11,6 +11,7 @@ package com.example.afs.musicpad.player;
 
 import java.util.Iterator;
 
+import com.example.afs.musicpad.analyzer.Names;
 import com.example.afs.musicpad.song.Note;
 import com.example.afs.musicpad.theory.IntervalSet;
 import com.example.afs.musicpad.theory.SoundType;
@@ -24,6 +25,7 @@ public class Sound implements Comparable<Sound>, Iterable<Note> {
   private long beginTick = Long.MAX_VALUE;
   private long endTick = Long.MIN_VALUE;
 
+  private String noteNames;
   private SoundType soundType;
   private RandomAccessList<Note> notes = new DirectList<>();
 
@@ -42,6 +44,7 @@ public class Sound implements Comparable<Sound>, Iterable<Note> {
     long tick = note.getTick();
     beginTick = Math.min(beginTick, tick);
     endTick = Math.max(endTick, tick + note.getDuration());
+    noteNames = null;
   }
 
   @Override
@@ -86,6 +89,20 @@ public class Sound implements Comparable<Sound>, Iterable<Note> {
 
   public String getName() {
     return getSoundType().getName();
+  }
+
+  public String getNoteNames() {
+    if (noteNames == null) {
+      StringBuilder s = new StringBuilder();
+      for (Note note : notes) {
+        if (s.length() > 0) {
+          s.append("/");
+        }
+        s.append(Names.formatNoteName(note.getMidiNote()));
+      }
+      noteNames = s.toString();
+    }
+    return noteNames;
   }
 
   public RandomAccessList<Note> getNotes() {
