@@ -25,9 +25,11 @@ import com.example.afs.musicpad.player.PlayableMap;
 import com.example.afs.musicpad.player.PlayableMap.OutputType;
 import com.example.afs.musicpad.player.PlayerDetail;
 import com.example.afs.musicpad.service.PlayerDetailService;
+import com.example.afs.musicpad.service.Services;
 import com.example.afs.musicpad.song.Note;
 import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.task.ControllerTask;
+import com.example.afs.musicpad.task.Message;
 import com.example.afs.musicpad.task.MessageBroker;
 import com.example.afs.musicpad.util.DelayTimer;
 import com.example.afs.musicpad.util.RandomAccessList;
@@ -81,6 +83,8 @@ public class StaffController extends ControllerTask {
   protected synchronized void doLoad() {
     if (!initialized) {
       initialized = true;
+      Message renderingState = request(Services.getRenderingState);
+      tsGetInputQueue().add(renderingState);
     }
     addShadowUpdate(new OnShadowUpdate(Action.REPLACE_CHILDREN, "body", staffView.render()));
   }

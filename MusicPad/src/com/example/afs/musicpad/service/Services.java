@@ -14,6 +14,7 @@ import java.util.NavigableSet;
 
 import com.example.afs.musicpad.player.PlayerDetail;
 import com.example.afs.musicpad.song.Song;
+import com.example.afs.musicpad.task.Message;
 import com.example.afs.musicpad.task.ServiceTask.Service;
 import com.example.afs.musicpad.util.RandomAccessList;
 
@@ -25,6 +26,9 @@ public class Services {
   public static final Service<Song> getCurrentSong = new Service<Song>() {
   };
 
+  public static final Service<NavigableSet<Integer>> getDeviceIndexes = new Service<NavigableSet<Integer>>() {
+  };
+
   public static final Service<Integer> getMasterGain = new Service<Integer>() {
   };
 
@@ -34,9 +38,9 @@ public class Services {
   public static Service<PlayerDetail> getPlayerDetail = new Service<PlayerDetail>() {
   };
 
-  public static final Service<Integer> getTempo = new Service<Integer>() {
+  public static final Service<Message> getRenderingState = new Service<Message>() {
   };
 
-  public static final Service<NavigableSet<Integer>> getDeviceIndexes = new Service<NavigableSet<Integer>>() {
+  public static final Service<Integer> getTempo = new Service<Integer>() {
   };
 }

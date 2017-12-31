@@ -27,6 +27,7 @@ import com.example.afs.musicpad.message.OnSampleSong;
 import com.example.afs.musicpad.parser.SongBuilder;
 import com.example.afs.musicpad.service.Services;
 import com.example.afs.musicpad.song.Song;
+import com.example.afs.musicpad.task.Message;
 import com.example.afs.musicpad.task.MessageBroker;
 import com.example.afs.musicpad.task.ServiceTask;
 import com.example.afs.musicpad.util.DirectList;
@@ -35,11 +36,15 @@ import com.example.afs.musicpad.util.Range;
 
 public class Conductor extends ServiceTask {
 
+  public static class OnUnitializedRenderingStateRequest implements Message {
+  }
+
   private Song song;
   private int songIndex;
   private File directory;
   private RandomAccessList<File> midiFiles;
   private NavigableSet<Integer> deviceIndexes = new TreeSet<>();
+  private Message renderingState = new OnUnitializedRenderingStateRequest();
   private NavigableMap<Integer, Integer> deviceChannelAssignments = new TreeMap<>();
 
   public Conductor(MessageBroker broker, String path) {
@@ -55,7 +60,14 @@ public class Conductor extends ServiceTask {
     subscribe(OnConfigurationChange.class, message -> doConfigurationChange(message));
     provide(Services.getMidiFiles, () -> midiFiles);
     provide(Services.getCurrentSong, () -> song);
+    provide(Services.getRenderingState, () -> renderingState);
     provide(Services.getDeviceIndexes, () -> new TreeSet<>(deviceIndexes)); // Avoid CME
+  }
+
+  @Override
+  protected void publish(Message message) {
+    renderingState = message;
+    super.publish(message);
   }
 
   private void doCommand(OnCommand message) {
