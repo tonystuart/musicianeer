@@ -17,8 +17,6 @@ import java.util.TreeMap;
 
 import com.example.afs.musicpad.Command;
 import com.example.afs.musicpad.DeviceCommand;
-import com.example.afs.musicpad.html.Option;
-import com.example.afs.musicpad.html.Template;
 import com.example.afs.musicpad.message.OnCommand;
 import com.example.afs.musicpad.message.OnDeviceCommand;
 import com.example.afs.musicpad.message.OnPickChannel;
@@ -27,8 +25,6 @@ import com.example.afs.musicpad.message.OnSampleChannel;
 import com.example.afs.musicpad.message.OnSampleSong;
 import com.example.afs.musicpad.message.OnShadowUpdate;
 import com.example.afs.musicpad.message.OnShadowUpdate.Action;
-import com.example.afs.musicpad.midi.Instruments;
-import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.player.PlayerDetail;
 import com.example.afs.musicpad.service.BackgroundMuteService;
 import com.example.afs.musicpad.service.PlayerDetailService;
@@ -228,16 +224,6 @@ public class KaraokeController extends ControllerTask {
 
   private void doSetTempo(int tempo) {
     karaokeView.setTempo(tempo);
-  }
-
-  private String getProgramOptions() {
-    Template template = new Template("#program-options");
-    for (int i = 0; i < Midi.PROGRAMS; i++) {
-      Option option = new Option(Instruments.getProgramName(i), i);
-      template.appendChild(option);
-    }
-    String programOptions = template.render();
-    return programOptions;
   }
 
   private void pickRandomSong() {
