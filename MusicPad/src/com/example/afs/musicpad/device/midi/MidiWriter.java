@@ -32,6 +32,7 @@ public class MidiWriter extends MessageTask {
 
   private int deviceIndex;
   private MidiDeviceBundle deviceBundle;
+  @SuppressWarnings("unused")
   private MidiConfiguration configuration;
   private RandomAccessList<Receiver> receivers = new DirectList<>();
   private Song song;
@@ -58,6 +59,11 @@ public class MidiWriter extends MessageTask {
   }
 
   @Override
+  public String toString() {
+    return "MidiWriter [type=" + deviceBundle.getType() + ", card=" + deviceBundle.getCard() + ", unit=" + deviceBundle.getUnit() + "]";
+  }
+
+  @Override
   public void tsStart() {
     super.tsStart();
     initializeDevice();
@@ -67,11 +73,6 @@ public class MidiWriter extends MessageTask {
   public void tsTerminate() {
     super.tsTerminate();
     disconnectDevices();
-  }
-
-  @Override
-  public String toString() {
-    return "MidiWriter [type=" + deviceBundle.getType() + ", card=" + deviceBundle.getCard() + ", unit=" + deviceBundle.getUnit() + "]";
   }
 
   private void connectDevices() {
