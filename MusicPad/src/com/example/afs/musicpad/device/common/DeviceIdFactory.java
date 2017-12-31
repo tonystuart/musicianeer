@@ -53,6 +53,7 @@ public class DeviceIdFactory {
   }
 
   private static class Devices {
+
     private Map<String, Integer> devices;
 
     public Devices(HashMap<String, Integer> devices) {
@@ -61,10 +62,6 @@ public class DeviceIdFactory {
 
     public Map<String, Integer> getDevices() {
       return devices;
-    }
-
-    public void setDevices(Map<String, Integer> devices) {
-      this.devices = devices;
     }
 
     @Override
