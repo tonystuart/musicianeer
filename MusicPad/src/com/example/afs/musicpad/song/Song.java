@@ -10,6 +10,7 @@
 package com.example.afs.musicpad.song;
 
 import java.io.File;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.NavigableSet;
@@ -21,7 +22,9 @@ import com.example.afs.musicpad.analyzer.TranspositionFinder;
 import com.example.afs.musicpad.midi.Instruments;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.song.Note.NoteBuilder;
+import com.example.afs.musicpad.util.DirectList;
 import com.example.afs.musicpad.util.FileUtilities;
+import com.example.afs.musicpad.util.RandomAccessList;
 
 public class Song {
 
@@ -317,6 +320,56 @@ public class Song {
     int channelNoteCount = getChannelNoteCount(channel);
     int percentMelody = (100 * melodyNoteCount) / channelNoteCount;
     return percentMelody;
+  }
+
+  public int getPresumedMelodyChannel() {
+
+    final class ChannelMelodyScore implements Comparable<ChannelMelodyScore> {
+
+      int channel;
+      double score;
+
+      ChannelMelodyScore(int channel) {
+        this.channel = channel;
+        int percentMelody = getPercentMelody(channel);
+        int concurrency = getConcurrency(channel);
+        int occupancy = getOccupancy(channel);
+        // A perfect score is 1.0:
+        // percentMelody = 100 (goes down as percentMelody goes down)
+        // concurrency = 100 (goes down as concurrency goes up)
+        // occupancy = 100 (goes down as occupancy goes down);
+        score = percentMelody / 100d;
+        score *= 100d / concurrency;
+        score *= occupancy / 100d;
+      }
+
+      @Override
+      public int compareTo(ChannelMelodyScore that) {
+        // Invert the comparison so the highest score is first
+        return this.score < that.score ? +1 : this.score > that.score ? -1 : 0;
+      }
+
+      @Override
+      public String toString() {
+        return "ChannelMelodyScorer [channel=" + channel + ", score=" + score + "]";
+      }
+
+    }
+
+    RandomAccessList<ChannelMelodyScore> scores = new DirectList<>();
+    for (int channel = 0; channel < Midi.CHANNELS; channel++) {
+      if (channel != Midi.DRUM && getChannelNoteCount(channel) > 0) {
+        scores.add(new ChannelMelodyScore(channel));
+      }
+    }
+    int presumedMelodyChannel;
+    if (scores.size() > 0) {
+      Collections.sort(scores);
+      presumedMelodyChannel = scores.get(0).channel;
+    } else {
+      presumedMelodyChannel = -1;
+    }
+    return presumedMelodyChannel;
   }
 
   public List<String> getProgramNames(int channel) {
