@@ -70,7 +70,7 @@ public class Names {
   }
 
   public static String formatNote(int midiNote) {
-    return SHARPS[midiNote % Midi.SEMITONES_PER_OCTAVE] + (midiNote / Midi.SEMITONES_PER_OCTAVE) + " (" + midiNote + ")";
+    return SHARPS[midiNote % Midi.SEMITONES_PER_OCTAVE] + getOctave(midiNote) + " (" + midiNote + ")";
   }
 
   public static String formatNote(long tick, int midiNote, long duration) {
@@ -78,7 +78,7 @@ public class Names {
   }
 
   public static String formatNoteName(int midiNote) {
-    return SHARPS[midiNote % Midi.SEMITONES_PER_OCTAVE] + (midiNote / Midi.SEMITONES_PER_OCTAVE);
+    return SHARPS[midiNote % Midi.SEMITONES_PER_OCTAVE] + getOctave(midiNote);
   }
 
   public static String getKeyName(int tonic, boolean isMajor, int sharpsOrFlats) {
@@ -102,6 +102,12 @@ public class Names {
       nickName = "";
     }
     return nickName;
+  }
+
+  private static int getOctave(int midiNote) {
+    // Octave is represented in standard pitch notation
+    // https://en.wikipedia.org/wiki/Scientific_pitch_notation
+    return (midiNote / Midi.SEMITONES_PER_OCTAVE) - 1;
   }
 
   private static String getPlural(int number, String text) {
