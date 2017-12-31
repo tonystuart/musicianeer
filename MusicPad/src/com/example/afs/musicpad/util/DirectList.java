@@ -24,4 +24,10 @@ public class DirectList<T> extends ArrayList<T> implements RandomAccessList<T> {
   public DirectList(int count) {
     super(count);
   }
+
+  public DirectList(Iterable<T> items) {
+    for (T item : items) {
+      add(item);
+    }
+  }
 }
