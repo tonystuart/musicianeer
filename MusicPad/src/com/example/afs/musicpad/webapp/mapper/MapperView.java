@@ -39,14 +39,20 @@ public class MapperView extends ShadowDomBuilder {
             .add(text("Select Input Device:")) //
             .add(div("#device-type-container"))) //
         .add(div("#mapper-diagram-container") //
-            .add(div("#mapper-diagram-instructions") //
-                .add(orderedList() //
-                    .add(listItem() //
-                        .add(text("Select an input device")))
-                    .add(listItem() //
-                        .add(text("Press, rotate or slide an input on your MIDI controller to configure its action")))
-                    .add(listItem() //
-                        .add(text("Drag the new action to its correct position relative to other mappings"))))))); //
+            .add(createInstructions()))); //
+  }
+
+  public Parent createInstructions() {
+    return div("#mapper-diagram-instructions") //
+        .add(orderedList() //
+            .add(listItem() //
+                .add(text("Select an input device from the list of available MIDI controllers")))
+            .add(listItem() //
+                .add(text("Press, rotate or slide an input on your MIDI controller to create a mapping")))
+            .add(listItem() //
+                .add(text("Drag the new mapping to its correct position relative to other mappings"))) //
+            .add(listItem() //
+                .add(text("Configure the mapping by selecting an action from the drop down"))));
   }
 
   public Parent createMapping(InputMessage inputMessage, OutputMessage outputMessage) {
@@ -89,10 +95,9 @@ public class MapperView extends ShadowDomBuilder {
     return mapping;
   }
 
-  public void displayDeviceSelector(NavigableMap<Integer, Controller> deviceControllers) {
-    Select select = createDeviceSelector(deviceControllers);
-    Division deviceTypeContainer = getElementById("device-type-container");
-    replaceChildren(deviceTypeContainer, select);
+  public void displayInstructions() {
+    Parent mapperDiagramContainer = getElementById("mapper-diagram-container");
+    replaceChildren(mapperDiagramContainer, createInstructions());
   }
 
   public String displayMapping(InputMessage inputMessage, OutputMessage outputMessage) {
@@ -161,6 +166,12 @@ public class MapperView extends ShadowDomBuilder {
     } else {
       removeClass(mappingId, "index-label-visible");
     }
+  }
+
+  public void updateDeviceSelector(NavigableMap<Integer, Controller> deviceControllers) {
+    Select select = createDeviceSelector(deviceControllers);
+    Division deviceTypeContainer = getElementById("device-type-container");
+    replaceChildren(deviceTypeContainer, select);
   }
 
   private Division createDeviceList(NavigableMap<Integer, Controller> deviceControllers) {

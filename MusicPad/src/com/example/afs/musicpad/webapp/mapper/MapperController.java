@@ -70,7 +70,9 @@ public class MapperController extends ControllerTask {
   @Override
   protected void doInput(String id, String value) {
     if (id.startsWith("device-type")) {
-      displayMappings(Integer.parseInt(value));
+      if (value.length() > 0) {
+        displayMappings(Integer.parseInt(value));
+      }
     } else if (id.startsWith("input-type-mapping-")) {
       String mappingId = id.substring("input-type-".length());
       Parent mapping = mapperView.getElementById(mappingId);
@@ -116,10 +118,7 @@ public class MapperController extends ControllerTask {
     for (Integer deviceIndex : devices) {
       addDevice(deviceIndex);
     }
-    mapperView.displayDeviceSelector(deviceControllers);
-    //    if (deviceControllers.size() > 0) {
-    //      displayMappings(deviceControllers.firstKey());
-    //    }
+    mapperView.updateDeviceSelector(deviceControllers);
   }
 
   @Override
@@ -158,14 +157,19 @@ public class MapperController extends ControllerTask {
 
   private void doDeviceAttached(OnDeviceAttached message) {
     addDevice(message.getDeviceIndex());
-    mapperView.displayDeviceSelector(deviceControllers);
+    mapperView.updateDeviceSelector(deviceControllers);
   }
 
   private void doDeviceCommand(OnDeviceCommand message) {
   }
 
   private void doDeviceDetached(OnDeviceDetached message) {
-    deviceControllers.remove(message.getDeviceIndex());
+    int detachedDeviceIndex = message.getDeviceIndex();
+    deviceControllers.remove(detachedDeviceIndex);
+    mapperView.updateDeviceSelector(deviceControllers);
+    if (this.deviceIndex == detachedDeviceIndex) {
+      mapperView.displayInstructions();
+    }
   }
 
   private void doShortMessage(OnShortMessage message) {
