@@ -124,9 +124,9 @@ Press NumLock + | For Command
 8 | Select Previous Instrument
 9 | Select Next Instrument
 / | Enter Numeric Keypad Mode
-* | Enter Alpha Keyboard Mode
-- | Enter Measure Arpeggiator Mode
-+ | Leave Measure Arpeggiator Mode
+\* | Enter Alpha Keyboard Mode
+\- | Enter Measure Arpeggiator Mode
+\+ | Leave Measure Arpeggiator Mode
 P | Play / Resume
 S | Stop / Pause
 I | Increase Master Volume
