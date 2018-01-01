@@ -75,9 +75,11 @@ public class DeviceWatcher extends MessageTask {
     Iterator<Entry<String, Device>> oldIterator = oldDevices.entrySet().iterator();
     while (oldIterator.hasNext()) {
       Entry<String, Device> oldEntry = oldIterator.next();
-      if (!newDeviceNames.contains(oldEntry.getKey())) {
-        detachDevice(oldEntry.getKey(), oldEntry.getValue());
+      String deviceName = oldEntry.getKey();
+      if (!newDeviceNames.contains(deviceName)) {
+        detachDevice(deviceName, oldEntry.getValue());
         oldIterator.remove();
+        detachedDevices.remove(deviceName);
       }
     }
     for (String newDeviceName : newDeviceNames) {
@@ -124,7 +126,6 @@ public class DeviceWatcher extends MessageTask {
       Device device = entry.getValue();
       detachDevice(deviceName, device);
       detachedDevices.add(deviceName);
-      oldDevices.remove(deviceName);
     }
   }
 
