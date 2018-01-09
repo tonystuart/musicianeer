@@ -341,7 +341,6 @@ public class KaraokeView extends ShadowDomBuilder {
   }
 
   private String getChannelText(int channel, List<String> programNames, NavigableMap<Integer, Integer> deviceChannelAssignments) {
-    int index = 0;
     int count = 0;
     StringBuilder s = new StringBuilder();
     s.append("Channel " + Value.toNumber(channel) + ": ");
@@ -353,9 +352,8 @@ public class KaraokeView extends ShadowDomBuilder {
         } else {
           s.append(", ");
         }
-        s.append(Utils.getPlayerName(index));
+        s.append(Utils.getPlayerName(entry.getKey()));
       }
-      index++;
     }
     if (count > 0) {
       s.append(")");
