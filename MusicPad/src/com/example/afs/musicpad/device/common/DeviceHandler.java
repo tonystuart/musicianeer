@@ -119,10 +119,12 @@ public class DeviceHandler extends ServiceTask {
   }
 
   private void createPlayableMap() {
-    InputMap groupInputMap = controller.getConfiguration().getGroupInputMap();
-    InputMap soundInputMap = controller.getConfiguration().getSoundInputMap();
-    Iterable<Note> channelNotes = song.getChannelNotes(channel);
-    playableMap = new PlayableMap(groupInputMap, soundInputMap, channelNotes, player.getOutputType());
+    if (song != null) {
+      InputMap groupInputMap = controller.getConfiguration().getGroupInputMap();
+      InputMap soundInputMap = controller.getConfiguration().getSoundInputMap();
+      Iterable<Note> channelNotes = song.getChannelNotes(channel);
+      playableMap = new PlayableMap(groupInputMap, soundInputMap, channelNotes, player.getOutputType());
+    }
   }
 
   private void doCommand(OnCommand message) {
