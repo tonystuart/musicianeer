@@ -16,6 +16,7 @@ import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.player.PlayableMap.OutputType;
 import com.example.afs.musicpad.song.Note;
 import com.example.afs.musicpad.transport.NoteEvent;
+import com.example.afs.musicpad.transport.NoteEvent.Type;
 import com.example.afs.musicpad.transport.Transport;
 
 public class Player {
@@ -131,21 +132,18 @@ public class Player {
   }
 
   private synchronized void processNoteEvent(NoteEvent noteEvent) {
-    Note note = noteEvent.getNote();
-    int midiNote = note.getMidiNote();
-    int velocity = note.getVelocity();
-    switch (noteEvent.getType()) {
-    case NOTE_OFF:
-      noteOff(midiNote, velocity);
-      break;
-    case NOTE_ON:
-      noteOn(midiNote, velocity);
-      break;
-    case TICK:
+    Type eventType = noteEvent.getType();
+    if (eventType == Type.TICK) {
       // TICK fills to end-of-measure
-      break;
-    default:
-      throw new UnsupportedOperationException();
+    } else {
+      Note note = noteEvent.getNote();
+      int midiNote = note.getMidiNote();
+      int velocity = note.getVelocity();
+      if (eventType == Type.NOTE_OFF) {
+        noteOff(midiNote, velocity);
+      } else if (eventType == Type.NOTE_ON) {
+        noteOn(midiNote, velocity);
+      }
     }
     if (!arpeggiator.isPlaying()) {
       if (repeatArpeggiation != null) {
