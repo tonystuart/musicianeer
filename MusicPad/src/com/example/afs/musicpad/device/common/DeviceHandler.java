@@ -345,6 +345,7 @@ public class DeviceHandler extends ServiceTask {
   private void setOutputType(OutputType outputType) {
     player.setOutputType(outputType);
     createPlayableMap();
+    publish(new OnConfigurationChange(deviceIndex));
   }
 
   private void setPercentVelocity(int velocity) {
