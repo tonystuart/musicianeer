@@ -52,6 +52,9 @@ public class Conductor extends ServiceTask {
     this.directory = new File(path);
     this.midiFiles = new DirectList<>();
     listMidiFiles(midiFiles, directory);
+    if (midiFiles.size() == 0) {
+      throw new IllegalArgumentException(path + " does not contain any .mid or .kar files");
+    }
     midiFiles.sort((o1, o2) -> o1.getPath().compareTo(o2.getPath()));
     subscribe(OnCommand.class, message -> doCommand(message));
     subscribe(OnDeviceCommand.class, message -> doDeviceCommand(message));
