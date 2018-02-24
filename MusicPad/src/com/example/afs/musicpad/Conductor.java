@@ -151,14 +151,17 @@ public class Conductor extends ServiceTask {
     deviceChannelAssignments.remove(deviceIndex);
     if (deviceIndexes.size() == deviceChannelAssignments.size()) {
       publish(new OnRenderSong(song, deviceChannelAssignments));
-    } else if (deviceChannelAssignments.size() > 0) { // only if channel selection has already begun
+    } else {
       Integer next;
       if (deviceChannelAssignments.size() > 0) {
         next = deviceIndexes.higher(deviceChannelAssignments.lastKey());
+        publish(new OnPickChannel(song, deviceChannelAssignments, next));
       } else {
-        next = deviceIndexes.first();
+        if (deviceIndexes.size() > 0) {
+          next = deviceIndexes.first();
+          publish(new OnPickChannel(song, deviceChannelAssignments, next));
+        }
       }
-      publish(new OnPickChannel(song, deviceChannelAssignments, next));
     }
   }
 
