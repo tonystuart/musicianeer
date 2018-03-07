@@ -38,6 +38,7 @@ public class QwertyReader {
   private Thread deviceReader;
   private QwertyController controller;
   private DeviceHandler deviceHandler;
+  private FileInputStream fileInputStream;
 
   public QwertyReader(DeviceHandler deviceHandler, QwertyController qwertyController) {
     this.deviceHandler = deviceHandler;
@@ -51,6 +52,12 @@ public class QwertyReader {
 
   public void terminate() {
     isTerminated = true;
+    try {
+      // Close file to release thread blocked in read_key_code
+      fileInputStream.close();
+    } catch (IOException e) {
+      // Read thread may have already closed file due to termination
+    }
   }
 
   private int getFileDescriptor(FileInputStream fileInputStream) {
@@ -179,6 +186,7 @@ public class QwertyReader {
 
   private void run() {
     try (FileInputStream fileInputStream = new FileInputStream(controller.getDeviceName())) {
+      this.fileInputStream = fileInputStream;
       int fd = getFileDescriptor(fileInputStream);
       int rc = Input.capture(fd, true);
       if (rc == -1) {
@@ -191,7 +199,7 @@ public class QwertyReader {
             processKeyDown(-code);
           } else if (code > 0) {
             processKeyUp(code);
-          } else {
+          } else if (!isTerminated) {
             throw new IllegalStateException("Cannot read key code from fd " + fd);
           }
         } catch (RuntimeException e) {

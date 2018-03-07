@@ -83,7 +83,7 @@ public class DeviceWatcher extends MessageTask {
       }
     }
     for (String newDeviceName : newDeviceNames) {
-      if (!oldDevices.containsKey(newDeviceName) && !detachedDevices.contains(newDeviceName)) {
+      if (!oldDevices.containsKey(newDeviceName)) {
         attachDevice(newDeviceName);
       }
     }
@@ -130,6 +130,9 @@ public class DeviceWatcher extends MessageTask {
   }
 
   private void doReattach() {
+    for (String deviceName : detachedDevices) {
+      attachDevice(deviceName);
+    }
     detachedDevices.clear();
   }
 
