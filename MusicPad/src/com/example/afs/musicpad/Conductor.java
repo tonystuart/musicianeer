@@ -24,14 +24,13 @@ import com.example.afs.musicpad.message.OnPickChannel;
 import com.example.afs.musicpad.message.OnRenderSong;
 import com.example.afs.musicpad.message.OnSampleChannel;
 import com.example.afs.musicpad.message.OnSampleSong;
+import com.example.afs.musicpad.midi.MidiLibrary;
 import com.example.afs.musicpad.parser.SongBuilder;
 import com.example.afs.musicpad.service.Services;
 import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.task.Message;
 import com.example.afs.musicpad.task.MessageBroker;
 import com.example.afs.musicpad.task.ServiceTask;
-import com.example.afs.musicpad.util.DirectList;
-import com.example.afs.musicpad.util.RandomAccessList;
 import com.example.afs.musicpad.util.Range;
 
 public class Conductor extends ServiceTask {
@@ -41,27 +40,20 @@ public class Conductor extends ServiceTask {
 
   private Song song;
   private int songIndex;
-  private File directory;
-  private RandomAccessList<File> midiFiles;
+  private MidiLibrary midiLibrary;
   private NavigableSet<Integer> deviceIndexes = new TreeSet<>();
   private Message renderingState = new OnUnitializedRenderingStateRequest();
   private NavigableMap<Integer, Integer> deviceChannelAssignments = new TreeMap<>();
 
   public Conductor(MessageBroker broker, String path) {
     super(broker);
-    this.directory = new File(path);
-    this.midiFiles = new DirectList<>();
-    listMidiFiles(midiFiles, directory);
-    if (midiFiles.size() == 0) {
-      throw new IllegalArgumentException(path + " does not contain any .mid or .kar files");
-    }
-    midiFiles.sort((o1, o2) -> o1.getPath().compareTo(o2.getPath()));
+    midiLibrary = new MidiLibrary(path);
     subscribe(OnCommand.class, message -> doCommand(message));
     subscribe(OnDeviceCommand.class, message -> doDeviceCommand(message));
     subscribe(OnDeviceAttached.class, message -> doDeviceAttached(message));
     subscribe(OnDeviceDetached.class, message -> doDeviceDetached(message));
     subscribe(OnConfigurationChange.class, message -> doConfigurationChange(message));
-    provide(Services.getMidiFiles, () -> midiFiles);
+    provide(Services.getMidiFiles, () -> midiLibrary.getMidiFiles());
     provide(Services.getCurrentSong, () -> song);
     provide(Services.getRenderingState, () -> renderingState);
     provide(Services.getDeviceIndexes, () -> new TreeSet<>(deviceIndexes)); // Avoid CME
@@ -166,7 +158,7 @@ public class Conductor extends ServiceTask {
   }
 
   private void doIncreaseSongIndex() {
-    if (songIndex < (midiFiles.size() - 1)) {
+    if (songIndex < (midiLibrary.size() - 1)) {
       doSampleSong(songIndex + 1);
     }
   }
@@ -186,7 +178,7 @@ public class Conductor extends ServiceTask {
   private void doSampleSong(int songIndex) {
     this.songIndex = songIndex;
     deviceChannelAssignments.clear();
-    File midiFile = midiFiles.get(songIndex);
+    File midiFile = midiLibrary.get(songIndex);
     SongBuilder songBuilder = new SongBuilder();
     song = songBuilder.createSong(midiFile);
     System.out.println("Sampling song " + songIndex + " - " + song.getTitle());
@@ -211,7 +203,7 @@ public class Conductor extends ServiceTask {
   }
 
   private void doSetSongIndex(int percentSong) {
-    int songIndex = Range.scale(0, midiFiles.size(), 0, 100, percentSong);
+    int songIndex = Range.scale(0, midiLibrary.size(), 0, 100, percentSong);
     doSampleSong(songIndex);
   }
 
@@ -220,26 +212,6 @@ public class Conductor extends ServiceTask {
     int maximumTransposition = song.getMaximumTransposition();
     int transposition = Range.scale(minimumTransposition, maximumTransposition, 0, 100, percentDistance);
     transposeTo(transposition);
-  }
-
-  private boolean isMidiFile(String name) {
-    String lowerCaseName = name.toLowerCase();
-    boolean isMidi = lowerCaseName.endsWith(".mid") || lowerCaseName.endsWith(".midi") || lowerCaseName.endsWith(".kar");
-    return isMidi;
-  }
-
-  private void listMidiFiles(RandomAccessList<File> midiFiles, File parent) {
-    if (!parent.isDirectory() || !parent.canRead()) {
-      throw new IllegalArgumentException(parent + " is not a readable directory");
-    }
-    File[] files = parent.listFiles((dir, name) -> isMidiFile(name));
-    for (File file : files) {
-      if (file.isFile()) {
-        midiFiles.add(file);
-      } else if (file.isDirectory()) {
-        listMidiFiles(midiFiles, file);
-      }
-    }
   }
 
   private void transposeTo(int distance) {

@@ -402,6 +402,14 @@ public class Song {
     return programs;
   }
 
+  public int getSeconds() {
+    long tickDuration = getDuration();
+    long beatDuration = tickDuration / Default.TICKS_PER_BEAT;
+    int beatsPerMinute = getBeatsPerMinute(0);
+    int seconds = (int) ((60 * beatDuration) / beatsPerMinute);
+    return seconds;
+  }
+
   public int getTicksPerMeasure(long tick) {
     int ticksPerMeasure = getBeatsPerMeasure(tick) * Default.TICKS_PER_BEAT;
     return ticksPerMeasure;

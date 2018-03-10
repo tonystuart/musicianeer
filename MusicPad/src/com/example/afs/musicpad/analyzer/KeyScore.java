@@ -66,6 +66,10 @@ public final class KeyScore implements Comparable<KeyScore> {
     return Names.getKeyName(tonic, isMajor, sharpsOrFlats);
   }
 
+  public int getNaturals() {
+    return naturals;
+  }
+
   public int getRank() {
     return rank;
   }
@@ -74,8 +78,16 @@ public final class KeyScore implements Comparable<KeyScore> {
     return Names.getKeyName(relativeTonic, !isMajor, sharpsOrFlats);
   }
 
+  public int getRelativeTonic() {
+    return relativeTonic;
+  }
+
   public int getSharps() {
     return sharpsOrFlats < 0 ? 0 : sharpsOrFlats;
+  }
+
+  public int getSharpsOrFlats() {
+    return sharpsOrFlats;
   }
 
   public String getSynopsis() {
@@ -86,8 +98,24 @@ public final class KeyScore implements Comparable<KeyScore> {
     return tonicThirds;
   }
 
+  public int getTonic() {
+    return tonic;
+  }
+
+  public int getTonicThirds() {
+    return tonicThirds;
+  }
+
+  public int getTonicTriads() {
+    return tonicTriads;
+  }
+
   public int getTriads() {
     return tonicTriads;
+  }
+
+  public boolean isMajor() {
+    return isMajor;
   }
 
   public boolean isTieScore(KeyScore that) {

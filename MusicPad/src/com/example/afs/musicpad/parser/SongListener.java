@@ -22,6 +22,9 @@ public class SongListener implements Listener {
   private static final Tempo DEFAULT_TEMPO = new Tempo(60000000 / Default.BEATS_PER_MINUTE, Default.BEATS_PER_MINUTE);
   private static final TimeSignature DEFAULT_TIME_SIGNATURE = new TimeSignature(Default.BEATS_PER_MEASURE, Default.BEAT_UNIT);
 
+  private int line;
+  private int stanza;
+
   private Song song;
   private NavigableMap<Long, Tempo> tempos = new TreeMap<>();
   private NavigableMap<Long, TimeSignature> timeSignatures = new TreeMap<>();
@@ -59,7 +62,7 @@ public class SongListener implements Listener {
   public void onNote(long tick, int channel, int midiNote, int velocity, long duration, int program, int startIndex, int endIndex) {
     Tempo tempo = tempos.floorEntry(tick).getValue();
     TimeSignature timeSignature = timeSignatures.floorEntry(tick).getValue();
-    song.add(new Note(tick, channel, midiNote, velocity, duration, program, startIndex, endIndex, tempo.getQuarterNotesPerMinute(), timeSignature.getBeatsPerMeasure(), timeSignature.getBeatUnit()));
+    song.add(new Note(tick, channel, midiNote, velocity, duration, program, startIndex, endIndex, tempo.getQuarterNotesPerMinute(), timeSignature.getBeatsPerMeasure(), timeSignature.getBeatUnit(), stanza, line));
   }
 
   @Override
@@ -79,6 +82,15 @@ public class SongListener implements Listener {
 
   @Override
   public void onText(long tick, String text) {
+    if (text.length() > 0) {
+      char firstChar = text.charAt(0);
+      if (firstChar == '\\') {
+        stanza++;
+        line = 0;
+      } else if (firstChar == '/') {
+        line++;
+      }
+    }
     addWord(tick, text);
   }
 

@@ -33,7 +33,6 @@ import com.example.afs.musicpad.player.Sound;
 import com.example.afs.musicpad.player.Sounds;
 import com.example.afs.musicpad.player.Sounds.SoundCount;
 import com.example.afs.musicpad.song.ChannelNotes;
-import com.example.afs.musicpad.song.Default;
 import com.example.afs.musicpad.song.Note;
 import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.task.ControllerTask;
@@ -386,10 +385,7 @@ public class KaraokeView extends ShadowDomBuilder {
   }
 
   private String getDuration(Song song) {
-    long tickDuration = song.getDuration();
-    long beatDuration = tickDuration / Default.TICKS_PER_BEAT;
-    int beatsPerMinute = song.getBeatsPerMinute(0);
-    int secondsDuration = (int) ((60 * beatDuration) / beatsPerMinute);
+    int secondsDuration = song.getSeconds();
     String duration = String.format("%d:%02d", secondsDuration / 60, secondsDuration % 60);
     return duration;
   }

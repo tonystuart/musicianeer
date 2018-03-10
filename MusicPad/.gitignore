@@ -2,3 +2,5 @@
 /lib/
 .*.swp
 /target/
+/Music/
+derby.log

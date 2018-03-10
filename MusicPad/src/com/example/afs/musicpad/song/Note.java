@@ -26,9 +26,11 @@ public class Note extends Item<Note> {
     private int beatsPerMinute = Default.BEATS_PER_MINUTE;
     private int beatsPerMeasure = Default.BEATS_PER_MEASURE;
     private int beatUnit = Default.BEAT_UNIT;
+    private int stanza;
+    private int line;
 
     public Note create() {
-      return new Note(tick, channel, midiNote, velocity, duration, program, startIndex, endIndex, beatsPerMinute, beatsPerMeasure, beatUnit);
+      return new Note(tick, channel, midiNote, velocity, duration, program, startIndex, endIndex, beatsPerMinute, beatsPerMeasure, beatUnit, stanza, line);
     }
 
     public NoteBuilder withBeatsPerMeasure(int beatsPerMeasure) {
@@ -61,6 +63,11 @@ public class Note extends Item<Note> {
       return this;
     }
 
+    public NoteBuilder withLine(int line) {
+      this.line = line;
+      return this;
+    }
+
     public NoteBuilder withMidiNote(int midiNote) {
       this.midiNote = midiNote;
       return this;
@@ -82,6 +89,11 @@ public class Note extends Item<Note> {
 
     public NoteBuilder withProgram(int program) {
       this.program = program;
+      return this;
+    }
+
+    public NoteBuilder withStanza(int stanza) {
+      this.stanza = stanza;
       return this;
     }
 
@@ -111,12 +123,14 @@ public class Note extends Item<Note> {
   private int beatsPerMinute;
   private int beatsPerMeasure;
   private int beatUnit;
+  private int stanza;
+  private int line;
 
   public Note(long tick) {
     super(tick);
   }
 
-  public Note(long tick, int channel, int midiNote, int velocity, long duration, int program, int startIndex, int endIndex, int beatsPerMinute, int beatsPerMeasure, int beatUnit) {
+  public Note(long tick, int channel, int midiNote, int velocity, long duration, int program, int startIndex, int endIndex, int beatsPerMinute, int beatsPerMeasure, int beatUnit, int stanza, int line) {
     super(tick);
     this.channel = channel;
     this.midiNote = midiNote;
@@ -128,6 +142,8 @@ public class Note extends Item<Note> {
     this.beatsPerMinute = beatsPerMinute;
     this.beatsPerMeasure = beatsPerMeasure;
     this.beatUnit = beatUnit;
+    this.stanza = stanza;
+    this.line = line;
   }
 
   @Override
@@ -195,6 +211,10 @@ public class Note extends Item<Note> {
     return endIndex;
   }
 
+  public int getLine() {
+    return line;
+  }
+
   public int getMeasure() {
     return (int) (tick / getTicksPerMeasure());
   }
@@ -205,6 +225,10 @@ public class Note extends Item<Note> {
 
   public int getProgram() {
     return program;
+  }
+
+  public int getStanza() {
+    return stanza;
   }
 
   public int getStartIndex() {
@@ -256,7 +280,7 @@ public class Note extends Item<Note> {
   @Override
   public String toString() {
     String noteDescription = getNoteDescription();
-    return "Note [tick=" + tick + ", channel=" + channel + ", midiNote=" + midiNote + ", velocity=" + velocity + ", duration=" + duration + ", instrument=" + program + ", bpm=" + beatsPerMinute + ", time=" + beatsPerMeasure + "/" + beatUnit + " " + noteDescription + "]";
+    return "Note [tick=" + tick + ", channel=" + channel + ", midiNote=" + midiNote + ", velocity=" + velocity + ", duration=" + duration + ", instrument=" + program + ", bpm=" + beatsPerMinute + ", time=" + beatsPerMeasure + "/" + beatUnit + ", stanza=" + stanza + ", line=" + line + " " + noteDescription + "]";
   }
 
   public void transpose(int distance) {
