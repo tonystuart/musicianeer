@@ -51,3 +51,12 @@ order by
   song,
   channel;
 
+select song, copy(min(id), max(id)) from neuron where song = 4 group by song;
+
+call reset();
+select song, copy(min(id), max(id)) from neuron where song = 4 and measure = 10 group by song;
+select song, copy(min(id), max(id)) from neuron where song = 3 and measure = 11 group by song;
+select song, copy(min(id), max(id)) from neuron where song = 2 and measure = 12 group by song;
+select song, copy(min(id), max(id)) from neuron where song = 1 and measure = 13 group by song;
+select song, copy(min(id), max(id)) from neuron where song = 4 and measure = 11 group by song;
+call play();

@@ -10,6 +10,7 @@
 connect 'jdbc:derby://localhost:1527/Music;create=true;';
 
 drop function append;
+drop function copy;
 drop function program;
 drop function round;
 drop function transpose;
@@ -23,12 +24,25 @@ create function append
   program integer,
   channel integer
 )
-returns varchar(128)
+returns integer
 language java
 deterministic
 external name 'com.example.afs.frankenmusic.db.Derby.append'
 parameter style java
 no sql
+returns null on null input;
+
+create function copy
+(
+  first_id integer,
+  last_id integer
+)
+returns integer
+language java
+deterministic
+external name 'com.example.afs.frankenmusic.db.Derby.copy'
+parameter style java
+reads sql data
 returns null on null input;
 
 create function program

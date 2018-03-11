@@ -16,6 +16,8 @@ import java.sql.SQLException;
 
 import com.example.afs.fluidsynth.Synthesizer;
 import com.example.afs.fluidsynth.Synthesizer.Settings;
+import com.example.afs.frankenmusic.loader.Neuron;
+import com.example.afs.frankenmusic.midi.SequenceBuilder;
 import com.example.afs.jni.FluidSynth;
 import com.example.afs.musicpad.midi.Instruments;
 import com.example.afs.musicpad.midi.Midi;
@@ -29,6 +31,12 @@ public class Derby {
 
   public static class DerbyImpl {
 
+    private int baseTick;
+    private int tickLength;
+    private int lastEndTick;
+    private int lastStartTick;
+    private int previousTicks;
+
     private Transport transport;
     private RandomAccessList<Note> notes;
 
@@ -38,25 +46,47 @@ public class Derby {
       reset();
     }
 
-    public void play() {
-      transport.play(notes);
+    private boolean addNote(Neuron neuron) {
+      int duration = neuron.getDuration();
+      int tick = neuron.getTick();
+      if (tick == -1) {
+        tick = lastEndTick;
+      }
+      if (tick < lastStartTick || tick > (lastEndTick + SequenceBuilder.TICKS_PER_MEASURE)) {
+        System.out.println("addNote: recalculating baseTick");
+        baseTick = tick;
+        previousTicks = tickLength;
+      }
+      int adjustedTick = previousTicks + (tick - baseTick);
+      System.out.println("addNote: baseTick=" + baseTick + ", tick=" + tick + ", previousTicks=" + previousTicks + ", adjustedTick=" + adjustedTick + ", duration=" + duration);
+      neuron.setTick(adjustedTick);
+      lastStartTick = tick;
+      lastEndTick = tick + duration;
+      tickLength = Math.max(tickLength, adjustedTick + duration);
+      return notes.add(toNote(neuron));
     }
 
-    public void reset() {
-      notes = new DirectList<>();
+    private int append(int tick, int midiNote, int duration, int velocity, int program, int channel) {
+      Neuron neuron = new Neuron();
+      neuron.setChannel(channel);
+      neuron.setDuration(duration);
+      neuron.setNote(midiNote);
+      neuron.setProgram(program);
+      neuron.setTick(tick);
+      neuron.setVelocity(velocity);
+      addNote(neuron);
+      return notes.size();
     }
 
-    private String append(int tick, int midiNote, int duration, int velocity, int program, int channel) {
-      Note note = new NoteBuilder() //
-          .withTick(tick) //
-          .withMidiNote(midiNote) //
-          .withDuration(duration) //
-          .withVelocity(velocity) //
-          .withProgram(program) //
-          .withChannel(channel) //
-          .create();
-      notes.add(note);
-      return note.toString();
+    private int copy(int firstId, int lastId) {
+      try {
+        Connection connection = DriverManager.getConnection("jdbc:default:connection");
+        Database database = new Database(connection);
+        database.selectAllByClause(neuron -> addNote(neuron), Neuron.class, "where id >= " + firstId + " and id <= " + lastId);
+        return notes.size();
+      } catch (SQLException e) {
+        throw new RuntimeException(e);
+      }
     }
 
     private Synthesizer createSynthesizer() {
@@ -70,8 +100,21 @@ public class Derby {
       return synthesizer;
     }
 
+    private void play() {
+      transport.play(notes);
+    }
+
     private String program(int program) {
       return Instruments.getProgramName(program);
+    }
+
+    private void reset() {
+      baseTick = 0;
+      tickLength = 0;
+      lastEndTick = 0;
+      lastStartTick = 0;
+      previousTicks = 0;
+      notes = new DirectList<>();
     }
 
     private int round(int value, int toNearest) {
@@ -87,6 +130,18 @@ public class Derby {
       transport.setPercentTempo(percentTempo);
     }
 
+    private Note toNote(Neuron neuron) {
+      Note note = new NoteBuilder() //
+          .withChannel(neuron.getChannel()) //
+          .withDuration(neuron.getDuration()) //
+          .withMidiNote(neuron.getNote()) //
+          .withProgram(neuron.getProgram()) //
+          .withTick(neuron.getTick()) //
+          .withVelocity(neuron.getVelocity()) //
+          .create();
+      return note;
+    }
+
     private ResultSet transpose(int song, int amount) {
       try {
         Connection connection = DriverManager.getConnection("jdbc:default:connection");
@@ -100,8 +155,12 @@ public class Derby {
 
   private static DerbyImpl derbyImpl = new DerbyImpl();
 
-  public static String append(int tick, int note, int duration, int velocity, int program, int channel) {
+  public static int append(int tick, int note, int duration, int velocity, int program, int channel) {
     return derbyImpl.append(tick, note, duration, velocity, program, channel);
+  }
+
+  public static int copy(int firstId, int lastId) {
+    return derbyImpl.copy(firstId, lastId);
   }
 
   public static void play() {

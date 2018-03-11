@@ -27,7 +27,7 @@ import com.example.afs.musicpad.util.RandomAccessList;
 
 public class SequenceBuilder {
 
-  public static final int TICKS_PER_MEASURE = Default.RESOLUTION * 4; // TODO: Support more than just 4/4 time
+  public static final int TICKS_PER_MEASURE = Default.BEATS_PER_MEASURE * Default.TICKS_PER_BEAT; // TODO: Support more than just default time
 
   public static long roundTickToNextMeasure(long endingTick) {
     return ((endingTick + (TICKS_PER_MEASURE - 1)) / TICKS_PER_MEASURE) * TICKS_PER_MEASURE;
