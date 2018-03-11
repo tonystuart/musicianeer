@@ -53,10 +53,10 @@ public class Database {
     }
   }
 
-  public <T> void executeSelect(Consumer<T> consumer, Class<T> objectClass, StringBuilder s) {
+  public <T> void executeSelect(Consumer<T> consumer, Class<T> objectClass, String sql) {
     try {
       Method[] methods = objectClass.getMethods();
-      try (PreparedStatement statement = connection.prepareStatement(s.toString())) {
+      try (PreparedStatement statement = connection.prepareStatement(sql.toString())) {
         statement.execute();
         ResultSet resultSet = statement.getResultSet();
         while (resultSet.next()) {
@@ -65,7 +65,7 @@ public class Database {
             String name = method.getName();
             if (method.getParameterCount() == 1) {
               if (name.startsWith(SET)) {
-                String fieldName = quote(name.substring(SET.length()));
+                String fieldName = name.substring(SET.length()).toUpperCase();
                 Object value = resultSet.getObject(fieldName);
                 method.invoke(object, value);
               }
@@ -211,7 +211,7 @@ public class Database {
       if (clause != null) {
         s.append(clause + "\n");
       }
-      executeSelect(consumer, objectClass, s);
+      executeSelect(consumer, objectClass, s.toString());
     } catch (SecurityException | IllegalArgumentException e) {
       throw new RuntimeException(e);
     }
