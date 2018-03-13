@@ -87,26 +87,28 @@ public class Loader {
     long startMillis = System.currentTimeMillis();
     MidiLibrary midiLibrary = new MidiLibrary(path);
     for (File midiFile : midiLibrary) {
-      Song song = createSong(midiFile);
-      Key key = getKey(song);
-      Integer distanceToWhiteKeys = song.getDistanceToWhiteKeys();
-      if (distanceToWhiteKeys != null) {
-        int transpose = distanceToWhiteKeys;
-        song.transposeTo(transpose);
-      }
-      database.setAutoCommit(false);
-      for (Note note : song.getNotes()) {
-        Neuron neuron = createNeuron(songIndex, noteIndex, song, note, key);
-        database.insert(neuron);
-        noteIndex++;
-      }
-      database.setAutoCommit(true);
-      songIndex++;
-      long memoryInUse = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
-      long elapsedMillis = System.currentTimeMillis() - startMillis;
-      System.out.println(songIndex + " " + song.getTitle() + " " + noteIndex + " " + memoryInUse + " " + (elapsedMillis / 1000));
-      if (songIndex == 5) {
-        return;
+      try {
+        Song song = createSong(midiFile);
+        Key key = getKey(song);
+        Integer distanceToWhiteKeys = song.getDistanceToWhiteKeys();
+        if (distanceToWhiteKeys != null) {
+          int transpose = distanceToWhiteKeys;
+          song.transposeTo(transpose);
+        }
+        database.setAutoCommit(false);
+        for (Note note : song.getNotes()) {
+          Neuron neuron = createNeuron(songIndex, noteIndex, song, note, key);
+          database.insert(neuron);
+          noteIndex++;
+        }
+        database.setAutoCommit(true);
+        long memoryInUse = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+        long elapsedMillis = System.currentTimeMillis() - startMillis;
+        System.out.println(songIndex + " " + song.getTitle() + " " + noteIndex + " " + memoryInUse + " " + (elapsedMillis / 1000));
+        songIndex++;
+      } catch (RuntimeException e) {
+        System.err.println("Cannot store " + midiFile);
+        e.printStackTrace();
       }
     }
   }
