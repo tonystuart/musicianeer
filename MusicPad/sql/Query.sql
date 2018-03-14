@@ -60,3 +60,23 @@ select song, copy(min(id), max(id)) from neuron where song = 2 and measure = 12 
 select song, copy(min(id), max(id)) from neuron where song = 1 and measure = 13 group by song;
 select song, copy(min(id), max(id)) from neuron where song = 4 and measure = 11 group by song;
 call play();
+
+select append(tick, note, duration, velocity, program, channel) from neuron where measure = 10 order by tick;
+
+select append(tick, note, duration, velocity, program, channel) from neuron where line = 2 order by tick;
+
+select append(tick, note, 1024, velocity, 0, channel) from neuron where song = 5 and id < 500 order by tick;
+
+select song, min(id), max(id) from neuron group by song order by song fetch first 20 rows only;
+
+select append(tick, note, 1024, velocity, 0, channel) from neuron where id >= 8948 and id <= 12900 order by id;
+
+select song, line, min(id), max(id) from neuron group by song, line order by song;
+
+select distinct song, stanza, line from neuron order by song;
+
+select measure, id, stanza, line from neuron where song = 2 and line = 1;
+
+select append(tick, note, duration, velocity, 0, channel) from neuron where song = 2 and line = 1 order by tick;
+
+select append(tick, note, duration, velocity, 0, channel) from neuron where song = 2 and stanza = 1 order by tick;

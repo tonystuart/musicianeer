@@ -10,6 +10,9 @@
 package com.example.afs.frankenmusic.loader;
 
 import java.io.File;
+import java.util.NavigableMap;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 import com.example.afs.frankenmusic.db.Database;
 import com.example.afs.musicpad.analyzer.KeyScore;
@@ -21,6 +24,7 @@ import com.example.afs.musicpad.parser.SongListener;
 import com.example.afs.musicpad.song.Default;
 import com.example.afs.musicpad.song.Note;
 import com.example.afs.musicpad.song.Song;
+import com.example.afs.musicpad.song.Word;
 
 public class Loader {
 
@@ -66,6 +70,31 @@ public class Loader {
 
   }
 
+  public static class Structure {
+
+    private int line;
+    private int stanza;
+
+    public Structure(int stanza, int line) {
+      this.stanza = stanza;
+      this.line = line;
+    }
+
+    public int getLine() {
+      return line;
+    }
+
+    public int getStanza() {
+      return stanza;
+    }
+
+    @Override
+    public String toString() {
+      return "Structure [stanza=" + stanza + ", line=" + line + "]";
+    }
+
+  }
+
   public static void main(String[] args) {
     if (args.length != 1) {
       System.err.println("Usage: java " + Loader.class.getName() + " directory");
@@ -89,6 +118,28 @@ public class Loader {
     for (File midiFile : midiLibrary) {
       try {
         Song song = createSong(midiFile);
+        NavigableMap<Integer, Structure> measureStructure = new TreeMap<>();
+        measureStructure.put(-1, new Structure(0, 0)); // ensure there is a floor for any key
+        TreeSet<Word> words = song.getWords();
+        int stanza = 0;
+        int line = 0;
+        for (Word word : words) {
+          long tick = word.getTick();
+          String text = word.getText();
+          if (text.length() > 0) {
+            char firstChar = text.charAt(0);
+            if (firstChar == '\\') {
+              stanza++;
+              line++;
+            } else if (firstChar == '/') {
+              line++;
+            }
+          }
+          // This is not quite right, but it's consistent with Note.getMeasure()
+          int measure = (int) (tick / (song.getBeatsPerMeasure(tick) * Default.TICKS_PER_BEAT));
+          Structure structure = new Structure(stanza, line);
+          measureStructure.put(measure, structure);
+        }
         Key key = getKey(song);
         Integer distanceToWhiteKeys = song.getDistanceToWhiteKeys();
         if (distanceToWhiteKeys != null) {
@@ -97,7 +148,9 @@ public class Loader {
         }
         database.setAutoCommit(false);
         for (Note note : song.getNotes()) {
-          Neuron neuron = createNeuron(songIndex, noteIndex, song, note, key);
+          int measure = note.getMeasure();
+          Structure structure = measureStructure.floorEntry(measure).getValue();
+          Neuron neuron = createNeuron(songIndex, noteIndex, song, note, key, structure);
           database.insert(neuron);
           noteIndex++;
         }
@@ -113,7 +166,7 @@ public class Loader {
     }
   }
 
-  private Neuron createNeuron(int songIndex, int noteIndex, Song song, Note note, Key key) {
+  private Neuron createNeuron(int songIndex, int noteIndex, Song song, Note note, Key key, Structure structure) {
     int channel = note.getChannel();
     Neuron neuron = new Neuron();
     neuron.setAccidentals(key.getAccidentals());
@@ -123,7 +176,7 @@ public class Loader {
     neuron.setConcurrency(song.getConcurrency(channel));
     neuron.setDuration((int) note.getDuration());
     neuron.setId(noteIndex);
-    neuron.setLine(note.getLine());
+    neuron.setLine(structure.getLine());
     neuron.setMajor(key.getMajor());
     neuron.setMeasure(note.getMeasure());
     neuron.setMelody(song.getPercentMelody(channel));
@@ -133,7 +186,7 @@ public class Loader {
     neuron.setProgram(note.getProgram());
     neuron.setSeconds(song.getSeconds());
     neuron.setSong(songIndex);
-    neuron.setStanza(note.getStanza());
+    neuron.setStanza(structure.getStanza());
     neuron.setStart(note.getStartIndex());
     neuron.setStop(note.getEndIndex());
     neuron.setThirds(key.getThirds());
