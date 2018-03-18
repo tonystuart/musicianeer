@@ -127,7 +127,8 @@ public class Derby {
     }
 
     private void tempo(int percentTempo) {
-      transport.setPercentTempo(percentTempo);
+      // NB: MusicPad uses 0 to 100% for min to max with 50% for normal
+      transport.setPercentTempo(percentTempo / 2);
     }
 
     private Note toNote(Neuron neuron) {
