@@ -70,6 +70,31 @@ public class Loader {
 
   }
 
+  public class Name {
+
+    private int song;
+    private String name;
+
+    public Name(int song, String name) {
+      this.song = song;
+      this.name = name;
+    }
+
+    public String getName() {
+      return name;
+    }
+
+    public int getSong() {
+      return song;
+    }
+
+    @Override
+    public String toString() {
+      return "SongName [song=" + song + ", name=" + name + "]";
+    }
+
+  }
+
   public static class Structure {
 
     private int line;
@@ -147,6 +172,8 @@ public class Loader {
           song.transposeTo(transpose);
         }
         database.setAutoCommit(false);
+        Name name = new Name(songIndex, midiFile.getName());
+        database.insert(name);
         for (Note note : song.getNotes()) {
           int measure = note.getMeasure();
           Structure structure = measureStructure.floorEntry(measure).getValue();

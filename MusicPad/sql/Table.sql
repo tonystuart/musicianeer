@@ -10,6 +10,7 @@
 connect 'jdbc:derby://localhost:1527/Music;create=true;';
 
 drop table neuron;
+drop table name;
 
 create table neuron
 (
@@ -42,3 +43,12 @@ create table neuron
 	velocity integer
 );
 
+create index bpm_index on neuron(bpm);
+create index song_index on neuron(song);
+create index name_song_index on name(song);
+
+create table name
+(
+  song integer,
+  name varchar(255)
+);
