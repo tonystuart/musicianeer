@@ -46,24 +46,30 @@ public class Derby {
       reset();
     }
 
-    private boolean addNote(Neuron neuron) {
+    private void addNote(Neuron neuron) {
       int duration = neuron.getDuration();
       int tick = neuron.getTick();
       if (tick == -1) {
         tick = lastEndTick;
       }
       if (tick < lastStartTick || tick > (lastEndTick + SequenceBuilder.TICKS_PER_MEASURE)) {
-        System.out.println("addNote: recalculating baseTick");
         baseTick = tick;
+        int noteCount = notes.size();
+        if (noteCount > 0) {
+          int lastNoteIndex = noteCount - 1;
+          long desiredTick = notes.get(lastNoteIndex).getTick() - SequenceBuilder.TICKS_PER_MEASURE;
+          int noteIndex = findPreviousNoteIndex(desiredTick);
+          rampDown(noteIndex);
+          baseTick += SequenceBuilder.TICKS_PER_MEASURE;
+        }
         previousTicks = tickLength;
       }
       int adjustedTick = previousTicks + (tick - baseTick);
-      System.out.println("addNote: baseTick=" + baseTick + ", tick=" + tick + ", previousTicks=" + previousTicks + ", adjustedTick=" + adjustedTick + ", duration=" + duration);
       neuron.setTick(adjustedTick);
       lastStartTick = tick;
       lastEndTick = tick + duration;
       tickLength = Math.max(tickLength, adjustedTick + duration);
-      return notes.add(toNote(neuron));
+      notes.add(toNote(neuron));
     }
 
     private int append(int tick, int midiNote, int duration, int velocity, int program, int channel) {
@@ -100,12 +106,39 @@ public class Derby {
       return synthesizer;
     }
 
+    private int findPreviousNoteIndex(long desiredTick) {
+      int index = notes.size() - 1;
+      while (index > 0) {
+        Note note = notes.get(index);
+        if (note.getTick() < desiredTick) {
+          return index;
+        }
+        index--;
+      }
+      return 0;
+    }
+
     private void play() {
       transport.play(notes);
     }
 
     private String program(int program) {
       return Instruments.getProgramName(program);
+    }
+
+    private void rampDown(int noteIndex) {
+      int limit = notes.size();
+      int count = limit - noteIndex;
+      if (count > 0) {
+        double percent = 100;
+        double percentDelta = 100d / count;
+        for (int i = noteIndex; i < limit; i++) {
+          Note note = notes.get(i);
+          int velocity = (int) ((percent * note.getVelocity()) / 100);
+          notes.set(i, new NoteBuilder().withNote(note).withVelocity(velocity).create());
+          percent -= percentDelta;
+        }
+      }
     }
 
     private void reset() {
@@ -144,13 +177,7 @@ public class Derby {
     }
 
     private ResultSet transpose(int song, int amount) {
-      try {
-        Connection connection = DriverManager.getConnection("jdbc:default:connection");
-        System.out.println("Database connection is " + connection);
-        return null;
-      } catch (SQLException e) {
-        throw new RuntimeException(e);
-      }
+      return null;
     }
   }
 

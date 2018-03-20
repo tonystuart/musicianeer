@@ -54,11 +54,11 @@ order by
 select song, copy(min(id), max(id)) from neuron where song = 4 group by song;
 
 call reset();
-select song, copy(min(id), max(id)) from neuron where song = 4 and measure = 10 group by song;
-select song, copy(min(id), max(id)) from neuron where song = 3 and measure = 11 group by song;
-select song, copy(min(id), max(id)) from neuron where song = 2 and measure = 12 group by song;
-select song, copy(min(id), max(id)) from neuron where song = 1 and measure = 13 group by song;
-select song, copy(min(id), max(id)) from neuron where song = 4 and measure = 11 group by song;
+select song, copy(min(id), max(id)) from neuron where song = 4 and measure > 16 and measure < 32 group by song;
+select song, copy(min(id), max(id)) from neuron where song = 3 and measure > 16 and measure < 32 group by song;
+select song, copy(min(id), max(id)) from neuron where song = 2 and measure > 16 and measure < 32 group by song;
+select song, copy(min(id), max(id)) from neuron where song = 1 and measure > 16 and measure < 32 group by song;
+select song, copy(min(id), max(id)) from neuron where song = 4 and measure > 16 and measure < 32 group by song;
 call play();
 
 select append(tick, note, duration, velocity, program, channel) from neuron where measure = 10 order by tick;
@@ -80,3 +80,141 @@ select measure, id, stanza, line from neuron where song = 2 and line = 1;
 select append(tick, note, duration, velocity, 0, channel) from neuron where song = 2 and line = 1 order by tick;
 
 select append(tick, note, duration, velocity, 0, channel) from neuron where song = 2 and stanza = 1 order by tick;
+
+select bpm, count(distinct song) from neuron group by bpm order by bpm;
+
+select distinct bpm, name from neuron, name where neuron.song = name.song order by bpm;
+
+select distinct avg(bpm), name from neuron, name where neuron.song = name.song group by name order by bpm;
+
+select * from name;
+
+select * from neuron;
+
+select name, neuron.*
+from neuron, name
+where neuron.song = name.song;
+
+select name.song, name, avg(bpm) as "AVG(BPM)"
+from neuron, name
+where neuron.song = name.song
+group by name.song, name
+order by avg(bpm);
+
+select neuron.song, name, stanza, line, avg(bpm)
+from neuron, name
+where neuron.song = name.song
+and neuron.song = 394
+group by neuron.song, name, stanza, line
+order by name, stanza, line;
+
+select name, neuron.*
+from neuron, name
+where neuron.song = name.song
+and neuron.song = 394;
+
+call reset();
+select song, copy(min(id), max(id)) from neuron where song = 394 and measure < 32 group by song;
+call play();
+
+call tempo(150);
+call tempo(100);
+call tempo(50);
+
+call reset();
+select append(tick, note, duration, velocity, 0, channel)
+from neuron
+where song = 394
+and measure < 16
+order by tick;
+
+call reset();
+select append(tick, note, duration, velocity, 0, channel) from neuron where song = 4 and measure > 8 and measure <= 17;
+select append(tick, note, duration, velocity, 0, channel) from neuron where song = 3 and measure > 8 and measure <= 17;
+select append(tick, note, duration, velocity, 0, channel) from neuron where song = 2 and measure > 8 and measure <= 17;
+select append(tick, note, duration, velocity, 0, channel) from neuron where song = 1 and measure > 8 and measure <= 17;
+select append(tick, note, duration, velocity, 0, channel) from neuron where song = 4 and measure > 8 and measure <= 17;
+call play();
+
+select distinct measure from neuron where song in (1, 2, 3, 4);
+
+-- First measure (0) of song 4 has meta events
+-- Second measure (1) is drum intor
+-- Third measure (2) is first note
+
+call reset();
+select append(tick, note, duration, velocity, 0, channel) from neuron where song = 4 and measure >= 1 and measure < 2;
+call play();
+
+select distinct neuron.song, name, stanza, avg(bpm) as bpm, count(note) as notes
+from neuron, name
+where neuron.song = name.song
+group by neuron.song, name, stanza
+order by bpm, song, stanza;
+
+call reset();
+select append(tick, note, duration, velocity, 0, channel)
+from neuron
+where
+(song = 4
+or song = 420)
+and stanza = 1
+order by song, tick;
+call play();
+
+-- NB: program is 0-based, but most GM descriptions are 1-based
+-- so program index less than 8 means pianos 1 through 8
+
+case
+when program < 8 then 0 -- acoustic grand piano
+when program < 16 then 13 -- xylophone
+when program < 24 then 19 -- church organ
+when program < 32 then 25 -- acoustic guitar (steel)
+when program < 40 then 32 -- acoustic bass
+when program < 47 then 40 -- violin
+when program = 47 then 47 -- timpani
+when program < 56 then 48 -- string ensemble 1
+when program < 64 then 56 -- trumpet
+when program < 72 then 65 -- alto sax
+when program < 80 then 74 -- recorder
+when program < 88 then 82 -- synth lead 3 (calliope)
+when program < 96 then 88 -- synth pad 1 (new age)
+else 0 -- acoustic grand piano
+end
+
+call reset();
+select append(tick, note, duration, velocity, program, channel)
+from neuron
+where measure >= 8 and measure <= 16
+order by bpm, song;
+call play();
+
+call reset();
+select append
+(
+  tick,
+  note,
+  duration,
+  velocity,
+  case
+		when program < 8 then 0 -- acoustic grand piano
+		when program < 16 then 13 -- xylophone
+		when program < 24 then 19 -- church organ
+		when program < 32 then 25 -- acoustic guitar (steel)
+		when program < 40 then 32 -- acoustic bass
+		when program < 47 then 40 -- violin
+		when program = 47 then 47 -- timpani
+		when program < 56 then 48 -- string ensemble 1
+		when program < 64 then 56 -- trumpet
+		when program < 72 then 65 -- alto sax
+		when program < 80 then 74 -- recorder
+		when program < 88 then 82 -- synth lead 3 (calliope)
+		when program < 96 then 88 -- synth pad 1 (new age)
+		else 0 -- acoustic grand piano
+		end,
+  channel
+)
+from neuron
+where measure >= 8 and measure <= 16
+order by bpm, song;
+call play();
