@@ -183,6 +183,36 @@ else 0 -- acoustic grand piano
 end
 
 call reset();
+select append
+(
+  tick,
+  note,
+  duration,
+  velocity,
+  case
+    when program < 8 then 0 -- acoustic grand piano
+    when program < 16 then 13 -- xylophone
+    when program < 24 then 19 -- church organ
+    when program < 32 then 25 -- acoustic guitar (steel)
+    when program < 40 then 32 -- acoustic bass
+    when program < 47 then 40 -- violin
+    when program = 47 then 47 -- timpani
+    when program < 56 then 48 -- string ensemble 1
+    when program < 64 then 56 -- trumpet
+    when program < 72 then 65 -- alto sax
+    when program < 80 then 74 -- recorder
+    when program < 88 then 82 -- synth lead 3 (calliope)
+    when program < 96 then 88 -- synth pad 1 (new age)
+    else 0 -- acoustic grand piano
+    end,
+  channel
+)
+from neuron
+where measure >= 8 and measure <= 16
+order by bpm, song;
+call play();
+
+call reset();
 select append(tick, note, duration, velocity, program, channel)
 from neuron
 where measure >= 8 and measure <= 16
@@ -197,24 +227,150 @@ select append
   duration,
   velocity,
   case
-		when program < 8 then 0 -- acoustic grand piano
-		when program < 16 then 13 -- xylophone
-		when program < 24 then 19 -- church organ
-		when program < 32 then 25 -- acoustic guitar (steel)
-		when program < 40 then 32 -- acoustic bass
-		when program < 47 then 40 -- violin
-		when program = 47 then 47 -- timpani
-		when program < 56 then 48 -- string ensemble 1
-		when program < 64 then 56 -- trumpet
-		when program < 72 then 65 -- alto sax
-		when program < 80 then 74 -- recorder
-		when program < 88 then 82 -- synth lead 3 (calliope)
-		when program < 96 then 88 -- synth pad 1 (new age)
-		else 0 -- acoustic grand piano
-		end,
+    when program < 8 then 0 -- acoustic grand piano
+    when program < 16 then 13 -- xylophone
+    when program < 24 then 19 -- church organ
+    when program < 32 then 25 -- acoustic guitar (steel)
+    when program < 40 then 32 -- acoustic bass
+    when program < 47 then 40 -- violin
+    when program = 47 then 47 -- timpani
+    when program < 56 then 48 -- string ensemble 1
+    when program < 64 then 56 -- trumpet
+    when program < 72 then 65 -- alto sax
+    when program < 80 then 74 -- recorder
+    when program < 88 then 82 -- synth lead 3 (calliope)
+    when program < 96 then 88 -- synth pad 1 (new age)
+    else 0 -- acoustic grand piano
+    end,
   channel
 )
 from neuron
 where measure >= 8 and measure <= 16
-order by bpm, song;
+and song in (
+  select song
+  from neuron
+  group by song
+  having avg(bpm) > 100
+  and avg(bpm) < 150
+  order by avg(bpm)
+)
+order by song, tick;
 call play();
+
+drop view neuron_bpm;
+create view neuron_bpm as
+  select song, avg(bpm) as avg_bpm
+  from neuron
+  group by song
+  order by avg(bpm);
+
+call reset();
+select append
+(
+  n1.tick,
+  n1.note,
+  n1.duration,
+  n1.velocity,
+  case
+    when n1.program < 8 then 0 -- acoustic grand piano
+    when n1.program < 16 then 13 -- xylophone
+    when n1.program < 24 then 19 -- church organ
+    when n1.program < 32 then 25 -- acoustic guitar (steel)
+    when n1.program < 40 then 32 -- acoustic bass
+    when n1.program < 47 then 40 -- violin
+    when n1.program = 47 then 47 -- timpani
+    when n1.program < 56 then 48 -- string ensemble 1
+    when n1.program < 64 then 56 -- trumpet
+    when n1.program < 72 then 65 -- alto sax
+    when n1.program < 80 then 74 -- recorder
+    when n1.program < 88 then 82 -- synth lead 3 (calliope)
+    when n1.program < 96 then 88 -- synth pad 1 (new age)
+    else 0 -- acoustic grand piano
+    end,
+  n1.channel
+)
+from neuron as n1, neuron_bpm as n2
+where n1.song = n2.song
+and n2.avg_bpm >= 100
+and n2.avg_bpm <= 150
+and n1.measure >= 8
+and n1.measure <= 12
+order by n2.avg_bpm, n1.tick;
+call play();
+
+call stop();
+
+select song,
+  measure,
+  bpm
+from neuron
+where measure >= 8 and measure <= 16
+order by bpm, song;
+
+select song, avg(bpm) as avg_bpm
+from neuron
+group by song
+order by avg_bpm;
+
+select distinct neuron.song, name, max(measure) as max_measure
+from neuron, name
+where neuron.song = name.song
+group by neuron.song, name
+order by max_measure, song;
+
+drop view neuron_name;
+create view neuron_name as
+select name.name, neuron.*
+from name, neuron
+where neuron.song = name.song;
+
+select distinct song, name
+from neuron_name
+where program >= 56
+and program <= 63;
+
+drop view neuron_brass;
+create view neuron_brass as
+  select distinct song
+  from neuron
+  where program >= 56
+  and program <= 63;
+
+select * from neuron_brass;
+
+call reset();
+select append
+(
+  n1.tick,
+  n1.note,
+  n1.duration,
+  n1.velocity,
+  case
+    when n1.program < 8 then 0 -- acoustic grand piano
+    when n1.program < 16 then 13 -- xylophone
+    when n1.program < 24 then 19 -- church organ
+    when n1.program < 32 then 25 -- acoustic guitar (steel)
+    when n1.program < 40 then 32 -- acoustic bass
+    when n1.program < 47 then 40 -- violin
+    when n1.program = 47 then 47 -- timpani
+    when n1.program < 56 then 48 -- string ensemble 1
+    when n1.program < 64 then 56 -- trumpet
+    when n1.program < 72 then 65 -- alto sax
+    when n1.program < 80 then 74 -- recorder
+    when n1.program < 88 then 82 -- synth lead 3 (calliope)
+    when n1.program < 96 then 88 -- synth pad 1 (new age)
+    else 0 -- acoustic grand piano
+    end,
+  n1.channel
+)
+from neuron as n1, neuron_bpm as n2, neuron_brass as n3
+where n1.song = n2.song
+and n2.song = n3.song
+and n2.avg_bpm >= 100
+and n2.avg_bpm <= 150
+and n1.measure >= 8
+and n1.measure <= 12
+order by n2.avg_bpm, n1.tick;
+call play();
+
+call stop();
