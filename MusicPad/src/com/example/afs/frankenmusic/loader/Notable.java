@@ -9,7 +9,7 @@
 
 package com.example.afs.frankenmusic.loader;
 
-public class Neuron {
+public class Notable {
   private int accidentals;
   private int beats;
   private int bpm;
@@ -256,6 +256,6 @@ public class Neuron {
 
   @Override
   public String toString() {
-    return "Neuron [accidentals=" + accidentals + ", beats=" + beats + ", bpm=" + bpm + ", channel=" + channel + ", concurrency=" + concurrency + ", duration=" + duration + ", id=" + id + ", line=" + line + ", major=" + major + ", measure=" + measure + ", melody=" + melody + ", note=" + note + ", occupancy=" + occupancy + ", parts=" + parts + ", program=" + program + ", seconds=" + seconds + ", song=" + song + ", stanza=" + stanza + ", start=" + start + ", stop=" + stop + ", thirds=" + thirds + ", tick=" + tick + ", tonic=" + tonic + ", transpose=" + transpose + ", triads=" + triads + ", unit=" + unit + ", velocity=" + velocity + "]";
+    return "Notable [accidentals=" + accidentals + ", beats=" + beats + ", bpm=" + bpm + ", channel=" + channel + ", concurrency=" + concurrency + ", duration=" + duration + ", id=" + id + ", line=" + line + ", major=" + major + ", measure=" + measure + ", melody=" + melody + ", note=" + note + ", occupancy=" + occupancy + ", parts=" + parts + ", program=" + program + ", seconds=" + seconds + ", song=" + song + ", stanza=" + stanza + ", start=" + start + ", stop=" + stop + ", thirds=" + thirds + ", tick=" + tick + ", tonic=" + tonic + ", transpose=" + transpose + ", triads=" + triads + ", unit=" + unit + ", velocity=" + velocity + "]";
   }
 }

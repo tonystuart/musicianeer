@@ -28,98 +28,6 @@ import com.example.afs.musicpad.song.Word;
 
 public class Loader {
 
-  public static class Key {
-    private int tonic;
-    private int major;
-    private int accidentals;
-    private int triads;
-    private int thirds;
-
-    public Key(int tonic, int major, int accidentals, int triads, int thirds) {
-      this.tonic = tonic;
-      this.major = major;
-      this.accidentals = accidentals;
-      this.triads = triads;
-      this.thirds = thirds;
-    }
-
-    public int getAccidentals() {
-      return accidentals;
-    }
-
-    public int getMajor() {
-      return major;
-    }
-
-    public int getThirds() {
-      return thirds;
-    }
-
-    public int getTonic() {
-      return tonic;
-    }
-
-    public int getTriads() {
-      return triads;
-    }
-
-    @Override
-    public String toString() {
-      return "Key [tonic=" + tonic + ", major=" + major + ", accidentals=" + accidentals + ", triads=" + triads + ", thirds=" + thirds + "]";
-    }
-
-  }
-
-  public class Name {
-
-    private int song;
-    private String name;
-
-    public Name(int song, String name) {
-      this.song = song;
-      this.name = name;
-    }
-
-    public String getName() {
-      return name;
-    }
-
-    public int getSong() {
-      return song;
-    }
-
-    @Override
-    public String toString() {
-      return "SongName [song=" + song + ", name=" + name + "]";
-    }
-
-  }
-
-  public static class Structure {
-
-    private int line;
-    private int stanza;
-
-    public Structure(int stanza, int line) {
-      this.stanza = stanza;
-      this.line = line;
-    }
-
-    public int getLine() {
-      return line;
-    }
-
-    public int getStanza() {
-      return stanza;
-    }
-
-    @Override
-    public String toString() {
-      return "Structure [stanza=" + stanza + ", line=" + line + "]";
-    }
-
-  }
-
   public static void main(String[] args) {
     if (args.length != 1) {
       System.err.println("Usage: java " + Loader.class.getName() + " directory");
@@ -165,7 +73,7 @@ public class Loader {
           Structure structure = new Structure(stanza, line);
           measureStructure.put(measure, structure);
         }
-        Key key = getKey(song);
+        KeyScore keyScore = getKeyScore(song);
         Integer distanceToWhiteKeys = song.getDistanceToWhiteKeys();
         if (distanceToWhiteKeys != null) {
           int transpose = distanceToWhiteKeys;
@@ -177,8 +85,8 @@ public class Loader {
         for (Note note : song.getNotes()) {
           int measure = note.getMeasure();
           Structure structure = measureStructure.floorEntry(measure).getValue();
-          Neuron neuron = createNeuron(songIndex, noteIndex, song, note, key, structure);
-          database.insert(neuron);
+          Notable notable = createNotable(songIndex, noteIndex, song, note, keyScore, structure);
+          database.insert(notable);
           noteIndex++;
         }
         database.setAutoCommit(true);
@@ -193,37 +101,37 @@ public class Loader {
     }
   }
 
-  private Neuron createNeuron(int songIndex, int noteIndex, Song song, Note note, Key key, Structure structure) {
+  private Notable createNotable(int songIndex, int noteIndex, Song song, Note note, KeyScore keyScore, Structure structure) {
     int channel = note.getChannel();
-    Neuron neuron = new Neuron();
-    neuron.setAccidentals(key.getAccidentals());
-    neuron.setBeats(note.getBeatsPerMeasure());
-    neuron.setBpm(note.getBeatsPerMinute());
-    neuron.setChannel(channel);
-    neuron.setConcurrency(song.getConcurrency(channel));
-    neuron.setDuration((int) note.getDuration());
-    neuron.setId(noteIndex);
-    neuron.setLine(structure.getLine());
-    neuron.setMajor(key.getMajor());
-    neuron.setMeasure(note.getMeasure());
-    neuron.setMelody(song.getPercentMelody(channel));
-    neuron.setNote(note.getMidiNote());
-    neuron.setOccupancy(song.getOccupancy(channel));
-    neuron.setParts(song.getActiveChannelCount());
-    neuron.setProgram(note.getProgram());
-    neuron.setSeconds(song.getSeconds());
-    neuron.setSong(songIndex);
-    neuron.setStanza(structure.getStanza());
-    neuron.setStart(note.getStartIndex());
-    neuron.setStop(note.getEndIndex());
-    neuron.setThirds(key.getThirds());
-    neuron.setTick((int) note.getTick());
-    neuron.setTonic(key.getTonic());
-    neuron.setTranspose(song.getTransposition());
-    neuron.setTriads(key.getTriads());
-    neuron.setUnit(note.getBeatUnit());
-    neuron.setVelocity(note.getVelocity());
-    return neuron;
+    Notable notable = new Notable();
+    notable.setAccidentals(keyScore.getAccidentals());
+    notable.setBeats(note.getBeatsPerMeasure());
+    notable.setBpm(note.getBeatsPerMinute());
+    notable.setChannel(channel);
+    notable.setConcurrency(song.getConcurrency(channel));
+    notable.setDuration((int) note.getDuration());
+    notable.setId(noteIndex);
+    notable.setLine(structure.getLine());
+    notable.setMajor(keyScore.isMajor() ? 1 : 0);
+    notable.setMeasure(note.getMeasure());
+    notable.setMelody(song.getPercentMelody(channel));
+    notable.setNote(note.getMidiNote());
+    notable.setOccupancy(song.getOccupancy(channel));
+    notable.setParts(song.getActiveChannelCount());
+    notable.setProgram(note.getProgram());
+    notable.setSeconds(song.getSeconds());
+    notable.setSong(songIndex);
+    notable.setStanza(structure.getStanza());
+    notable.setStart(note.getStartIndex());
+    notable.setStop(note.getEndIndex());
+    notable.setThirds(keyScore.getThirds());
+    notable.setTick((int) note.getTick());
+    notable.setTonic(keyScore.getTonic());
+    notable.setTranspose(song.getTransposition());
+    notable.setTriads(keyScore.getTriads());
+    notable.setUnit(note.getBeatUnit());
+    notable.setVelocity(note.getVelocity());
+    return notable;
   }
 
   private Song createSong(File file) {
@@ -234,7 +142,7 @@ public class Loader {
     return song;
   }
 
-  private Key getKey(Song song) {
+  private KeyScore getKeyScore(Song song) {
     int[] noteCounts = new int[Midi.SEMITONES_PER_OCTAVE];
     for (int channel = 0; channel < Midi.CHANNELS; channel++) {
       if (song.getChannelNoteCount(channel) > 0) {
@@ -246,24 +154,16 @@ public class Loader {
         }
       }
     }
-    int tonic = -1;
-    int major = -1;
-    int accidentals = -1;
-    int triads = -1;
-    int thirds = -1;
+    KeyScore topKeyScore = null;
     KeyScore[] keyScores = KeySignatures.getKeyScores(noteCounts);
-    for (int i = 0; i < keyScores.length && tonic == -1; i++) {
+    for (int i = 0; i < keyScores.length && topKeyScore == null; i++) {
       KeyScore keyScore = keyScores[i];
       int rank = keyScore.getRank();
       if (rank == 1) {
-        tonic = keyScore.getTonic();
-        major = keyScore.isMajor() ? 1 : 0;
-        accidentals = keyScore.getAccidentals();
-        triads = keyScore.getTriads();
-        thirds = keyScore.getThirds();
+        topKeyScore = keyScore;
       }
     }
-    return new Key(tonic, major, accidentals, triads, thirds);
+    return topKeyScore;
   }
 
 }

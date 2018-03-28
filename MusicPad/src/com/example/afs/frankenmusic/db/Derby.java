@@ -16,7 +16,7 @@ import java.sql.SQLException;
 
 import com.example.afs.fluidsynth.Synthesizer;
 import com.example.afs.fluidsynth.Synthesizer.Settings;
-import com.example.afs.frankenmusic.loader.Neuron;
+import com.example.afs.frankenmusic.loader.Notable;
 import com.example.afs.frankenmusic.midi.SequenceBuilder;
 import com.example.afs.jni.FluidSynth;
 import com.example.afs.musicpad.midi.Instruments;
@@ -46,9 +46,9 @@ public class Derby {
       reset();
     }
 
-    private void addNote(Neuron neuron) {
-      int duration = neuron.getDuration();
-      int tick = neuron.getTick();
+    private void addNote(Notable notable) {
+      int duration = notable.getDuration();
+      int tick = notable.getTick();
       if (tick == -1) {
         tick = lastEndTick;
       }
@@ -65,22 +65,22 @@ public class Derby {
         previousTicks = tickLength;
       }
       int adjustedTick = previousTicks + (tick - baseTick);
-      neuron.setTick(adjustedTick);
+      notable.setTick(adjustedTick);
       lastStartTick = tick;
       lastEndTick = tick + duration;
       tickLength = Math.max(tickLength, adjustedTick + duration);
-      notes.add(toNote(neuron));
+      notes.add(toNote(notable));
     }
 
     private int append(int tick, int midiNote, int duration, int velocity, int program, int channel) {
-      Neuron neuron = new Neuron();
-      neuron.setChannel(channel);
-      neuron.setDuration(duration);
-      neuron.setNote(midiNote);
-      neuron.setProgram(program);
-      neuron.setTick(tick);
-      neuron.setVelocity(velocity);
-      addNote(neuron);
+      Notable notable = new Notable();
+      notable.setChannel(channel);
+      notable.setDuration(duration);
+      notable.setNote(midiNote);
+      notable.setProgram(program);
+      notable.setTick(tick);
+      notable.setVelocity(velocity);
+      addNote(notable);
       return notes.size();
     }
 
@@ -88,7 +88,7 @@ public class Derby {
       try {
         Connection connection = DriverManager.getConnection("jdbc:default:connection");
         Database database = new Database(connection);
-        database.selectAllByClause(neuron -> addNote(neuron), Neuron.class, "where id >= " + firstId + " and id <= " + lastId);
+        database.selectAllByClause(notable -> addNote(notable), Notable.class, "where id >= " + firstId + " and id <= " + lastId);
         return notes.size();
       } catch (SQLException e) {
         throw new RuntimeException(e);
@@ -164,14 +164,14 @@ public class Derby {
       transport.setPercentTempo(percentTempo / 2);
     }
 
-    private Note toNote(Neuron neuron) {
+    private Note toNote(Notable notable) {
       Note note = new NoteBuilder() //
-          .withChannel(neuron.getChannel()) //
-          .withDuration(neuron.getDuration()) //
-          .withMidiNote(neuron.getNote()) //
-          .withProgram(neuron.getProgram()) //
-          .withTick(neuron.getTick()) //
-          .withVelocity(neuron.getVelocity()) //
+          .withChannel(notable.getChannel()) //
+          .withDuration(notable.getDuration()) //
+          .withMidiNote(notable.getNote()) //
+          .withProgram(notable.getProgram()) //
+          .withTick(notable.getTick()) //
+          .withVelocity(notable.getVelocity()) //
           .create();
       return note;
     }
