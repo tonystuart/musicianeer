@@ -26,6 +26,7 @@ import com.example.afs.musicpad.task.MessageTask;
 import com.example.afs.musicpad.webapp.example.ExampleWebAppFactory;
 import com.example.afs.musicpad.webapp.karaoke.KaraokeWebAppFactory;
 import com.example.afs.musicpad.webapp.mapper.MapperWebAppFactory;
+import com.example.afs.musicpad.webapp.musicianeer.MusicianeerWebAppFactory;
 import com.example.afs.musicpad.webapp.staff.StaffWebAppFactory;
 
 public class WebServer extends MessageTask {
@@ -38,6 +39,7 @@ public class WebServer extends MessageTask {
   private KaraokeWebAppFactory karaokeWebAppFactory;
   private StaffWebAppFactory staffWebAppFactory;
   private MapperWebAppFactory mapperWebAppFactory;
+  private MusicianeerWebAppFactory musicianeerWebAppFactory;
 
   public WebServer(MessageBroker broker) {
     super(broker);
@@ -45,6 +47,7 @@ public class WebServer extends MessageTask {
     karaokeWebAppFactory = new KaraokeWebAppFactory(tsGetBroker());
     staffWebAppFactory = new StaffWebAppFactory(tsGetBroker());
     mapperWebAppFactory = new MapperWebAppFactory(tsGetBroker());
+    musicianeerWebAppFactory = new MusicianeerWebAppFactory(tsGetBroker());
     createServer();
   }
 
@@ -84,6 +87,12 @@ public class WebServer extends MessageTask {
     return servletHolder;
   }
 
+  private ServletHolder createMusicianeerServlet() {
+    WebAppServlet musicianeerServlet = new WebAppServlet(musicianeerWebAppFactory);
+    ServletHolder servletHolder = new ServletHolder("MusicianeerServlet", musicianeerServlet);
+    return servletHolder;
+  }
+
   private ServletHolder createRestServlet() {
     RestServlet restServlet = new RestServlet();
     ServletHolder restServletHolder = new ServletHolder(restServlet);
@@ -102,6 +111,7 @@ public class WebServer extends MessageTask {
     context.addServlet(createKaraokeServlet(), "/v1/karaoke/*");
     context.addServlet(createStaffServlet(), "/v1/staff/*");
     context.addServlet(createMapperServlet(), "/v1/mapper/*");
+    context.addServlet(createMusicianeerServlet(), "/v1/musicianeer/*");
     HandlerCollection handlers = new HandlerCollection();
     handlers.setHandlers(new Handler[] {
         context,
