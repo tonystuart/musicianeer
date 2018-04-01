@@ -44,6 +44,18 @@ public abstract class ControllerTask extends ServiceTask {
     // Defer processing that could send shadow update messages until here
   }
 
+  protected void doMouseDown(String id) {
+  }
+
+  protected void doMouseOut(String id) {
+  }
+
+  protected void doMouseOver(String id) {
+  }
+
+  protected void doMouseUp(String id) {
+  }
+
   protected void doMove(String id, String value) {
   }
 
@@ -52,20 +64,32 @@ public abstract class ControllerTask extends ServiceTask {
 
   private void doBrowserEvent(OnBrowserEvent message) {
     switch (message.getAction()) {
-    case LOAD:
-      doLoad();
-      break;
     case CLICK:
       doClick(message.getId());
       break;
     case INPUT:
       doInput(message.getId(), message.getValue());
       break;
-    case SUBMIT:
-      doSubmit(message.getId(), message.getValue());
+    case LOAD:
+      doLoad();
       break;
     case MOVE:
       doMove(message.getId(), message.getValue());
+      break;
+    case MOUSE_DOWN:
+      doMouseDown(message.getId());
+      break;
+    case MOUSE_OUT:
+      doMouseOut(message.getId());
+      break;
+    case MOUSE_OVER:
+      doMouseOver(message.getId());
+      break;
+    case MOUSE_UP:
+      doMouseUp(message.getId());
+      break;
+    case SUBMIT:
+      doSubmit(message.getId(), message.getValue());
       break;
     default:
       throw new UnsupportedOperationException();

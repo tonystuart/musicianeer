@@ -54,6 +54,18 @@ musicPad.ensureVisible = function(element) {
     }
 }
 
+musicPad.fireBrowserEvent = function(action, event) {
+    let id = event.target.id;
+    if (!id) {
+        id = event.target.closest('[id]').id;
+    }
+    musicPad.send(JSON.stringify({
+        type: 'OnBrowserEvent',
+        action: action,
+        id: id
+    }));
+}
+
 musicPad.getScrollParent = function(node) {
     if (node == null) {
         return null;
@@ -66,15 +78,7 @@ musicPad.getScrollParent = function(node) {
 }
 
 musicPad.onClick = function(event) {
-    let id = event.target.id;
-    if (!id) {
-        id = event.target.closest('[id]').id;
-    }
-    musicPad.send(JSON.stringify({
-        type: 'OnBrowserEvent',
-        action: 'CLICK',
-        id: id
-    }));
+    musicPad.fireBrowserEvent('CLICK', event);
 }
 
 musicPad.onInput = function(event, value) {
@@ -85,6 +89,22 @@ musicPad.onInput = function(event, value) {
         id: id,
         value: value
     }));
+}
+
+musicPad.onMouseDown = function(event) {
+    musicPad.fireBrowserEvent('MOUSE_DOWN', event);
+}
+
+musicPad.onMouseOut = function(event) {
+    musicPad.fireBrowserEvent('MOUSE_OUT', event);
+}
+
+musicPad.onMouseOver = function(event) {
+    musicPad.fireBrowserEvent('MOUSE_OVER', event);
+}
+
+musicPad.onMouseUp = function(event) {
+    musicPad.fireBrowserEvent('MOUSE_UP', event);
 }
 
 musicPad.onMoveDrop = function(event) {
