@@ -47,6 +47,26 @@ public class MusicianeerController extends ControllerTask {
     musicianeerView.setAlternative("full");
   }
 
+  @Override
+  protected void doMouseDown(String id) {
+    System.out.println("doMouseDown: id=" + id);
+  }
+
+  @Override
+  protected void doMouseOut(String id) {
+    System.out.println("doMouseOut: id=" + id);
+  }
+
+  @Override
+  protected void doMouseOver(String id) {
+    System.out.println("doMouseOver: id=" + id);
+  }
+
+  @Override
+  protected void doMouseUp(String id) {
+    System.out.println("doMouseUp: id=" + id);
+  }
+
   private void doCommand(OnCommand message) {
   }
 

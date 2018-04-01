@@ -78,8 +78,8 @@ public class MusicianeerView extends ShadowDomBuilder {
                     .add(alternative("accompaniment", "Piano")) //
                     .add(alternative("accompaniment", "Rhythm")) //
                     .add(alternative("accompaniment", "Drums")) //
-                    .add(alternative("accompaniment", "Solo")) //
-    )))); //
+                    .add(alternative("accompaniment", "Solo"))))) //
+        .addMouseUpHandler()); //
   }
 
   public void setAlternative(String id) {
@@ -110,7 +110,9 @@ public class MusicianeerView extends ShadowDomBuilder {
 
   private Division key(int midiKey, String className) {
     Division key = div("#midi-key-" + midiKey, "." + className);
-    key.addClickHandler();
+    key.addMouseDownHandler();
+    key.addMouseOutHandler();
+    key.addMouseOverHandler();
     key.add(div("." + className + "-led"));
     return key;
   }
