@@ -47,10 +47,35 @@ public class Element extends Node {
   }
 
   public Element addClickHandler() {
+    addHandler("onClick");
+    return this;
+  }
+
+  public Element addHandler(String handler) {
     if (getId() == null) {
       throw new IllegalStateException();
     }
-    setProperty("onclick", "musicPad.onClick(event)");
+    setProperty(handler.toLowerCase(), "musicPad." + handler + "(event)");
+    return this;
+  }
+
+  public Element addMouseDownHandler() {
+    addHandler("onMouseDown");
+    return this;
+  }
+
+  public Element addMouseOutHandler() {
+    addHandler("onMouseOut");
+    return this;
+  }
+
+  public Element addMouseOverHandler() {
+    addHandler("onMouseOver");
+    return this;
+  }
+
+  public Element addMouseUpHandler() {
+    addHandler("onMouseUp");
     return this;
   }
 
