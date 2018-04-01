@@ -29,6 +29,7 @@ public class MusicianeerController extends ControllerTask {
 
   @Override
   protected void doClick(String id) {
+    System.out.println("doClick: id=" + id);
     if (id.startsWith("item-")) {
       musicianeerView.selectElement(id, "selected-item");
     }
@@ -36,11 +37,14 @@ public class MusicianeerController extends ControllerTask {
 
   @Override
   protected void doInput(String id, String value) {
+    System.out.println("doInput: id=" + id + ", value=" + value);
   }
 
   @Override
   protected void doLoad() {
     addShadowUpdate(new OnShadowUpdate(Action.REPLACE_CHILDREN, "body", musicianeerView.render()));
+    musicianeerView.setAlternative("lead");
+    musicianeerView.setAlternative("full");
   }
 
   private void doCommand(OnCommand message) {
