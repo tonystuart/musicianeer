@@ -72,6 +72,9 @@ public class MusicianeerController extends ControllerTask {
   @Override
   protected void doMouseOut(String id) {
     System.out.println("doMouseOut: id=" + id);
+    if (isDown) {
+      musicianeer.release();
+    }
   }
 
   @Override
@@ -86,10 +89,8 @@ public class MusicianeerController extends ControllerTask {
   @Override
   protected void doMouseUp(String id) {
     System.out.println("doMouseUp: id=" + id);
-    if (id.startsWith("midi-note-")) {
-      musicianeer.release();
-      isDown = false;
-    }
+    musicianeer.release();
+    isDown = false;
   }
 
   private void doSong(OnSong message) {
