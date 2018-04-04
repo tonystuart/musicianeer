@@ -9,29 +9,41 @@
 
 package com.example.afs.musicpad.webapp.musicianeer;
 
-import com.example.afs.musicpad.message.OnCommand;
-import com.example.afs.musicpad.message.OnDeviceCommand;
 import com.example.afs.musicpad.message.OnShadowUpdate;
 import com.example.afs.musicpad.message.OnShadowUpdate.Action;
 import com.example.afs.musicpad.task.ControllerTask;
 import com.example.afs.musicpad.task.MessageBroker;
+import com.example.afs.musicpad.webapp.musicianeer.Musicianeer.SelectType;
 
 public class MusicianeerController extends ControllerTask {
 
+  private boolean isDown;
+  private Musicianeer musicianeer;
   private MusicianeerView musicianeerView;
 
-  public MusicianeerController(MessageBroker broker) {
-    super(broker);
+  public MusicianeerController(MessageBroker messageBroker) {
+    super(messageBroker);
     musicianeerView = new MusicianeerView(this);
-    subscribe(OnCommand.class, message -> doCommand(message));
-    subscribe(OnDeviceCommand.class, message -> doDeviceCommand(message));
+    subscribe(OnSong.class, message -> doSong(message));
+    musicianeer = new Musicianeer(messageBroker);
   }
 
   @Override
   protected void doClick(String id) {
     System.out.println("doClick: id=" + id);
-    if (id.startsWith("item-")) {
-      musicianeerView.selectElement(id, "selected-item");
+    switch (id) {
+    case "play":
+      musicianeer.play();
+      break;
+    case "left-single":
+      musicianeer.selectSong(SelectType.PREVIOUS);
+      break;
+    case "right-single":
+      musicianeer.selectSong(SelectType.NEXT);
+      break;
+    case "stop":
+      musicianeer.stop();
+      break;
     }
   }
 
@@ -50,6 +62,11 @@ public class MusicianeerController extends ControllerTask {
   @Override
   protected void doMouseDown(String id) {
     System.out.println("doMouseDown: id=" + id);
+    if (id.startsWith("midi-note-")) {
+      int midiNote = Integer.parseInt(id.substring("midi-note-".length()));
+      musicianeer.press(midiNote);
+      isDown = true;
+    }
   }
 
   @Override
@@ -60,17 +77,24 @@ public class MusicianeerController extends ControllerTask {
   @Override
   protected void doMouseOver(String id) {
     System.out.println("doMouseOver: id=" + id);
+    if (isDown && id.startsWith("midi-note-")) {
+      int midiNote = Integer.parseInt(id.substring("midi-note-".length()));
+      musicianeer.press(midiNote);
+    }
   }
 
   @Override
   protected void doMouseUp(String id) {
     System.out.println("doMouseUp: id=" + id);
+    if (id.startsWith("midi-note-")) {
+      musicianeer.release();
+      isDown = false;
+    }
   }
 
-  private void doCommand(OnCommand message) {
-  }
-
-  private void doDeviceCommand(OnDeviceCommand message) {
+  private void doSong(OnSong message) {
+    System.out.println("title=" + message.getSong().getTitle());
+    musicianeerView.setSongTitle(message.getSong().getTitle());
   }
 
 }

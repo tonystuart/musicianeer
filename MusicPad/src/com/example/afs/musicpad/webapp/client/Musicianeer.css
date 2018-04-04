@@ -49,6 +49,9 @@ fieldset {
 #song-title {
 	flex-grow: 1;
 	text-align: center;
+	width: 300px;
+	height: 1em;
+	overflow: hidden;
 }
 .keyboard {
 	display: flex;

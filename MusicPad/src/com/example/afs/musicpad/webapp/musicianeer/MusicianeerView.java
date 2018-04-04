@@ -28,8 +28,10 @@ public class MusicianeerView extends ShadowDomBuilder {
             .add(div(".song") //
                 .add(clicker("left-group", "<<")) //
                 .add(clicker("left-single", "<")) //
+                .add(clicker("stop", "STOP")) //
                 .add(div("#song-title") //
                     .add(text("Title of current song"))) //
+                .add(clicker("play", "PLAY")) //
                 .add(clicker("right-single", ">")) //
                 .add(clicker("right-group", ">>"))) //
             .add(div(".keyboard") //
@@ -89,6 +91,11 @@ public class MusicianeerView extends ShadowDomBuilder {
     }
   }
 
+  public void setSongTitle(String titleText) {
+    Division songTitle = getElementById("song-title");
+    replaceChildren(songTitle, text(titleText));
+  }
+
   private Parent alternative(String name, String legend) {
     return label() // 
         .add(radio("#" + legend.toLowerCase()) //
@@ -98,8 +105,8 @@ public class MusicianeerView extends ShadowDomBuilder {
         .add(text(legend));
   }
 
-  private Division blackKey(int midiKey) {
-    return key(midiKey, "black-key");
+  private Division blackKey(int midiNote) {
+    return key(midiNote, "black-key");
   }
 
   private Element clicker(String id, String legend) {
@@ -108,8 +115,8 @@ public class MusicianeerView extends ShadowDomBuilder {
         .addClickHandler();
   }
 
-  private Division key(int midiKey, String className) {
-    Division key = div("#midi-key-" + midiKey, "." + className);
+  private Division key(int midiNote, String className) {
+    Division key = div("#midi-note-" + midiNote, "." + className);
     key.addMouseDownHandler();
     key.addMouseOutHandler();
     key.addMouseOverHandler();
@@ -126,8 +133,8 @@ public class MusicianeerView extends ShadowDomBuilder {
     return div;
   }
 
-  private Division whiteKey(int midiKey) {
-    return key(midiKey, "white-key");
+  private Division whiteKey(int midiNote) {
+    return key(midiNote, "white-key");
   }
 
 }
