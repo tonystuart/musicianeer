@@ -76,8 +76,11 @@ public class Musicianeer {
     FOLLOW, LEAD
   }
 
-  private int channel = 0;
+  private int lastProgram;
+  private int melodyChannel;
   private int midiNote = -1;
+  private int programOverride = 127;
+
   private Transport transport;
   private SongLibrary songLibrary;
   private Synthesizer synthesizer;
@@ -85,12 +88,11 @@ public class Musicianeer {
   private Random random = new Random();
   private TrackingType trackingType = TrackingType.LEAD;
   private AccompanimentType accompanimentType = AccompanimentType.FULL;
-  private int program;
 
   public Musicianeer(MessageBroker messageBroker) {
     this.messageBroker = messageBroker;
     synthesizer = createSynthesizer();
-    transport = new Transport(synthesizer);
+    transport = new Transport(synthesizer, tick -> onTick(tick), midiNote -> onMidiNote(midiNote), program -> onProgram(program));
     String path = System.getProperty("midiLibraryPath");
     if (path == null) {
       throw new IllegalStateException("midiLibraryPath property not set");
@@ -105,21 +107,21 @@ public class Musicianeer {
   public void play() {
     Song song = songLibrary.getSong();
     if (song != null) {
-      transport.play(song.getNotes());
+      transport.play(song.getNotes(), melodyChannel);
     }
   }
 
   public void press(int midiNote) {
     if (this.midiNote != -1) {
-      synthesizer.releaseKey(channel, this.midiNote);
+      synthesizer.releaseKey(melodyChannel, this.midiNote);
     }
-    synthesizer.pressKey(channel, midiNote, 24);
+    synthesizer.pressKey(melodyChannel, midiNote, 24);
     this.midiNote = midiNote;
   }
 
   public void release() {
     if (midiNote != -1) {
-      synthesizer.releaseKey(channel, midiNote);
+      synthesizer.releaseKey(melodyChannel, midiNote);
       midiNote = -1;
     }
   }
@@ -159,9 +161,13 @@ public class Musicianeer {
     transport.setPercentTempo(percentTempo);
   }
 
-  public void setProgram(int program) {
-    this.program = program;
-    synthesizer.changeProgram(17, program);
+  public void setProgramOverride(int program) {
+    this.programOverride = program;
+    if (program == 127) {
+      synthesizer.changeProgram(melodyChannel, lastProgram);
+    } else {
+      synthesizer.changeProgram(melodyChannel, program);
+    }
   }
 
   public void setTracking(TrackingType trackingType) {
@@ -182,13 +188,38 @@ public class Musicianeer {
     return synthesizer;
   }
 
+  private void onMidiNote(int midiNote) {
+  }
+
+  private void onProgram(int program) {
+    lastProgram = program;
+    if (programOverride == 127) {
+      synthesizer.changeProgram(melodyChannel, program);
+    }
+  }
+
   private void onTick(long tick) {
   }
 
   private void setSong(int index) {
     songLibrary.setIndex(index);
     Song song = songLibrary.getSong();
-    transport.play(song.getNotes(), tick -> onTick(tick));
+    int distanceToWhiteKeys = song.getDistanceToWhiteKeys();
+    System.out.println("distanceToWhiteKeys=" + distanceToWhiteKeys);
+    if (distanceToWhiteKeys < 0) {
+      int minimumTransposition = song.getMinimumTransposition();
+      if (Math.abs(distanceToWhiteKeys) < Math.abs(minimumTransposition)) {
+        song.transposeBy(distanceToWhiteKeys);
+      }
+    } else if (distanceToWhiteKeys > 0) {
+      int maximumTransposition = song.getMaximumTransposition();
+      if (distanceToWhiteKeys < maximumTransposition) {
+        song.transposeBy(distanceToWhiteKeys);
+      }
+    }
+    int melodyChannel = song.getPresumedMelodyChannel();
+    System.out.println("melodyChannel=" + melodyChannel);
+    transport.play(song.getNotes(), melodyChannel);
     messageBroker.publish(new OnSong(song));
   }
 

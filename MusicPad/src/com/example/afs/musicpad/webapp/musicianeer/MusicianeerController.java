@@ -71,7 +71,7 @@ public class MusicianeerController extends ControllerTask {
       musicianeer.setPercentTempo(Integer.parseInt(value));
       break;
     case "instrument":
-      musicianeer.setProgram(Integer.parseInt(value));
+      musicianeer.setProgramOverride(Integer.parseInt(value));
       break;
     case "volume":
       musicianeer.setPercentGain(Integer.parseInt(value));

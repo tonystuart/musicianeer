@@ -27,6 +27,14 @@ import com.example.afs.musicpad.webapp.musicianeer.Musicianeer.AccompanimentType
 
 public class Transport {
 
+  public interface MidiNoteHandler {
+    void onMidiNote(int midiNote);
+  }
+
+  public interface ProgramHandler {
+    void onProgram(int program);
+  }
+
   public interface TickHandler {
     void onTick(long tick);
   }
@@ -40,6 +48,7 @@ public class Transport {
   public static final int DEFAULT_PERCENT_VELOCITY = 10;
   public static final int DEFAULT_MASTER_PROGRAM_OFF = Midi.MAX_VALUE;
 
+  private int melodyChannel;
   private int masterProgram = DEFAULT_MASTER_PROGRAM_OFF;
   private int percentVelocity = DEFAULT_PERCENT_VELOCITY;
   private int[] currentPrograms = new int[Midi.CHANNELS];
@@ -47,11 +56,16 @@ public class Transport {
   private Synthesizer synthesizer;
   private TickHandler tickHandler;
   private NoteEventSequencer sequencer;
+  private ProgramHandler programHandler;
+  private MidiNoteHandler midiNoteHandler;
   private Deque<NoteEvent> reviewQueue = new LinkedList<>();
   private AccompanimentType accompanimentType = AccompanimentType.FULL;
 
-  public Transport(Synthesizer synthesizer) {
+  public Transport(Synthesizer synthesizer, TickHandler tickHandler, MidiNoteHandler midiNoteHandler, ProgramHandler programHandler) {
     this.synthesizer = synthesizer;
+    this.tickHandler = tickHandler;
+    this.midiNoteHandler = midiNoteHandler;
+    this.programHandler = programHandler;
     this.sequencer = new NoteEventSequencer(noteEvent -> processNoteEvent(noteEvent));
     setPercentGain(DEFAULT_PERCENT_GAIN);
     sequencer.tsStart();
@@ -98,12 +112,8 @@ public class Transport {
     synthesizer.allNotesOff();
   }
 
-  public void play(Iterable<Note> notes) {
-    play(notes, null);
-  }
-
-  public void play(Iterable<Note> notes, TickHandler tickHandler) {
-    this.tickHandler = tickHandler;
+  public void play(Iterable<Note> notes, int melodyChannel) {
+    this.melodyChannel = melodyChannel;
     clear();
     long firstTick = -1;
     long lastTick = -1;
@@ -217,6 +227,18 @@ public class Transport {
     reviewQueue.clear();
   }
 
+  private void fireMidiNote(int midiNote) {
+    if (midiNoteHandler != null) {
+      midiNoteHandler.onMidiNote(midiNote);
+    }
+  }
+
+  private void fireProgram(int program) {
+    if (programHandler != null) {
+      programHandler.onProgram(program);
+    }
+  }
+
   private void fireTick(long tick) {
     if (tickHandler != null) {
       tickHandler.onTick(tick);
@@ -243,31 +265,37 @@ public class Transport {
       if (currentPrograms[channel] != program) {
         synthesizer.changeProgram(channel, program);
         currentPrograms[channel] = program;
-        // TODO: Publish this for Player
+        if (channel == melodyChannel) {
+          fireProgram(program);
+        }
       }
-      int scaledVelocity = Velocity.scale(velocity, percentVelocity);
-      switch (accompanimentType) {
-      case DRUMS:
-        if (channel == Midi.DRUM) {
+      if (channel == melodyChannel) {
+        fireMidiNote(midiNote);
+      } else {
+        int scaledVelocity = Velocity.scale(velocity, percentVelocity);
+        switch (accompanimentType) {
+        case DRUMS:
+          if (channel == Midi.DRUM) {
+            synthesizer.pressKey(channel, midiNote, scaledVelocity);
+          }
+          break;
+        case FULL:
           synthesizer.pressKey(channel, midiNote, scaledVelocity);
-        }
-        break;
-      case FULL:
-        synthesizer.pressKey(channel, midiNote, scaledVelocity);
-        break;
-      case PIANO:
-        // Handled via master program
-        synthesizer.pressKey(channel, midiNote, scaledVelocity);
-        break;
-      case RHYTHM:
-        if (channel == Midi.DRUM || (currentPrograms[channel] >= 32 && currentPrograms[channel] < 40)) {
+          break;
+        case PIANO:
+          // Handled via master program
           synthesizer.pressKey(channel, midiNote, scaledVelocity);
+          break;
+        case RHYTHM:
+          if (channel == Midi.DRUM || (currentPrograms[channel] >= 32 && currentPrograms[channel] < 40)) {
+            synthesizer.pressKey(channel, midiNote, scaledVelocity);
+          }
+          break;
+        case SOLO:
+          break;
+        default:
+          break;
         }
-        break;
-      case SOLO:
-        break;
-      default:
-        break;
       }
       break;
     }
