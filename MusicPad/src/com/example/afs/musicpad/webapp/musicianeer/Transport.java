@@ -23,6 +23,7 @@ import com.example.afs.musicpad.transport.NoteEvent.Type;
 import com.example.afs.musicpad.transport.NoteEventSequencer;
 import com.example.afs.musicpad.util.Range;
 import com.example.afs.musicpad.util.Velocity;
+import com.example.afs.musicpad.webapp.musicianeer.Musicianeer.AccompanimentType;
 
 public class Transport {
 
@@ -47,6 +48,7 @@ public class Transport {
   private TickHandler tickHandler;
   private NoteEventSequencer sequencer;
   private Deque<NoteEvent> reviewQueue = new LinkedList<>();
+  private AccompanimentType accompanimentType = AccompanimentType.FULL;
 
   public Transport(Synthesizer synthesizer) {
     this.synthesizer = synthesizer;
@@ -180,6 +182,15 @@ public class Transport {
     }
   }
 
+  public void setAccompaniment(AccompanimentType accompanimentType) {
+    this.accompanimentType = accompanimentType;
+    if (accompanimentType == AccompanimentType.PIANO) {
+      masterProgram = 0;
+    } else {
+      masterProgram = DEFAULT_MASTER_PROGRAM_OFF;
+    }
+  }
+
   public void setMasterProgram(int masterProgram) {
     this.masterProgram = masterProgram;
   }
@@ -235,7 +246,29 @@ public class Transport {
         // TODO: Publish this for Player
       }
       int scaledVelocity = Velocity.scale(velocity, percentVelocity);
-      synthesizer.pressKey(channel, midiNote, scaledVelocity);
+      switch (accompanimentType) {
+      case DRUMS:
+        if (channel == Midi.DRUM) {
+          synthesizer.pressKey(channel, midiNote, scaledVelocity);
+        }
+        break;
+      case FULL:
+        synthesizer.pressKey(channel, midiNote, scaledVelocity);
+        break;
+      case PIANO:
+        // Handled via master program
+        synthesizer.pressKey(channel, midiNote, scaledVelocity);
+        break;
+      case RHYTHM:
+        if (channel == Midi.DRUM || (currentPrograms[channel] >= 32 && currentPrograms[channel] < 40)) {
+          synthesizer.pressKey(channel, midiNote, scaledVelocity);
+        }
+        break;
+      case SOLO:
+        break;
+      default:
+        break;
+      }
       break;
     }
     case TICK:

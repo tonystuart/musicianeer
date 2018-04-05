@@ -13,6 +13,7 @@ import com.example.afs.musicpad.message.OnShadowUpdate;
 import com.example.afs.musicpad.message.OnShadowUpdate.Action;
 import com.example.afs.musicpad.task.ControllerTask;
 import com.example.afs.musicpad.task.MessageBroker;
+import com.example.afs.musicpad.webapp.musicianeer.Musicianeer.AccompanimentType;
 import com.example.afs.musicpad.webapp.musicianeer.Musicianeer.SelectType;
 
 public class MusicianeerController extends ControllerTask {
@@ -32,14 +33,29 @@ public class MusicianeerController extends ControllerTask {
   protected void doClick(String id) {
     System.out.println("doClick: id=" + id);
     switch (id) {
+    case "drums":
+      musicianeer.setAccompaniment(AccompanimentType.DRUMS);
+      break;
+    case "full":
+      musicianeer.setAccompaniment(AccompanimentType.FULL);
+      break;
+    case "piano":
+      musicianeer.setAccompaniment(AccompanimentType.PIANO);
+      break;
     case "play":
       musicianeer.play();
       break;
     case "left-single":
       musicianeer.selectSong(SelectType.PREVIOUS);
       break;
+    case "rhythm":
+      musicianeer.setAccompaniment(AccompanimentType.RHYTHM);
+      break;
     case "right-single":
       musicianeer.selectSong(SelectType.NEXT);
+      break;
+    case "solo":
+      musicianeer.setAccompaniment(AccompanimentType.SOLO);
       break;
     case "stop":
       musicianeer.stop();
@@ -50,6 +66,17 @@ public class MusicianeerController extends ControllerTask {
   @Override
   protected void doInput(String id, String value) {
     System.out.println("doInput: id=" + id + ", value=" + value);
+    switch (id) {
+    case "tempo":
+      musicianeer.setPercentTempo(Integer.parseInt(value));
+      break;
+    case "instrument":
+      musicianeer.setProgram(Integer.parseInt(value));
+      break;
+    case "volume":
+      musicianeer.setPercentGain(Integer.parseInt(value));
+      break;
+    }
   }
 
   @Override

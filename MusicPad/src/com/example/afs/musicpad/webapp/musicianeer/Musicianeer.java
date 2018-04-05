@@ -22,7 +22,6 @@ import com.example.afs.musicpad.parser.SongListener;
 import com.example.afs.musicpad.song.Default;
 import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.task.MessageBroker;
-import com.example.afs.musicpad.transport.Transport;
 
 public class Musicianeer {
 
@@ -86,6 +85,7 @@ public class Musicianeer {
   private Random random = new Random();
   private TrackingType trackingType = TrackingType.LEAD;
   private AccompanimentType accompanimentType = AccompanimentType.FULL;
+  private int program;
 
   public Musicianeer(MessageBroker messageBroker) {
     this.messageBroker = messageBroker;
@@ -113,7 +113,7 @@ public class Musicianeer {
     if (this.midiNote != -1) {
       synthesizer.releaseKey(channel, this.midiNote);
     }
-    synthesizer.pressKey(channel, midiNote, 92);
+    synthesizer.pressKey(channel, midiNote, 24);
     this.midiNote = midiNote;
   }
 
@@ -148,15 +148,20 @@ public class Musicianeer {
   }
 
   public void setAccompaniment(AccompanimentType accompanimentType) {
+    transport.setAccompaniment(accompanimentType);
   }
 
-  public void setMidiInstrument(int instrument) {
+  public void setPercentGain(int percentGain) {
+    transport.setPercentGain(percentGain);
   }
 
-  public void setMidiTempo(int percent) {
+  public void setPercentTempo(int percentTempo) {
+    transport.setPercentTempo(percentTempo);
   }
 
-  public void setMidiVolument(int volument) {
+  public void setProgram(int program) {
+    this.program = program;
+    synthesizer.changeProgram(17, program);
   }
 
   public void setTracking(TrackingType trackingType) {
@@ -169,7 +174,7 @@ public class Musicianeer {
   private Synthesizer createSynthesizer() {
     System.loadLibrary(FluidSynth.NATIVE_LIBRARY_NAME);
     int processors = Runtime.getRuntime().availableProcessors();
-    System.out.println("Derby.createSynthesizer: processors=" + processors);
+    System.out.println("Musicianeer.createSynthesizer: processors=" + processors);
     Settings settings = Synthesizer.createDefaultSettings();
     settings.set("synth.midi-channels", Midi.CHANNELS);
     settings.set("synth.cpu-cores", processors);

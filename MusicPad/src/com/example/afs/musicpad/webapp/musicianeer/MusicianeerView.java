@@ -15,6 +15,7 @@ import com.example.afs.musicpad.html.Parent;
 import com.example.afs.musicpad.html.Radio;
 import com.example.afs.musicpad.html.Range;
 import com.example.afs.musicpad.html.ShadowDomBuilder;
+import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.task.ControllerTask;
 
 public class MusicianeerView extends ShadowDomBuilder {
@@ -68,9 +69,9 @@ public class MusicianeerView extends ShadowDomBuilder {
                 .add(div(".key-parent") //
                     .add(whiteKey(76)))) //
             .add(div(".sliders") //
-                .add(slider("tempo")) //
-                .add(slider("instrument")) //
-                .add(slider("volume"))) //
+                .add(slider("tempo", 100)) //
+                .add(slider("instrument", Midi.MAX_VALUE)) //
+                .add(slider("volume", 100))) //
             .add(div(".buttons") //
                 .add(fieldSet() //
                     .add(alternative("track", "Lead")) //
@@ -124,10 +125,11 @@ public class MusicianeerView extends ShadowDomBuilder {
     return key;
   }
 
-  private Division slider(String id) {
+  private Division slider(String id, int maximum) {
     Division div = new Division(".slider");
     div.add(text(id));
     Range slider = new Range("#" + id);
+    slider.setMaximum(maximum);
     slider.addInputHandler();
     div.add(slider);
     return div;
