@@ -123,7 +123,7 @@ fieldset {
 }
 
 .slider {
-	width: 200px;
+	width: calc((100%)/3 - 5px);
 }
 
 .buttons {

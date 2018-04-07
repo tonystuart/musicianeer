@@ -77,8 +77,8 @@ public class Musicianeer extends MessageTask {
     FOLLOW, LEAD
   }
 
-  public static final int LOWEST_AVAILABLE_NOTE = 57;
-  public static final int HIGHEST_AVAILABLE_NOTE = 76;
+  public static final int LOWEST_NOTE = 48;
+  public static final int HIGHEST_NOTE = 76;
 
   private int lastProgram;
   private int melodyChannel;
@@ -214,12 +214,12 @@ public class Musicianeer extends MessageTask {
     System.out.println("song=" + song);
     System.out.println("melodyChannel=" + melodyChannel + ", distanceToWhiteKeys=" + distanceToWhiteKeys + ", lowestMidiNote=" + lowestMidiNote + ", highestMidiNote=" + highestMidiNote);
     lowestMidiNote += distanceToWhiteKeys;
-    int octaveOutOfRange = (LOWEST_AVAILABLE_NOTE - lowestMidiNote) / Midi.SEMITONES_PER_OCTAVE;
+    int octaveOutOfRange = (LOWEST_NOTE - lowestMidiNote) / Midi.SEMITONES_PER_OCTAVE;
     if (octaveOutOfRange > 0) {
       distanceToWhiteKeys += octaveOutOfRange * Midi.SEMITONES_PER_OCTAVE;
       System.out.println("new distanceToWhiteKeys=" + distanceToWhiteKeys);
     } else {
-      octaveOutOfRange = (highestMidiNote - HIGHEST_AVAILABLE_NOTE) / Midi.SEMITONES_PER_OCTAVE;
+      octaveOutOfRange = (highestMidiNote - HIGHEST_NOTE) / Midi.SEMITONES_PER_OCTAVE;
       if (octaveOutOfRange > 0) {
         distanceToWhiteKeys -= octaveOutOfRange * Midi.SEMITONES_PER_OCTAVE;
         System.out.println("new distanceToWhiteKeys=" + distanceToWhiteKeys);

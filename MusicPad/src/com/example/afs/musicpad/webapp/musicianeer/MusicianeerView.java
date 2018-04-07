@@ -22,7 +22,6 @@ public class MusicianeerView extends ShadowDomBuilder {
 
   public MusicianeerView(ControllerTask controllerTask) {
     super(controllerTask);
-    int midiNote = Musicianeer.LOWEST_AVAILABLE_NOTE;
     add(div("#musicianeer", ".tab", ".selected-tab") //
         .add(div(".packed-column") //)
             .add(div(".title") //
@@ -36,39 +35,7 @@ public class MusicianeerView extends ShadowDomBuilder {
                 .add(clicker("play", "PLAY")) //
                 .add(clicker("right-single", ">")) //
                 .add(clicker("right-group", ">>"))) //
-            .add(div(".keyboard") //
-                .add(div(".key-parent") //
-                    .add(whiteKey(midiNote++)) //
-                    .add(blackKey(midiNote++))) //
-                .add(div(".key-parent") //
-                    .add(whiteKey(midiNote++))) //
-                .add(div(".key-parent") //
-                    .add(whiteKey(midiNote++)) //
-                    .add(blackKey(midiNote++))) //
-                .add(div(".key-parent") //
-                    .add(whiteKey(midiNote++)) //
-                    .add(blackKey(midiNote++))) //
-                .add(div(".key-parent") //
-                    .add(whiteKey(midiNote++))) //
-                .add(div(".key-parent") //
-                    .add(whiteKey(midiNote++))//
-                    .add(blackKey(midiNote++))) //
-                .add(div(".key-parent") //
-                    .add(whiteKey(midiNote++))//
-                    .add(blackKey(midiNote++))) //
-                .add(div(".key-parent") //
-                    .add(whiteKey(midiNote++)) //
-                    .add(blackKey(midiNote++))) //
-                .add(div(".key-parent") //
-                    .add(whiteKey(midiNote++))) //
-                .add(div(".key-parent") //
-                    .add(whiteKey(midiNote++))//
-                    .add(blackKey(midiNote++))) //
-                .add(div(".key-parent") //
-                    .add(whiteKey(midiNote++))//
-                    .add(blackKey(midiNote++))) //
-                .add(div(".key-parent") //
-                    .add(whiteKey(midiNote++)))) //
+            .add(keyboard()) //
             .add(div(".sliders") //
                 .add(slider("tempo", 100)) //
                 .add(slider("instrument", Midi.MAX_VALUE)) //
@@ -137,6 +104,23 @@ public class MusicianeerView extends ShadowDomBuilder {
     key.addMouseOverHandler();
     key.add(div("#midi-note-led-" + midiNote, "." + className + "-led"));
     return key;
+  }
+
+  private Parent keyboard() {
+    Division keyParent = null;
+    Division keyboard = div(".keyboard");
+    int lowestNote = Keyboard.roundToNatural(Musicianeer.LOWEST_NOTE);
+    int highestNote = Keyboard.roundToNatural(Musicianeer.HIGHEST_NOTE);
+    for (int midiNote = lowestNote; midiNote <= highestNote; midiNote++) {
+      if (Keyboard.isNatural(midiNote)) {
+        keyParent = div(".key-parent");
+        keyboard.add(keyParent);
+        keyParent.add(whiteKey(midiNote));
+      } else {
+        keyParent.add(blackKey(midiNote));
+      }
+    }
+    return keyboard;
   }
 
   private Division slider(String id, int maximum) {
