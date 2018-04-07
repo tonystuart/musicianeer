@@ -77,6 +77,9 @@ public class Musicianeer extends MessageTask {
     FOLLOW, LEAD
   }
 
+  public static final int LOWEST_AVAILABLE_NOTE = 57;
+  public static final int HIGHEST_AVAILABLE_NOTE = 76;
+
   private int lastProgram;
   private int melodyChannel;
   private int midiNote = -1;
@@ -205,7 +208,23 @@ public class Musicianeer extends MessageTask {
     songLibrary.setIndex(index);
     Song song = songLibrary.getSong();
     int distanceToWhiteKeys = song.getDistanceToWhiteKeys();
-    System.out.println("distanceToWhiteKeys=" + distanceToWhiteKeys);
+    int melodyChannel = song.getPresumedMelodyChannel();
+    int lowestMidiNote = song.getLowestMidiNote(melodyChannel);
+    int highestMidiNote = song.getHighestMidiNote(melodyChannel);
+    System.out.println("song=" + song);
+    System.out.println("melodyChannel=" + melodyChannel + ", distanceToWhiteKeys=" + distanceToWhiteKeys + ", lowestMidiNote=" + lowestMidiNote + ", highestMidiNote=" + highestMidiNote);
+    lowestMidiNote += distanceToWhiteKeys;
+    int octaveOutOfRange = (LOWEST_AVAILABLE_NOTE - lowestMidiNote) / Midi.SEMITONES_PER_OCTAVE;
+    if (octaveOutOfRange > 0) {
+      distanceToWhiteKeys += octaveOutOfRange * Midi.SEMITONES_PER_OCTAVE;
+      System.out.println("new distanceToWhiteKeys=" + distanceToWhiteKeys);
+    } else {
+      octaveOutOfRange = (highestMidiNote - HIGHEST_AVAILABLE_NOTE) / Midi.SEMITONES_PER_OCTAVE;
+      if (octaveOutOfRange > 0) {
+        distanceToWhiteKeys -= octaveOutOfRange * Midi.SEMITONES_PER_OCTAVE;
+        System.out.println("new distanceToWhiteKeys=" + distanceToWhiteKeys);
+      }
+    }
     if (distanceToWhiteKeys < 0) {
       int minimumTransposition = song.getMinimumTransposition();
       if (Math.abs(distanceToWhiteKeys) < Math.abs(minimumTransposition)) {
@@ -217,8 +236,6 @@ public class Musicianeer extends MessageTask {
         song.transposeBy(distanceToWhiteKeys);
       }
     }
-    int melodyChannel = song.getPresumedMelodyChannel();
-    System.out.println("melodyChannel=" + melodyChannel);
     transport.play(song.getNotes(), melodyChannel);
     publish(new OnSong(song));
   }
