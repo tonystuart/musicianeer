@@ -229,8 +229,10 @@ public class Transport {
     switch (noteEvent.getType()) {
     case NOTE_OFF: {
       int channel = note.getChannel();
-      int midiNote = note.getMidiNote();
-      synthesizer.releaseKey(channel, midiNote);
+      if (channel != melodyChannel) {
+        int midiNote = note.getMidiNote();
+        synthesizer.releaseKey(channel, midiNote);
+      }
       break;
     }
     case NOTE_ON: {
