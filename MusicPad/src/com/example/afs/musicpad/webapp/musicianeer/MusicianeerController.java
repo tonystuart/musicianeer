@@ -19,6 +19,7 @@ import com.example.afs.musicpad.webapp.musicianeer.Musicianeer.SelectType;
 public class MusicianeerController extends ControllerTask {
 
   private boolean isDown;
+  private int lastMidiNote;
   private Musicianeer musicianeer;
   private MusicianeerView musicianeerView;
 
@@ -32,7 +33,6 @@ public class MusicianeerController extends ControllerTask {
 
   @Override
   protected void doClick(String id) {
-    System.out.println("doClick: id=" + id);
     switch (id) {
     case "drums":
       musicianeer.setAccompaniment(AccompanimentType.DRUMS);
@@ -66,7 +66,6 @@ public class MusicianeerController extends ControllerTask {
 
   @Override
   protected void doInput(String id, String value) {
-    System.out.println("doInput: id=" + id + ", value=" + value);
     switch (id) {
     case "tempo":
       musicianeer.setPercentTempo(Integer.parseInt(value));
@@ -89,7 +88,6 @@ public class MusicianeerController extends ControllerTask {
 
   @Override
   protected void doMouseDown(String id) {
-    System.out.println("doMouseDown: id=" + id);
     if (id.startsWith("midi-note-")) {
       int midiNote = Integer.parseInt(id.substring("midi-note-".length()));
       musicianeer.press(midiNote);
@@ -100,7 +98,6 @@ public class MusicianeerController extends ControllerTask {
 
   @Override
   protected void doMouseOut(String id) {
-    System.out.println("doMouseOut: id=" + id);
     if (isDown) {
       musicianeer.release();
     }
@@ -108,7 +105,6 @@ public class MusicianeerController extends ControllerTask {
 
   @Override
   protected void doMouseOver(String id) {
-    System.out.println("doMouseOver: id=" + id);
     if (isDown && id.startsWith("midi-note-")) {
       int midiNote = Integer.parseInt(id.substring("midi-note-".length()));
       musicianeer.press(midiNote);
@@ -117,17 +113,19 @@ public class MusicianeerController extends ControllerTask {
 
   @Override
   protected void doMouseUp(String id) {
-    System.out.println("doMouseUp: id=" + id);
     musicianeer.release();
     isDown = false;
   }
 
   private void doMelodyNote(OnMelodyNote message) {
-    musicianeerView.setMidiNoteLed(message.getMidiNote(), true);
+    int midiNote = message.getMidiNote();
+    musicianeerView.setMidiNoteLed(lastMidiNote, false);
+    musicianeerView.setMidiNoteLed(midiNote, true);
+    lastMidiNote = midiNote;
   }
 
   private void doSong(OnSong message) {
-    System.out.println("title=" + message.getSong().getTitle());
+    musicianeerView.resetMidiNoteLeds();
     musicianeerView.setSongTitle(message.getSong().getTitle());
   }
 
