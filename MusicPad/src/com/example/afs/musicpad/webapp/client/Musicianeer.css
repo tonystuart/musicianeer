@@ -111,6 +111,10 @@ fieldset {
 	left: 19px;
 }
 
+.led-on {
+	background-color: red;
+}
+
 .sliders {
 	margin: 10px 0px;
 	display: flex;

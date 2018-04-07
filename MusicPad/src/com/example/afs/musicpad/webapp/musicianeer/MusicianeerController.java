@@ -26,6 +26,7 @@ public class MusicianeerController extends ControllerTask {
     super(messageBroker);
     musicianeerView = new MusicianeerView(this);
     subscribe(OnSong.class, message -> doSong(message));
+    subscribe(OnMelodyNote.class, message -> doMelodyNote(message));
     musicianeer = new Musicianeer(messageBroker);
   }
 
@@ -93,6 +94,7 @@ public class MusicianeerController extends ControllerTask {
       int midiNote = Integer.parseInt(id.substring("midi-note-".length()));
       musicianeer.press(midiNote);
       isDown = true;
+      musicianeerView.setMidiNoteLed(midiNote, false);
     }
   }
 
@@ -118,6 +120,10 @@ public class MusicianeerController extends ControllerTask {
     System.out.println("doMouseUp: id=" + id);
     musicianeer.release();
     isDown = false;
+  }
+
+  private void doMelodyNote(OnMelodyNote message) {
+    musicianeerView.setMidiNoteLed(message.getMidiNote(), true);
   }
 
   private void doSong(OnSong message) {

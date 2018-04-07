@@ -22,8 +22,9 @@ import com.example.afs.musicpad.parser.SongListener;
 import com.example.afs.musicpad.song.Default;
 import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.task.MessageBroker;
+import com.example.afs.musicpad.task.MessageTask;
 
-public class Musicianeer {
+public class Musicianeer extends MessageTask {
 
   public enum AccompanimentType {
     FULL, PIANO, RHYTHM, DRUMS, SOLO
@@ -84,15 +85,16 @@ public class Musicianeer {
   private Transport transport;
   private SongLibrary songLibrary;
   private Synthesizer synthesizer;
-  private MessageBroker messageBroker;
   private Random random = new Random();
   private TrackingType trackingType = TrackingType.LEAD;
   private AccompanimentType accompanimentType = AccompanimentType.FULL;
 
   public Musicianeer(MessageBroker messageBroker) {
-    this.messageBroker = messageBroker;
+    super(messageBroker);
+    subscribe(OnMelodyNote.class, message -> doMelodyNote(message));
+    subscribe(OnProgramChange.class, message -> doProgramChange(message));
     synthesizer = createSynthesizer();
-    transport = new Transport(synthesizer, tick -> onTick(tick), midiNote -> onMidiNote(midiNote), program -> onProgram(program));
+    transport = new Transport(messageBroker, synthesizer);
     String path = System.getProperty("midiLibraryPath");
     if (path == null) {
       throw new IllegalStateException("midiLibraryPath property not set");
@@ -188,17 +190,15 @@ public class Musicianeer {
     return synthesizer;
   }
 
-  private void onMidiNote(int midiNote) {
+  private void doMelodyNote(OnMelodyNote message) {
   }
 
-  private void onProgram(int program) {
+  private void doProgramChange(OnProgramChange message) {
+    int program = message.getProgram();
     lastProgram = program;
     if (programOverride == 127) {
       synthesizer.changeProgram(melodyChannel, program);
     }
-  }
-
-  private void onTick(long tick) {
   }
 
   private void setSong(int index) {
@@ -220,7 +220,7 @@ public class Musicianeer {
     int melodyChannel = song.getPresumedMelodyChannel();
     System.out.println("melodyChannel=" + melodyChannel);
     transport.play(song.getNotes(), melodyChannel);
-    messageBroker.publish(new OnSong(song));
+    publish(new OnSong(song));
   }
 
 }

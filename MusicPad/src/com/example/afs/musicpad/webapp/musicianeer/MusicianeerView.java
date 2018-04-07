@@ -92,6 +92,14 @@ public class MusicianeerView extends ShadowDomBuilder {
     }
   }
 
+  public void setMidiNoteLed(int midiNote, boolean isOn) {
+    if (isOn) {
+      addClass("midi-note-led-" + midiNote, "led-on");
+    } else {
+      removeClass("midi-note-led-" + midiNote, "led-on");
+    }
+  }
+
   public void setSongTitle(String titleText) {
     Division songTitle = getElementById("song-title");
     replaceChildren(songTitle, text(titleText));
@@ -121,7 +129,7 @@ public class MusicianeerView extends ShadowDomBuilder {
     key.addMouseDownHandler();
     key.addMouseOutHandler();
     key.addMouseOverHandler();
-    key.add(div("." + className + "-led"));
+    key.add(div("#midi-note-led-" + midiNote, "." + className + "-led"));
     return key;
   }
 

@@ -9,6 +9,23 @@
 
 package com.example.afs.musicpad.webapp.musicianeer;
 
-public class OnPrompt {
+import com.example.afs.musicpad.message.TypedMessage;
+
+public class OnTick extends TypedMessage {
+
+  private long tick;
+
+  public OnTick(long tick) {
+    this.tick = tick;
+  }
+
+  public long getTick() {
+    return tick;
+  }
+
+  @Override
+  public String toString() {
+    return "OnTick [tick=" + tick + "]";
+  }
 
 }

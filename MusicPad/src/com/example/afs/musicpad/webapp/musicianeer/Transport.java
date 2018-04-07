@@ -18,6 +18,7 @@ import com.example.afs.fluidsynth.Synthesizer;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.song.Default;
 import com.example.afs.musicpad.song.Note;
+import com.example.afs.musicpad.task.MessageBroker;
 import com.example.afs.musicpad.transport.NoteEvent;
 import com.example.afs.musicpad.transport.NoteEvent.Type;
 import com.example.afs.musicpad.transport.NoteEventSequencer;
@@ -26,18 +27,6 @@ import com.example.afs.musicpad.util.Velocity;
 import com.example.afs.musicpad.webapp.musicianeer.Musicianeer.AccompanimentType;
 
 public class Transport {
-
-  public interface MidiNoteHandler {
-    void onMidiNote(int midiNote);
-  }
-
-  public interface ProgramHandler {
-    void onProgram(int program);
-  }
-
-  public interface TickHandler {
-    void onTick(long tick);
-  }
 
   public enum Whence {
     RELATIVE, ABSOLUTE
@@ -54,18 +43,14 @@ public class Transport {
   private int[] currentPrograms = new int[Midi.CHANNELS];
 
   private Synthesizer synthesizer;
-  private TickHandler tickHandler;
+  private MessageBroker messageBroker;
   private NoteEventSequencer sequencer;
-  private ProgramHandler programHandler;
-  private MidiNoteHandler midiNoteHandler;
   private Deque<NoteEvent> reviewQueue = new LinkedList<>();
   private AccompanimentType accompanimentType = AccompanimentType.FULL;
 
-  public Transport(Synthesizer synthesizer, TickHandler tickHandler, MidiNoteHandler midiNoteHandler, ProgramHandler programHandler) {
+  public Transport(MessageBroker messageBroker, Synthesizer synthesizer) {
+    this.messageBroker = messageBroker;
     this.synthesizer = synthesizer;
-    this.tickHandler = tickHandler;
-    this.midiNoteHandler = midiNoteHandler;
-    this.programHandler = programHandler;
     this.sequencer = new NoteEventSequencer(noteEvent -> processNoteEvent(noteEvent));
     setPercentGain(DEFAULT_PERCENT_GAIN);
     sequencer.tsStart();
@@ -227,22 +212,16 @@ public class Transport {
     reviewQueue.clear();
   }
 
-  private void fireMidiNote(int midiNote) {
-    if (midiNoteHandler != null) {
-      midiNoteHandler.onMidiNote(midiNote);
-    }
+  private void fireMelodyNote(int midiNote) {
+    messageBroker.publish(new OnMelodyNote(midiNote));
   }
 
-  private void fireProgram(int program) {
-    if (programHandler != null) {
-      programHandler.onProgram(program);
-    }
+  private void fireProgramChange(int program) {
+    messageBroker.publish(new OnProgramChange(program));
   }
 
   private void fireTick(long tick) {
-    if (tickHandler != null) {
-      tickHandler.onTick(tick);
-    }
+    messageBroker.publish(new OnTick(tick));
   }
 
   private void processNoteEvent(NoteEvent noteEvent) {
@@ -266,11 +245,11 @@ public class Transport {
         synthesizer.changeProgram(channel, program);
         currentPrograms[channel] = program;
         if (channel == melodyChannel) {
-          fireProgram(program);
+          fireProgramChange(program);
         }
       }
       if (channel == melodyChannel) {
-        fireMidiNote(midiNote);
+        fireMelodyNote(midiNote);
       } else {
         int scaledVelocity = Velocity.scale(velocity, percentVelocity);
         switch (accompanimentType) {
