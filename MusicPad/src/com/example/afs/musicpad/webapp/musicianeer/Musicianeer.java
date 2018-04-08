@@ -224,37 +224,41 @@ public class Musicianeer extends MessageTask {
     setProgram(0);
     songLibrary.setIndex(index);
     Song song = songLibrary.getSong();
-    int distanceToWhiteKeys = song.getDistanceToWhiteKeys();
+    int songTransposition = song.getDistanceToWhiteKeys();
     int melodyChannel = song.getPresumedMelodyChannel();
     int lowestMidiNote = song.getLowestMidiNote(melodyChannel);
     int highestMidiNote = song.getHighestMidiNote(melodyChannel);
     System.out.println("song=" + song);
-    System.out.println("melodyChannel=" + melodyChannel + ", distanceToWhiteKeys=" + distanceToWhiteKeys + ", lowestMidiNote=" + lowestMidiNote + ", highestMidiNote=" + highestMidiNote);
-    lowestMidiNote += distanceToWhiteKeys;
-    int octaveOutOfRange = (LOWEST_NOTE - lowestMidiNote) / Midi.SEMITONES_PER_OCTAVE;
-    if (octaveOutOfRange > 0) {
-      distanceToWhiteKeys += octaveOutOfRange * Midi.SEMITONES_PER_OCTAVE;
-      System.out.println("new distanceToWhiteKeys=" + distanceToWhiteKeys);
-    } else {
-      octaveOutOfRange = (highestMidiNote - HIGHEST_NOTE) / Midi.SEMITONES_PER_OCTAVE;
+    System.out.println("melodyChannel=" + melodyChannel + ", songTransposition=" + songTransposition + ", lowestMidiNote=" + lowestMidiNote + ", highestMidiNote=" + highestMidiNote);
+    lowestMidiNote += songTransposition;
+    highestMidiNote += songTransposition;
+    int keyboardTransposition = 0;
+    if (lowestMidiNote < LOWEST_NOTE) {
+      int octaveOutOfRange = (LOWEST_NOTE - lowestMidiNote) / Midi.SEMITONES_PER_OCTAVE;
       if (octaveOutOfRange > 0) {
-        distanceToWhiteKeys -= octaveOutOfRange * Midi.SEMITONES_PER_OCTAVE;
-        System.out.println("new distanceToWhiteKeys=" + distanceToWhiteKeys);
+        keyboardTransposition = octaveOutOfRange * Midi.SEMITONES_PER_OCTAVE;
+        System.out.println("keyboardTransposition=" + keyboardTransposition);
+      }
+    } else if (highestMidiNote > HIGHEST_NOTE) {
+      int octaveOutOfRange = (lowestMidiNote - LOWEST_NOTE) / Midi.SEMITONES_PER_OCTAVE;
+      if (octaveOutOfRange > 0) {
+        keyboardTransposition = -octaveOutOfRange * Midi.SEMITONES_PER_OCTAVE;
+        System.out.println("keyboardTransposition=" + keyboardTransposition);
       }
     }
-    if (distanceToWhiteKeys < 0) {
+    if (songTransposition < 0) {
       int minimumTransposition = song.getMinimumTransposition();
-      if (Math.abs(distanceToWhiteKeys) < Math.abs(minimumTransposition)) {
-        song.transposeBy(distanceToWhiteKeys);
+      if (Math.abs(songTransposition) < Math.abs(minimumTransposition)) {
+        song.transposeBy(songTransposition);
       }
-    } else if (distanceToWhiteKeys > 0) {
+    } else if (songTransposition > 0) {
       int maximumTransposition = song.getMaximumTransposition();
-      if (distanceToWhiteKeys < maximumTransposition) {
-        song.transposeBy(distanceToWhiteKeys);
+      if (songTransposition < maximumTransposition) {
+        song.transposeBy(songTransposition);
       }
     }
     transport.play(song.getNotes(), melodyChannel);
-    publish(new OnSong(song, index));
+    publish(new OnSong(song, index, keyboardTransposition));
   }
 
 }

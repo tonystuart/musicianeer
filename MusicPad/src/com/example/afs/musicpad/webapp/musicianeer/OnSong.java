@@ -16,14 +16,20 @@ public class OnSong extends TypedMessage {
 
   private Song song;
   private int index;
+  private int keyboardTransposition;
 
-  public OnSong(Song song, int index) {
+  public OnSong(Song song, int index, int keyboardTransposition) {
     this.song = song;
     this.index = index;
+    this.keyboardTransposition = keyboardTransposition;
   }
 
   public int getIndex() {
     return index;
+  }
+
+  public int getKeyboardTransposition() {
+    return keyboardTransposition;
   }
 
   public Song getSong() {
@@ -32,7 +38,7 @@ public class OnSong extends TypedMessage {
 
   @Override
   public String toString() {
-    return "OnSong [song=" + song + ", index=" + index + "]";
+    return "OnSong [song=" + song + ", index=" + index + ", keyboardTransposition=" + keyboardTransposition + "]";
   }
 
 }
