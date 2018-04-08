@@ -182,7 +182,8 @@ public class Musicianeer extends MessageTask {
   }
 
   public void setTracking(TrackingType trackingType) {
-    transport.setTracking(trackingType);
+    this.trackingType = trackingType;
+    transport.resume();
   }
 
   public void stop() {
@@ -202,6 +203,9 @@ public class Musicianeer extends MessageTask {
 
   private void doMelodyNote(OnMelodyNote message) {
     melodyNote = message.getMidiNote();
+    if (trackingType == TrackingType.LEAD && (melodyNote >= LOWEST_NOTE && melodyNote <= HIGHEST_NOTE)) {
+      transport.pause();
+    }
   }
 
   private void doProgramChange(OnProgramChange message) {

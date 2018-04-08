@@ -25,7 +25,6 @@ import com.example.afs.musicpad.transport.NoteEventSequencer;
 import com.example.afs.musicpad.util.Range;
 import com.example.afs.musicpad.util.Velocity;
 import com.example.afs.musicpad.webapp.musicianeer.Musicianeer.AccompanimentType;
-import com.example.afs.musicpad.webapp.musicianeer.Musicianeer.TrackingType;
 
 // TODO: Derive this from ServiceTask
 // TODO: Replace public methods with message handlers
@@ -49,7 +48,6 @@ public class Transport {
   private Synthesizer synthesizer;
   private MessageBroker messageBroker;
   private NoteEventSequencer sequencer;
-  private TrackingType trackingType = TrackingType.LEAD;
   private Deque<NoteEvent> reviewQueue = new LinkedList<>();
   private AccompanimentType accompanimentType = AccompanimentType.FULL;
 
@@ -207,10 +205,6 @@ public class Transport {
     this.percentVelocity = percentVelocity;
   }
 
-  public void setTracking(TrackingType trackingType) {
-    this.trackingType = trackingType;
-  }
-
   public void stop() {
     clear();
   }
@@ -261,9 +255,6 @@ public class Transport {
       }
       if (channel == melodyChannel) {
         fireMelodyNote(midiNote);
-        if (trackingType == TrackingType.LEAD) {
-          pause();
-        }
       } else {
         int scaledVelocity = Velocity.scale(velocity, percentVelocity);
         switch (accompanimentType) {
