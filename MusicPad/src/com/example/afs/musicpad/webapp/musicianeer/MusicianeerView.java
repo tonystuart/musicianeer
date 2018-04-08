@@ -37,9 +37,9 @@ public class MusicianeerView extends ShadowDomBuilder {
                 .add(clicker("next-page", ">>"))) //
             .add(keyboard()) //
             .add(div(".sliders") //
-                .add(slider("tempo", 100)) //
+                .add(slider("tempo", MusicianeerController.DEFAULT_PERCENT_TEMPO)) //
                 .add(slider("instrument", Midi.MAX_VALUE)) //
-                .add(slider("volume", 100))) //
+                .add(slider("volume", MusicianeerController.DEFAULT_PERCENT_GAIN))) //
             .add(div(".buttons") //
                 .add(fieldSet() //
                     .add(alternative("track", "Lead")) //
