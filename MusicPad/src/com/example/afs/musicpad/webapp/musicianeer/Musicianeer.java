@@ -104,6 +104,9 @@ public class Musicianeer extends MessageTask {
     }
     MidiLibrary midiLibrary = new MidiLibrary(path);
     songLibrary = new SongLibrary(midiLibrary);
+  }
+
+  public void loadInitialSong() {
     if (songLibrary.size() > 0) {
       setSong(random.nextInt(songLibrary.size()));
     }

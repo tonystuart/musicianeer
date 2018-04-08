@@ -99,6 +99,7 @@ public class MusicianeerController extends ControllerTask {
     addShadowUpdate(new OnShadowUpdate(Action.REPLACE_CHILDREN, "body", musicianeerView.render()));
     musicianeerView.setAlternative("lead");
     musicianeerView.setAlternative("full");
+    musicianeer.loadInitialSong();
   }
 
   @Override
