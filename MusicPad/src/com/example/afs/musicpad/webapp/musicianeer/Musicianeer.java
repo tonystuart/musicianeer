@@ -77,8 +77,8 @@ public class Musicianeer extends MessageTask {
     FOLLOW, LEAD
   }
 
-  public static final int LOWEST_NOTE = 48;
-  public static final int HIGHEST_NOTE = 76;
+  public static final int LOWEST_NOTE = 36;
+  public static final int HIGHEST_NOTE = 88;
 
   private int melodyNote;
   private int lastProgram;
