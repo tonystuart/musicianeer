@@ -94,6 +94,8 @@ public class Musicianeer extends MessageTask {
 
   public Musicianeer(MessageBroker messageBroker) {
     super(messageBroker);
+    subscribe(OnNoteOn.class, message -> doNoteOn(message));
+    subscribe(OnNoteOff.class, message -> doNoteOff(message));
     subscribe(OnMelodyNote.class, message -> doMelodyNote(message));
     subscribe(OnProgramChange.class, message -> doProgramChange(message));
     synthesizer = createSynthesizer();
@@ -130,11 +132,9 @@ public class Musicianeer extends MessageTask {
     this.midiNote = midiNote;
   }
 
-  public void release() {
-    if (midiNote != -1) {
-      synthesizer.releaseKey(melodyChannel, midiNote);
-      midiNote = -1;
-    }
+  // TODO: Decouple using message handler and make private
+  public void release(int midiNote) {
+    synthesizer.releaseKey(melodyChannel, midiNote);
   }
 
   public void selectSong(SelectType selectType) {
@@ -206,6 +206,14 @@ public class Musicianeer extends MessageTask {
     if (trackingType == TrackingType.LEAD && (melodyNote >= LOWEST_NOTE && melodyNote <= HIGHEST_NOTE)) {
       transport.pause();
     }
+  }
+
+  private void doNoteOff(OnNoteOff message) {
+    release(message.getData1());
+  }
+
+  private void doNoteOn(OnNoteOn message) {
+    press(message.getData1());
   }
 
   private void doProgramChange(OnProgramChange message) {

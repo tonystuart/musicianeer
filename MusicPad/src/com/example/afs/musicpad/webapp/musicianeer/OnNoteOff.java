@@ -9,15 +9,23 @@
 
 package com.example.afs.musicpad.webapp.musicianeer;
 
-import com.example.afs.musicpad.task.MessageBroker;
-import com.example.afs.musicpad.webapp.WebServer;
+import com.example.afs.musicpad.message.TypedMessage;
 
-public class WebServerMain {
-  public static void main(String[] args) {
-    MessageBroker messageBroker = new MessageBroker();
-    MidiWatcher midiWatcher = new MidiWatcher(messageBroker);
-    WebServer webServer = new WebServer(messageBroker);
-    midiWatcher.tsStart();
-    webServer.tsStart();
+public class OnNoteOff extends TypedMessage {
+
+  private int data1;
+
+  public OnNoteOff(int data1) {
+    this.data1 = data1;
   }
+
+  public int getData1() {
+    return data1;
+  }
+
+  @Override
+  public String toString() {
+    return "OnNoteOff [data1=" + data1 + "]";
+  }
+
 }

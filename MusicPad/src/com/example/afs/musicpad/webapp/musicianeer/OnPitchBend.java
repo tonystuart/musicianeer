@@ -9,15 +9,23 @@
 
 package com.example.afs.musicpad.webapp.musicianeer;
 
-import com.example.afs.musicpad.task.MessageBroker;
-import com.example.afs.musicpad.webapp.WebServer;
+import com.example.afs.musicpad.message.TypedMessage;
 
-public class WebServerMain {
-  public static void main(String[] args) {
-    MessageBroker messageBroker = new MessageBroker();
-    MidiWatcher midiWatcher = new MidiWatcher(messageBroker);
-    WebServer webServer = new WebServer(messageBroker);
-    midiWatcher.tsStart();
-    webServer.tsStart();
+public class OnPitchBend extends TypedMessage {
+
+  private int program;
+
+  public OnPitchBend(int program) {
+    this.program = program;
   }
+
+  public int getProgram() {
+    return program;
+  }
+
+  @Override
+  public String toString() {
+    return "OnProgramChange [program=" + program + "]";
+  }
+
 }

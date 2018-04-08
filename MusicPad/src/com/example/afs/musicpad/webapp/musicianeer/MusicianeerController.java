@@ -23,6 +23,7 @@ public class MusicianeerController extends ControllerTask {
   public static final int DEFAULT_PERCENT_GAIN = 50;
 
   private boolean isDown;
+  private int midiNote = -1;
   private int lastMidiNote;
   private Musicianeer musicianeer;
   private MusicianeerView musicianeerView;
@@ -109,33 +110,37 @@ public class MusicianeerController extends ControllerTask {
 
   @Override
   protected void doMouseDown(String id) {
+    isDown = true;
     if (id.startsWith("midi-note-")) {
-      int midiNote = Integer.parseInt(id.substring("midi-note-".length()));
+      midiNote = Integer.parseInt(id.substring("midi-note-".length()));
       musicianeer.press(midiNote);
-      isDown = true;
       musicianeerView.setMidiNoteLed(midiNote, false);
     }
   }
 
   @Override
   protected void doMouseOut(String id) {
-    if (isDown) {
-      musicianeer.release();
+    if (midiNote != -1) {
+      musicianeer.release(midiNote);
+      midiNote = -1;
     }
   }
 
   @Override
   protected void doMouseOver(String id) {
     if (isDown && id.startsWith("midi-note-")) {
-      int midiNote = Integer.parseInt(id.substring("midi-note-".length()));
+      midiNote = Integer.parseInt(id.substring("midi-note-".length()));
       musicianeer.press(midiNote);
     }
   }
 
   @Override
   protected void doMouseUp(String id) {
-    musicianeer.release();
     isDown = false;
+    if (midiNote != -1) {
+      musicianeer.release(midiNote);
+      midiNote = -1;
+    }
   }
 
   private void doMelodyNote(OnMelodyNote message) {
