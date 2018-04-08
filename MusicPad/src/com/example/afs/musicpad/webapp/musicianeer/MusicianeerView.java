@@ -27,14 +27,14 @@ public class MusicianeerView extends ShadowDomBuilder {
             .add(div(".title") //
                 .add(text("Musicianeer"))) //
             .add(div(".song") //
-                .add(clicker("left-group", "<<")) //
-                .add(clicker("left-single", "<")) //
+                .add(clicker("previous-page", "<<")) //
+                .add(clicker("previous-song", "<")) //
                 .add(clicker("stop", "STOP")) //
                 .add(div("#song-title") //
                     .add(text("Title of current song"))) //
                 .add(clicker("play", "PLAY")) //
-                .add(clicker("right-single", ">")) //
-                .add(clicker("right-group", ">>"))) //
+                .add(clicker("next-song", ">")) //
+                .add(clicker("next-page", ">>"))) //
             .add(keyboard()) //
             .add(div(".sliders") //
                 .add(slider("tempo", 100)) //

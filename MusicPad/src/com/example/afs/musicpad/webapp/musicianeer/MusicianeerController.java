@@ -15,6 +15,7 @@ import com.example.afs.musicpad.task.ControllerTask;
 import com.example.afs.musicpad.task.MessageBroker;
 import com.example.afs.musicpad.webapp.musicianeer.Musicianeer.AccompanimentType;
 import com.example.afs.musicpad.webapp.musicianeer.Musicianeer.SelectType;
+import com.example.afs.musicpad.webapp.musicianeer.Musicianeer.TrackingType;
 
 public class MusicianeerController extends ControllerTask {
 
@@ -29,6 +30,7 @@ public class MusicianeerController extends ControllerTask {
     subscribe(OnSong.class, message -> doSong(message));
     subscribe(OnMelodyNote.class, message -> doMelodyNote(message));
     musicianeer = new Musicianeer(messageBroker);
+    musicianeer.tsStart();
   }
 
   @Override
@@ -37,8 +39,20 @@ public class MusicianeerController extends ControllerTask {
     case "drums":
       musicianeer.setAccompaniment(AccompanimentType.DRUMS);
       break;
+    case "follow":
+      musicianeer.setTracking(TrackingType.FOLLOW);
+      break;
     case "full":
       musicianeer.setAccompaniment(AccompanimentType.FULL);
+      break;
+    case "lead":
+      musicianeer.setTracking(TrackingType.LEAD);
+      break;
+    case "next-song":
+      musicianeer.selectSong(SelectType.NEXT);
+      break;
+    case "next-page":
+      musicianeer.selectSong(SelectType.NEXT_PAGE);
       break;
     case "piano":
       musicianeer.setAccompaniment(AccompanimentType.PIANO);
@@ -46,20 +60,21 @@ public class MusicianeerController extends ControllerTask {
     case "play":
       musicianeer.play();
       break;
-    case "left-single":
+    case "previous-page":
+      musicianeer.selectSong(SelectType.PREVIOUS_PAGE);
+      break;
+    case "previous-song":
       musicianeer.selectSong(SelectType.PREVIOUS);
       break;
     case "rhythm":
       musicianeer.setAccompaniment(AccompanimentType.RHYTHM);
-      break;
-    case "right-single":
-      musicianeer.selectSong(SelectType.NEXT);
       break;
     case "solo":
       musicianeer.setAccompaniment(AccompanimentType.SOLO);
       break;
     case "stop":
       musicianeer.stop();
+      musicianeerView.resetMidiNoteLeds();
       break;
     }
   }
@@ -126,7 +141,7 @@ public class MusicianeerController extends ControllerTask {
 
   private void doSong(OnSong message) {
     musicianeerView.resetMidiNoteLeds();
-    musicianeerView.setSongTitle(message.getSong().getTitle());
+    musicianeerView.setSongTitle((message.getIndex() + 1) + " - " + message.getSong().getTitle());
   }
 
 }

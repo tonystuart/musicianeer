@@ -80,6 +80,7 @@ public class Musicianeer extends MessageTask {
   public static final int LOWEST_NOTE = 48;
   public static final int HIGHEST_NOTE = 76;
 
+  private int melodyNote;
   private int lastProgram;
   private int melodyChannel;
   private int midiNote = -1;
@@ -90,7 +91,6 @@ public class Musicianeer extends MessageTask {
   private Synthesizer synthesizer;
   private Random random = new Random();
   private TrackingType trackingType = TrackingType.LEAD;
-  private AccompanimentType accompanimentType = AccompanimentType.FULL;
 
   public Musicianeer(MessageBroker messageBroker) {
     super(messageBroker);
@@ -119,6 +119,9 @@ public class Musicianeer extends MessageTask {
   public void press(int midiNote) {
     if (this.midiNote != -1) {
       synthesizer.releaseKey(melodyChannel, this.midiNote);
+    }
+    if (trackingType == TrackingType.LEAD && midiNote == melodyNote) {
+      transport.resume();
     }
     synthesizer.pressKey(melodyChannel, midiNote, 24);
     this.midiNote = midiNote;
@@ -176,6 +179,7 @@ public class Musicianeer extends MessageTask {
   }
 
   public void setTracking(TrackingType trackingType) {
+    transport.setTracking(trackingType);
   }
 
   public void stop() {
@@ -194,10 +198,15 @@ public class Musicianeer extends MessageTask {
   }
 
   private void doMelodyNote(OnMelodyNote message) {
+    melodyNote = message.getMidiNote();
   }
 
   private void doProgramChange(OnProgramChange message) {
     int program = message.getProgram();
+    setProgram(program);
+  }
+
+  private void setProgram(int program) {
     lastProgram = program;
     if (programOverride == 127) {
       synthesizer.changeProgram(melodyChannel, program);
@@ -205,6 +214,7 @@ public class Musicianeer extends MessageTask {
   }
 
   private void setSong(int index) {
+    setProgram(0);
     songLibrary.setIndex(index);
     Song song = songLibrary.getSong();
     int distanceToWhiteKeys = song.getDistanceToWhiteKeys();
@@ -237,7 +247,7 @@ public class Musicianeer extends MessageTask {
       }
     }
     transport.play(song.getNotes(), melodyChannel);
-    publish(new OnSong(song));
+    publish(new OnSong(song, index));
   }
 
 }

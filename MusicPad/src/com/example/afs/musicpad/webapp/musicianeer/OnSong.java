@@ -15,9 +15,15 @@ import com.example.afs.musicpad.song.Song;
 public class OnSong extends TypedMessage {
 
   private Song song;
+  private int index;
 
-  public OnSong(Song song) {
+  public OnSong(Song song, int index) {
     this.song = song;
+    this.index = index;
+  }
+
+  public int getIndex() {
+    return index;
   }
 
   public Song getSong() {
@@ -26,7 +32,7 @@ public class OnSong extends TypedMessage {
 
   @Override
   public String toString() {
-    return "OnSong [song=" + song + "]";
+    return "OnSong [song=" + song + ", index=" + index + "]";
   }
 
 }
