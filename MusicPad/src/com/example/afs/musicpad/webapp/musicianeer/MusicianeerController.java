@@ -19,7 +19,7 @@ import com.example.afs.musicpad.webapp.musicianeer.Musicianeer.TrackingType;
 
 public class MusicianeerController extends ControllerTask {
 
-  public static final int DEFAULT_PERCENT_TEMPO = 50;
+  public static final int DEFAULT_PERCENT_TEMPO = 100;
   public static final int DEFAULT_PERCENT_GAIN = 50;
 
   private boolean isDown;
