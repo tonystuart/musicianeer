@@ -55,7 +55,7 @@ fieldset {
 }
 .keyboard {
 	display: flex;
-	margin-top: 40px;
+	margin-top: 60px;
 }
 
 .keyboard div:hover {
@@ -94,21 +94,21 @@ fieldset {
 
 .black-key-led, .white-key-led {
 	position: absolute;
-	top: -20px;
-	width: 10px;
-	height: 10px;
+	width: 16px;
+	height: 16px;
 	border: 1px solid black;
-	border-radius: 5px;
+	border-radius: 8px;
 	background-color: black;
 }
 
 .black-key-led {
 	left: 5px;
-	top: -21px;
+	top: -50px;
 }
 
 .white-key-led {
 	left: 19px;
+	top: -30px;
 }
 
 .led-red {
