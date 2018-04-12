@@ -16,6 +16,7 @@ import com.example.afs.musicpad.task.MessageBroker;
 import com.example.afs.musicpad.webapp.musicianeer.Musicianeer.AccompanimentType;
 import com.example.afs.musicpad.webapp.musicianeer.Musicianeer.SelectType;
 import com.example.afs.musicpad.webapp.musicianeer.Musicianeer.TrackingType;
+import com.example.afs.musicpad.webapp.musicianeer.MusicianeerView.LedState;
 
 public class MusicianeerController extends ControllerTask {
 
@@ -31,6 +32,7 @@ public class MusicianeerController extends ControllerTask {
   public MusicianeerController(MessageBroker messageBroker) {
     super(messageBroker);
     musicianeerView = new MusicianeerView(this);
+    subscribe(OnHit.class, message -> doHit(message));
     subscribe(OnSong.class, message -> doSong(message));
     subscribe(OnMelodyNote.class, message -> doMelodyNote(message));
     musicianeer = new Musicianeer(messageBroker);
@@ -114,7 +116,7 @@ public class MusicianeerController extends ControllerTask {
     if (id.startsWith("midi-note-")) {
       midiNote = Integer.parseInt(id.substring("midi-note-".length()));
       musicianeer.press(midiNote);
-      musicianeerView.setMidiNoteLed(midiNote, false);
+      musicianeerView.setLedState(midiNote, LedState.OFF);
     }
   }
 
@@ -143,10 +145,14 @@ public class MusicianeerController extends ControllerTask {
     }
   }
 
+  private void doHit(OnHit message) {
+    musicianeerView.setLedState(message.getMidiNote(), LedState.GREEN);
+  }
+
   private void doMelodyNote(OnMelodyNote message) {
     int midiNote = message.getMidiNote();
-    musicianeerView.setMidiNoteLed(lastMidiNote, false);
-    musicianeerView.setMidiNoteLed(midiNote, true);
+    musicianeerView.setLedState(lastMidiNote, LedState.OFF);
+    musicianeerView.setLedState(midiNote, LedState.RED);
     lastMidiNote = midiNote;
   }
 

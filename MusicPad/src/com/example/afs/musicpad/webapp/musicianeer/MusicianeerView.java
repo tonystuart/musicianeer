@@ -20,6 +20,10 @@ import com.example.afs.musicpad.task.ControllerTask;
 
 public class MusicianeerView extends ShadowDomBuilder {
 
+  public enum LedState {
+    GREEN, OFF, RED
+  }
+
   public MusicianeerView(ControllerTask controllerTask) {
     super(controllerTask);
     add(div("#musicianeer", ".tab", ".selected-tab") //
@@ -54,8 +58,9 @@ public class MusicianeerView extends ShadowDomBuilder {
   }
 
   public void resetMidiNoteLeds() {
-    getElementsByClassName("white-key-led").forEach(element -> removeClass(element, "led-on"));
-    getElementsByClassName("black-key-led").forEach(element -> removeClass(element, "led-on"));
+    for (int i = Musicianeer.LOWEST_NOTE; i <= Musicianeer.HIGHEST_NOTE; i++) {
+      setLedState(i, LedState.OFF);
+    }
   }
 
   public void setAlternative(String id) {
@@ -65,11 +70,23 @@ public class MusicianeerView extends ShadowDomBuilder {
     }
   }
 
-  public void setMidiNoteLed(int midiNote, boolean isOn) {
-    if (isOn) {
-      addClass("midi-note-led-" + midiNote, "led-on");
-    } else {
-      removeClass("midi-note-led-" + midiNote, "led-on");
+  public void setLedState(int midiNote, LedState ledState) {
+    switch (ledState) {
+    case GREEN:
+      removeClass("midi-note-led-" + midiNote, "led-red");
+      addClass("midi-note-led-" + midiNote, "led-green");
+      break;
+    case OFF:
+      removeClass("midi-note-led-" + midiNote, "led-red");
+      removeClass("midi-note-led-" + midiNote, "led-green");
+      break;
+    case RED:
+      addClass("midi-note-led-" + midiNote, "led-red");
+      removeClass("midi-note-led-" + midiNote, "led-green");
+      break;
+    default:
+      break;
+
     }
   }
 

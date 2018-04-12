@@ -125,8 +125,11 @@ public class Musicianeer extends MessageTask {
     if (this.midiNote != -1) {
       synthesizer.releaseKey(melodyChannel, this.midiNote);
     }
-    if (trackingType == TrackingType.LEAD && midiNote == melodyNote) {
-      transport.resume();
+    if (midiNote == melodyNote) {
+      publish(new OnHit(midiNote));
+      if (trackingType == TrackingType.LEAD) {
+        transport.resume();
+      }
     }
     synthesizer.pressKey(melodyChannel, midiNote, 24);
     this.midiNote = midiNote;
