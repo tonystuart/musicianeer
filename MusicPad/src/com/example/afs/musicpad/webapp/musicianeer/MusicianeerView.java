@@ -9,13 +9,18 @@
 
 package com.example.afs.musicpad.webapp.musicianeer;
 
+import java.io.File;
+
 import com.example.afs.musicpad.html.Division;
 import com.example.afs.musicpad.html.Element;
+import com.example.afs.musicpad.html.Option;
 import com.example.afs.musicpad.html.Parent;
 import com.example.afs.musicpad.html.Radio;
 import com.example.afs.musicpad.html.Range;
+import com.example.afs.musicpad.html.Select;
 import com.example.afs.musicpad.html.ShadowDomBuilder;
 import com.example.afs.musicpad.midi.Midi;
+import com.example.afs.musicpad.midi.MidiLibrary;
 import com.example.afs.musicpad.task.ControllerTask;
 
 public class MusicianeerView extends ShadowDomBuilder {
@@ -34,8 +39,7 @@ public class MusicianeerView extends ShadowDomBuilder {
                 .add(clicker("previous-page", "<<")) //
                 .add(clicker("previous-song", "<")) //
                 .add(clicker("stop", "STOP")) //
-                .add(div("#song-title") //
-                    .add(text("Title of current song"))) //
+                .add(div("#song-title-container")) // initialized by setSongTitle
                 .add(clicker("play", "PLAY")) //
                 .add(clicker("next-song", ">")) //
                 .add(clicker("next-page", ">>"))) //
@@ -55,6 +59,18 @@ public class MusicianeerView extends ShadowDomBuilder {
                     .add(alternative("accompaniment", "Drums")) //
                     .add(alternative("accompaniment", "Solo"))))) //
         .addMouseUpHandler()); //
+  }
+
+  public void displaySongTitles(MidiLibrary midiLibrary) {
+    Division parent = getElementById("song-title-container");
+    Select songTitles = new Select("#song-titles");
+    songTitles.addInputHandler();
+    int index = 0;
+    for (File midiFile : midiLibrary) {
+      Option option = new Option(midiFile.getName(), index++);
+      songTitles.appendChild(option);
+    }
+    replaceChildren(parent, songTitles);
   }
 
   public void resetMidiNoteLeds() {
@@ -90,9 +106,9 @@ public class MusicianeerView extends ShadowDomBuilder {
     }
   }
 
-  public void setSongTitle(String titleText) {
-    Division songTitle = getElementById("song-title");
-    replaceChildren(songTitle, text(titleText));
+  public void setSongTitle(int songIndex) {
+    Select songTitles = getElementById("song-titles");
+    setProperty(songTitles, "value", songIndex);
   }
 
   private Parent alternative(String name, String legend) {

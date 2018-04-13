@@ -89,6 +89,7 @@ public class Musicianeer extends MessageTask {
   private Transport transport;
   private SongLibrary songLibrary;
   private Synthesizer synthesizer;
+  private MidiLibrary midiLibrary;
   private Random random = new Random();
   private TrackingType trackingType = TrackingType.LEAD;
 
@@ -104,12 +105,13 @@ public class Musicianeer extends MessageTask {
     if (path == null) {
       throw new IllegalStateException("midiLibraryPath property not set");
     }
-    MidiLibrary midiLibrary = new MidiLibrary(path);
+    midiLibrary = new MidiLibrary(path);
     songLibrary = new SongLibrary(midiLibrary);
   }
 
   public void loadInitialSong() {
     if (songLibrary.size() > 0) {
+      publish(new OnMidiLibrary(midiLibrary));
       setSong(random.nextInt(songLibrary.size()));
     }
   }

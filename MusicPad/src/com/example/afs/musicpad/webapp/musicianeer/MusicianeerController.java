@@ -35,6 +35,7 @@ public class MusicianeerController extends ControllerTask {
     subscribe(OnHit.class, message -> doHit(message));
     subscribe(OnSong.class, message -> doSong(message));
     subscribe(OnMelodyNote.class, message -> doMelodyNote(message));
+    subscribe(OnMidiLibrary.class, message -> doSongLibrary(message));
     musicianeer = new Musicianeer(messageBroker);
     musicianeer.tsStart();
   }
@@ -158,7 +159,11 @@ public class MusicianeerController extends ControllerTask {
 
   private void doSong(OnSong message) {
     musicianeerView.resetMidiNoteLeds();
-    musicianeerView.setSongTitle((message.getIndex() + 1) + " - " + message.getSong().getTitle());
+    musicianeerView.setSongTitle(message.getIndex());
+  }
+
+  private void doSongLibrary(OnMidiLibrary message) {
+    musicianeerView.displaySongTitles(message.getMidiLibrary());
   }
 
 }
