@@ -95,6 +95,9 @@ public class MusicianeerController extends ControllerTask {
     case "instrument":
       musicianeer.setProgramOverride(Integer.parseInt(value));
       break;
+    case "song-titles":
+      publish(new OnSongIndex(Integer.parseInt(value)));
+      break;
     case "volume":
       musicianeer.setPercentGain(Integer.parseInt(value));
       break;

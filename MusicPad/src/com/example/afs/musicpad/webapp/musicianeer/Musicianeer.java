@@ -59,6 +59,7 @@ public class Musicianeer extends MessageTask {
     super(messageBroker);
     subscribe(OnNoteOn.class, message -> doNoteOn(message));
     subscribe(OnNoteOff.class, message -> doNoteOff(message));
+    subscribe(OnSongIndex.class, message -> doSongIndex(message));
     subscribe(OnMelodyNote.class, message -> doMelodyNote(message));
     subscribe(OnProgramChange.class, message -> doProgramChange(message));
     synthesizer = createSynthesizer();
@@ -184,6 +185,10 @@ public class Musicianeer extends MessageTask {
   private void doProgramChange(OnProgramChange message) {
     int program = message.getProgram();
     setProgram(program);
+  }
+
+  private void doSongIndex(OnSongIndex message) {
+    setSong(message.getSongIndex());
   }
 
   private Song readSong(File file) {
