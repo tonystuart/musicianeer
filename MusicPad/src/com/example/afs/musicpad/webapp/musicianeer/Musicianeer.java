@@ -34,45 +34,6 @@ public class Musicianeer extends MessageTask {
     NEXT, NEXT_PAGE, PREVIOUS, PREVIOUS_PAGE
   }
 
-  public class SongLibrary {
-    private int index;
-    private Song song;
-    private MidiLibrary midiLibrary;
-
-    public SongLibrary(MidiLibrary midiLibrary) {
-      this.midiLibrary = midiLibrary;
-    }
-
-    public int getIndex() {
-      return index;
-    }
-
-    public Song getSong() {
-      return song;
-    }
-
-    public void setIndex(int index) {
-      if (index < 0 || index >= midiLibrary.size()) {
-        throw new IndexOutOfBoundsException();
-      }
-      this.index = index;
-      this.song = createSong(midiLibrary.get(index));
-    }
-
-    public int size() {
-      return midiLibrary.size();
-    }
-
-    private Song createSong(File file) {
-      Song song = new Song(file);
-      SongListener songListener = new SongListener(song);
-      MidiParser midiParser = new MidiParser(songListener, Default.TICKS_PER_BEAT);
-      midiParser.parse(file.getPath());
-      return song;
-    }
-
-  }
-
   public enum TrackingType {
     FOLLOW, LEAD
   }
@@ -80,6 +41,8 @@ public class Musicianeer extends MessageTask {
   public static final int LOWEST_NOTE = 36;
   public static final int HIGHEST_NOTE = 88;
 
+  private int index;
+  private Song song;
   private int melodyNote;
   private int lastProgram;
   private int melodyChannel;
@@ -87,7 +50,6 @@ public class Musicianeer extends MessageTask {
   private int programOverride = 127;
 
   private Transport transport;
-  private SongLibrary songLibrary;
   private Synthesizer synthesizer;
   private MidiLibrary midiLibrary;
   private Random random = new Random();
@@ -106,18 +68,16 @@ public class Musicianeer extends MessageTask {
       throw new IllegalStateException("midiLibraryPath property not set");
     }
     midiLibrary = new MidiLibrary(path);
-    songLibrary = new SongLibrary(midiLibrary);
   }
 
   public void loadInitialSong() {
-    if (songLibrary.size() > 0) {
+    if (midiLibrary.size() > 0) {
       publish(new OnMidiLibrary(midiLibrary));
-      setSong(random.nextInt(songLibrary.size()));
+      setSong(random.nextInt(midiLibrary.size()));
     }
   }
 
   public void play() {
-    Song song = songLibrary.getSong();
     if (song != null) {
       transport.play(song.getNotes(), melodyChannel);
     }
@@ -144,19 +104,19 @@ public class Musicianeer extends MessageTask {
 
   public void selectSong(SelectType selectType) {
     int newIndex;
-    if (songLibrary.size() > 0) {
+    if (midiLibrary.size() > 0) {
       switch (selectType) {
       case NEXT:
-        newIndex = Math.min(songLibrary.size() - 1, songLibrary.getIndex() + 1);
+        newIndex = Math.min(midiLibrary.size() - 1, index + 1);
         break;
       case NEXT_PAGE:
-        newIndex = Math.min(songLibrary.size() - 1, songLibrary.getIndex() + 10);
+        newIndex = Math.min(midiLibrary.size() - 1, index + 10);
         break;
       case PREVIOUS:
-        newIndex = Math.max(0, songLibrary.getIndex() - 1);
+        newIndex = Math.max(0, index - 1);
         break;
       case PREVIOUS_PAGE:
-        newIndex = Math.max(0, songLibrary.getIndex() - 10);
+        newIndex = Math.max(0, index - 10);
         break;
       default:
         throw new UnsupportedOperationException(selectType.name());
@@ -226,6 +186,14 @@ public class Musicianeer extends MessageTask {
     setProgram(program);
   }
 
+  private Song readSong(File file) {
+    Song song = new Song(file);
+    SongListener songListener = new SongListener(song);
+    MidiParser midiParser = new MidiParser(songListener, Default.TICKS_PER_BEAT);
+    midiParser.parse(file.getPath());
+    return song;
+  }
+
   private void setProgram(int program) {
     lastProgram = program;
     if (programOverride == 127) {
@@ -234,13 +202,16 @@ public class Musicianeer extends MessageTask {
   }
 
   private void setSong(int index) {
+    if (index < 0 || index >= midiLibrary.size()) {
+      throw new IndexOutOfBoundsException();
+    }
+    this.index = index;
+    this.song = readSong(midiLibrary.get(index));
     setProgram(0);
-    songLibrary.setIndex(index);
-    Song song = songLibrary.getSong();
-    int songTransposition = song.getDistanceToWhiteKeys();
     int melodyChannel = song.getPresumedMelodyChannel();
     int lowestMidiNote = song.getLowestMidiNote(melodyChannel);
     int highestMidiNote = song.getHighestMidiNote(melodyChannel);
+    int songTransposition = song.getDistanceToWhiteKeys();
     System.out.println("song=" + song);
     System.out.println("melodyChannel=" + melodyChannel + ", songTransposition=" + songTransposition + ", lowestMidiNote=" + lowestMidiNote + ", highestMidiNote=" + highestMidiNote);
     lowestMidiNote += songTransposition;
