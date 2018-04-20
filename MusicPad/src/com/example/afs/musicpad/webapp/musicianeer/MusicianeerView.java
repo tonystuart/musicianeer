@@ -15,6 +15,7 @@ import com.example.afs.musicpad.html.Division;
 import com.example.afs.musicpad.html.Element;
 import com.example.afs.musicpad.html.Option;
 import com.example.afs.musicpad.html.Parent;
+import com.example.afs.musicpad.html.PercentRange;
 import com.example.afs.musicpad.html.Radio;
 import com.example.afs.musicpad.html.Range;
 import com.example.afs.musicpad.html.Select;
@@ -45,9 +46,9 @@ public class MusicianeerView extends ShadowDomBuilder {
                 .add(clicker("next-page", ">>"))) //
             .add(keyboard()) //
             .add(div(".sliders") //
-                .add(slider("tempo", MusicianeerController.DEFAULT_PERCENT_TEMPO)) //
-                .add(slider("instrument", Midi.MAX_VALUE)) //
-                .add(slider("volume", MusicianeerController.DEFAULT_PERCENT_GAIN))) //
+                .add(percentSlider("tempo", Transport.DEFAULT_PERCENT_TEMPO)) //
+                .add(midiSlider("instrument", 50)) // TODO: Update instrument on program change
+                .add(percentSlider("volume", Transport.DEFAULT_PERCENT_GAIN))) //
             .add(div(".buttons") //
                 .add(fieldSet() //
                     .add(alternative("track", "Lead")) //
@@ -156,12 +157,23 @@ public class MusicianeerView extends ShadowDomBuilder {
     return keyboard;
   }
 
-  private Division slider(String id, int maximum) {
+  private Division midiSlider(String id, int value) {
     Division div = new Division(".slider");
     div.add(text(id));
     Range slider = new Range("#" + id);
-    slider.setMaximum(maximum);
+    slider.setMaximum(Midi.MAX_VALUE);
     slider.addInputHandler();
+    slider.setValue(value);
+    div.add(slider);
+    return div;
+  }
+
+  private Division percentSlider(String id, int value) {
+    Division div = new Division(".slider");
+    div.add(text(id));
+    Range slider = new PercentRange("#" + id);
+    slider.addInputHandler();
+    slider.setValue(value);
     div.add(slider);
     return div;
   }

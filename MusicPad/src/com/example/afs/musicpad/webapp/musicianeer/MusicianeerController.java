@@ -20,8 +20,8 @@ import com.example.afs.musicpad.webapp.musicianeer.MusicianeerView.LedState;
 
 public class MusicianeerController extends ControllerTask {
 
-  public static final int DEFAULT_PERCENT_TEMPO = 100;
-  public static final int DEFAULT_PERCENT_GAIN = 50;
+  public static final int MAX_PERCENT_TEMPO = 100;
+  public static final int MAX_PERCENT_GAIN = 100;
 
   private boolean isDown;
   private int midiNote = -1;
@@ -109,8 +109,6 @@ public class MusicianeerController extends ControllerTask {
     addShadowUpdate(new OnShadowUpdate(Action.REPLACE_CHILDREN, "body", musicianeerView.render()));
     musicianeerView.setAlternative("lead");
     musicianeerView.setAlternative("full");
-    musicianeer.setPercentGain(DEFAULT_PERCENT_TEMPO);
-    musicianeer.setPercentGain(DEFAULT_PERCENT_GAIN);
     musicianeer.loadInitialSong();
   }
 
