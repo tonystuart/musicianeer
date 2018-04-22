@@ -226,6 +226,7 @@ public class Transport {
     Note note = noteEvent.getNote();
     switch (noteEvent.getType()) {
     case NOTE_OFF: {
+      synthesizer.releaseKey(note.getChannel(), note.getMidiNote());
       break;
     }
     case NOTE_ON: {
