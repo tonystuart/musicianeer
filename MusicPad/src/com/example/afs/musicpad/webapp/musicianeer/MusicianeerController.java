@@ -27,7 +27,6 @@ public class MusicianeerController extends ControllerTask {
   private int channel;
   private int midiNote = -1;
   private int expectedMidiNote;
-  private Musicianeer musicianeer;
   private MusicianeerView musicianeerView;
 
   public MusicianeerController(MessageBroker messageBroker) {
@@ -36,8 +35,6 @@ public class MusicianeerController extends ControllerTask {
     subscribe(OnPlayCurrentSong.class, message -> doSong(message));
     subscribe(OnMidiLibrary.class, message -> doSongLibrary(message));
     subscribe(OnTransportNote.class, message -> doTransportNote(message));
-    musicianeer = new Musicianeer(messageBroker);
-    musicianeer.tsStart();
   }
 
   @Override

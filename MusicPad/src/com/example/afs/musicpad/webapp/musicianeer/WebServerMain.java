@@ -16,8 +16,10 @@ public class WebServerMain {
   public static void main(String[] args) {
     MessageBroker messageBroker = new MessageBroker();
     MidiWatcher midiWatcher = new MidiWatcher(messageBroker);
+    Musicianeer musicianeer = new Musicianeer(messageBroker);
     WebServer webServer = new WebServer(messageBroker);
     midiWatcher.tsStart();
+    musicianeer.tsStart();
     webServer.tsStart();
   }
 }
