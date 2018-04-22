@@ -11,33 +11,25 @@ package com.example.afs.musicpad.webapp.musicianeer;
 
 import com.example.afs.musicpad.task.Message;
 
-public class OnNoteOn implements Message {
+public class OnBrowseSong implements Message {
 
-  private int channel;
-  private int data1;
-  private int data2;
-
-  public OnNoteOn(int channel, int data1, int data2) {
-    this.channel = channel;
-    this.data1 = data1;
-    this.data2 = data2;
+  public enum BrowseType {
+    NEXT, NEXT_PAGE, PREVIOUS, PREVIOUS_PAGE
   }
 
-  public int getChannel() {
-    return channel;
+  private BrowseType browseType;
+
+  public OnBrowseSong(BrowseType browseType) {
+    this.browseType = browseType;
   }
 
-  public int getData1() {
-    return data1;
-  }
-
-  public int getData2() {
-    return data2;
+  public BrowseType getBrowseType() {
+    return browseType;
   }
 
   @Override
   public String toString() {
-    return "OnNoteOn [channel=" + channel + ", data1=" + data1 + ", data2=" + data2 + "]";
+    return "OnSelectSong [browseType=" + browseType + "]";
   }
 
 }

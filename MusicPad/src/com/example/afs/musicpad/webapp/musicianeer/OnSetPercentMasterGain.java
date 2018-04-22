@@ -11,21 +11,21 @@ package com.example.afs.musicpad.webapp.musicianeer;
 
 import com.example.afs.musicpad.task.Message;
 
-public class OnSongIndex implements Message {
+public class OnSetPercentMasterGain implements Message {
 
-  private int songIndex;
+  private int percentMasterGain;
 
-  public OnSongIndex(int songIndex) {
-    this.songIndex = songIndex;
+  public OnSetPercentMasterGain(int percentMasterGain) {
+    this.percentMasterGain = percentMasterGain;
   }
 
-  public int getSongIndex() {
-    return songIndex;
+  public int getPercentMasterGain() {
+    return percentMasterGain;
   }
 
   @Override
   public String toString() {
-    return "OnSongIndex [songIndex=" + songIndex + "]";
+    return "OnSetPercentMasterGain [percentMasterGain=" + percentMasterGain + "]";
   }
 
 }

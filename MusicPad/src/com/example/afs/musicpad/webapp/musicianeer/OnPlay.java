@@ -11,21 +11,6 @@ package com.example.afs.musicpad.webapp.musicianeer;
 
 import com.example.afs.musicpad.task.Message;
 
-public class OnHit implements Message {
-
-  private int midiNote;
-
-  public OnHit(int midiNote) {
-    this.midiNote = midiNote;
-  }
-
-  public int getMidiNote() {
-    return midiNote;
-  }
-
-  @Override
-  public String toString() {
-    return "OnHit [midiNote=" + midiNote + "]";
-  }
+public class OnPlay implements Message {
 
 }

@@ -9,29 +9,28 @@
 
 package com.example.afs.musicpad.webapp.musicianeer;
 
-import com.example.afs.musicpad.task.Message;
+import com.example.afs.musicpad.song.Song;
 
-public class OnProgramChange implements Message {
+public class CurrentSong {
+  private int index;
+  private Song song;
 
-  private int channel;
-  private int program;
-
-  public OnProgramChange(int channel, int program) {
-    this.channel = channel;
-    this.program = program;
+  public CurrentSong(int index, Song song) {
+    this.index = index;
+    this.song = song;
   }
 
-  public int getChannel() {
-    return channel;
+  public int getIndex() {
+    return index;
   }
 
-  public int getProgram() {
-    return program;
+  public Song getSong() {
+    return song;
   }
 
   @Override
   public String toString() {
-    return "OnProgramChange [channel=" + channel + ", program=" + program + "]";
+    return "CurrentSong [index=" + index + ", song=" + song + "]";
   }
 
 }

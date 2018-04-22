@@ -11,27 +11,6 @@ package com.example.afs.musicpad.webapp.musicianeer;
 
 import com.example.afs.musicpad.task.Message;
 
-public class OnProgramChange implements Message {
-
-  private int channel;
-  private int program;
-
-  public OnProgramChange(int channel, int program) {
-    this.channel = channel;
-    this.program = program;
-  }
-
-  public int getChannel() {
-    return channel;
-  }
-
-  public int getProgram() {
-    return program;
-  }
-
-  @Override
-  public String toString() {
-    return "OnProgramChange [channel=" + channel + ", program=" + program + "]";
-  }
+public class OnStop implements Message {
 
 }

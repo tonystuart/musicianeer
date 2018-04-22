@@ -42,6 +42,7 @@ public class MidiController extends MessageTask {
 
   private String deviceName;
   private MidiDeviceBundle deviceBundle;
+  private int channel;
 
   public MidiController(MessageBroker messageBroker, String deviceName, MidiDeviceBundle deviceBundle) {
     super(messageBroker);
@@ -90,9 +91,9 @@ public class MidiController extends MessageTask {
     int data1 = shortMessage.getData1();
     int data2 = shortMessage.getData2();
     if (command == ShortMessage.NOTE_ON) {
-      publish(new OnNoteOn(data1, data2));
+      publish(new OnNoteOn(channel, data1, data2));
     } else if (command == ShortMessage.NOTE_OFF) {
-      publish(new OnNoteOff(data1));
+      publish(new OnNoteOff(channel, data1));
     } else if (command == ShortMessage.POLY_PRESSURE) {
       publish(new OnChannelPressure(data1, data2));
     } else if (command == ShortMessage.CONTROL_CHANGE) {

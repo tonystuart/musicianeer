@@ -13,29 +13,29 @@ import com.example.afs.musicpad.message.OnShadowUpdate;
 import com.example.afs.musicpad.message.OnShadowUpdate.Action;
 import com.example.afs.musicpad.task.ControllerTask;
 import com.example.afs.musicpad.task.MessageBroker;
-import com.example.afs.musicpad.webapp.musicianeer.Musicianeer.AccompanimentType;
-import com.example.afs.musicpad.webapp.musicianeer.Musicianeer.SelectType;
-import com.example.afs.musicpad.webapp.musicianeer.Musicianeer.TrackingType;
 import com.example.afs.musicpad.webapp.musicianeer.MusicianeerView.LedState;
+import com.example.afs.musicpad.webapp.musicianeer.OnBrowseSong.BrowseType;
+import com.example.afs.musicpad.webapp.musicianeer.OnSetAccompanimentType.AccompanimentType;
 
 public class MusicianeerController extends ControllerTask {
 
   public static final int MAX_PERCENT_TEMPO = 100;
   public static final int MAX_PERCENT_GAIN = 100;
+  private static final int DEFAULT_VELOCITY = 24;
 
   private boolean isDown;
+  private int channel;
   private int midiNote = -1;
-  private int lastMidiNote;
+  private int expectedMidiNote;
   private Musicianeer musicianeer;
   private MusicianeerView musicianeerView;
 
   public MusicianeerController(MessageBroker messageBroker) {
     super(messageBroker);
     musicianeerView = new MusicianeerView(this);
-    subscribe(OnHit.class, message -> doHit(message));
-    subscribe(OnSong.class, message -> doSong(message));
-    subscribe(OnMelodyNote.class, message -> doMelodyNote(message));
+    subscribe(OnPlayCurrentSong.class, message -> doSong(message));
     subscribe(OnMidiLibrary.class, message -> doSongLibrary(message));
+    subscribe(OnTransportNote.class, message -> doTransportNote(message));
     musicianeer = new Musicianeer(messageBroker);
     musicianeer.tsStart();
   }
@@ -44,43 +44,37 @@ public class MusicianeerController extends ControllerTask {
   protected void doClick(String id) {
     switch (id) {
     case "drums":
-      musicianeer.setAccompaniment(AccompanimentType.DRUMS);
-      break;
-    case "follow":
-      musicianeer.setTracking(TrackingType.FOLLOW);
+      publish(new OnSetAccompanimentType(AccompanimentType.DRUMS));
       break;
     case "full":
-      musicianeer.setAccompaniment(AccompanimentType.FULL);
-      break;
-    case "lead":
-      musicianeer.setTracking(TrackingType.LEAD);
+      publish(new OnSetAccompanimentType(OnSetAccompanimentType.AccompanimentType.FULL));
       break;
     case "next-song":
-      musicianeer.selectSong(SelectType.NEXT);
+      publish(new OnBrowseSong(BrowseType.NEXT));
       break;
     case "next-page":
-      musicianeer.selectSong(SelectType.NEXT_PAGE);
+      publish(new OnBrowseSong(OnBrowseSong.BrowseType.NEXT_PAGE));
       break;
     case "piano":
-      musicianeer.setAccompaniment(AccompanimentType.PIANO);
+      publish(new OnSetAccompanimentType(OnSetAccompanimentType.AccompanimentType.PIANO));
       break;
     case "play":
-      musicianeer.play();
+      publish(new OnPlay());
       break;
     case "previous-page":
-      musicianeer.selectSong(SelectType.PREVIOUS_PAGE);
+      publish(new OnBrowseSong(OnBrowseSong.BrowseType.PREVIOUS_PAGE));
       break;
     case "previous-song":
-      musicianeer.selectSong(SelectType.PREVIOUS);
+      publish(new OnBrowseSong(OnBrowseSong.BrowseType.PREVIOUS));
       break;
     case "rhythm":
-      musicianeer.setAccompaniment(AccompanimentType.RHYTHM);
+      publish(new OnSetAccompanimentType(OnSetAccompanimentType.AccompanimentType.RHYTHM));
       break;
     case "solo":
-      musicianeer.setAccompaniment(AccompanimentType.SOLO);
+      publish(new OnSetAccompanimentType(OnSetAccompanimentType.AccompanimentType.SOLO));
       break;
     case "stop":
-      musicianeer.stop();
+      publish(new OnStop());
       musicianeerView.resetMidiNoteLeds();
       break;
     }
@@ -90,16 +84,16 @@ public class MusicianeerController extends ControllerTask {
   protected void doInput(String id, String value) {
     switch (id) {
     case "tempo":
-      musicianeer.setPercentTempo(Integer.parseInt(value));
+      publish(new OnSetPercentTempo(Integer.parseInt(value)));
       break;
     case "instrument":
-      musicianeer.setProgramOverride(Integer.parseInt(value));
+      publish(new OnProgramOverride(channel, Integer.parseInt(value)));
       break;
     case "song-titles":
-      publish(new OnSongIndex(Integer.parseInt(value)));
+      publish(new OnSelectSong(Integer.parseInt(value)));
       break;
     case "volume":
-      musicianeer.setPercentGain(Integer.parseInt(value));
+      publish(new OnSetPercentMasterGain(Integer.parseInt(value)));
       break;
     }
   }
@@ -107,9 +101,7 @@ public class MusicianeerController extends ControllerTask {
   @Override
   protected void doLoad() {
     addShadowUpdate(new OnShadowUpdate(Action.REPLACE_CHILDREN, "body", musicianeerView.render()));
-    musicianeerView.setAlternative("lead");
     musicianeerView.setAlternative("full");
-    musicianeer.loadInitialSong();
   }
 
   @Override
@@ -117,15 +109,19 @@ public class MusicianeerController extends ControllerTask {
     isDown = true;
     if (id.startsWith("midi-note-")) {
       midiNote = Integer.parseInt(id.substring("midi-note-".length()));
-      musicianeer.press(midiNote);
-      musicianeerView.setLedState(midiNote, LedState.OFF);
+      publish(new OnNoteOn(channel, midiNote, DEFAULT_VELOCITY));
+      if (midiNote == expectedMidiNote) {
+        musicianeerView.setLedState(midiNote, LedState.GREEN);
+      } else {
+        musicianeerView.setLedState(midiNote, LedState.OFF);
+      }
     }
   }
 
   @Override
   protected void doMouseOut(String id) {
     if (midiNote != -1) {
-      musicianeer.release(midiNote);
+      publish(new OnNoteOff(channel, midiNote));
       midiNote = -1;
     }
   }
@@ -134,7 +130,7 @@ public class MusicianeerController extends ControllerTask {
   protected void doMouseOver(String id) {
     if (isDown && id.startsWith("midi-note-")) {
       midiNote = Integer.parseInt(id.substring("midi-note-".length()));
-      musicianeer.press(midiNote);
+      publish(new OnNoteOn(channel, midiNote, DEFAULT_VELOCITY));
     }
   }
 
@@ -142,29 +138,27 @@ public class MusicianeerController extends ControllerTask {
   protected void doMouseUp(String id) {
     isDown = false;
     if (midiNote != -1) {
-      musicianeer.release(midiNote);
+      publish(new OnNoteOff(channel, midiNote));
       midiNote = -1;
     }
   }
 
-  private void doHit(OnHit message) {
-    musicianeerView.setLedState(message.getMidiNote(), LedState.GREEN);
-  }
-
-  private void doMelodyNote(OnMelodyNote message) {
-    int midiNote = message.getMidiNote();
-    musicianeerView.setLedState(lastMidiNote, LedState.OFF);
-    musicianeerView.setLedState(midiNote, LedState.RED);
-    lastMidiNote = midiNote;
-  }
-
-  private void doSong(OnSong message) {
+  private void doSong(OnPlayCurrentSong message) {
     musicianeerView.resetMidiNoteLeds();
-    musicianeerView.setSongTitle(message.getIndex());
+    musicianeerView.setSongTitle(message.getCurrentSong().getIndex());
   }
 
   private void doSongLibrary(OnMidiLibrary message) {
     musicianeerView.displaySongTitles(message.getMidiLibrary());
+  }
+
+  private void doTransportNote(OnTransportNote message) {
+    int midiNote = message.getMidiNote();
+    musicianeerView.setLedState(expectedMidiNote, LedState.OFF);
+    musicianeerView.setLedState(midiNote, LedState.RED);
+    if (message.getChannel() == channel) {
+      expectedMidiNote = midiNote;
+    }
   }
 
 }

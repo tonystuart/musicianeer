@@ -13,10 +13,16 @@ import com.example.afs.musicpad.task.Message;
 
 public class OnNoteOff implements Message {
 
+  private int channel;
   private int data1;
 
-  public OnNoteOff(int data1) {
+  public OnNoteOff(int channel, int data1) {
+    this.channel = channel;
     this.data1 = data1;
+  }
+
+  public int getChannel() {
+    return channel;
   }
 
   public int getData1() {
@@ -25,7 +31,7 @@ public class OnNoteOff implements Message {
 
   @Override
   public String toString() {
-    return "OnNoteOff [data1=" + data1 + "]";
+    return "OnNoteOff [channel=" + channel + ", data1=" + data1 + "]";
   }
 
 }

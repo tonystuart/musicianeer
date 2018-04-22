@@ -24,11 +24,8 @@ import com.example.afs.musicpad.transport.NoteEvent.Type;
 import com.example.afs.musicpad.transport.NoteEventSequencer;
 import com.example.afs.musicpad.util.Range;
 import com.example.afs.musicpad.util.Velocity;
-import com.example.afs.musicpad.webapp.musicianeer.Musicianeer.AccompanimentType;
 
-// TODO: Derive this from ServiceTask
-// TODO: Replace public methods with message handlers
-// TODO: Provide services in place of getters
+// NB: All methods are single threaded via Musicianeer
 public class Transport {
 
   public enum Whence {
@@ -40,7 +37,6 @@ public class Transport {
   public static final int DEFAULT_PERCENT_VELOCITY = 10;
   public static final int DEFAULT_MASTER_PROGRAM_OFF = Midi.MAX_VALUE;
 
-  private int melodyChannel;
   private int masterProgram = DEFAULT_MASTER_PROGRAM_OFF;
   private int percentVelocity = DEFAULT_PERCENT_VELOCITY;
   private int[] currentPrograms = new int[Midi.CHANNELS];
@@ -49,7 +45,7 @@ public class Transport {
   private MessageBroker messageBroker;
   private NoteEventSequencer sequencer;
   private Deque<NoteEvent> reviewQueue = new LinkedList<>();
-  private AccompanimentType accompanimentType = AccompanimentType.FULL;
+  private OnSetAccompanimentType.AccompanimentType accompanimentType = OnSetAccompanimentType.AccompanimentType.FULL;
 
   public Transport(MessageBroker messageBroker, Synthesizer synthesizer) {
     this.messageBroker = messageBroker;
@@ -100,8 +96,7 @@ public class Transport {
     synthesizer.allNotesOff();
   }
 
-  public void play(Iterable<Note> notes, int melodyChannel) {
-    this.melodyChannel = melodyChannel;
+  public void play(Iterable<Note> notes) {
     clear();
     long firstTick = -1;
     long lastTick = -1;
@@ -180,9 +175,9 @@ public class Transport {
     }
   }
 
-  public void setAccompaniment(AccompanimentType accompanimentType) {
+  public void setAccompaniment(OnSetAccompanimentType.AccompanimentType accompanimentType) {
     this.accompanimentType = accompanimentType;
-    if (accompanimentType == AccompanimentType.PIANO) {
+    if (accompanimentType == OnSetAccompanimentType.AccompanimentType.PIANO) {
       masterProgram = 0;
     } else {
       masterProgram = DEFAULT_MASTER_PROGRAM_OFF;
@@ -215,27 +210,22 @@ public class Transport {
     reviewQueue.clear();
   }
 
-  private void fireMelodyNote(int midiNote) {
-    messageBroker.publish(new OnMelodyNote(midiNote));
-  }
-
-  private void fireProgramChange(int program) {
-    messageBroker.publish(new OnProgramChange(program));
+  private void fireProgramChange(int channel, int program) {
+    messageBroker.publish(new OnProgramChange(channel, program));
   }
 
   private void fireTick(long tick) {
     messageBroker.publish(new OnTick(tick));
   }
 
+  private void fireTransportNote(int channel, int midiNote) {
+    messageBroker.publish(new OnTransportNote(channel, midiNote));
+  }
+
   private void processNoteEvent(NoteEvent noteEvent) {
     Note note = noteEvent.getNote();
     switch (noteEvent.getType()) {
     case NOTE_OFF: {
-      int channel = note.getChannel();
-      if (channel != melodyChannel) {
-        int midiNote = note.getMidiNote();
-        synthesizer.releaseKey(channel, midiNote);
-      }
       break;
     }
     case NOTE_ON: {
@@ -249,37 +239,32 @@ public class Transport {
       if (currentPrograms[channel] != program) {
         synthesizer.changeProgram(channel, program);
         currentPrograms[channel] = program;
-        if (channel == melodyChannel) {
-          fireProgramChange(program);
-        }
+        fireProgramChange(channel, program);
       }
-      if (channel == melodyChannel) {
-        fireMelodyNote(midiNote);
-      } else {
-        int scaledVelocity = Velocity.scale(velocity, percentVelocity);
-        switch (accompanimentType) {
-        case DRUMS:
-          if (channel == Midi.DRUM) {
-            synthesizer.pressKey(channel, midiNote, scaledVelocity);
-          }
-          break;
-        case FULL:
+      fireTransportNote(channel, midiNote);
+      int scaledVelocity = Velocity.scale(velocity, percentVelocity);
+      switch (accompanimentType) {
+      case DRUMS:
+        if (channel == Midi.DRUM) {
           synthesizer.pressKey(channel, midiNote, scaledVelocity);
-          break;
-        case PIANO:
-          // Handled via master program
-          synthesizer.pressKey(channel, midiNote, scaledVelocity);
-          break;
-        case RHYTHM:
-          if (channel == Midi.DRUM || (currentPrograms[channel] >= 32 && currentPrograms[channel] < 40)) {
-            synthesizer.pressKey(channel, midiNote, scaledVelocity);
-          }
-          break;
-        case SOLO:
-          break;
-        default:
-          break;
         }
+        break;
+      case FULL:
+        synthesizer.pressKey(channel, midiNote, scaledVelocity);
+        break;
+      case PIANO:
+        // Handled via master program
+        synthesizer.pressKey(channel, midiNote, scaledVelocity);
+        break;
+      case RHYTHM:
+        if (channel == Midi.DRUM || (currentPrograms[channel] >= 32 && currentPrograms[channel] < 40)) {
+          synthesizer.pressKey(channel, midiNote, scaledVelocity);
+        }
+        break;
+      case SOLO:
+        break;
+      default:
+        break;
       }
       break;
     }

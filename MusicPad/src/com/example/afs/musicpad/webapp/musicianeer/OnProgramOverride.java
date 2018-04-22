@@ -11,33 +11,29 @@ package com.example.afs.musicpad.webapp.musicianeer;
 
 import com.example.afs.musicpad.task.Message;
 
-public class OnNoteOn implements Message {
+public class OnProgramOverride implements Message {
+
+  public static final int DEFAULT = -1;
 
   private int channel;
-  private int data1;
-  private int data2;
+  private int program;
 
-  public OnNoteOn(int channel, int data1, int data2) {
+  public OnProgramOverride(int channel, int program) {
     this.channel = channel;
-    this.data1 = data1;
-    this.data2 = data2;
+    this.program = program;
   }
 
   public int getChannel() {
     return channel;
   }
 
-  public int getData1() {
-    return data1;
-  }
-
-  public int getData2() {
-    return data2;
+  public int getProgram() {
+    return program;
   }
 
   @Override
   public String toString() {
-    return "OnNoteOn [channel=" + channel + ", data1=" + data1 + ", data2=" + data2 + "]";
+    return "OnProgramOverride [channel=" + channel + ", program=" + program + "]";
   }
 
 }

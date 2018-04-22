@@ -11,33 +11,21 @@ package com.example.afs.musicpad.webapp.musicianeer;
 
 import com.example.afs.musicpad.task.Message;
 
-public class OnNoteOn implements Message {
+public class OnSetPercentTempo implements Message {
 
-  private int channel;
-  private int data1;
-  private int data2;
+  private int percentTempo;
 
-  public OnNoteOn(int channel, int data1, int data2) {
-    this.channel = channel;
-    this.data1 = data1;
-    this.data2 = data2;
+  public OnSetPercentTempo(int percentTempo) {
+    this.percentTempo = percentTempo;
   }
 
-  public int getChannel() {
-    return channel;
-  }
-
-  public int getData1() {
-    return data1;
-  }
-
-  public int getData2() {
-    return data2;
+  public int getPercentTempo() {
+    return percentTempo;
   }
 
   @Override
   public String toString() {
-    return "OnNoteOn [channel=" + channel + ", data1=" + data1 + ", data2=" + data2 + "]";
+    return "OnSetPercentTempo [percentTempo=" + percentTempo + "]";
   }
 
 }

@@ -11,33 +11,25 @@ package com.example.afs.musicpad.webapp.musicianeer;
 
 import com.example.afs.musicpad.task.Message;
 
-public class OnNoteOn implements Message {
+public class OnSetAccompanimentType implements Message {
 
-  private int channel;
-  private int data1;
-  private int data2;
-
-  public OnNoteOn(int channel, int data1, int data2) {
-    this.channel = channel;
-    this.data1 = data1;
-    this.data2 = data2;
+  public enum AccompanimentType {
+    FULL, PIANO, RHYTHM, DRUMS, SOLO
   }
 
-  public int getChannel() {
-    return channel;
+  private AccompanimentType accompanimentType;
+
+  public OnSetAccompanimentType(AccompanimentType accompanimentType) {
+    this.accompanimentType = accompanimentType;
   }
 
-  public int getData1() {
-    return data1;
-  }
-
-  public int getData2() {
-    return data2;
+  public AccompanimentType getAccompanimentType() {
+    return accompanimentType;
   }
 
   @Override
   public String toString() {
-    return "OnNoteOn [channel=" + channel + ", data1=" + data1 + ", data2=" + data2 + "]";
+    return "OnSetAccompanimentType [accompanimentType=" + accompanimentType + "]";
   }
 
 }

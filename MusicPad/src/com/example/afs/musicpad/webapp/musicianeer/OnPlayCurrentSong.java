@@ -9,36 +9,29 @@
 
 package com.example.afs.musicpad.webapp.musicianeer;
 
-import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.task.Message;
 
-public class OnSong implements Message {
+public class OnPlayCurrentSong implements Message {
 
-  private Song song;
-  private int index;
+  private CurrentSong currentSong;
   private int keyboardTransposition;
 
-  public OnSong(Song song, int index, int keyboardTransposition) {
-    this.song = song;
-    this.index = index;
+  public OnPlayCurrentSong(CurrentSong currentSong, int keyboardTransposition) {
+    this.currentSong = currentSong;
     this.keyboardTransposition = keyboardTransposition;
   }
 
-  public int getIndex() {
-    return index;
+  public CurrentSong getCurrentSong() {
+    return currentSong;
   }
 
   public int getKeyboardTransposition() {
     return keyboardTransposition;
   }
 
-  public Song getSong() {
-    return song;
-  }
-
   @Override
   public String toString() {
-    return "OnSong [song=" + song + ", index=" + index + ", keyboardTransposition=" + keyboardTransposition + "]";
+    return "OnPlayCurrentSong [currentSong=" + currentSong + ", keyboardTransposition=" + keyboardTransposition + "]";
   }
 
 }

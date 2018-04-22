@@ -22,46 +22,48 @@ import com.example.afs.musicpad.parser.SongListener;
 import com.example.afs.musicpad.song.Default;
 import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.task.MessageBroker;
-import com.example.afs.musicpad.task.MessageTask;
+import com.example.afs.musicpad.task.ServiceTask;
+import com.example.afs.musicpad.webapp.musicianeer.OnBrowseSong.BrowseType;
 
-public class Musicianeer extends MessageTask {
-
-  public enum AccompanimentType {
-    FULL, PIANO, RHYTHM, DRUMS, SOLO
-  }
-
-  public enum SelectType {
-    NEXT, NEXT_PAGE, PREVIOUS, PREVIOUS_PAGE
-  }
-
-  public enum TrackingType {
-    FOLLOW, LEAD
-  }
+public class Musicianeer extends ServiceTask {
 
   public static final int LOWEST_NOTE = 36;
   public static final int HIGHEST_NOTE = 88;
 
-  private int index;
-  private Song song;
-  private int melodyNote;
-  private int lastProgram;
-  private int melodyChannel;
-  private int midiNote = -1;
-  private int programOverride = 127;
+  private static final int PLAYER_BASE = Midi.CHANNELS;
+  private static final int PLAYER_CHANNELS = Midi.CHANNELS;
+  private static final int TOTAL_CHANNELS = PLAYER_BASE + PLAYER_CHANNELS;
+
+  private static final int mapChannel(int channel) {
+    return PLAYER_BASE + channel;
+  }
+
+  private int[] defaultPrograms = new int[Midi.CHANNELS];
+  private int[] programOverrides = new int[Midi.CHANNELS];
 
   private Transport transport;
   private Synthesizer synthesizer;
   private MidiLibrary midiLibrary;
+  private CurrentSong currentSong;
   private Random random = new Random();
-  private TrackingType trackingType = TrackingType.LEAD;
 
   public Musicianeer(MessageBroker messageBroker) {
     super(messageBroker);
+    provide(Services.getMidiLibrary, () -> getMidiLibrary());
+    provide(Services.getCurrentSong, () -> getCurrentSong());
+    provide(Services.getPercentTempo, () -> getPercentTempo());
+    provide(Services.getPercentMasterGain, () -> getPercentMasterGain());
+    subscribe(OnPlay.class, message -> doPlay(message));
+    subscribe(OnStop.class, message -> doStop(message));
     subscribe(OnNoteOn.class, message -> doNoteOn(message));
     subscribe(OnNoteOff.class, message -> doNoteOff(message));
-    subscribe(OnSongIndex.class, message -> doSongIndex(message));
-    subscribe(OnMelodyNote.class, message -> doMelodyNote(message));
+    subscribe(OnBrowseSong.class, message -> doBrowseSong(message));
+    subscribe(OnSelectSong.class, message -> doSelectSong(message));
     subscribe(OnProgramChange.class, message -> doProgramChange(message));
+    subscribe(OnProgramOverride.class, message -> doProgramOverride(message));
+    subscribe(OnSetPercentTempo.class, message -> doSetPercentTempo(message));
+    subscribe(OnSetAccompanimentType.class, message -> doSetAccompanimentType(message));
+    subscribe(OnSetPercentMasterGain.class, message -> doSetPercentMasterGain(message));
     synthesizer = createSynthesizer();
     transport = new Transport(messageBroker, synthesizer);
     String path = System.getProperty("midiLibraryPath");
@@ -69,44 +71,29 @@ public class Musicianeer extends MessageTask {
       throw new IllegalStateException("midiLibraryPath property not set");
     }
     midiLibrary = new MidiLibrary(path);
-  }
-
-  public void loadInitialSong() {
+    publish(new OnMidiLibrary(midiLibrary));
     if (midiLibrary.size() > 0) {
-      publish(new OnMidiLibrary(midiLibrary));
-      setSong(random.nextInt(midiLibrary.size()));
+      setCurrentSong(random.nextInt(midiLibrary.size()));
     }
   }
 
-  public void play() {
-    if (song != null) {
-      transport.play(song.getNotes(), melodyChannel);
-    }
+  private Synthesizer createSynthesizer() {
+    System.loadLibrary(FluidSynth.NATIVE_LIBRARY_NAME);
+    int processors = Runtime.getRuntime().availableProcessors();
+    System.out.println("Musicianeer.createSynthesizer: processors=" + processors);
+    Settings settings = Synthesizer.createDefaultSettings();
+    settings.set("synth.midi-channels", TOTAL_CHANNELS);
+    settings.set("synth.cpu-cores", processors);
+    Synthesizer synthesizer = new Synthesizer(settings);
+    return synthesizer;
   }
 
-  public void press(int midiNote) {
-    if (this.midiNote != -1) {
-      synthesizer.releaseKey(melodyChannel, this.midiNote);
-    }
-    if (midiNote == melodyNote) {
-      publish(new OnHit(midiNote));
-      if (trackingType == TrackingType.LEAD) {
-        transport.resume();
-      }
-    }
-    synthesizer.pressKey(melodyChannel, midiNote, 24);
-    this.midiNote = midiNote;
-  }
-
-  // TODO: Decouple using message handler and make private
-  public void release(int midiNote) {
-    synthesizer.releaseKey(melodyChannel, midiNote);
-  }
-
-  public void selectSong(SelectType selectType) {
+  private void doBrowseSong(OnBrowseSong message) {
     int newIndex;
-    if (midiLibrary.size() > 0) {
-      switch (selectType) {
+    if (currentSong != null) {
+      int index = currentSong.getIndex();
+      BrowseType browseType = message.getBrowseType();
+      switch (browseType) {
       case NEXT:
         newIndex = Math.min(midiLibrary.size() - 1, index + 1);
         break;
@@ -120,99 +107,84 @@ public class Musicianeer extends MessageTask {
         newIndex = Math.max(0, index - 10);
         break;
       default:
-        throw new UnsupportedOperationException(selectType.name());
+        throw new UnsupportedOperationException(browseType.name());
       }
-      setSong(newIndex);
-    }
-  }
-
-  public void setAccompaniment(AccompanimentType accompanimentType) {
-    transport.setAccompaniment(accompanimentType);
-  }
-
-  public void setPercentGain(int percentGain) {
-    transport.setPercentGain(percentGain);
-  }
-
-  public void setPercentTempo(int percentTempo) {
-    transport.setPercentTempo(percentTempo);
-  }
-
-  public void setProgramOverride(int program) {
-    this.programOverride = program;
-    if (program == 127) {
-      synthesizer.changeProgram(melodyChannel, lastProgram);
-    } else {
-      synthesizer.changeProgram(melodyChannel, program);
-    }
-  }
-
-  public void setTracking(TrackingType trackingType) {
-    this.trackingType = trackingType;
-    transport.resume();
-  }
-
-  public void stop() {
-    transport.stop();
-  }
-
-  private Synthesizer createSynthesizer() {
-    System.loadLibrary(FluidSynth.NATIVE_LIBRARY_NAME);
-    int processors = Runtime.getRuntime().availableProcessors();
-    System.out.println("Musicianeer.createSynthesizer: processors=" + processors);
-    Settings settings = Synthesizer.createDefaultSettings();
-    settings.set("synth.midi-channels", Midi.CHANNELS);
-    settings.set("synth.cpu-cores", processors);
-    Synthesizer synthesizer = new Synthesizer(settings);
-    return synthesizer;
-  }
-
-  private void doMelodyNote(OnMelodyNote message) {
-    melodyNote = message.getMidiNote();
-    if (trackingType == TrackingType.LEAD && (melodyNote >= LOWEST_NOTE && melodyNote <= HIGHEST_NOTE)) {
-      transport.pause();
+      setCurrentSong(newIndex);
     }
   }
 
   private void doNoteOff(OnNoteOff message) {
-    release(message.getData1());
+    synthesizer.releaseKey(mapChannel(message.getChannel()), message.getData1());
   }
 
   private void doNoteOn(OnNoteOn message) {
-    press(message.getData1());
+    synthesizer.pressKey(mapChannel(message.getChannel()), message.getData1(), message.getData2());
+  }
+
+  private void doPlay(OnPlay message) {
+    if (currentSong != null) {
+      transport.play(currentSong.getSong().getNotes());
+    }
   }
 
   private void doProgramChange(OnProgramChange message) {
+    int channel = message.getChannel();
     int program = message.getProgram();
-    setProgram(program);
-  }
-
-  private void doSongIndex(OnSongIndex message) {
-    setSong(message.getSongIndex());
-  }
-
-  private Song readSong(File file) {
-    Song song = new Song(file);
-    SongListener songListener = new SongListener(song);
-    MidiParser midiParser = new MidiParser(songListener, Default.TICKS_PER_BEAT);
-    midiParser.parse(file.getPath());
-    return song;
-  }
-
-  private void setProgram(int program) {
-    lastProgram = program;
-    if (programOverride == 127) {
-      synthesizer.changeProgram(melodyChannel, program);
+    defaultPrograms[channel] = program;
+    if (programOverrides[channel] == OnProgramOverride.DEFAULT) {
+      setProgram(channel, program);
     }
   }
 
-  private void setSong(int index) {
-    if (index < 0 || index >= midiLibrary.size()) {
-      throw new IndexOutOfBoundsException();
+  private void doProgramOverride(OnProgramOverride message) {
+    int channel = message.getChannel();
+    int newProgram = message.getProgram();
+    programOverrides[channel] = newProgram;
+    if (newProgram == OnProgramOverride.DEFAULT) {
+      setProgram(channel, defaultPrograms[channel]);
+    } else {
+      setProgram(channel, newProgram);
     }
-    this.index = index;
-    this.song = readSong(midiLibrary.get(index));
-    setProgram(0);
+  }
+
+  private void doSelectSong(OnSelectSong message) {
+    setCurrentSong(message.getSongIndex());
+  }
+
+  private void doSetAccompanimentType(OnSetAccompanimentType message) {
+    transport.setAccompaniment(message.getAccompanimentType());
+  }
+
+  private void doSetPercentMasterGain(OnSetPercentMasterGain message) {
+    transport.setPercentGain(message.getPercentMasterGain());
+  }
+
+  private void doSetPercentTempo(OnSetPercentTempo message) {
+    transport.setPercentGain(message.getPercentTempo());
+  }
+
+  private void doStop(OnStop message) {
+    transport.stop();
+  }
+
+  private CurrentSong getCurrentSong() {
+    return currentSong;
+  }
+
+  private MidiLibrary getMidiLibrary() {
+    return midiLibrary;
+  }
+
+  private int getPercentMasterGain() {
+    return transport.getPercentGain();
+  }
+
+  private int getPercentTempo() {
+    return transport.getPercentTempo();
+  }
+
+  private void playCurrentSong() {
+    Song song = currentSong.getSong();
     int melodyChannel = song.getPresumedMelodyChannel();
     int lowestMidiNote = song.getLowestMidiNote(melodyChannel);
     int highestMidiNote = song.getHighestMidiNote(melodyChannel);
@@ -246,8 +218,30 @@ public class Musicianeer extends MessageTask {
         song.transposeBy(songTransposition);
       }
     }
-    transport.play(song.getNotes(), melodyChannel);
-    publish(new OnSong(song, index, keyboardTransposition));
+    transport.play(song.getNotes());
+    publish(new OnPlayCurrentSong(currentSong, keyboardTransposition));
+  }
+
+  private Song readSong(File file) {
+    Song song = new Song(file);
+    SongListener songListener = new SongListener(song);
+    MidiParser midiParser = new MidiParser(songListener, Default.TICKS_PER_BEAT);
+    midiParser.parse(file.getPath());
+    return song;
+  }
+
+  private void setCurrentSong(int index) {
+    if (index < 0 || index >= midiLibrary.size()) {
+      throw new IndexOutOfBoundsException();
+    }
+    Song song = readSong(midiLibrary.get(index));
+    currentSong = new CurrentSong(index, song);
+    playCurrentSong();
+  }
+
+  private void setProgram(int channel, int program) {
+    synthesizer.changeProgram(channel, program);
+    synthesizer.changeProgram(mapChannel(channel), program);
   }
 
 }
