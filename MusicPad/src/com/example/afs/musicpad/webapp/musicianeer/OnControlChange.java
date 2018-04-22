@@ -9,9 +9,9 @@
 
 package com.example.afs.musicpad.webapp.musicianeer;
 
-import com.example.afs.musicpad.message.TypedMessage;
+import com.example.afs.musicpad.task.Message;
 
-public class OnControlChange extends TypedMessage {
+public class OnControlChange implements Message {
 
   private int control;
   private int value;

@@ -9,10 +9,10 @@
 
 package com.example.afs.musicpad.webapp.musicianeer;
 
-import com.example.afs.musicpad.message.TypedMessage;
 import com.example.afs.musicpad.midi.MidiLibrary;
+import com.example.afs.musicpad.task.Message;
 
-public class OnMidiLibrary extends TypedMessage {
+public class OnMidiLibrary implements Message {
 
   private MidiLibrary midiLibrary;
 

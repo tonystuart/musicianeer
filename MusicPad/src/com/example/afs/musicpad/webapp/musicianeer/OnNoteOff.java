@@ -9,9 +9,9 @@
 
 package com.example.afs.musicpad.webapp.musicianeer;
 
-import com.example.afs.musicpad.message.TypedMessage;
+import com.example.afs.musicpad.task.Message;
 
-public class OnNoteOff extends TypedMessage {
+public class OnNoteOff implements Message {
 
   private int data1;
 

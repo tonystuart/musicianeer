@@ -9,10 +9,10 @@
 
 package com.example.afs.musicpad.webapp.musicianeer;
 
-import com.example.afs.musicpad.message.TypedMessage;
 import com.example.afs.musicpad.song.Song;
+import com.example.afs.musicpad.task.Message;
 
-public class OnSong extends TypedMessage {
+public class OnSong implements Message {
 
   private Song song;
   private int index;

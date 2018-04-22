@@ -9,9 +9,9 @@
 
 package com.example.afs.musicpad.webapp.musicianeer;
 
-import com.example.afs.musicpad.message.TypedMessage;
+import com.example.afs.musicpad.task.Message;
 
-public class OnChannelPressure extends TypedMessage {
+public class OnChannelPressure implements Message {
 
   private int data1;
   private int data2;
