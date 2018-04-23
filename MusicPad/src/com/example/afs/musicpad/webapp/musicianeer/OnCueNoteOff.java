@@ -11,12 +11,12 @@ package com.example.afs.musicpad.webapp.musicianeer;
 
 import com.example.afs.musicpad.task.Message;
 
-public class OnTransportNote implements Message {
+public class OnCueNoteOff implements Message {
 
   private int channel;
   private int midiNote;
 
-  public OnTransportNote(int channel, int midiNote) {
+  public OnCueNoteOff(int channel, int midiNote) {
     this.channel = channel;
     this.midiNote = midiNote;
   }
@@ -31,7 +31,7 @@ public class OnTransportNote implements Message {
 
   @Override
   public String toString() {
-    return "OnTransportNote [channel=" + channel + ", midiNote=" + midiNote + "]";
+    return "OnCueNoteOff [channel=" + channel + ", midiNote=" + midiNote + "]";
   }
 
 }

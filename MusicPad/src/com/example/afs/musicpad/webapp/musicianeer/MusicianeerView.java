@@ -27,7 +27,7 @@ import com.example.afs.musicpad.task.ControllerTask;
 public class MusicianeerView extends ShadowDomBuilder {
 
   public enum LedState {
-    GREEN, OFF, RED
+    OFF, GREEN, YELLOW, RED, BLUE
   }
 
   public MusicianeerView(ControllerTask controllerTask) {
@@ -90,20 +90,37 @@ public class MusicianeerView extends ShadowDomBuilder {
   public void setLedState(int midiNote, LedState ledState) {
     switch (ledState) {
     case GREEN:
+      removeClass("midi-note-led-" + midiNote, "led-yellow");
       removeClass("midi-note-led-" + midiNote, "led-red");
+      removeClass("midi-note-led-" + midiNote, "led-blue");
       addClass("midi-note-led-" + midiNote, "led-green");
       break;
-    case OFF:
-      removeClass("midi-note-led-" + midiNote, "led-red");
+    case YELLOW:
       removeClass("midi-note-led-" + midiNote, "led-green");
+      removeClass("midi-note-led-" + midiNote, "led-red");
+      removeClass("midi-note-led-" + midiNote, "led-blue");
+      addClass("midi-note-led-" + midiNote, "led-yellow");
       break;
     case RED:
-      addClass("midi-note-led-" + midiNote, "led-red");
       removeClass("midi-note-led-" + midiNote, "led-green");
+      removeClass("midi-note-led-" + midiNote, "led-yellow");
+      removeClass("midi-note-led-" + midiNote, "led-blue");
+      addClass("midi-note-led-" + midiNote, "led-red");
+      break;
+    case BLUE:
+      removeClass("midi-note-led-" + midiNote, "led-green");
+      removeClass("midi-note-led-" + midiNote, "led-yellow");
+      removeClass("midi-note-led-" + midiNote, "led-red");
+      addClass("midi-note-led-" + midiNote, "led-blue");
+      break;
+    case OFF:
+      removeClass("midi-note-led-" + midiNote, "led-green");
+      removeClass("midi-note-led-" + midiNote, "led-yellow");
+      removeClass("midi-note-led-" + midiNote, "led-red");
+      removeClass("midi-note-led-" + midiNote, "led-blue");
       break;
     default:
-      break;
-
+      throw new UnsupportedOperationException();
     }
   }
 

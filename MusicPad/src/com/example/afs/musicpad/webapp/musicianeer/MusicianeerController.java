@@ -9,6 +9,9 @@
 
 package com.example.afs.musicpad.webapp.musicianeer;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import com.example.afs.musicpad.message.OnShadowUpdate;
 import com.example.afs.musicpad.message.OnShadowUpdate.Action;
 import com.example.afs.musicpad.task.ControllerTask;
@@ -23,18 +26,22 @@ public class MusicianeerController extends ControllerTask {
   public static final int MAX_PERCENT_GAIN = 100;
   private static final int DEFAULT_VELOCITY = 24;
 
-  private boolean isDown;
   private int channel;
-  private int midiNote = -1;
-  private int expectedMidiNote;
+  private boolean isDown;
+
   private MusicianeerView musicianeerView;
+  private Set<Integer> cueMidiNotes = new HashSet<>();
+  private Set<Integer> playerMidiNotes = new HashSet<>();
 
   public MusicianeerController(MessageBroker messageBroker) {
     super(messageBroker);
     musicianeerView = new MusicianeerView(this);
     subscribe(OnPlayCurrentSong.class, message -> doSong(message));
     subscribe(OnMidiLibrary.class, message -> doSongLibrary(message));
-    subscribe(OnTransportNote.class, message -> doTransportNote(message));
+    subscribe(OnTransportNoteOn.class, message -> doTransportNoteOn(message));
+    subscribe(OnTransportNoteOff.class, message -> doTransportNoteOff(message));
+    subscribe(OnCueNoteOn.class, message -> doCueNoteOn(message));
+    subscribe(OnCueNoteOff.class, message -> doCueNoteOff(message));
   }
 
   @Override
@@ -105,38 +112,50 @@ public class MusicianeerController extends ControllerTask {
   protected void doMouseDown(String id) {
     isDown = true;
     if (id.startsWith("midi-note-")) {
-      midiNote = Integer.parseInt(id.substring("midi-note-".length()));
-      publish(new OnNoteOn(channel, midiNote, DEFAULT_VELOCITY));
-      if (midiNote == expectedMidiNote) {
-        musicianeerView.setLedState(midiNote, LedState.GREEN);
-      } else {
-        musicianeerView.setLedState(midiNote, LedState.OFF);
+      int mouseMidiNote = Integer.parseInt(id.substring("midi-note-".length()));
+      publish(new OnNoteOn(channel, mouseMidiNote, DEFAULT_VELOCITY));
+      playerMidiNotes.add(mouseMidiNote);
+      if (cueMidiNotes.contains(mouseMidiNote)) {
+        musicianeerView.setLedState(mouseMidiNote, LedState.GREEN);
       }
     }
   }
 
   @Override
   protected void doMouseOut(String id) {
-    if (midiNote != -1) {
-      publish(new OnNoteOff(channel, midiNote));
-      midiNote = -1;
-    }
+    playerMidiNotes.forEach(midiNote -> publish(new OnNoteOff(channel, midiNote)));
+    playerMidiNotes.clear();
   }
 
   @Override
   protected void doMouseOver(String id) {
     if (isDown && id.startsWith("midi-note-")) {
-      midiNote = Integer.parseInt(id.substring("midi-note-".length()));
-      publish(new OnNoteOn(channel, midiNote, DEFAULT_VELOCITY));
+      int mouseMidiNote = Integer.parseInt(id.substring("midi-note-".length()));
+      publish(new OnNoteOn(channel, mouseMidiNote, DEFAULT_VELOCITY));
+      playerMidiNotes.add(mouseMidiNote);
     }
   }
 
   @Override
   protected void doMouseUp(String id) {
     isDown = false;
-    if (midiNote != -1) {
-      publish(new OnNoteOff(channel, midiNote));
-      midiNote = -1;
+    playerMidiNotes.forEach(midiNote -> publish(new OnNoteOff(channel, midiNote)));
+    playerMidiNotes.clear();
+  }
+
+  private void doCueNoteOff(OnCueNoteOff message) {
+    if (message.getChannel() == channel) {
+      int midiNote = message.getMidiNote();
+      cueMidiNotes.remove(midiNote);
+      musicianeerView.setLedState(midiNote, LedState.BLUE);
+    }
+  }
+
+  private void doCueNoteOn(OnCueNoteOn message) {
+    if (message.getChannel() == channel) {
+      int midiNote = message.getMidiNote();
+      cueMidiNotes.add(midiNote);
+      musicianeerView.setLedState(midiNote, LedState.YELLOW);
     }
   }
 
@@ -149,12 +168,19 @@ public class MusicianeerController extends ControllerTask {
     musicianeerView.displaySongTitles(message.getMidiLibrary());
   }
 
-  private void doTransportNote(OnTransportNote message) {
-    int midiNote = message.getMidiNote();
-    musicianeerView.setLedState(expectedMidiNote, LedState.OFF);
-    musicianeerView.setLedState(midiNote, LedState.RED);
+  private void doTransportNoteOff(OnTransportNoteOff message) {
     if (message.getChannel() == channel) {
-      expectedMidiNote = midiNote;
+      int midiNote = message.getMidiNote();
+      musicianeerView.setLedState(midiNote, LedState.OFF);
+    }
+  }
+
+  private void doTransportNoteOn(OnTransportNoteOn message) {
+    if (message.getChannel() == channel) {
+      int midiNote = message.getMidiNote();
+      if (!playerMidiNotes.contains(midiNote)) {
+        musicianeerView.setLedState(midiNote, LedState.RED);
+      }
     }
   }
 

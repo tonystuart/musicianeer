@@ -18,6 +18,7 @@ import com.example.afs.fluidsynth.Synthesizer;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.song.Default;
 import com.example.afs.musicpad.song.Note;
+import com.example.afs.musicpad.task.Message;
 import com.example.afs.musicpad.task.MessageBroker;
 import com.example.afs.musicpad.transport.NoteEvent;
 import com.example.afs.musicpad.transport.NoteEvent.Type;
@@ -118,7 +119,9 @@ public class Transport {
       long endTick = beginTick + duration;
       lastTick = Math.max(lastTick, endTick);
       inputQueue.add(new NoteEvent(Type.NOTE_ON, beginTick, note));
+      inputQueue.add(new NoteEvent(Type.CUE_NOTE_ON, beginTick - 1024, note));
       inputQueue.add(new NoteEvent(Type.NOTE_OFF, endTick, note));
+      inputQueue.add(new NoteEvent(Type.CUE_NOTE_OFF, endTick - 1024, note));
       beatsPerMinute = note.getBeatsPerMinute();
     }
     long lastTickRoundedUp = ((lastTick + 1) / Default.RESOLUTION) * Default.RESOLUTION;
@@ -171,7 +174,7 @@ public class Transport {
     if (wasPlaying) {
       resume();
     } else {
-      fireTick(newTick);
+      publish(new OnTick(newTick));
     }
   }
 
@@ -210,23 +213,15 @@ public class Transport {
     reviewQueue.clear();
   }
 
-  private void fireProgramChange(int channel, int program) {
-    messageBroker.publish(new OnProgramChange(channel, program));
-  }
-
-  private void fireTick(long tick) {
-    messageBroker.publish(new OnTick(tick));
-  }
-
-  private void fireTransportNote(int channel, int midiNote) {
-    messageBroker.publish(new OnTransportNote(channel, midiNote));
-  }
-
   private void processNoteEvent(NoteEvent noteEvent) {
     Note note = noteEvent.getNote();
     switch (noteEvent.getType()) {
+
     case NOTE_OFF: {
-      synthesizer.releaseKey(note.getChannel(), note.getMidiNote());
+      int channel = note.getChannel();
+      int midiNote = note.getMidiNote();
+      synthesizer.releaseKey(channel, midiNote);
+      publish(new OnTransportNoteOff(channel, midiNote));
       break;
     }
     case NOTE_ON: {
@@ -240,9 +235,9 @@ public class Transport {
       if (currentPrograms[channel] != program) {
         synthesizer.changeProgram(channel, program);
         currentPrograms[channel] = program;
-        fireProgramChange(channel, program);
+        publish(new OnProgramChange(channel, program));
       }
-      fireTransportNote(channel, midiNote);
+      publish(new OnTransportNoteOn(channel, midiNote));
       int scaledVelocity = Velocity.scale(velocity, percentVelocity);
       switch (accompanimentType) {
       case DRUMS:
@@ -270,12 +265,22 @@ public class Transport {
       break;
     }
     case TICK:
-      fireTick(noteEvent.getTick());
+      publish(new OnTick(noteEvent.getTick()));
+      break;
+    case CUE_NOTE_OFF:
+      publish(new OnCueNoteOff(note.getChannel(), note.getMidiNote()));
+      break;
+    case CUE_NOTE_ON:
+      publish(new OnCueNoteOn(note.getChannel(), note.getMidiNote()));
       break;
     default:
       throw new UnsupportedOperationException();
     }
     reviewQueue.add(noteEvent);
+  }
+
+  private void publish(Message message) {
+    messageBroker.publish(message);
   }
 
   private void setBaseTick(long baseTick) {
