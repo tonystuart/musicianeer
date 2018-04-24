@@ -111,12 +111,20 @@ fieldset {
 	top: -30px;
 }
 
-.led-red {
-	background-color: red;
+.led-green {
+	background-color: #00ff00;
 }
 
-.led-green {
-	background-color: green;
+.led-yellow {
+  background-color: #ffff00;
+}
+
+.led-red {
+  background-color: #ff0000;
+}
+
+.led-blue {
+  background-color: #00ffff;
 }
 
 .sliders {
