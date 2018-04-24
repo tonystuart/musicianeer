@@ -30,7 +30,7 @@ public class MusicianeerView extends ShadowDomBuilder {
     OFF, GREEN, YELLOW, RED, BLUE
   }
 
-  public MusicianeerView(ControllerTask controllerTask) {
+  public MusicianeerView(ControllerTask controllerTask, MidiLibrary midiLibrary) {
     super(controllerTask);
     add(div("#musicianeer", ".tab", ".selected-tab") //
         .add(div(".packed-column") //)
@@ -40,7 +40,8 @@ public class MusicianeerView extends ShadowDomBuilder {
                 .add(clicker("previous-page", "<<")) //
                 .add(clicker("previous-song", "<")) //
                 .add(clicker("stop", "STOP")) //
-                .add(div("#song-title-container")) // initialized by setSongTitle
+                .add(div("#song-title-container") //
+                    .add(getSongTitles(midiLibrary))) //
                 .add(clicker("play", "PLAY")) //
                 .add(clicker("next-song", ">")) //
                 .add(clicker("next-page", ">>"))) //
@@ -64,13 +65,7 @@ public class MusicianeerView extends ShadowDomBuilder {
 
   public void displaySongTitles(MidiLibrary midiLibrary) {
     Division parent = getElementById("song-title-container");
-    Select songTitles = new Select("#song-titles");
-    songTitles.addInputHandler();
-    int index = 0;
-    for (File midiFile : midiLibrary) {
-      Option option = new Option(midiFile.getName(), index++);
-      songTitles.appendChild(option);
-    }
+    Select songTitles = getSongTitles(midiLibrary);
     replaceChildren(parent, songTitles);
   }
 
@@ -146,6 +141,17 @@ public class MusicianeerView extends ShadowDomBuilder {
     return button("#" + id) //
         .setValue(legend) //
         .addClickHandler();
+  }
+
+  private Select getSongTitles(MidiLibrary midiLibrary) {
+    Select songTitles = new Select("#song-titles");
+    songTitles.addInputHandler();
+    int index = 0;
+    for (File midiFile : midiLibrary) {
+      Option option = new Option(midiFile.getName(), index++);
+      songTitles.appendChild(option);
+    }
+    return songTitles;
   }
 
   private Division key(int midiNote, String className) {

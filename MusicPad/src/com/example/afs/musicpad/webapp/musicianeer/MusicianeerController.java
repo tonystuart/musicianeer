@@ -14,6 +14,7 @@ import java.util.Set;
 
 import com.example.afs.musicpad.message.OnShadowUpdate;
 import com.example.afs.musicpad.message.OnShadowUpdate.Action;
+import com.example.afs.musicpad.midi.MidiLibrary;
 import com.example.afs.musicpad.task.ControllerTask;
 import com.example.afs.musicpad.task.MessageBroker;
 import com.example.afs.musicpad.webapp.musicianeer.MusicianeerView.LedState;
@@ -35,7 +36,8 @@ public class MusicianeerController extends ControllerTask {
 
   public MusicianeerController(MessageBroker messageBroker) {
     super(messageBroker);
-    musicianeerView = new MusicianeerView(this);
+    MidiLibrary midiLibrary = request(Services.getMidiLibrary);
+    musicianeerView = new MusicianeerView(this, midiLibrary);
     subscribe(OnPlayCurrentSong.class, message -> doSong(message));
     subscribe(OnMidiLibrary.class, message -> doSongLibrary(message));
     subscribe(OnTransportNoteOn.class, message -> doTransportNoteOn(message));
@@ -106,6 +108,11 @@ public class MusicianeerController extends ControllerTask {
   protected void doLoad() {
     addShadowUpdate(new OnShadowUpdate(Action.REPLACE_CHILDREN, "body", musicianeerView.render()));
     musicianeerView.setAlternative("full");
+    CurrentSong currentSong = request(Services.getCurrentSong);
+    if (currentSong != null) {
+      int songIndex = currentSong.getIndex();
+      musicianeerView.setSongTitle(songIndex);
+    }
   }
 
   @Override
