@@ -9,7 +9,6 @@
 
 package com.example.afs.musicpad.webapp.musicianeer;
 
-import java.io.File;
 import java.util.Random;
 
 import com.example.afs.fluidsynth.Synthesizer;
@@ -17,9 +16,6 @@ import com.example.afs.fluidsynth.Synthesizer.Settings;
 import com.example.afs.jni.FluidSynth;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.midi.MidiLibrary;
-import com.example.afs.musicpad.parser.MidiParser;
-import com.example.afs.musicpad.parser.SongListener;
-import com.example.afs.musicpad.song.Default;
 import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.task.MessageBroker;
 import com.example.afs.musicpad.task.ServiceTask;
@@ -72,9 +68,9 @@ public class Musicianeer extends ServiceTask {
     }
     midiLibrary = new MidiLibrary(path);
     publish(new OnMidiLibrary(midiLibrary));
-    if (midiLibrary.size() > 0) {
-      setCurrentSong(random.nextInt(midiLibrary.size()));
-    }
+    //    if (midiLibrary.size() > 0) {
+    //      setCurrentSong(random.nextInt(midiLibrary.size()));
+    //    }
   }
 
   private Synthesizer createSynthesizer() {
@@ -160,7 +156,7 @@ public class Musicianeer extends ServiceTask {
   }
 
   private void doSetPercentTempo(OnSetPercentTempo message) {
-    transport.setPercentGain(message.getPercentTempo());
+    transport.setPercentTempo(message.getPercentTempo());
   }
 
   private void doStop(OnStop message) {
@@ -222,19 +218,11 @@ public class Musicianeer extends ServiceTask {
     publish(new OnPlayCurrentSong(currentSong, keyboardTransposition));
   }
 
-  private Song readSong(File file) {
-    Song song = new Song(file);
-    SongListener songListener = new SongListener(song);
-    MidiParser midiParser = new MidiParser(songListener, Default.TICKS_PER_BEAT);
-    midiParser.parse(file.getPath());
-    return song;
-  }
-
   private void setCurrentSong(int index) {
     if (index < 0 || index >= midiLibrary.size()) {
       throw new IndexOutOfBoundsException();
     }
-    Song song = readSong(midiLibrary.get(index));
+    Song song = midiLibrary.readSong(index);
     currentSong = new CurrentSong(index, song);
     playCurrentSong();
   }
