@@ -30,6 +30,11 @@ fieldset {
 	
 }
 
+.selected-song {
+    color: black;
+    background-color: magenta;
+}
+
 .selected-item {
 	color: white;
 	background-color: teal;
@@ -39,11 +44,17 @@ fieldset {
 	display: flex;
 	flex-direction: column;
 	margin: auto;
+	height: 100%;
 }
 
-.song {
+#song {
 	display: flex;
 	flex-direction: row;
+	flex: 1;
+}
+
+#song-list {
+	width: 50%;
 }
 
 #song-title {

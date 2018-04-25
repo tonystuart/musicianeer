@@ -38,7 +38,7 @@ public class MusicianeerController extends ControllerTask {
     super(messageBroker);
     MidiLibrary midiLibrary = request(Services.getMidiLibrary);
     musicianeerView = new MusicianeerView(this, midiLibrary);
-    subscribe(OnPlayCurrentSong.class, message -> doSong(message));
+    subscribe(OnPlayCurrentSong.class, message -> doPlayCurrentSong(message));
     subscribe(OnMidiLibrary.class, message -> doSongLibrary(message));
     subscribe(OnTransportNoteOn.class, message -> doTransportNoteOn(message));
     subscribe(OnTransportNoteOff.class, message -> doTransportNoteOff(message));
@@ -48,41 +48,45 @@ public class MusicianeerController extends ControllerTask {
 
   @Override
   protected void doClick(String id) {
-    switch (id) {
-    case "drums":
-      publish(new OnSetAccompanimentType(AccompanimentType.DRUMS));
-      break;
-    case "full":
-      publish(new OnSetAccompanimentType(OnSetAccompanimentType.AccompanimentType.FULL));
-      break;
-    case "next-song":
-      publish(new OnBrowseSong(BrowseType.NEXT));
-      break;
-    case "next-page":
-      publish(new OnBrowseSong(OnBrowseSong.BrowseType.NEXT_PAGE));
-      break;
-    case "piano":
-      publish(new OnSetAccompanimentType(OnSetAccompanimentType.AccompanimentType.PIANO));
-      break;
-    case "play":
-      publish(new OnPlay());
-      break;
-    case "previous-page":
-      publish(new OnBrowseSong(OnBrowseSong.BrowseType.PREVIOUS_PAGE));
-      break;
-    case "previous-song":
-      publish(new OnBrowseSong(OnBrowseSong.BrowseType.PREVIOUS));
-      break;
-    case "rhythm":
-      publish(new OnSetAccompanimentType(OnSetAccompanimentType.AccompanimentType.RHYTHM));
-      break;
-    case "solo":
-      publish(new OnSetAccompanimentType(OnSetAccompanimentType.AccompanimentType.SOLO));
-      break;
-    case "stop":
-      publish(new OnStop());
-      musicianeerView.resetMidiNoteLeds();
-      break;
+    if (id.startsWith("song-index-")) {
+      publish(new OnSelectSong(Integer.parseInt(id.substring("song-index-".length()))));
+    } else {
+      switch (id) {
+      case "drums":
+        publish(new OnSetAccompanimentType(AccompanimentType.DRUMS));
+        break;
+      case "full":
+        publish(new OnSetAccompanimentType(OnSetAccompanimentType.AccompanimentType.FULL));
+        break;
+      case "next-song":
+        publish(new OnBrowseSong(BrowseType.NEXT));
+        break;
+      case "next-page":
+        publish(new OnBrowseSong(OnBrowseSong.BrowseType.NEXT_PAGE));
+        break;
+      case "piano":
+        publish(new OnSetAccompanimentType(OnSetAccompanimentType.AccompanimentType.PIANO));
+        break;
+      case "play":
+        publish(new OnPlay());
+        break;
+      case "previous-page":
+        publish(new OnBrowseSong(OnBrowseSong.BrowseType.PREVIOUS_PAGE));
+        break;
+      case "previous-song":
+        publish(new OnBrowseSong(OnBrowseSong.BrowseType.PREVIOUS));
+        break;
+      case "rhythm":
+        publish(new OnSetAccompanimentType(OnSetAccompanimentType.AccompanimentType.RHYTHM));
+        break;
+      case "solo":
+        publish(new OnSetAccompanimentType(OnSetAccompanimentType.AccompanimentType.SOLO));
+        break;
+      case "stop":
+        publish(new OnStop());
+        musicianeerView.resetMidiNoteLeds();
+        break;
+      }
     }
   }
 
@@ -94,9 +98,6 @@ public class MusicianeerController extends ControllerTask {
       break;
     case "instrument":
       publish(new OnProgramOverride(channel, Integer.parseInt(value)));
-      break;
-    case "song-titles":
-      publish(new OnSelectSong(Integer.parseInt(value)));
       break;
     case "volume":
       publish(new OnSetPercentMasterGain(Integer.parseInt(value)));
@@ -110,8 +111,7 @@ public class MusicianeerController extends ControllerTask {
     musicianeerView.setAlternative("full");
     CurrentSong currentSong = request(Services.getCurrentSong);
     if (currentSong != null) {
-      int songIndex = currentSong.getIndex();
-      musicianeerView.setSongTitle(songIndex);
+      playCurrentSong(currentSong);
     }
   }
 
@@ -166,13 +166,12 @@ public class MusicianeerController extends ControllerTask {
     }
   }
 
-  private void doSong(OnPlayCurrentSong message) {
-    musicianeerView.resetMidiNoteLeds();
-    musicianeerView.setSongTitle(message.getCurrentSong().getIndex());
+  private void doPlayCurrentSong(OnPlayCurrentSong message) {
+    playCurrentSong(message.getCurrentSong());
   }
 
   private void doSongLibrary(OnMidiLibrary message) {
-    musicianeerView.displaySongTitles(message.getMidiLibrary());
+    musicianeerView.renderSongList(message.getMidiLibrary());
   }
 
   private void doTransportNoteOff(OnTransportNoteOff message) {
@@ -189,6 +188,12 @@ public class MusicianeerController extends ControllerTask {
         musicianeerView.setLedState(midiNote, LedState.RED);
       }
     }
+  }
+
+  private void playCurrentSong(CurrentSong currentSong) {
+    musicianeerView.resetMidiNoteLeds();
+    musicianeerView.selectSong(currentSong.getIndex());
+    musicianeerView.renderSongDetails(currentSong.getSong());
   }
 
 }

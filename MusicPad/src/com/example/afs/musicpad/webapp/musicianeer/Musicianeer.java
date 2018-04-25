@@ -68,9 +68,9 @@ public class Musicianeer extends ServiceTask {
     }
     midiLibrary = new MidiLibrary(path);
     publish(new OnMidiLibrary(midiLibrary));
-    //    if (midiLibrary.size() > 0) {
-    //      setCurrentSong(random.nextInt(midiLibrary.size()));
-    //    }
+    if (midiLibrary.size() > 0) {
+      setCurrentSong(random.nextInt(midiLibrary.size()));
+    }
   }
 
   private Synthesizer createSynthesizer() {

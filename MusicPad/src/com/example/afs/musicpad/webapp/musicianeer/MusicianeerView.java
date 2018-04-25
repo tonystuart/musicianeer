@@ -11,18 +11,20 @@ package com.example.afs.musicpad.webapp.musicianeer;
 
 import java.io.File;
 
+import com.example.afs.musicpad.analyzer.KeyScore;
+import com.example.afs.musicpad.analyzer.KeySignatures;
 import com.example.afs.musicpad.html.Division;
 import com.example.afs.musicpad.html.Element;
-import com.example.afs.musicpad.html.Option;
 import com.example.afs.musicpad.html.Parent;
 import com.example.afs.musicpad.html.PercentRange;
 import com.example.afs.musicpad.html.Radio;
 import com.example.afs.musicpad.html.Range;
-import com.example.afs.musicpad.html.Select;
 import com.example.afs.musicpad.html.ShadowDomBuilder;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.midi.MidiLibrary;
+import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.task.ControllerTask;
+import com.example.afs.musicpad.util.FileUtilities;
 
 public class MusicianeerView extends ShadowDomBuilder {
 
@@ -36,12 +38,15 @@ public class MusicianeerView extends ShadowDomBuilder {
         .add(div(".packed-column") //)
             .add(div(".title") //
                 .add(text("Musicianeer"))) //
-            .add(div(".song") //
+            .add(div("#song") //
+                .add(div("#song-list", ".list") //
+                    .add(createSongList(midiLibrary)) //
+                    .addClickHandler()) //
+                .add(div("#song-details", ".details"))) // createSongDetails
+            .add(div("#transport") //
                 .add(clicker("previous-page", "<<")) //
                 .add(clicker("previous-song", "<")) //
                 .add(clicker("stop", "STOP")) //
-                .add(div("#song-title-container") //
-                    .add(getSongTitles(midiLibrary))) //
                 .add(clicker("play", "PLAY")) //
                 .add(clicker("next-song", ">")) //
                 .add(clicker("next-page", ">>"))) //
@@ -63,16 +68,25 @@ public class MusicianeerView extends ShadowDomBuilder {
         .addMouseUpHandler()); //
   }
 
-  public void displaySongTitles(MidiLibrary midiLibrary) {
-    Division parent = getElementById("song-title-container");
-    Select songTitles = getSongTitles(midiLibrary);
-    replaceChildren(parent, songTitles);
+  public void renderSongDetails(Song song) {
+    Parent songDetails = getElementById("song-details");
+    replaceChildren(songDetails, createSongDetails(song));
+  }
+
+  public void renderSongList(MidiLibrary midiLibrary) {
+    Division div = createSongList(midiLibrary);
+    Parent songListParent = getElementById("song-list");
+    replaceChildren(songListParent, div);
   }
 
   public void resetMidiNoteLeds() {
     for (int i = Musicianeer.LOWEST_NOTE; i <= Musicianeer.HIGHEST_NOTE; i++) {
       setLedState(i, LedState.OFF);
     }
+  }
+
+  public void selectSong(int songIndex) {
+    selectElement("song-index-" + songIndex, "selected-song");
   }
 
   public void setAlternative(String id) {
@@ -119,11 +133,6 @@ public class MusicianeerView extends ShadowDomBuilder {
     }
   }
 
-  public void setSongTitle(int songIndex) {
-    Select songTitles = getElementById("song-titles");
-    setProperty(songTitles, "value", songIndex);
-  }
-
   private Parent alternative(String name, String legend) {
     return label() // 
         .add(radio("#" + legend.toLowerCase()) //
@@ -143,15 +152,78 @@ public class MusicianeerView extends ShadowDomBuilder {
         .addClickHandler();
   }
 
-  private Select getSongTitles(MidiLibrary midiLibrary) {
-    Select songTitles = new Select("#song-titles");
-    songTitles.addInputHandler();
-    int index = 0;
-    for (File midiFile : midiLibrary) {
-      Option option = new Option(midiFile.getName(), index++);
-      songTitles.appendChild(option);
+  private Element createSongDetails(Song song) {
+    return div() //
+        .add(nameValue("Title", song.getTitle())) //
+        .add(nameValue("Duration", getDuration(song))) //
+        .add(nameValue("Parts", song.getActiveChannelCount())) //
+        .add(nameValue("Beats per Minute", song.getBeatsPerMinute(0))) //
+        .add(nameValue("Time Signature", song.getBeatsPerMeasure(0) + "/" + song.getBeatUnit(0))) //
+        .add(nameValue("Predominant Key", getKeyInfo(song))) //
+        .add(nameValue("EZ Keyboard Transposition", song.getDistanceToWhiteKeys())) //
+        .add(nameValue("Current Transposition", song.getTransposition())) //
+        .add(nameValue("Complexity", getComplexity(song))); //
+  }
+
+  private Division createSongList(MidiLibrary midiLibrary) {
+    Division div = div();
+    int fileCount = midiLibrary.size();
+    for (int songIndex = 0; songIndex < fileCount; songIndex++) {
+      File midiFile = midiLibrary.get(songIndex);
+      String name = FileUtilities.getBaseName(midiFile.getPath());
+      div.add(div("#song-index-" + songIndex)//
+          .add(text(name)));
     }
-    return songTitles;
+    return div;
+  }
+
+  // TODO: Move to Song
+  private double getComplexity(Song song) {
+    double complexity = 0;
+    long duration = song.getDuration();
+    long measures = duration / song.getTicksPerMeasure(0);
+    if (measures > 0) {
+      int noteCount = song.getNoteCount();
+      complexity = noteCount / measures;
+    }
+    return complexity;
+  }
+
+  // TODO: Move to Song
+  private String getDuration(Song song) {
+    int secondsDuration = song.getSeconds();
+    String duration = String.format("%d:%02d", secondsDuration / 60, secondsDuration % 60);
+    return duration;
+  }
+
+  // TODO: Move to Song
+  private String getKeyInfo(Song song) {
+    StringBuilder s = new StringBuilder();
+    int[] noteCounts = new int[Midi.SEMITONES_PER_OCTAVE];
+    for (int channel = 0; channel < Midi.CHANNELS; channel++) {
+      if (song.getChannelNoteCount(channel) > 0) {
+        if (channel != Midi.DRUM) {
+          int[] channelNoteCounts = song.getChromaticNoteCounts(channel);
+          for (int i = 0; i < noteCounts.length; i++) {
+            noteCounts[i] += channelNoteCounts[i];
+          }
+        }
+      }
+    }
+    KeyScore[] keyScores = KeySignatures.getKeyScores(noteCounts);
+    for (int i = 0; i < keyScores.length && s.length() == 0; i++) {
+      KeyScore keyScore = keyScores[i];
+      int rank = keyScore.getRank();
+      if (rank == 1) {
+        String key = keyScore.getKey();
+        String synopsis = keyScore.getSynopsis();
+        int accidentals = keyScore.getAccidentals();
+        int triads = keyScore.getTriads();
+        int thirds = keyScore.getThirds();
+        s.append(String.format("%s (%s) %d / %d / %d", key, synopsis, accidentals, triads, thirds));
+      }
+    }
+    return s.toString();
   }
 
   private Division key(int midiNote, String className) {
