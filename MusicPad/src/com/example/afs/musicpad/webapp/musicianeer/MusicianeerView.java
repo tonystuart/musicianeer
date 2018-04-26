@@ -103,7 +103,7 @@ public class MusicianeerView extends ShadowDomBuilder {
     }
   }
 
-  public void selectChannel(SongInfo songInfo, int channelIndex) {
+  public void selectChannel(int channelIndex) {
     selectElement("channel-index-" + channelIndex, "selected-channel");
   }
 
@@ -176,6 +176,7 @@ public class MusicianeerView extends ShadowDomBuilder {
 
   private Parent createChannelBody(SongInfo songInfo) {
     Parent channelBody = tbody("#channel-body");
+    channelBody.addClickHandler();
     for (int channel : songInfo.getActiveChannels()) {
       channelBody.add(row("#channel-index-" + channel) //
           .add(td() //

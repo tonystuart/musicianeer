@@ -35,6 +35,11 @@ fieldset {
     background-color: magenta;
 }
 
+.selected-channel {
+    color: #2E4A62; /* sailor blue */
+    background-color: #B4B7BA; /* harbor mist */
+}
+
 .selected-item {
 	color: white;
 	background-color: teal;

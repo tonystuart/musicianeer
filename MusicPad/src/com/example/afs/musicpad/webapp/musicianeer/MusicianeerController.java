@@ -50,6 +50,10 @@ public class MusicianeerController extends ControllerTask {
   protected void doClick(String id) {
     if (id.startsWith("song-index-")) {
       publish(new OnSelectSong(Integer.parseInt(id.substring("song-index-".length()))));
+    } else if (id.startsWith("channel-index-")) {
+      channel = Integer.parseInt(id.substring("channel-index-".length()));
+      musicianeerView.resetMidiNoteLeds();
+      musicianeerView.selectChannel(channel);
     } else {
       switch (id) {
       case "drums":
