@@ -108,6 +108,12 @@ public class Parent extends Element implements Iterable<Node> {
     s.append(format("</%s>\n", getType()));
   }
 
+  public void replaceChild(Element oldChild, Element newChild) {
+    int index = childNodes.indexOf(oldChild);
+    childNodes.remove(index);
+    childNodes.add(index, newChild);
+  }
+
   public void replaceChildren(Node node) {
     clear();
     appendChild(node);

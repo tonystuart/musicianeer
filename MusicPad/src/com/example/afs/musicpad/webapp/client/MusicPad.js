@@ -211,6 +211,12 @@ musicPad.onShadowUpdate = function(message) {
             match.innerHTML = message.value;
         }
         break;
+    case 'REPLACE_ELEMENT':
+        matches = document.querySelectorAll(message.selector);
+        for (const match of matches) {
+            match.parentNode.replaceChild(musicPad.createNode(message.value), match);
+        }
+        break;
     }
 }
 

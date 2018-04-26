@@ -176,6 +176,17 @@ public class ShadowDom {
     onReplaceChildren(parent, newChild);
   }
 
+  public void replaceElement(Parent parent, Element oldChild, Element newChild) {
+    replaceElement(parent, oldChild, newChild, true);
+  }
+
+  public void replaceElement(Parent parent, Element oldChild, Element newChild, boolean isManageDeep) {
+    parent.replaceChild(oldChild, newChild);
+    removeManagedNode(oldChild, isManageDeep);
+    addManagedNode(newChild, isManageDeep);
+    onReplaceElement(oldChild, newChild);
+  }
+
   public Element selectElement(String id, String className) {
     Element newSelection = swapClassName(id, className);
     ensureVisible(newSelection);
@@ -260,6 +271,10 @@ public class ShadowDom {
 
   protected void onReplaceChildren(Parent parent, Node newChild) {
     controllerTask.addShadowUpdate(new OnShadowUpdate(Action.REPLACE_CHILDREN, "#" + parent.getId(), newChild.render()));
+  }
+
+  protected void onReplaceElement(Element oldChild, Element newChild) {
+    controllerTask.addShadowUpdate(new OnShadowUpdate(Action.REPLACE_ELEMENT, "#" + oldChild.getId(), newChild.render()));
   }
 
   protected void onSetProperty(Element element, String name, Object value) {

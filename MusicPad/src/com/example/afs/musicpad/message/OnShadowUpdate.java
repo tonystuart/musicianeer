@@ -12,7 +12,7 @@ package com.example.afs.musicpad.message;
 public class OnShadowUpdate extends TypedMessage {
 
   public enum Action {
-    APPEND_CHILD, INSERT_BEFORE, REMOVE_CHILD, REPLACE_CHILDREN, ADD_CLASS, REMOVE_CLASS, ENSURE_VISIBLE, SET_PROPERTY
+    APPEND_CHILD, INSERT_BEFORE, REMOVE_CHILD, REPLACE_CHILDREN, REPLACE_ELEMENT, ADD_CLASS, REMOVE_CLASS, ENSURE_VISIBLE, SET_PROPERTY
   }
 
   private String name;
