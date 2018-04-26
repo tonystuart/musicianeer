@@ -193,7 +193,7 @@ public class MusicianeerController extends ControllerTask {
   private void playCurrentSong(CurrentSong currentSong) {
     musicianeerView.resetMidiNoteLeds();
     musicianeerView.selectSong(currentSong.getIndex());
-    musicianeerView.renderSongDetails(currentSong.getSong());
+    musicianeerView.renderSongDetails(new SongInfo(currentSong.getSong()));
   }
 
 }
