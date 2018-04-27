@@ -130,15 +130,11 @@ public class SongInfo {
 
   public String getProgramNames(int channel) {
     StringBuilder s = new StringBuilder();
-    if (channel == Midi.DRUM) {
-      s.append("Drums");
-    } else {
-      for (String programName : song.getProgramNames(channel)) {
-        if (s.length() > 0) {
-          s.append(", ");
-        }
-        s.append(programName);
+    for (String programName : song.getProgramNames(channel)) {
+      if (s.length() > 0) {
+        s.append(", ");
       }
+      s.append(programName);
     }
     return s.toString();
   }
