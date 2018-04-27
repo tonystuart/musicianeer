@@ -25,8 +25,8 @@ fieldset {
 table {
 	border: 1px solid #B4B7BA;
 	flex: 1;
-	width: 100%;
 }
+
 tbody {
     background-color: black;
     color: #B4B7BA;
