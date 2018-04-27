@@ -33,35 +33,37 @@ public class MusicianeerView extends ShadowDomBuilder {
     super(controllerTask);
     add(div("#musicianeer") //
         .add(div("#song") //
-            .add(table("#song-table") // was #song-list
-                .add(thead("#channel-head") //
-                    .add(td() //
-                        .add(text("Song"))) //
-                    .add(td() //
-                        .add(text("Title")))) //
-                .add(createSongBody(midiLibrary)) //
-                .addClickHandler()) //
-            .add(table("#channel-table") //
-                .add(thead("#channel-head") //
-                    .add(td() //
-                        .add(text("Channel"))) //
-                    .add(td() //
-                        .add(text("Instrument"))) //
-                    .add(td() //
-                        .add(text("Mute"))) //
-                    .add(td() //
-                        .add(text("Solo"))) //
-                    .add(td() //
-                        .add(text("Measures"))) //
-                    .add(td() //
-                        .add(text("Melody"))) //
-                    .add(td() //
-                        .add(text("Occupancy"))) //
-                    .add(td() //
-                        .add(text("Concurrency"))) //
-                    .add(td() //
-                        .add(text("Notes")))) //
-                .add(tbody("#channel-body")))) //
+            .add(div("#song-table-wrapper") //
+                .add(table("#song-table")
+                    .add(thead("#channel-head") //
+                        .add(td() //
+                            .add(text("Song"))) //
+                        .add(td() //
+                            .add(text("Title")))) //
+                    .add(createSongBody(midiLibrary)) //
+                    .addClickHandler())) //
+            .add(div("#channel-table-wrapper") //
+                .add(table("#channel-table") //
+                    .add(thead("#channel-head") //
+                        .add(td() //
+                            .add(text("Channel"))) //
+                        .add(td() //
+                            .add(text("Instrument"))) //
+                        .add(td() //
+                            .add(text("Mute"))) //
+                        .add(td() //
+                            .add(text("Solo"))) //
+                        .add(td() //
+                            .add(text("Measures"))) //
+                        .add(td() //
+                            .add(text("Melody"))) //
+                        .add(td() //
+                            .add(text("Occupancy"))) //
+                        .add(td() //
+                            .add(text("Concurrency"))) //
+                        .add(td() //
+                            .add(text("Notes")))) //
+                    .add(tbody("#channel-body"))))) //
         .add(table("#info-table") //
             .add(thead("#info-head") //
                 .add(td() //
