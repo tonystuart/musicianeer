@@ -25,6 +25,7 @@ fieldset {
 table {
 	border: 1px solid #B4B7BA;
 	flex: 1;
+	width: 100%;
 }
 tbody {
     background-color: black;
@@ -66,12 +67,14 @@ tbody {
 }
 
 #song-table-wrapper {
-	flex: 1;
+	/* flex: 1; */
 	overflow: auto;
+	width: 33%;
 }
 
 #song-table {
     word-break: break-all;
+    width: 100%;
 }
 
 #channel-table-wrapper {
