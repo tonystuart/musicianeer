@@ -34,7 +34,7 @@ public class MusicianeerView extends ShadowDomBuilder {
     add(div("#musicianeer") //
         .add(div("#song") //
             .add(div("#song-table-wrapper") //
-                .add(table("#song-table")
+                .add(table("#song-table") //
                     .add(thead("#channel-head") //
                         .add(td() //
                             .add(text("Song"))) //
@@ -98,9 +98,6 @@ public class MusicianeerView extends ShadowDomBuilder {
             .add(midiSlider("instrument", 50)) // TODO: Update instrument on program change
             .add(percentSlider("volume", Transport.DEFAULT_PERCENT_GAIN))) //
         .add(div(".buttons") //
-            .add(fieldSet() //
-                .add(alternative("track", "Lead")) //
-                .add(alternative("track", "Follow"))) //
             .add(fieldSet() //
                 .add(alternative("accompaniment", "Full")) //
                 .add(alternative("accompaniment", "Piano")) //
