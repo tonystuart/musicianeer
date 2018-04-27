@@ -8,26 +8,40 @@ options please contact the copyright owner.
 This program is made available on an "as is" basis, without
 warranties or conditions of any kind, either express or implied.
 */
-@CHARSET "UTF-8";
-
-body {
-	color: #B4B7BA; /* harbor mist */
-	background-color: #2E4A62; /* sailor blue */
-	font-size: 2vh;
+@CHARSET "UTF-8"; body {
+    color: #B4B7BA;
+    /* harbor mist */
+    background-color: #2E4A62;
+    /* sailor blue */
+    font-size: 2vh;
 }
 
 fieldset {
-	font-size: 1.5vh;
-	color: #B4B7BA; /* harbor mist */
-	border: 1px solid #B4B7BA; /* harbor mist */
+    font-size: 1.5vh;
+    color: #B4B7BA;
+    /* harbor mist */
+    border: 1px solid #B4B7BA;
+    /* harbor mist */
+}
+
+tbody {
+    background-color: black;
+    color: #B4B7BA;
+    /* harbor mist */
+    border: 1px solid #B4B7BA;
+    /* harbor mist */
+    height 10)%: auto;
 }
 
 #musicianeer {
-	display: flex;
-}
-
-.title {
-	
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
 }
 
 .selected-song {
@@ -36,124 +50,124 @@ fieldset {
 }
 
 .selected-channel {
-    color: #2E4A62; /* sailor blue */
-    background-color: #B4B7BA; /* harbor mist */
+    color: #2E4A62;
+    /* sailor blue */
+    background-color: #B4B7BA;
+    /* harbor mist */
 }
 
 .selected-item {
-	color: white;
-	background-color: teal;
-}
-
-.packed-column {
-	display: flex;
-	flex-direction: column;
-	margin: auto;
-	height: 100%;
+    color: white;
+    background-color: teal;
 }
 
 #song {
-	display: flex;
-	flex-direction: row;
-	flex: 1;
+    display: flex;
+    flex-direction: row;
+    flex: 1;
 }
 
-#song-list {
-	width: 50%;
+#song-table {
+    overflow: auto;
+    border: 1px solid white;
+    position: relative;
+    word-break: break-all;
+    flex: 1;
 }
 
 #song-title {
-	flex-grow: 1;
-	text-align: center;
-	width: 300px;
-	height: 1em;
-	overflow: hidden;
+    flex-grow: 1;
+    text-align: center;
+    width: 300px;
+    height: 1em;
+    overflow: hidden;
 }
+
 .keyboard {
-	display: flex;
-	margin-top: 60px;
+    display: flex;
+    margin-top: 60px;
 }
 
 .keyboard div:hover {
-	background-color: gray;
+    background-color: gray;
 }
 
-.white-key .black-key:not (:hover ) {
-	background-color: red;
+.white-key .black-key :not ( :hover ) {
+    background-color : red ;
 }
 
 .keyboard div:active {
-	background-color: blue;
+    background-color: blue;
 }
 
 .key-parent {
-	position: relative;
+    position: relative;
 }
 
 .black-key {
-	background-color: black;
-	position: absolute;
-	z-index: 1;
-	left: 37px;
-	top: 0px;
-	width: 25px;
-	height: 150px;
-	border: 1px solid black;
+    background-color: black;
+    position: absolute;
+    z-index: 1;
+    left: 37px;
+    top: 0px;
+    width: 25px;
+    height: 150px;
+    border: 1px solid black;
 }
 
 .white-key {
-	background-color: white;
-	width: 50px;
-	height: 200px;
-	border: 1px solid blue;
+    background-color: white;
+    width: 50px;
+    height: 200px;
+    border: 1px solid blue;
 }
 
 .black-key-led, .white-key-led {
-	position: absolute;
-	width: 16px;
-	height: 16px;
-	border: 1px solid black;
-	border-radius: 8px;
-	background-color: black;
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    border: 1px solid black;
+    border-radius: 8px;
+    background-color: black;
 }
 
 .black-key-led {
-	left: 5px;
-	top: -50px;
+    left: 5px;
+    top: -50px;
 }
 
 .white-key-led {
-	left: 19px;
-	top: -30px;
+    left: 19px;
+    top: -30px;
 }
 
 .led-green {
-	background-color: #00ff00;
+    background-color: #00ff00;
 }
 
 .led-yellow {
-  background-color: #ffff00;
+    background-color: #ffff00;
 }
 
 .led-red {
-  background-color: #ff0000;
+    background-color: #ff0000;
 }
 
 .led-blue {
-  background-color: #00ffff;
+    background-color: #00ffff;
 }
 
 .sliders {
-	margin: 10px 0px;
-	display: flex;
-	text-align: center;
-	justify-content: space-between;
+    margin: 10px 0px;
+    display: flex;
+    text-align: center;
+    justify-content: space-between;
 }
 
 .slider {
-	width: calc((100%)/3 - 5px);
+    width: calc(( 100%)/3- 5px);
 }
 
 .buttons {
-	display: flex;
+    display: flex;
 }

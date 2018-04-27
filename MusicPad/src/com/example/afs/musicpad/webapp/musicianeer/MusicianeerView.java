@@ -31,70 +31,96 @@ public class MusicianeerView extends ShadowDomBuilder {
 
   public MusicianeerView(ControllerTask controllerTask, MidiLibrary midiLibrary) {
     super(controllerTask);
-    add(div("#musicianeer", ".tab", ".selected-tab") //
-        .add(div(".packed-column") //)
-            .add(div(".title") //
-                .add(text("Musicianeer"))) //
-            .add(div("#song") //
-                .add(div("#song-list", ".list") //
-                    .add(createSongList(midiLibrary)) //
-                    .addClickHandler()) //
-                .add(div("#song-details", ".details"))) // createSongDetails
-            .add(div("#channel-table-container", ".details") //
-                .add(table("#channel-table") //
-                    .add(thead("#channel-head") //
-                        .add(td() //
-                            .add(text("Channel"))) //
-                        .add(td() //
-                            .add(text("Instrument"))) //
-                        .add(td() //
-                            .add(text("Measures"))) //
-                        .add(td() //
-                            .add(text("Melody"))) //
-                        .add(td() //
-                            .add(text("Occupancy"))) //
-                        .add(td() //
-                            .add(text("Concurrency"))) //
-                        .add(td() //
-                            .add(text("Notes")))) //
-                    .add(tbody("#channel-body")))) // createChannelDetails
-            .add(div("#transport") //
-                .add(clicker("previous-page", "<<")) //
-                .add(clicker("previous-song", "<")) //
-                .add(clicker("stop", "STOP")) //
-                .add(clicker("play", "PLAY")) //
-                .add(clicker("next-song", ">")) //
-                .add(clicker("next-page", ">>"))) //
-            .add(keyboard()) //
-            .add(div(".sliders") //
-                .add(percentSlider("tempo", Transport.DEFAULT_PERCENT_TEMPO)) //
-                .add(midiSlider("instrument", 50)) // TODO: Update instrument on program change
-                .add(percentSlider("volume", Transport.DEFAULT_PERCENT_GAIN))) //
-            .add(div(".buttons") //
-                .add(fieldSet() //
-                    .add(alternative("track", "Lead")) //
-                    .add(alternative("track", "Follow"))) //
-                .add(fieldSet() //
-                    .add(alternative("accompaniment", "Full")) //
-                    .add(alternative("accompaniment", "Piano")) //
-                    .add(alternative("accompaniment", "Rhythm")) //
-                    .add(alternative("accompaniment", "Drums")) //
-                    .add(alternative("accompaniment", "Solo"))))) //
+    add(div("#musicianeer") //
+        .add(div("#song") //
+            .add(table("#song-table") // was #song-list
+                .add(thead("#channel-head") //
+                    .add(td() //
+                        .add(text("Song"))) //
+                    .add(td() //
+                        .add(text("Title")))) //
+                .add(createSongBody(midiLibrary)) //
+                .addClickHandler()) //
+            .add(table("#channel-table") //
+                .add(thead("#channel-head") //
+                    .add(td() //
+                        .add(text("Channel"))) //
+                    .add(td() //
+                        .add(text("Instrument"))) //
+                    .add(td() //
+                        .add(text("Mute"))) //
+                    .add(td() //
+                        .add(text("Solo"))) //
+                    .add(td() //
+                        .add(text("Measures"))) //
+                    .add(td() //
+                        .add(text("Melody"))) //
+                    .add(td() //
+                        .add(text("Occupancy"))) //
+                    .add(td() //
+                        .add(text("Concurrency"))) //
+                    .add(td() //
+                        .add(text("Notes")))) //
+                .add(tbody("#channel-body")))) //
+        .add(table("#info-table") //
+            .add(thead("#info-head") //
+                .add(td() //
+                    .add(text("Title"))) //
+                .add(td() //
+                    .add(text("Duration"))) //
+                .add(td() //
+                    .add(text("Parts"))) //
+                .add(td() //
+                    .add(text("Beats per Minute"))) //
+                .add(td() //
+                    .add(text("Time Signature"))) //
+                .add(td() //
+                    .add(text("Predominant Key"))) //
+                .add(td() //
+                    .add(text("EZ Keyboard"))) //
+                .add(td() //
+                    .add(text("Current Transposition"))) //
+                .add(td() //
+                    .add(text("Complexity")))) //
+            .add(tbody("#info-body"))) //
+        .add(div("#transport") //
+            .add(clicker("previous-page", "<<")) //
+            .add(clicker("previous-song", "<")) //
+            .add(clicker("stop", "STOP")) //
+            .add(clicker("play", "PLAY")) //
+            .add(clicker("next-song", ">")) //
+            .add(clicker("next-page", ">>"))) //
+        .add(keyboard()) //
+        .add(div(".sliders") //
+            .add(percentSlider("tempo", Transport.DEFAULT_PERCENT_TEMPO)) //
+            .add(midiSlider("instrument", 50)) // TODO: Update instrument on program change
+            .add(percentSlider("volume", Transport.DEFAULT_PERCENT_GAIN))) //
+        .add(div(".buttons") //
+            .add(fieldSet() //
+                .add(alternative("track", "Lead")) //
+                .add(alternative("track", "Follow"))) //
+            .add(fieldSet() //
+                .add(alternative("accompaniment", "Full")) //
+                .add(alternative("accompaniment", "Piano")) //
+                .add(alternative("accompaniment", "Rhythm")) //
+                .add(alternative("accompaniment", "Drums")) //
+                .add(alternative("accompaniment", "Solo")))) //
         .addMouseUpHandler()); //
   }
 
   public void renderSongDetails(SongInfo songInfo) {
-    Parent songDetails = getElementById("song-details");
-    replaceChildren(songDetails, createSongDetails(songInfo));
     Parent channelTable = getElementById("channel-table");
     Parent channelBody = getElementById("channel-body");
     replaceElement(channelTable, channelBody, createChannelBody(songInfo));
+    Parent songInfoTable = getElementById("info-table");
+    Parent songInfoBody = getElementById("info-body");
+    replaceElement(songInfoTable, songInfoBody, createInfoBody(songInfo));
   }
 
   public void renderSongList(MidiLibrary midiLibrary) {
-    Division div = createSongList(midiLibrary);
-    Parent songListParent = getElementById("song-list");
-    replaceChildren(songListParent, div);
+    Parent songTable = getElementById("song-table");
+    Parent songBody = getElementById("song-body");
+    replaceElement(songTable, songBody, createSongBody(midiLibrary));
   }
 
   public void resetMidiNoteLeds() {
@@ -184,6 +210,10 @@ public class MusicianeerView extends ShadowDomBuilder {
           .add(td() //
               .add(text(songInfo.getProgramNames(channel)))) //
           .add(td() //
+              .add(checkbox("#channel-mute-" + channel))) //
+          .add(td() //
+              .add(checkbox("#channel-mute-" + channel))) //
+          .add(td() //
               .add(text(songInfo.getPercentMeasuresPlayed(channel) + "%"))) //
           .add(td() //
               .add(text(songInfo.getPercentMelody(channel) + "%"))) //
@@ -197,29 +227,45 @@ public class MusicianeerView extends ShadowDomBuilder {
     return channelBody;
   }
 
-  private Element createSongDetails(SongInfo songInfo) {
-    return div() //
-        .add(nameValue("Title", songInfo.getTitle())) //
-        .add(nameValue("Duration", songInfo.getDuration())) //
-        .add(nameValue("Parts", songInfo.getParts())) //
-        .add(nameValue("Beats per Minute", songInfo.getBeatsPerMinute(0))) //
-        .add(nameValue("Time Signature", songInfo.getTimeSignature())) //
-        .add(nameValue("Predominant Key", songInfo.getPredominantKey())) //
-        .add(nameValue("EZ Keyboard Transposition", songInfo.getDistanceToWhiteKeys())) //
-        .add(nameValue("Current Transposition", songInfo.getTransposition())) //
-        .add(nameValue("Complexity", songInfo.getComplexity())); //
+  private Parent createInfoBody(SongInfo songInfo) {
+    Parent songInfoBody = tbody("#info-body");
+    songInfoBody.add(row() //
+        .add(td() //
+            .add(text(songInfo.getTitle()))) //
+        .add(td() //
+            .add(text(songInfo.getDuration()))) //
+        .add(td() //
+            .add(text(songInfo.getParts()))) //
+        .add(td() //
+            .add(text(songInfo.getBeatsPerMinute(0)))) //
+        .add(td() //
+            .add(text(songInfo.getTimeSignature()))) //
+        .add(td() //
+            .add(text(songInfo.getPredominantKey()))) //
+        .add(td() //
+            .add(text(songInfo.getDistanceToWhiteKeys()))) //
+        .add(td() //
+            .add(text(songInfo.getTransposition()))) //
+        .add(td() //
+            .add(text(songInfo.getComplexity()))));
+    return songInfoBody;
+
   }
 
-  private Division createSongList(MidiLibrary midiLibrary) {
-    Division div = div();
+  private Parent createSongBody(MidiLibrary midiLibrary) {
+    Parent songBody = tbody("#song-body");
+    songBody.addClickHandler();
     int fileCount = midiLibrary.size();
     for (int songIndex = 0; songIndex < fileCount; songIndex++) {
       File midiFile = midiLibrary.get(songIndex);
       String name = FileUtilities.getBaseName(midiFile.getPath());
-      div.add(div("#song-index-" + songIndex)//
-          .add(text(name)));
+      songBody.add(row("#song-index-" + songIndex) //
+          .add(td() //
+              .add(text(songIndex))) //
+          .add(td() //
+              .add(text(name))));
     }
-    return div;
+    return songBody;
   }
 
   private Division key(int midiNote, String className) {
