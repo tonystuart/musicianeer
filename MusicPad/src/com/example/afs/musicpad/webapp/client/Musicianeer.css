@@ -82,6 +82,10 @@ tbody {
 	overflow: auto;
 }
 
+#channel-table {
+	width: 100%;
+}
+
 .keyboard {
     display: flex;
     margin-top: 60px;
