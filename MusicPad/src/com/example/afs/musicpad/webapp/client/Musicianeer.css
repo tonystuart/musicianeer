@@ -23,8 +23,8 @@ fieldset {
 }
 
 table {
-	border: 1px solid #B4B7BA;
-	flex: 1;
+    border: 1px solid #B4B7BA;
+    flex: 1;
 }
 
 tbody {
@@ -67,9 +67,9 @@ tbody {
 }
 
 #song-table-wrapper {
-	/* flex: 1; */
-	overflow: auto;
-	width: 33%;
+    /* flex: 1; */
+    overflow: auto;
+    width: 33%;
 }
 
 #song-table {
@@ -78,12 +78,18 @@ tbody {
 }
 
 #channel-table-wrapper {
-	flex: 1;
-	overflow: auto;
+    flex: 1;
+    overflow: auto;
 }
 
 #channel-table {
-	width: 100%;
+    width: 100%;
+}
+
+#controls {
+    display: flex;
+    flex-direction: row;
+    margin: auto;
 }
 
 .keyboard {

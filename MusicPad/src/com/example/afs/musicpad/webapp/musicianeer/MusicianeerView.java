@@ -85,25 +85,26 @@ public class MusicianeerView extends ShadowDomBuilder {
                 .add(td() //
                     .add(text("Complexity")))) //
             .add(tbody("#info-body"))) //
-        .add(div("#transport") //
-            .add(clicker("previous-page", "<<")) //
-            .add(clicker("previous-song", "<")) //
-            .add(clicker("stop", "STOP")) //
-            .add(clicker("play", "PLAY")) //
-            .add(clicker("next-song", ">")) //
-            .add(clicker("next-page", ">>"))) //
+        .add(div("#controls") //
+            .add(div("#transport") //
+                .add(clicker("previous-page", "<<")) //
+                .add(clicker("previous-song", "<")) //
+                .add(clicker("stop", "STOP")) //
+                .add(clicker("play", "PLAY")) //
+                .add(clicker("next-song", ">")) //
+                .add(clicker("next-page", ">>"))) //
+            .add(div(".sliders") //
+                .add(percentSlider("tempo", Transport.DEFAULT_PERCENT_TEMPO)) //
+                .add(midiSlider("instrument", 50)) // TODO: Update instrument on program change
+                .add(percentSlider("volume", Transport.DEFAULT_PERCENT_GAIN))) //
+            .add(div(".buttons") //
+                .add(fieldSet() //
+                    .add(alternative("accompaniment", "Full")) //
+                    .add(alternative("accompaniment", "Piano")) //
+                    .add(alternative("accompaniment", "Rhythm")) //
+                    .add(alternative("accompaniment", "Drums")) //
+                    .add(alternative("accompaniment", "Solo"))))) //
         .add(keyboard()) //
-        .add(div(".sliders") //
-            .add(percentSlider("tempo", Transport.DEFAULT_PERCENT_TEMPO)) //
-            .add(midiSlider("instrument", 50)) // TODO: Update instrument on program change
-            .add(percentSlider("volume", Transport.DEFAULT_PERCENT_GAIN))) //
-        .add(div(".buttons") //
-            .add(fieldSet() //
-                .add(alternative("accompaniment", "Full")) //
-                .add(alternative("accompaniment", "Piano")) //
-                .add(alternative("accompaniment", "Rhythm")) //
-                .add(alternative("accompaniment", "Drums")) //
-                .add(alternative("accompaniment", "Solo")))) //
         .addMouseUpHandler()); //
   }
 
