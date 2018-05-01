@@ -30,6 +30,7 @@ public class MusicianeerController extends ControllerTask {
   private int channel;
   private boolean isDown;
 
+  private CurrentSong currentSong;
   private MusicianeerView musicianeerView;
   private Set<Integer> cueMidiNotes = new HashSet<>();
   private Set<Integer> playerMidiNotes = new HashSet<>();
@@ -53,7 +54,7 @@ public class MusicianeerController extends ControllerTask {
     } else if (id.startsWith("channel-index-")) {
       channel = Integer.parseInt(id.substring("channel-index-".length()));
       musicianeerView.resetMidiNoteLeds();
-      musicianeerView.selectChannel(channel);
+      musicianeerView.selectChannel(currentSong.getSong(), channel);
     } else {
       switch (id) {
       case "drums":
@@ -195,6 +196,7 @@ public class MusicianeerController extends ControllerTask {
   }
 
   private void playCurrentSong(CurrentSong currentSong) {
+    this.currentSong = currentSong;
     musicianeerView.resetMidiNoteLeds();
     musicianeerView.selectSong(currentSong.getIndex());
     musicianeerView.renderSongDetails(new SongInfo(currentSong.getSong()));

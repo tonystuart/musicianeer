@@ -22,6 +22,7 @@ public class MusicianeerWebApp extends MultitonWebApp {
 
   public MusicianeerWebApp(MessageBroker broker, MusicianeerWebAppFactory musicianeerWebAppFactory) {
     super(broker, musicianeerWebAppFactory, new MusicianeerController(broker));
+    subscribe(OnTick.class, message -> doMessage(message));
   }
 
 }

@@ -9,9 +9,9 @@
 
 package com.example.afs.musicpad.webapp.musicianeer;
 
-import com.example.afs.musicpad.task.Message;
+import com.example.afs.musicpad.message.TypedMessage;
 
-public class OnTick implements Message {
+public class OnTick extends TypedMessage {
 
   private long tick;
 

@@ -13,7 +13,7 @@ warranties or conditions of any kind, either express or implied.
     /* harbor mist */
     background-color: #2E4A62;
     /* sailor blue */
-    font-size: 2vh;
+    font-size: 1.5vh;
 }
 
 fieldset {
@@ -32,6 +32,26 @@ tbody {
     color: #B4B7BA;
     border: 1px solid #B4B7BA;
     height 10)%: auto;
+}
+
+svg {
+    stroke: #B4B7BA;
+    fill: #B4B7BA;
+    height: 95%;
+    margin-left: 50%;
+    margin-right: 50%;
+}
+
+line {
+    stroke-width: 2;
+}
+
+circle {
+    stroke-width: 1;
+}
+
+text {
+    font-size: 11pt;
 }
 
 #musicianeer {
@@ -89,7 +109,30 @@ tbody {
 #controls {
     display: flex;
     flex-direction: row;
-    margin: auto;
+}
+
+#staff-container {
+    flex: 1;
+    display: flex;
+    background: black;
+}
+
+#staff-cursor {
+    position: relative;
+    left: 50%;
+    height: 100%;
+    z-index: 100;
+    border-left: 1px solid red;
+}
+
+#staff-scroller {
+    flex: 1;
+    /* display: flex; */
+    overflow: auto;
+}
+
+#staff {
+    transform-origin: 0 0;
 }
 
 .keyboard {
@@ -175,7 +218,7 @@ tbody {
 }
 
 .slider {
-    width: calc(( 100%)/3- 5px);
+    display: flex;
 }
 
 .buttons {

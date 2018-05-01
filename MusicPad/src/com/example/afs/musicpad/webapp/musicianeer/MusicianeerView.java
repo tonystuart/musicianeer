@@ -20,6 +20,7 @@ import com.example.afs.musicpad.html.Range;
 import com.example.afs.musicpad.html.ShadowDomBuilder;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.midi.MidiLibrary;
+import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.task.ControllerTask;
 import com.example.afs.musicpad.util.FileUtilities;
 
@@ -104,6 +105,9 @@ public class MusicianeerView extends ShadowDomBuilder {
                     .add(alternative("accompaniment", "Rhythm")) //
                     .add(alternative("accompaniment", "Drums")) //
                     .add(alternative("accompaniment", "Solo"))))) //
+        .add(div("#staff-container") //
+            .add(div("#staff-cursor")) //
+            .add(div("#staff-scroller"))) //
         .add(keyboard()) //
         .addMouseUpHandler()); //
   }
@@ -123,14 +127,22 @@ public class MusicianeerView extends ShadowDomBuilder {
     replaceElement(songTable, songBody, createSongBody(midiLibrary));
   }
 
+  public void renderStaff(Song song, int channel) {
+    Engraver engraver = new Engraver();
+    Parent staff = engraver.notate(song, channel);
+    Parent staffScroller = getElementById("staff-scroller");
+    replaceChildren(staffScroller, staff, false);
+  }
+
   public void resetMidiNoteLeds() {
     for (int i = Musicianeer.LOWEST_NOTE; i <= Musicianeer.HIGHEST_NOTE; i++) {
       setLedState(i, LedState.OFF);
     }
   }
 
-  public void selectChannel(int channelIndex) {
-    selectElement("channel-index-" + channelIndex, "selected-channel");
+  public void selectChannel(Song song, int channel) {
+    selectElement("channel-index-" + channel, "selected-channel");
+    renderStaff(song, channel);
   }
 
   public void selectSong(int songIndex) {
