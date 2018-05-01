@@ -27,6 +27,15 @@ public class MultitonWebApp extends WebApp {
     subscribe(OnShadowUpdate.class, message -> doMessage(message));
   }
 
+  protected void doMessage(Message message) {
+    if (webSocket == null) {
+      throw new IllegalStateException("WebSocket is not open until doLoad is invoked, discarding message " + message);
+    } else if (webSocket.isNotConnected()) {
+      System.out.println("Message arrived after web socket was closed, discarding message=" + message);
+    }
+    webSocket.write(message);
+  }
+
   @Override
   protected void onPing(ByteBuffer ping) {
     try {
@@ -45,15 +54,6 @@ public class MultitonWebApp extends WebApp {
   @Override
   protected void onWebSocketConnect(WebSocket webSocket) {
     this.webSocket = webSocket;
-  }
-
-  private void doMessage(Message message) {
-    if (webSocket == null) {
-      throw new IllegalStateException("WebSocket is not open until doLoad is invoked, discarding message " + message);
-    } else if (webSocket.isNotConnected()) {
-      System.out.println("Message arrived after web socket was closed, discarding message=" + message);
-    }
-    webSocket.write(message);
   }
 
 }
