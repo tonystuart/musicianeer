@@ -112,7 +112,7 @@ text {
 }
 
 #staff-container {
-    flex: 1;
+    flex: 2;
     display: flex;
     background: black;
 }
@@ -138,7 +138,7 @@ text {
 .keyboard {
     display: flex;
     margin-top: 60px;
-    margin: auto;
+    flex: 1.7;
 }
 
 .keyboard div:hover {
@@ -155,24 +155,25 @@ text {
 
 .key-parent {
     position: relative;
+    flex: 1;
+    display: flex;
 }
 
 .black-key {
     background-color: black;
     position: absolute;
     z-index: 1;
-    left: 37px;
     top: 0px;
-    width: 25px;
-    height: 150px;
+    left: calc(83%);
+    width: calc(33%);
+    height: calc(66%);
     border: 1px solid black;
 }
 
 .white-key {
     background-color: white;
-    width: 50px;
-    height: 200px;
     border: 1px solid blue;
+    flex: 1;
 }
 
 .black-key-led, .white-key-led {
