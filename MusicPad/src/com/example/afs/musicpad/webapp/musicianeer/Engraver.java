@@ -164,8 +164,8 @@ public class Engraver {
     return SHARPS[midiNote % SHARPS.length];
   }
 
-  public Parent notate(Song song, int channel) {
-    return getStaff(song, channel);
+  public Parent notate(Song song, int channel, int transposition) {
+    return getStaff(song, channel, transposition);
   }
 
   private void drawHead(Svg staff, Context context, int noteX, int noteY) {
@@ -379,11 +379,11 @@ public class Engraver {
     return context;
   }
 
-  private Svg getStaff(Song song, int channel) {
+  private Svg getStaff(Song song, int channel, int transposition) {
     long duration = song.getDuration();
     Svg staff = drawStaff(song, channel, duration);
     drawMeasures(song, staff, duration);
-    Sounds sounds = new Sounds(OutputType.TICK, song.getChannelNotes(channel));
+    Sounds sounds = new Sounds(OutputType.TICK, new Transposer(song.getChannelNotes(channel), transposition));
     drawNotes(staff, sounds);
     drawNoteNames(staff, sounds);
     drawWords(song, staff);

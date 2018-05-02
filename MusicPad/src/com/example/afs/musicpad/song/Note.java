@@ -73,6 +73,7 @@ public class Note extends Item<Note> {
       velocity = note.getVelocity();
       duration = note.getDuration();
       program = note.getProgram();
+      startIndex = note.getStartIndex();
       endIndex = note.getEndIndex();
       beatsPerMinute = note.getBeatsPerMinute();
       beatsPerMeasure = note.getBeatsPerMeasure();

@@ -34,7 +34,6 @@ public class Transposer implements Iterable<Note> {
     @Override
     public Note next() {
       Note note = iterator.next();
-      //return note;
       return new NoteBuilder().withNote(note).withMidiNote(note.getMidiNote() + transposition).create();
     }
 

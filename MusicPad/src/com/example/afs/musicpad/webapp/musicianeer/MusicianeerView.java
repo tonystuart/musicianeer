@@ -119,9 +119,9 @@ public class MusicianeerView extends ShadowDomBuilder {
     replaceElement(songTable, songBody, createSongBody(midiLibrary));
   }
 
-  public void renderStaff(Song song, int channel) {
+  public void renderStaff(Song song, int channel, int transposition) {
     Engraver engraver = new Engraver();
-    Parent staff = engraver.notate(song, channel);
+    Parent staff = engraver.notate(song, channel, transposition);
     Parent staffScroller = getElementById("staff-scroller");
     replaceChildren(staffScroller, staff, false);
   }
@@ -132,9 +132,9 @@ public class MusicianeerView extends ShadowDomBuilder {
     }
   }
 
-  public void selectChannel(Song song, int channel) {
+  public void selectChannel(Song song, int channel, int transposition) {
     selectElement("channel-index-" + channel, "selected-channel");
-    renderStaff(song, channel);
+    renderStaff(song, channel, transposition);
   }
 
   public void selectSong(int songIndex) {
