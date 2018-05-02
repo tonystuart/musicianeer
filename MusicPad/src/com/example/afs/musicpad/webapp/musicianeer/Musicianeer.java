@@ -19,12 +19,11 @@ import com.example.afs.musicpad.midi.MidiLibrary;
 import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.task.MessageBroker;
 import com.example.afs.musicpad.task.ServiceTask;
-import com.example.afs.musicpad.webapp.musicianeer.OnBrowseSong.BrowseType;
 
 public class Musicianeer extends ServiceTask {
 
   public static final int LOWEST_NOTE = 36;
-  public static final int HIGHEST_NOTE = 88;
+  public static final int HIGHEST_NOTE = 84;
 
   private static final int PLAYER_BASE = Midi.CHANNELS;
   private static final int PLAYER_CHANNELS = Midi.CHANNELS;
@@ -53,7 +52,6 @@ public class Musicianeer extends ServiceTask {
     subscribe(OnStop.class, message -> doStop(message));
     subscribe(OnNoteOn.class, message -> doNoteOn(message));
     subscribe(OnNoteOff.class, message -> doNoteOff(message));
-    subscribe(OnBrowseSong.class, message -> doBrowseSong(message));
     subscribe(OnSelectSong.class, message -> doSelectSong(message));
     subscribe(OnProgramChange.class, message -> doProgramChange(message));
     subscribe(OnProgramOverride.class, message -> doProgramOverride(message));
@@ -69,7 +67,7 @@ public class Musicianeer extends ServiceTask {
     midiLibrary = new MidiLibrary(path);
     publish(new OnMidiLibrary(midiLibrary));
     if (midiLibrary.size() > 0) {
-      setCurrentSong(random.nextInt(midiLibrary.size()));
+      selectSong(random.nextInt(midiLibrary.size()));
     }
   }
 
@@ -82,31 +80,6 @@ public class Musicianeer extends ServiceTask {
     settings.set("synth.cpu-cores", processors);
     Synthesizer synthesizer = new Synthesizer(settings);
     return synthesizer;
-  }
-
-  private void doBrowseSong(OnBrowseSong message) {
-    int newIndex;
-    if (currentSong != null) {
-      int index = currentSong.getIndex();
-      BrowseType browseType = message.getBrowseType();
-      switch (browseType) {
-      case NEXT:
-        newIndex = Math.min(midiLibrary.size() - 1, index + 1);
-        break;
-      case NEXT_PAGE:
-        newIndex = Math.min(midiLibrary.size() - 1, index + 10);
-        break;
-      case PREVIOUS:
-        newIndex = Math.max(0, index - 1);
-        break;
-      case PREVIOUS_PAGE:
-        newIndex = Math.max(0, index - 10);
-        break;
-      default:
-        throw new UnsupportedOperationException(browseType.name());
-      }
-      setCurrentSong(newIndex);
-    }
   }
 
   private void doNoteOff(OnNoteOff message) {
@@ -144,7 +117,7 @@ public class Musicianeer extends ServiceTask {
   }
 
   private void doSelectSong(OnSelectSong message) {
-    setCurrentSong(message.getSongIndex());
+    selectSong(message.getSongIndex());
   }
 
   private void doSetAccompanimentType(OnSetAccompanimentType message) {
@@ -167,6 +140,45 @@ public class Musicianeer extends ServiceTask {
     return currentSong;
   }
 
+  private int getEasyTransposition(Song song) {
+    int melodyChannel = song.getPresumedMelodyChannel();
+    int lowestMidiNote = song.getLowestMidiNote(melodyChannel);
+    int highestMidiNote = song.getHighestMidiNote(melodyChannel);
+    int distanceToWhiteKeys = song.getDistanceToWhiteKeys();
+    System.out.println("song=" + song);
+    System.out.println("melodyChannel=" + melodyChannel + ", distanceToWhiteKeys=" + distanceToWhiteKeys + ", lowestMidiNote=" + lowestMidiNote + ", highestMidiNote=" + highestMidiNote);
+    lowestMidiNote += distanceToWhiteKeys;
+    highestMidiNote += distanceToWhiteKeys;
+    int octaveTransposition = 0;
+    if (lowestMidiNote < LOWEST_NOTE) {
+      int octaveOutOfRange = (LOWEST_NOTE - lowestMidiNote) / Midi.SEMITONES_PER_OCTAVE;
+      if (octaveOutOfRange > 0) {
+        octaveTransposition = octaveOutOfRange * Midi.SEMITONES_PER_OCTAVE;
+        System.out.println("keyboardTransposition=" + octaveTransposition);
+      }
+    } else if (highestMidiNote > HIGHEST_NOTE) {
+      int octaveOutOfRange = (lowestMidiNote - LOWEST_NOTE) / Midi.SEMITONES_PER_OCTAVE;
+      if (octaveOutOfRange > 0) {
+        octaveTransposition = -octaveOutOfRange * Midi.SEMITONES_PER_OCTAVE;
+        System.out.println("keyboardTransposition=" + octaveTransposition);
+      }
+    }
+    // distanceToWhiteKeys += keyboardTransposition;
+    int easyTransposition = 0;
+    if (distanceToWhiteKeys < 0) {
+      int minimumTransposition = song.getMinimumTransposition();
+      if (Math.abs(distanceToWhiteKeys) < Math.abs(minimumTransposition)) {
+        easyTransposition = distanceToWhiteKeys;
+      }
+    } else if (distanceToWhiteKeys > 0) {
+      int maximumTransposition = song.getMaximumTransposition();
+      if (distanceToWhiteKeys < maximumTransposition) {
+        easyTransposition = distanceToWhiteKeys;
+      }
+    }
+    return easyTransposition;
+  }
+
   private MidiLibrary getMidiLibrary() {
     return midiLibrary;
   }
@@ -181,49 +193,19 @@ public class Musicianeer extends ServiceTask {
 
   private void playCurrentSong() {
     Song song = currentSong.getSong();
-    int melodyChannel = song.getPresumedMelodyChannel();
-    int lowestMidiNote = song.getLowestMidiNote(melodyChannel);
-    int highestMidiNote = song.getHighestMidiNote(melodyChannel);
-    int songTransposition = song.getDistanceToWhiteKeys();
-    System.out.println("song=" + song);
-    System.out.println("melodyChannel=" + melodyChannel + ", songTransposition=" + songTransposition + ", lowestMidiNote=" + lowestMidiNote + ", highestMidiNote=" + highestMidiNote);
-    lowestMidiNote += songTransposition;
-    highestMidiNote += songTransposition;
-    int keyboardTransposition = 0;
-    if (lowestMidiNote < LOWEST_NOTE) {
-      int octaveOutOfRange = (LOWEST_NOTE - lowestMidiNote) / Midi.SEMITONES_PER_OCTAVE;
-      if (octaveOutOfRange > 0) {
-        keyboardTransposition = octaveOutOfRange * Midi.SEMITONES_PER_OCTAVE;
-        System.out.println("keyboardTransposition=" + keyboardTransposition);
-      }
-    } else if (highestMidiNote > HIGHEST_NOTE) {
-      int octaveOutOfRange = (lowestMidiNote - LOWEST_NOTE) / Midi.SEMITONES_PER_OCTAVE;
-      if (octaveOutOfRange > 0) {
-        keyboardTransposition = -octaveOutOfRange * Midi.SEMITONES_PER_OCTAVE;
-        System.out.println("keyboardTransposition=" + keyboardTransposition);
-      }
-    }
-    if (songTransposition < 0) {
-      int minimumTransposition = song.getMinimumTransposition();
-      if (Math.abs(songTransposition) < Math.abs(minimumTransposition)) {
-        song.transposeBy(songTransposition);
-      }
-    } else if (songTransposition > 0) {
-      int maximumTransposition = song.getMaximumTransposition();
-      if (songTransposition < maximumTransposition) {
-        song.transposeBy(songTransposition);
-      }
-    }
     transport.play(song.getNotes());
-    publish(new OnPlayCurrentSong(currentSong, keyboardTransposition));
+    publish(new OnTransportPlay(currentSong));
   }
 
-  private void setCurrentSong(int index) {
+  private void selectSong(int index) {
     if (index < 0 || index >= midiLibrary.size()) {
       throw new IndexOutOfBoundsException();
     }
     Song song = midiLibrary.readSong(index);
-    currentSong = new CurrentSong(index, song);
+    int easyTransposition = getEasyTransposition(song);
+    transport.setCurrentTransposition(easyTransposition);
+    currentSong = new CurrentSong(index, song, easyTransposition);
+    publish(new OnSongSelected(currentSong));
     playCurrentSong();
   }
 

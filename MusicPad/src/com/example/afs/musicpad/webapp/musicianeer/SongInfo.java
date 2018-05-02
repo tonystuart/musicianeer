@@ -27,9 +27,11 @@ import com.example.afs.musicpad.song.Song;
 public class SongInfo {
 
   private Song song;
+  private int easyTransposition;
 
-  public SongInfo(Song song) {
-    this.song = song;
+  public SongInfo(CurrentSong currentSong) {
+    this.song = currentSong.getSong();
+    this.easyTransposition = currentSong.getEasyTransposition();
   }
 
   public int[] getActiveChannels() {
@@ -63,14 +65,14 @@ public class SongInfo {
     return song.getConcurrency(channel);
   }
 
-  public int getDistanceToWhiteKeys() {
-    return song.getDistanceToWhiteKeys();
-  }
-
   public String getDuration() {
     int secondsDuration = song.getSeconds();
     String duration = String.format("%d:%02d", secondsDuration / 60, secondsDuration % 60);
     return duration;
+  }
+
+  public int getEasyTransposition() {
+    return easyTransposition;
   }
 
   public int getOccupancy(int channel) {
@@ -145,10 +147,6 @@ public class SongInfo {
 
   public String getTitle() {
     return song.getTitle();
-  }
-
-  public int getTransposition() {
-    return song.getTransposition();
   }
 
   public int getUniqueSounds(int channel) {

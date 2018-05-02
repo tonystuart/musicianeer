@@ -38,6 +38,7 @@ public class Transport {
   public static final int DEFAULT_PERCENT_VELOCITY = 10;
   public static final int DEFAULT_MASTER_PROGRAM_OFF = Midi.MAX_VALUE;
 
+  private int currentTransposition;
   private int masterProgram = DEFAULT_MASTER_PROGRAM_OFF;
   private int percentVelocity = DEFAULT_PERCENT_VELOCITY;
   private int[] currentPrograms = new int[Midi.CHANNELS];
@@ -187,6 +188,10 @@ public class Transport {
     }
   }
 
+  public void setCurrentTransposition(int currentTransposition) {
+    this.currentTransposition = currentTransposition;
+  }
+
   public void setMasterProgram(int masterProgram) {
     this.masterProgram = masterProgram;
   }
@@ -213,20 +218,28 @@ public class Transport {
     reviewQueue.clear();
   }
 
+  private int getTransposedMidiNote(Note note, int channel) {
+    int midiNote = note.getMidiNote();
+    if (currentTransposition != 0 && channel != Midi.DRUM) {
+      midiNote += currentTransposition;
+    }
+    return midiNote;
+  }
+
   private void processNoteEvent(NoteEvent noteEvent) {
     Note note = noteEvent.getNote();
     switch (noteEvent.getType()) {
 
     case NOTE_OFF: {
       int channel = note.getChannel();
-      int midiNote = note.getMidiNote();
+      int midiNote = getTransposedMidiNote(note, channel);
       synthesizer.releaseKey(channel, midiNote);
       publish(new OnTransportNoteOff(channel, midiNote));
       break;
     }
     case NOTE_ON: {
       int channel = note.getChannel();
-      int midiNote = note.getMidiNote();
+      int midiNote = getTransposedMidiNote(note, channel);
       int velocity = note.getVelocity();
       int program = note.getProgram();
       if (channel != Midi.DRUM && masterProgram != DEFAULT_MASTER_PROGRAM_OFF) {
@@ -257,8 +270,6 @@ public class Transport {
           synthesizer.pressKey(channel, midiNote, scaledVelocity);
         }
         break;
-      case SOLO:
-        break;
       default:
         break;
       }
@@ -267,11 +278,16 @@ public class Transport {
     case TICK:
       publish(new OnTick(noteEvent.getTick()));
       break;
-    case CUE_NOTE_OFF:
-      publish(new OnCueNoteOff(note.getChannel(), note.getMidiNote()));
+    case CUE_NOTE_OFF: {
+      int channel = note.getChannel();
+      int midiNote = getTransposedMidiNote(note, channel);
+      publish(new OnCueNoteOff(channel, midiNote));
       break;
+    }
     case CUE_NOTE_ON:
-      publish(new OnCueNoteOn(note.getChannel(), note.getMidiNote()));
+      int channel = note.getChannel();
+      int midiNote = getTransposedMidiNote(note, channel);
+      publish(new OnCueNoteOn(channel, midiNote));
       break;
     default:
       throw new UnsupportedOperationException();

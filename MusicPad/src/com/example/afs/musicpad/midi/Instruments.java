@@ -192,6 +192,29 @@ public class Instruments {
       "Gunshot", //
   };
 
+  private static final String[] CATEGORIES = new String[] {
+      "Piano", //
+      "Chromatic Percussion", //
+      "Organ", //
+      "Guitar", //
+      "Bass", //
+      "Strings", //
+      "Ensemble", //
+      "Brass", //
+      "Reed", //
+      "Pipe", //
+      "Synth Lead", //
+      "Synth Pad", //
+      "Synth Effects", //
+      "Ethnic", //
+      "Percussive", //
+      "Sound Effects" //
+  };
+
+  public static String getCategoryName(int category) {
+    return findElement(CATEGORIES, category);
+  }
+
   public static int getDrum(String name) {
     return findIndex(DRUMS, name);
   }

@@ -119,4 +119,9 @@ public class Parent extends Element implements Iterable<Node> {
     appendChild(node);
   }
 
+  @Override
+  public Parent style(String newStyle) {
+    return (Parent) super.style(newStyle);
+  }
+
 }

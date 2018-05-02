@@ -18,6 +18,7 @@ import java.util.Set;
 public class Element extends Node {
   private String type;
   private String id;
+  private StringBuilder style;
   private Set<String> classList;
   private Map<String, Object> attributes;
 
@@ -115,6 +116,11 @@ public class Element extends Node {
       }
       s.append("'");
     }
+    if (style != null) {
+      s.append(" style='");
+      s.append(style);
+      s.append("'");
+    }
     if (attributes != null) {
       for (Entry<String, Object> entry : attributes.entrySet()) {
         String name = entry.getKey();
@@ -146,6 +152,20 @@ public class Element extends Node {
       attributes = new HashMap<>();
     }
     attributes.put(name, value);
+  }
+
+  public Element style(String newStyle) {
+    if (!newStyle.endsWith(";")) {
+      throw new IllegalArgumentException("Expected newStyle to end with semicolon");
+    }
+    if (style == null) {
+      style = new StringBuilder();
+    }
+    if (style.length() > 0) {
+      style.append(" ");
+    }
+    style.append(newStyle);
+    return this;
   }
 
   protected void processProperty(String property) {

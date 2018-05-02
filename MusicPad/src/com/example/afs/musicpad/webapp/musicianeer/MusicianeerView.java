@@ -13,11 +13,14 @@ import java.io.File;
 
 import com.example.afs.musicpad.html.Division;
 import com.example.afs.musicpad.html.Element;
+import com.example.afs.musicpad.html.NumberInput;
 import com.example.afs.musicpad.html.Parent;
 import com.example.afs.musicpad.html.PercentRange;
 import com.example.afs.musicpad.html.Radio;
 import com.example.afs.musicpad.html.Range;
+import com.example.afs.musicpad.html.Select;
 import com.example.afs.musicpad.html.ShadowDomBuilder;
+import com.example.afs.musicpad.midi.Instruments;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.midi.MidiLibrary;
 import com.example.afs.musicpad.song.Song;
@@ -36,75 +39,61 @@ public class MusicianeerView extends ShadowDomBuilder {
         .add(div("#song") //
             .add(div("#song-table-wrapper") //
                 .add(table("#song-table") //
-                    .add(thead("#channel-head") //
-                        .add(td() //
+                    .add(thead("#song-head") //
+                        .add(th("#song-number-column") //
                             .add(text("Song"))) //
-                        .add(td() //
+                        .add(th("#song-title-column") //
                             .add(text("Title")))) //
                     .add(createSongBody(midiLibrary)) //
                     .addClickHandler())) //
             .add(div("#channel-table-wrapper") //
                 .add(table("#channel-table") //
                     .add(thead("#channel-head") //
-                        .add(td() //
+                        .add(th() //
                             .add(text("Channel"))) //
-                        .add(td() //
+                        .add(th() //
                             .add(text("Instrument"))) //
-                        .add(td() //
+                        .add(th() //
                             .add(text("Mute"))) //
-                        .add(td() //
+                        .add(th() //
                             .add(text("Solo"))) //
-                        .add(td() //
+                        .add(th() //
                             .add(text("Measures"))) //
-                        .add(td() //
+                        .add(th() //
                             .add(text("Melody"))) //
-                        .add(td() //
+                        .add(th() //
                             .add(text("Occupancy"))) //
-                        .add(td() //
+                        .add(th() //
                             .add(text("Concurrency"))) //
-                        .add(td() //
+                        .add(th() //
                             .add(text("Notes")))) //
-                    .add(tbody("#channel-body"))))) //
-        .add(table("#info-table") //
-            .add(thead("#info-head") //
-                .add(td() //
-                    .add(text("Title"))) //
-                .add(td() //
-                    .add(text("Duration"))) //
-                .add(td() //
-                    .add(text("Parts"))) //
-                .add(td() //
-                    .add(text("Beats per Minute"))) //
-                .add(td() //
-                    .add(text("Time Signature"))) //
-                .add(td() //
-                    .add(text("Predominant Key"))) //
-                .add(td() //
-                    .add(text("EZ Keyboard"))) //
-                .add(td() //
-                    .add(text("Current Transposition"))) //
-                .add(td() //
-                    .add(text("Complexity")))) //
-            .add(tbody("#info-body"))) //
+                    .add(tbody("#channel-body")))) //
+            .add(div("#info-table-wrapper") //
+                .add(table("#info-table") //
+                    .add(thead("#info-head") //
+                        .add(th() //
+                            .add(text("Property"))) //
+                        .add(th() //
+                            .add(text("Value")))) //
+                    .add(tbody("#info-body"))))) //
         .add(div("#controls") //
-            .add(div("#transport") //
-                .add(clicker("previous-page", "<<")) //
-                .add(clicker("previous-song", "<")) //
-                .add(clicker("stop", "STOP")) //
-                .add(clicker("play", "PLAY")) //
-                .add(clicker("next-song", ">")) //
-                .add(clicker("next-page", ">>"))) //
-            .add(div(".sliders") //
-                .add(percentSlider("tempo", Transport.DEFAULT_PERCENT_TEMPO)) //
-                .add(midiSlider("instrument", 50)) // TODO: Update instrument on program change
-                .add(percentSlider("volume", Transport.DEFAULT_PERCENT_GAIN))) //
-            .add(div(".buttons") //
-                .add(fieldSet() //
-                    .add(alternative("accompaniment", "Full")) //
-                    .add(alternative("accompaniment", "Piano")) //
-                    .add(alternative("accompaniment", "Rhythm")) //
-                    .add(alternative("accompaniment", "Drums")) //
-                    .add(alternative("accompaniment", "Solo"))))) //
+            .add(clicker("stop", "STOP")) //
+            .add(clicker("play", "PLAY")) //
+            .add(percentSlider("tempo", Transport.DEFAULT_PERCENT_TEMPO)) //
+            .add(percentSlider("volume", Transport.DEFAULT_PERCENT_GAIN)) //
+            .add(div(".name-value") //
+                .add(text("Transposition:&nbsp;")) //
+                .add(numberInput("#transposition"))) //
+            .add(div(".name-value") //
+                .add(text("Override:&nbsp;")) //
+                .add(createInstrumentSelect())) //
+            .add(fieldSet() //
+                .add(legend() //
+                    .add(text("Accompaniment"))) //
+                .add(alternative("accompaniment", "Full")) //
+                .add(alternative("accompaniment", "Piano")) //
+                .add(alternative("accompaniment", "Rhythm")) //
+                .add(alternative("accompaniment", "Drums")))) //
         .add(div("#staff-container") //
             .add(div("#staff-cursor")) //
             .add(div("#staff-scroller"))) //
@@ -112,13 +101,16 @@ public class MusicianeerView extends ShadowDomBuilder {
         .addMouseUpHandler()); //
   }
 
-  public void renderSongDetails(SongInfo songInfo) {
+  public void renderSongDetails(CurrentSong currentSong) {
+    SongInfo songInfo = new SongInfo(currentSong);
     Parent channelTable = getElementById("channel-table");
     Parent channelBody = getElementById("channel-body");
     replaceElement(channelTable, channelBody, createChannelBody(songInfo));
     Parent songInfoTable = getElementById("info-table");
     Parent songInfoBody = getElementById("info-body");
     replaceElement(songInfoTable, songInfoBody, createInfoBody(songInfo));
+    NumberInput transposition = getElementById("transposition");
+    setProperty(transposition, "value", currentSong.getEasyTransposition());
   }
 
   public void renderSongList(MidiLibrary midiLibrary) {
@@ -241,27 +233,67 @@ public class MusicianeerView extends ShadowDomBuilder {
 
   private Parent createInfoBody(SongInfo songInfo) {
     Parent songInfoBody = tbody("#info-body");
+
     songInfoBody.add(row() //
         .add(td() //
-            .add(text(songInfo.getTitle()))) //
+            .add(text("Duration"))) //
         .add(td() //
-            .add(text(songInfo.getDuration()))) //
+            .add(text(songInfo.getDuration()))));
+
+    songInfoBody.add(row() //
         .add(td() //
-            .add(text(songInfo.getParts()))) //
+            .add(text("Parts"))) //
         .add(td() //
-            .add(text(songInfo.getBeatsPerMinute(0)))) //
+            .add(text(songInfo.getParts()))));
+
+    songInfoBody.add(row() //
         .add(td() //
-            .add(text(songInfo.getTimeSignature()))) //
+            .add(text("Beats per Minute"))) //
         .add(td() //
-            .add(text(songInfo.getPredominantKey()))) //
+            .add(text(songInfo.getBeatsPerMinute(0)))));
+
+    songInfoBody.add(row() //
         .add(td() //
-            .add(text(songInfo.getDistanceToWhiteKeys()))) //
+            .add(text("Time Signature"))) //
         .add(td() //
-            .add(text(songInfo.getTransposition()))) //
+            .add(text(songInfo.getTimeSignature()))));
+
+    songInfoBody.add(row() //
+        .add(td() //
+            .add(text("Presumed Key"))) //
+        .add(td() //
+            .add(text(songInfo.getPredominantKey()))));
+
+    songInfoBody.add(row() //
+        .add(td() //
+            .add(text("EZ Tranposition"))) //
+        .add(td() //
+            .add(text(songInfo.getEasyTransposition()))));
+
+    songInfoBody.add(row() //
+        .add(td() //
+            .add(text("Complexity"))) //
         .add(td() //
             .add(text(songInfo.getComplexity()))));
+
     return songInfoBody;
 
+  }
+
+  private Select createInstrumentSelect() {
+    Select select = new Select("#instrument-select");
+    select.addInputHandler();
+    select.required();
+    select.add(option("Default", -1));
+    int program = 0;
+    for (int category = 0; category < 16; category++) {
+      select.add(optionGroup(Instruments.getCategoryName(category)));
+      for (int j = 0; j < 8; j++) {
+        select.add(option(Instruments.getProgramName(program), program));
+        program++;
+      }
+    }
+    return select;
   }
 
   private Parent createSongBody(MidiLibrary midiLibrary) {
@@ -319,7 +351,7 @@ public class MusicianeerView extends ShadowDomBuilder {
 
   private Division percentSlider(String id, int value) {
     Division div = new Division(".slider");
-    div.add(text(id));
+    div.add(text(Utils.capitalize(id) + ":&nbsp;"));
     Range slider = new PercentRange("#" + id);
     slider.addInputHandler();
     slider.setValue(value);

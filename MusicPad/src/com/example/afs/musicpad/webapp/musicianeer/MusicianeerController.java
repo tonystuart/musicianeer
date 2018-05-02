@@ -18,7 +18,6 @@ import com.example.afs.musicpad.midi.MidiLibrary;
 import com.example.afs.musicpad.task.ControllerTask;
 import com.example.afs.musicpad.task.MessageBroker;
 import com.example.afs.musicpad.webapp.musicianeer.MusicianeerView.LedState;
-import com.example.afs.musicpad.webapp.musicianeer.OnBrowseSong.BrowseType;
 import com.example.afs.musicpad.webapp.musicianeer.OnSetAccompanimentType.AccompanimentType;
 
 public class MusicianeerController extends ControllerTask {
@@ -39,7 +38,8 @@ public class MusicianeerController extends ControllerTask {
     super(messageBroker);
     MidiLibrary midiLibrary = request(Services.getMidiLibrary);
     musicianeerView = new MusicianeerView(this, midiLibrary);
-    subscribe(OnPlayCurrentSong.class, message -> doPlayCurrentSong(message));
+    subscribe(OnSongSelected.class, message -> doSongSelected(message));
+    subscribe(OnTransportPlay.class, message -> doTransportPlay(message));
     subscribe(OnMidiLibrary.class, message -> doSongLibrary(message));
     subscribe(OnTransportNoteOn.class, message -> doTransportNoteOn(message));
     subscribe(OnTransportNoteOff.class, message -> doTransportNoteOff(message));
@@ -63,29 +63,14 @@ public class MusicianeerController extends ControllerTask {
       case "full":
         publish(new OnSetAccompanimentType(OnSetAccompanimentType.AccompanimentType.FULL));
         break;
-      case "next-song":
-        publish(new OnBrowseSong(BrowseType.NEXT));
-        break;
-      case "next-page":
-        publish(new OnBrowseSong(OnBrowseSong.BrowseType.NEXT_PAGE));
-        break;
       case "piano":
         publish(new OnSetAccompanimentType(OnSetAccompanimentType.AccompanimentType.PIANO));
         break;
       case "play":
         publish(new OnPlay());
         break;
-      case "previous-page":
-        publish(new OnBrowseSong(OnBrowseSong.BrowseType.PREVIOUS_PAGE));
-        break;
-      case "previous-song":
-        publish(new OnBrowseSong(OnBrowseSong.BrowseType.PREVIOUS));
-        break;
       case "rhythm":
         publish(new OnSetAccompanimentType(OnSetAccompanimentType.AccompanimentType.RHYTHM));
-        break;
-      case "solo":
-        publish(new OnSetAccompanimentType(OnSetAccompanimentType.AccompanimentType.SOLO));
         break;
       case "stop":
         publish(new OnStop());
@@ -116,7 +101,7 @@ public class MusicianeerController extends ControllerTask {
     musicianeerView.setAlternative("full");
     CurrentSong currentSong = request(Services.getCurrentSong);
     if (currentSong != null) {
-      playCurrentSong(currentSong);
+      initializeCurrentSong(currentSong);
     }
   }
 
@@ -171,12 +156,12 @@ public class MusicianeerController extends ControllerTask {
     }
   }
 
-  private void doPlayCurrentSong(OnPlayCurrentSong message) {
-    playCurrentSong(message.getCurrentSong());
-  }
-
   private void doSongLibrary(OnMidiLibrary message) {
     musicianeerView.renderSongList(message.getMidiLibrary());
+  }
+
+  private void doSongSelected(OnSongSelected message) {
+    initializeCurrentSong(message.getCurrentSong());
   }
 
   private void doTransportNoteOff(OnTransportNoteOff message) {
@@ -195,11 +180,19 @@ public class MusicianeerController extends ControllerTask {
     }
   }
 
-  private void playCurrentSong(CurrentSong currentSong) {
+  private void doTransportPlay(OnTransportPlay message) {
+    playCurrentSong(message.getCurrentSong());
+  }
+
+  private void initializeCurrentSong(CurrentSong currentSong) {
     this.currentSong = currentSong;
     musicianeerView.resetMidiNoteLeds();
     musicianeerView.selectSong(currentSong.getIndex());
-    musicianeerView.renderSongDetails(new SongInfo(currentSong.getSong()));
+    musicianeerView.renderSongDetails(currentSong);
+  }
+
+  private void playCurrentSong(CurrentSong currentSong) {
+    musicianeerView.resetMidiNoteLeds();
   }
 
 }

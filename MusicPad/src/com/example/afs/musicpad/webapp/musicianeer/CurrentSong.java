@@ -14,10 +14,16 @@ import com.example.afs.musicpad.song.Song;
 public class CurrentSong {
   private int index;
   private Song song;
+  private int easyTransposition;
 
-  public CurrentSong(int index, Song song) {
+  public CurrentSong(int index, Song song, int easyTransposition) {
     this.index = index;
     this.song = song;
+    this.easyTransposition = easyTransposition;
+  }
+
+  public int getEasyTransposition() {
+    return easyTransposition;
   }
 
   public int getIndex() {
@@ -30,7 +36,7 @@ public class CurrentSong {
 
   @Override
   public String toString() {
-    return "CurrentSong [index=" + index + ", song=" + song + "]";
+    return "CurrentSong [index=" + index + ", song=" + song + ", easyTransposition=" + easyTransposition + "]";
   }
 
 }

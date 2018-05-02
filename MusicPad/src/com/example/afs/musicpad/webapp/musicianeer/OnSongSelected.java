@@ -11,25 +11,21 @@ package com.example.afs.musicpad.webapp.musicianeer;
 
 import com.example.afs.musicpad.task.Message;
 
-public class OnSetAccompanimentType implements Message {
+public class OnSongSelected implements Message {
 
-  public enum AccompanimentType {
-    FULL, PIANO, RHYTHM, DRUMS
+  private CurrentSong currentSong;
+
+  public OnSongSelected(CurrentSong currentSong) {
+    this.currentSong = currentSong;
   }
 
-  private AccompanimentType accompanimentType;
-
-  public OnSetAccompanimentType(AccompanimentType accompanimentType) {
-    this.accompanimentType = accompanimentType;
-  }
-
-  public AccompanimentType getAccompanimentType() {
-    return accompanimentType;
+  public CurrentSong getCurrentSong() {
+    return currentSong;
   }
 
   @Override
   public String toString() {
-    return "OnSetAccompanimentType [accompanimentType=" + accompanimentType + "]";
+    return "OnSongSelected [currentSong=" + currentSong + "]";
   }
 
 }

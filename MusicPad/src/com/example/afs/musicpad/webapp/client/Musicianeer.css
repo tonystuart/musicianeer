@@ -13,32 +13,29 @@ warranties or conditions of any kind, either express or implied.
     /* harbor mist */
     background-color: #2E4A62;
     /* sailor blue */
-    font-size: 1.5vh;
+    font-size: 2vh;
 }
 
 fieldset {
-    font-size: 1.5vh;
+    border: 1px solid #B4B7BA;
     color: #B4B7BA;
-    border: 1px solid #B4B7BA;
-}
-
-table {
-    border: 1px solid #B4B7BA;
+    font-size: 1.5vh;
+    flex-grow: 0;
 }
 
 tbody {
     background-color: black;
-    color: #B4B7BA;
     border: 1px solid #B4B7BA;
+    color: #B4B7BA;
     height 10)%: auto;
 }
 
 svg {
-    stroke: #B4B7BA;
     fill: #B4B7BA;
     height: 95%;
     margin-left: 50%;
     margin-right: 50%;
+    stroke: #B4B7BA;
 }
 
 line {
@@ -53,6 +50,19 @@ text {
     font-size: 11pt;
 }
 
+input[type=number], input[type=text] {
+	    color: #B4B7BA;
+	    border: 1px solid #B4B7BA;
+}
+
+select {
+	    border: 1px solid #B4B7BA;
+	    flex-grow: 0;
+}
+::-webkit-scrollbar {
+    background-color: #B4B7BA;
+}
+
 #musicianeer {
     display: flex;
     flex-direction: column;
@@ -62,11 +72,12 @@ text {
     bottom: 0;
     left: 0;
     right: 0;
+    padding: 10px;
 }
 
 .selected-song {
-    color: black;
-    background-color: magenta;
+    color: #2E4A62;
+    background-color: #B4B7BA;
 }
 
 .selected-channel {
@@ -86,34 +97,53 @@ text {
 }
 
 #song-table-wrapper {
-    /* flex: 1; */
-    overflow: auto;
-    width: 33%;
+	margin: 0px 10px 0px 0px;
+	border: 1px solid #B4B7BA;
+	overflow: auto;
+	width: 25%;
 }
 
 #song-table {
-    word-break: break-all;
-    width: 100%;
+    word-break: break-word;
+}
+
+#song-number-column {
+	width: 20%;
+}
+
+#song-title-column {
+	width: 80%;
 }
 
 #channel-table-wrapper {
-    flex: 1;
-    overflow: auto;
+	border: 1px solid #B4B7BA;
+	overflow: auto;
+	margin: 0px 10px 0px 0px;
+	width: 50%;
 }
 
 #channel-table {
-    width: 100%;
+}
+
+#info-table-wrapper {
+	border: 1px solid #B4B7BA;
+	overflow: auto;
+	width: 25%;
 }
 
 #controls {
     display: flex;
     flex-direction: row;
+    align-items: center;
+    justify-content: space-around;
+    padding: 5px;
 }
 
 #staff-container {
     flex: 2;
     display: flex;
     background: black;
+    border: 1px solid #B4B7BA;
 }
 
 #staff-cursor {
@@ -137,11 +167,11 @@ text {
 .keyboard {
     display: flex;
     margin-top: 60px;
-    flex: 1.7;
+    flex: 1;
 }
 
 .keyboard div:hover {
-    background-color: gray;
+    background-color: #B4B7BA;
 }
 
 .white-key .black-key :not ( :hover ) {
@@ -149,7 +179,7 @@ text {
 }
 
 .keyboard div:active {
-    background-color: blue;
+    background-color: #2E4A62;
 }
 
 .key-parent {
@@ -219,6 +249,7 @@ text {
 
 .slider {
     display: flex;
+    align-items: center;
 }
 
 .buttons {
