@@ -13,7 +13,7 @@ warranties or conditions of any kind, either express or implied.
     /* harbor mist */
     background-color: #2E4A62;
     /* sailor blue */
-    font-size: 2vh;
+    font-size: 1.7vh;
 }
 
 fieldset {
@@ -51,14 +51,15 @@ text {
 }
 
 input[type=number], input[type=text] {
-	    color: #B4B7BA;
-	    border: 1px solid #B4B7BA;
+    color: #B4B7BA;
+    border: 1px solid #B4B7BA;
 }
 
 select {
-	    border: 1px solid #B4B7BA;
-	    flex-grow: 0;
+    border: 1px solid #B4B7BA;
+    flex-grow: 0;
 }
+
 ::-webkit-scrollbar {
     background-color: #B4B7BA;
 }
@@ -97,38 +98,27 @@ select {
 }
 
 #song-table-wrapper {
-	margin: 0px 10px 0px 0px;
-	border: 1px solid #B4B7BA;
-	overflow: auto;
-	width: 25%;
+    margin: 0px 5px 0px 0px;
+    border: 1px solid #B4B7BA;
+    overflow: auto;
+    width: 50%;
 }
 
 #song-table {
-    word-break: break-word;
-}
-
-#song-number-column {
-	width: 20%;
-}
-
-#song-title-column {
-	width: 80%;
+    table-layout: fixed;
+    width: 100%;
 }
 
 #channel-table-wrapper {
-	border: 1px solid #B4B7BA;
-	overflow: auto;
-	margin: 0px 10px 0px 0px;
-	width: 50%;
+	margin: 0px 0px 0px 5px;
+    border: 1px solid #B4B7BA;
+    overflow: auto;
+    width: 50%;
 }
 
 #channel-table {
-}
-
-#info-table-wrapper {
-	border: 1px solid #B4B7BA;
-	overflow: auto;
-	width: 25%;
+    table-layout: fixed;
+    width: 100%;
 }
 
 #controls {

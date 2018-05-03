@@ -20,6 +20,7 @@ import com.example.afs.musicpad.html.Radio;
 import com.example.afs.musicpad.html.Range;
 import com.example.afs.musicpad.html.Select;
 import com.example.afs.musicpad.html.ShadowDomBuilder;
+import com.example.afs.musicpad.html.TableRow;
 import com.example.afs.musicpad.midi.Instruments;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.midi.MidiLibrary;
@@ -43,7 +44,22 @@ public class MusicianeerView extends ShadowDomBuilder {
                         .add(th("#song-number-column") //
                             .add(text("Song"))) //
                         .add(th("#song-title-column") //
-                            .add(text("Title")))) //
+                            .add(text("Title"))) //
+                        .add(th("#song-duration-column") //
+                            .add(text("Duration"))) //
+                        .add(th("#song-parts-column") //
+                            .add(text("Parts"))) //
+                        .add(th("#song-beats-per-minute-column") //
+                            .add(text("Beats per Minute"))) //
+                        .add(th("#song-time-signature-column") //
+                            .add(text("Time Signature"))) //
+                        .add(th("#song-presumed-key-column") //
+                            .add(text("Presumed Key"))) //
+                        .add(th("#song-easy-transposition-column") //
+                            .add(text("EZ Transpose"))) //
+                        .add(th("#song-complexity-column") //
+                            .add(text("Complexity"))) //
+                    ) //
                     .add(createSongBody(midiLibrary)) //
                     .addClickHandler())) //
             .add(div("#channel-table-wrapper") //
@@ -66,16 +82,8 @@ public class MusicianeerView extends ShadowDomBuilder {
                         .add(th() //
                             .add(text("Concurrency"))) //
                         .add(th() //
-                            .add(text("Notes")))) //
-                    .add(tbody("#channel-body")))) //
-            .add(div("#info-table-wrapper") //
-                .add(table("#info-table") //
-                    .add(thead("#info-head") //
-                        .add(th() //
-                            .add(text("Property"))) //
-                        .add(th() //
-                            .add(text("Value")))) //
-                    .add(tbody("#info-body"))))) //
+                            .add(text("Total Notes")))) //
+                    .add(tbody("#channel-body"))))) //
         .add(div("#controls") //
             .add(clicker("stop", "STOP")) //
             .add(clicker("play", "PLAY")) //
@@ -85,7 +93,7 @@ public class MusicianeerView extends ShadowDomBuilder {
                 .add(text("Transposition:&nbsp;")) //
                 .add(numberInput("#transposition"))) //
             .add(div(".name-value") //
-                .add(text("Override:&nbsp;")) //
+                .add(text("Instrument:&nbsp;")) //
                 .add(createInstrumentSelect())) //
             .add(fieldSet() //
                 .add(legend() //
@@ -106,9 +114,10 @@ public class MusicianeerView extends ShadowDomBuilder {
     Parent channelTable = getElementById("channel-table");
     Parent channelBody = getElementById("channel-body");
     replaceElement(channelTable, channelBody, createChannelBody(songInfo));
-    Parent songInfoTable = getElementById("info-table");
-    Parent songInfoBody = getElementById("info-body");
-    replaceElement(songInfoTable, songInfoBody, createInfoBody(songInfo));
+    Parent songInfoBody = getElementById("song-body");
+    int songIndex = currentSong.getIndex();
+    Parent songTableRow = getElementById("song-index-" + songIndex);
+    replaceElement(songInfoBody, songTableRow, createSongTableRow(currentSong, songInfo));
     NumberInput transposition = getElementById("transposition");
     setProperty(transposition, "value", currentSong.getEasyTransposition());
   }
@@ -231,55 +240,6 @@ public class MusicianeerView extends ShadowDomBuilder {
     return channelBody;
   }
 
-  private Parent createInfoBody(SongInfo songInfo) {
-    Parent songInfoBody = tbody("#info-body");
-
-    songInfoBody.add(row() //
-        .add(td() //
-            .add(text("Duration"))) //
-        .add(td() //
-            .add(text(songInfo.getDuration()))));
-
-    songInfoBody.add(row() //
-        .add(td() //
-            .add(text("Parts"))) //
-        .add(td() //
-            .add(text(songInfo.getParts()))));
-
-    songInfoBody.add(row() //
-        .add(td() //
-            .add(text("Beats per Minute"))) //
-        .add(td() //
-            .add(text(songInfo.getBeatsPerMinute(0)))));
-
-    songInfoBody.add(row() //
-        .add(td() //
-            .add(text("Time Signature"))) //
-        .add(td() //
-            .add(text(songInfo.getTimeSignature()))));
-
-    songInfoBody.add(row() //
-        .add(td() //
-            .add(text("Presumed Key"))) //
-        .add(td() //
-            .add(text(songInfo.getPredominantKey()))));
-
-    songInfoBody.add(row() //
-        .add(td() //
-            .add(text("EZ Tranposition"))) //
-        .add(td() //
-            .add(text(songInfo.getEasyTransposition()))));
-
-    songInfoBody.add(row() //
-        .add(td() //
-            .add(text("Complexity"))) //
-        .add(td() //
-            .add(text(songInfo.getComplexity()))));
-
-    return songInfoBody;
-
-  }
-
   private Select createInstrumentSelect() {
     Select select = new Select("#instrument-select");
     select.addInputHandler();
@@ -310,6 +270,31 @@ public class MusicianeerView extends ShadowDomBuilder {
               .add(text(name))));
     }
     return songBody;
+  }
+
+  private Parent createSongTableRow(CurrentSong currentSong, SongInfo songInfo) {
+    int songIndex = currentSong.getIndex();
+    TableRow row = new TableRow("#song-index-" + songIndex);
+    row.add(td() //
+        .add(text(songIndex))) //
+        .add(td() //
+            .add(text(currentSong.getSong().getTitle()))) //
+        .add(td() //
+            .add(text(songInfo.getDuration())))
+        .add(td() //
+            .add(text(songInfo.getParts())))
+        .add(td() //
+            .add(text(songInfo.getBeatsPerMinute(0))))
+        .add(td() //
+            .add(text(songInfo.getTimeSignature())))
+        .add(td() //
+            .add(text(songInfo.getPredominantKey())))
+        .add(td() //
+            .add(text(songInfo.getEasyTransposition())))
+        .add(td() //
+            .add(text(songInfo.getComplexity())));
+    return row;
+
   }
 
   private Division key(int midiNote, String className) {

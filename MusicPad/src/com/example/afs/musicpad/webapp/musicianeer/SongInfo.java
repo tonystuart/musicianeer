@@ -102,6 +102,7 @@ public class SongInfo {
   }
 
   public String getPredominantKey() {
+    String key = "";
     StringBuilder s = new StringBuilder();
     int[] noteCounts = new int[Midi.SEMITONES_PER_OCTAVE];
     for (int channel = 0; channel < Midi.CHANNELS; channel++) {
@@ -119,15 +120,10 @@ public class SongInfo {
       KeyScore keyScore = keyScores[i];
       int rank = keyScore.getRank();
       if (rank == 1) {
-        String key = keyScore.getKey();
-        String synopsis = keyScore.getSynopsis();
-        int accidentals = keyScore.getAccidentals();
-        int triads = keyScore.getTriads();
-        int thirds = keyScore.getThirds();
-        s.append(String.format("%s (%s) %d / %d / %d", key, synopsis, accidentals, triads, thirds));
+        key = keyScore.getKey();
       }
     }
-    return s.toString();
+    return key;
   }
 
   public String getProgramNames(int channel) {
