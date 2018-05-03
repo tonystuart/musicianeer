@@ -94,32 +94,42 @@ select {
 #song {
     display: flex;
     flex-direction: row;
-    flex: 1;
+    /* flex: 1; */
     margin-bottom: 10px;
 }
 
 #song-table-wrapper {
     margin: 0px 5px 0px 0px;
-    border: 1px solid #B4B7BA;
-    overflow: auto;
+    /* border: 1px solid #B4B7BA; */
     width: 50%;
 }
 
-#song-table {
-    table-layout: fixed;
-    width: 100%;
+.scrollable-table {
+	table-layout: fixed;
+	width: 100%;
+}
+
+.scrollable-table thead tr {
+	display: block;
+	width: calc(100% - 16px);
+}
+
+.scrollable-table th, .scrollable-table td {
+	width: 11%;
+}
+
+.scrollable-table tbody {
+	display: block;
+	overflow-y: auto;
+	overflow-x: hidden;
+	height: 150px;
 }
 
 #channel-table-wrapper {
 	margin: 0px 0px 0px 5px;
-    border: 1px solid #B4B7BA;
-    overflow: auto;
-    width: 50%;
-}
-
-#channel-table {
-    table-layout: fixed;
-    width: 100%;
+	/* border: 1px solid #B4B7BA; */
+	overflow: auto;
+	width: 50%;
 }
 
 #controls {
@@ -140,7 +150,7 @@ select {
 #staff-cursor {
     position: relative;
     left: 50%;
-    height: 100%;
+    height: calc(100% - 16px);
     z-index: 100;
     border-left: 1px solid red;
 }

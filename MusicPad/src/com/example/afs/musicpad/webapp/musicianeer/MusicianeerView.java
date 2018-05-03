@@ -39,32 +39,31 @@ public class MusicianeerView extends ShadowDomBuilder {
     add(div("#musicianeer") //
         .add(div("#song") //
             .add(div("#song-table-wrapper") //
-                .add(table("#song-table") //
-                    .add(thead("#song-head") //
-                        .add(th("#song-number-column") //
+                .add(table("#song-table", ".scrollable-table") //
+                    .add(thead() //
+                        .add(th() //
                             .add(text("Song"))) //
-                        .add(th("#song-title-column") //
+                        .add(th() //
                             .add(text("Title"))) //
-                        .add(th("#song-duration-column") //
+                        .add(th() //
                             .add(text("Duration"))) //
-                        .add(th("#song-parts-column") //
+                        .add(th() //
                             .add(text("Parts"))) //
-                        .add(th("#song-beats-per-minute-column") //
+                        .add(th() //
                             .add(text("Beats per Minute"))) //
-                        .add(th("#song-time-signature-column") //
+                        .add(th() //
                             .add(text("Time Signature"))) //
-                        .add(th("#song-presumed-key-column") //
+                        .add(th() //
                             .add(text("Presumed Key"))) //
-                        .add(th("#song-easy-transposition-column") //
+                        .add(th() //
                             .add(text("EZ Transpose"))) //
-                        .add(th("#song-complexity-column") //
-                            .add(text("Complexity"))) //
-                    ) //
+                        .add(th() //
+                            .add(text("Complexity")))) //
                     .add(createSongBody(midiLibrary)) //
                     .addClickHandler())) //
             .add(div("#channel-table-wrapper") //
-                .add(table("#channel-table") //
-                    .add(thead("#channel-head") //
+                .add(table("#channel-table", ".scrollable-table") //
+                    .add(thead() //
                         .add(th() //
                             .add(text("Channel"))) //
                         .add(th() //
