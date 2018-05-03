@@ -84,6 +84,9 @@ public class MusicianeerView extends ShadowDomBuilder {
                         .add(th() //
                             .add(text("Total Notes")))) //
                     .add(tbody("#channel-body"))))) //
+        .add(div("#staff-container") //
+            .add(div("#staff-cursor")) //
+            .add(div("#staff-scroller"))) //
         .add(div("#controls") //
             .add(clicker("stop", "STOP")) //
             .add(clicker("play", "PLAY")) //
@@ -102,9 +105,6 @@ public class MusicianeerView extends ShadowDomBuilder {
                 .add(alternative("accompaniment", "Piano")) //
                 .add(alternative("accompaniment", "Rhythm")) //
                 .add(alternative("accompaniment", "Drums")))) //
-        .add(div("#staff-container") //
-            .add(div("#staff-cursor")) //
-            .add(div("#staff-scroller"))) //
         .add(keyboard()) //
         .addMouseUpHandler()); //
   }

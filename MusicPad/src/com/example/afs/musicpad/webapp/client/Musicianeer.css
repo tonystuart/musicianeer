@@ -95,6 +95,7 @@ select {
     display: flex;
     flex-direction: row;
     flex: 1;
+    margin-bottom: 10px;
 }
 
 #song-table-wrapper {
@@ -130,7 +131,7 @@ select {
 }
 
 #staff-container {
-    flex: 2;
+    flex: 1.5;
     display: flex;
     background: black;
     border: 1px solid #B4B7BA;
