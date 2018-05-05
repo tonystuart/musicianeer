@@ -14,11 +14,11 @@ import java.util.Set;
 
 import com.example.afs.musicpad.message.OnShadowUpdate;
 import com.example.afs.musicpad.message.OnShadowUpdate.Action;
-import com.example.afs.musicpad.midi.MidiLibrary;
 import com.example.afs.musicpad.task.ControllerTask;
 import com.example.afs.musicpad.task.MessageBroker;
 import com.example.afs.musicpad.webapp.musicianeer.MusicianeerView.LedState;
 import com.example.afs.musicpad.webapp.musicianeer.OnSetAccompanimentType.AccompanimentType;
+import com.example.afs.musicpad.webapp.musicianeer.SongInfoFactory.SongInfo;
 
 public class MusicianeerController extends ControllerTask {
 
@@ -37,15 +37,7 @@ public class MusicianeerController extends ControllerTask {
 
   public MusicianeerController(MessageBroker messageBroker) {
     super(messageBroker);
-    MidiLibrary midiLibrary = request(Services.getMidiLibrary);
-    musicianeerView = new MusicianeerView(this, midiLibrary);
-    subscribe(OnSongSelected.class, message -> doSongSelected(message));
-    subscribe(OnTransportPlay.class, message -> doTransportPlay(message));
-    subscribe(OnMidiLibrary.class, message -> doSongLibrary(message));
-    subscribe(OnTransportNoteOn.class, message -> doTransportNoteOn(message));
-    subscribe(OnTransportNoteOff.class, message -> doTransportNoteOff(message));
-    subscribe(OnCueNoteOn.class, message -> doCueNoteOn(message));
-    subscribe(OnCueNoteOff.class, message -> doCueNoteOff(message));
+    musicianeerView = new MusicianeerView(this);
   }
 
   @Override
@@ -53,9 +45,7 @@ public class MusicianeerController extends ControllerTask {
     if (id.startsWith("song-index-")) {
       publish(new OnSelectSong(Integer.parseInt(id.substring("song-index-".length()))));
     } else if (id.startsWith("channel-index-")) {
-      channel = Integer.parseInt(id.substring("channel-index-".length()));
-      musicianeerView.resetMidiNoteLeds();
-      musicianeerView.selectChannel(currentSong.getSong(), channel, transposition);
+      renderChannel(Integer.parseInt(id.substring("channel-index-".length())));
     } else {
       switch (id) {
       case "drums":
@@ -100,10 +90,19 @@ public class MusicianeerController extends ControllerTask {
   protected void doLoad() {
     addShadowUpdate(new OnShadowUpdate(Action.REPLACE_CHILDREN, "body", musicianeerView.render()));
     musicianeerView.setAlternative("full");
-    CurrentSong currentSong = request(Services.getCurrentSong);
-    if (currentSong != null) {
-      initializeCurrentSong(currentSong);
+    Iterable<SongInfo> songInfoList = request(Services.getSongInfoList);
+    for (SongInfo songInfo : songInfoList) {
+      renderSongInfo(songInfo);
     }
+    initializeCurrentSong(request(Services.getCurrentSong));
+    // TODO: Eliminate SongInfo timing window here
+    subscribe(OnSongInfo.class, message -> doSongInfo(message));
+    subscribe(OnSongSelected.class, message -> doSongSelected(message));
+    subscribe(OnTransportPlay.class, message -> doTransportPlay(message));
+    subscribe(OnTransportNoteOn.class, message -> doTransportNoteOn(message));
+    subscribe(OnTransportNoteOff.class, message -> doTransportNoteOff(message));
+    subscribe(OnCueNoteOn.class, message -> doCueNoteOn(message));
+    subscribe(OnCueNoteOff.class, message -> doCueNoteOff(message));
   }
 
   @Override
@@ -157,8 +156,8 @@ public class MusicianeerController extends ControllerTask {
     }
   }
 
-  private void doSongLibrary(OnMidiLibrary message) {
-    musicianeerView.renderSongList(message.getMidiLibrary());
+  private void doSongInfo(OnSongInfo message) {
+    renderSongInfo(message.getSongInfo());
   }
 
   private void doSongSelected(OnSongSelected message) {
@@ -187,14 +186,26 @@ public class MusicianeerController extends ControllerTask {
 
   private void initializeCurrentSong(CurrentSong currentSong) {
     this.currentSong = currentSong;
-    this.transposition = currentSong.getEasyTransposition();
+    SongInfo songInfo = currentSong.getSongInfo();
+    this.transposition = songInfo.getEasyTransposition();
     musicianeerView.resetMidiNoteLeds();
-    musicianeerView.selectSong(currentSong.getIndex());
+    musicianeerView.selectSong(songInfo.getSongIndex());
     musicianeerView.renderSongDetails(currentSong);
+    renderChannel(currentSong.getSongInfo().getActiveChannels()[0]);
   }
 
   private void playCurrentSong(CurrentSong currentSong) {
     musicianeerView.resetMidiNoteLeds();
+  }
+
+  private void renderChannel(int channel) {
+    this.channel = channel;
+    musicianeerView.resetMidiNoteLeds();
+    musicianeerView.selectChannel(currentSong.getSong(), channel, transposition);
+  }
+
+  private void renderSongInfo(SongInfo songInfo) {
+    musicianeerView.renderSongInfo(songInfo);
   }
 
 }

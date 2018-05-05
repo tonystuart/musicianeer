@@ -9,22 +9,13 @@
 
 package com.example.afs.musicpad.webapp.musicianeer;
 
-import java.util.NavigableSet;
-
 import com.example.afs.musicpad.midi.MidiLibrary;
-import com.example.afs.musicpad.player.PlayerDetail;
-import com.example.afs.musicpad.task.Message;
 import com.example.afs.musicpad.task.ServiceTask.Service;
+import com.example.afs.musicpad.webapp.musicianeer.SongInfoFactory.SongInfo;
 
 public class Services {
 
-  public static final Service<Integer> getBackgroundVelocity = new Service<Integer>() {
-  };
-
   public static final Service<CurrentSong> getCurrentSong = new Service<CurrentSong>() {
-  };
-
-  public static final Service<NavigableSet<Integer>> getDeviceIndexes = new Service<NavigableSet<Integer>>() {
   };
 
   public static final Service<Integer> getPercentMasterGain = new Service<Integer>() {
@@ -33,12 +24,9 @@ public class Services {
   public static final Service<MidiLibrary> getMidiLibrary = new Service<MidiLibrary>() {
   };
 
-  public static Service<PlayerDetail> getPlayerDetail = new Service<PlayerDetail>() {
-  };
-
-  public static final Service<Message> getRenderingState = new Service<Message>() {
-  };
-
   public static final Service<Integer> getPercentTempo = new Service<Integer>() {
+  };
+
+  public static final Service<Iterable<SongInfo>> getSongInfoList = new Service<Iterable<SongInfo>>() {
   };
 }

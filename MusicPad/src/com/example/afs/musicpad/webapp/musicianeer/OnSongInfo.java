@@ -9,21 +9,15 @@
 
 package com.example.afs.musicpad.webapp.musicianeer;
 
-import com.example.afs.musicpad.song.Song;
+import com.example.afs.musicpad.task.Message;
 import com.example.afs.musicpad.webapp.musicianeer.SongInfoFactory.SongInfo;
 
-public class CurrentSong {
+public class OnSongInfo implements Message {
 
-  private Song song;
   private SongInfo songInfo;
 
-  public CurrentSong(Song song, SongInfo songInfo) {
-    this.song = song;
+  public OnSongInfo(SongInfo songInfo) {
     this.songInfo = songInfo;
-  }
-
-  public Song getSong() {
-    return song;
   }
 
   public SongInfo getSongInfo() {
@@ -32,7 +26,7 @@ public class CurrentSong {
 
   @Override
   public String toString() {
-    return "CurrentSong [song=" + song + ", songInfo=" + songInfo + "]";
+    return "OnSongInfo [songInfo=" + songInfo + "]";
   }
 
 }

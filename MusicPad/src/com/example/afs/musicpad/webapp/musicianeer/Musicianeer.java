@@ -9,13 +9,10 @@
 
 package com.example.afs.musicpad.webapp.musicianeer;
 
-import java.util.Random;
-
 import com.example.afs.fluidsynth.Synthesizer;
 import com.example.afs.fluidsynth.Synthesizer.Settings;
 import com.example.afs.jni.FluidSynth;
 import com.example.afs.musicpad.midi.Midi;
-import com.example.afs.musicpad.midi.MidiLibrary;
 import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.task.MessageBroker;
 import com.example.afs.musicpad.task.ServiceTask;
@@ -38,13 +35,10 @@ public class Musicianeer extends ServiceTask {
 
   private Transport transport;
   private Synthesizer synthesizer;
-  private MidiLibrary midiLibrary;
   private CurrentSong currentSong;
-  private Random random = new Random();
 
   public Musicianeer(MessageBroker messageBroker) {
     super(messageBroker);
-    provide(Services.getMidiLibrary, () -> getMidiLibrary());
     provide(Services.getCurrentSong, () -> getCurrentSong());
     provide(Services.getPercentTempo, () -> getPercentTempo());
     provide(Services.getPercentMasterGain, () -> getPercentMasterGain());
@@ -52,7 +46,7 @@ public class Musicianeer extends ServiceTask {
     subscribe(OnStop.class, message -> doStop(message));
     subscribe(OnNoteOn.class, message -> doNoteOn(message));
     subscribe(OnNoteOff.class, message -> doNoteOff(message));
-    subscribe(OnSelectSong.class, message -> doSelectSong(message));
+    subscribe(OnSongSelected.class, message -> doSongSelected(message));
     subscribe(OnProgramChange.class, message -> doProgramChange(message));
     subscribe(OnProgramOverride.class, message -> doProgramOverride(message));
     subscribe(OnSetPercentTempo.class, message -> doSetPercentTempo(message));
@@ -60,15 +54,6 @@ public class Musicianeer extends ServiceTask {
     subscribe(OnSetPercentMasterGain.class, message -> doSetPercentMasterGain(message));
     synthesizer = createSynthesizer();
     transport = new Transport(messageBroker, synthesizer);
-    String path = System.getProperty("midiLibraryPath");
-    if (path == null) {
-      throw new IllegalStateException("midiLibraryPath property not set");
-    }
-    midiLibrary = new MidiLibrary(path);
-    publish(new OnMidiLibrary(midiLibrary));
-    if (midiLibrary.size() > 0) {
-      selectSong(random.nextInt(midiLibrary.size()));
-    }
   }
 
   private Synthesizer createSynthesizer() {
@@ -116,10 +101,6 @@ public class Musicianeer extends ServiceTask {
     }
   }
 
-  private void doSelectSong(OnSelectSong message) {
-    selectSong(message.getSongIndex());
-  }
-
   private void doSetAccompanimentType(OnSetAccompanimentType message) {
     transport.setAccompaniment(message.getAccompanimentType());
   }
@@ -132,55 +113,18 @@ public class Musicianeer extends ServiceTask {
     transport.setPercentTempo(message.getPercentTempo());
   }
 
+  private void doSongSelected(OnSongSelected message) {
+    currentSong = message.getCurrentSong();
+    transport.setCurrentTransposition(currentSong.getSongInfo().getEasyTransposition());
+    playCurrentSong();
+  }
+
   private void doStop(OnStop message) {
     transport.stop();
   }
 
   private CurrentSong getCurrentSong() {
     return currentSong;
-  }
-
-  private int getEasyTransposition(Song song) {
-    int melodyChannel = song.getPresumedMelodyChannel();
-    int lowestMidiNote = song.getLowestMidiNote(melodyChannel);
-    int highestMidiNote = song.getHighestMidiNote(melodyChannel);
-    int distanceToWhiteKeys = song.getDistanceToWhiteKeys();
-    System.out.println("song=" + song);
-    System.out.println("melodyChannel=" + melodyChannel + ", distanceToWhiteKeys=" + distanceToWhiteKeys + ", lowestMidiNote=" + lowestMidiNote + ", highestMidiNote=" + highestMidiNote);
-    lowestMidiNote += distanceToWhiteKeys;
-    highestMidiNote += distanceToWhiteKeys;
-    int octaveTransposition = 0;
-    if (lowestMidiNote < LOWEST_NOTE) {
-      int octaveOutOfRange = (LOWEST_NOTE - lowestMidiNote) / Midi.SEMITONES_PER_OCTAVE;
-      if (octaveOutOfRange > 0) {
-        octaveTransposition = octaveOutOfRange * Midi.SEMITONES_PER_OCTAVE;
-        System.out.println("keyboardTransposition=" + octaveTransposition);
-      }
-    } else if (highestMidiNote > HIGHEST_NOTE) {
-      int octaveOutOfRange = (lowestMidiNote - LOWEST_NOTE) / Midi.SEMITONES_PER_OCTAVE;
-      if (octaveOutOfRange > 0) {
-        octaveTransposition = -octaveOutOfRange * Midi.SEMITONES_PER_OCTAVE;
-        System.out.println("keyboardTransposition=" + octaveTransposition);
-      }
-    }
-    // distanceToWhiteKeys += keyboardTransposition;
-    int easyTransposition = 0;
-    if (distanceToWhiteKeys < 0) {
-      int minimumTransposition = song.getMinimumTransposition();
-      if (Math.abs(distanceToWhiteKeys) < Math.abs(minimumTransposition)) {
-        easyTransposition = distanceToWhiteKeys;
-      }
-    } else if (distanceToWhiteKeys > 0) {
-      int maximumTransposition = song.getMaximumTransposition();
-      if (distanceToWhiteKeys < maximumTransposition) {
-        easyTransposition = distanceToWhiteKeys;
-      }
-    }
-    return easyTransposition;
-  }
-
-  private MidiLibrary getMidiLibrary() {
-    return midiLibrary;
   }
 
   private int getPercentMasterGain() {
@@ -195,18 +139,6 @@ public class Musicianeer extends ServiceTask {
     Song song = currentSong.getSong();
     transport.play(song.getNotes());
     publish(new OnTransportPlay(currentSong));
-  }
-
-  private void selectSong(int index) {
-    if (index < 0 || index >= midiLibrary.size()) {
-      throw new IndexOutOfBoundsException();
-    }
-    Song song = midiLibrary.readSong(index);
-    int easyTransposition = getEasyTransposition(song);
-    transport.setCurrentTransposition(easyTransposition);
-    currentSong = new CurrentSong(index, song, easyTransposition);
-    publish(new OnSongSelected(currentSong));
-    playCurrentSong();
   }
 
   private void setProgram(int channel, int program) {

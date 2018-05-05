@@ -15,9 +15,11 @@ import com.example.afs.musicpad.webapp.WebServer;
 public class WebServerMain {
   public static void main(String[] args) {
     MessageBroker messageBroker = new MessageBroker();
+    MidiLibraryManager midiLibraryManager = new MidiLibraryManager(messageBroker);
     MidiWatcher midiWatcher = new MidiWatcher(messageBroker);
     Musicianeer musicianeer = new Musicianeer(messageBroker);
     WebServer webServer = new WebServer(messageBroker);
+    midiLibraryManager.tsStart();
     midiWatcher.tsStart();
     musicianeer.tsStart();
     webServer.tsStart();
