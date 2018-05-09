@@ -37,12 +37,10 @@ public class MusicianeerView extends ShadowDomBuilder {
     add(div("#musicianeer") //
         .add(div("#song") //
             .add(div("#song-table-wrapper") //
-                .add(table("#song-table", ".scrollable-table") //
+                .add(table("#song-table") //
                     .add(thead() //
                         .add(th() //
                             .add(text("Song"))) //
-                        .add(th() //
-                            .add(text("Title"))) //
                         .add(th() //
                             .add(text("Duration"))) //
                         .add(th() //
@@ -60,7 +58,7 @@ public class MusicianeerView extends ShadowDomBuilder {
                     .add(tbody("#song-body")) //
                     .addClickHandler())) //
             .add(div("#channel-table-wrapper") //
-                .add(table("#channel-table", ".scrollable-table") //
+                .add(table("#channel-table") //
                     .add(thead() //
                         .add(th() //
                             .add(text("Channel"))) //
@@ -117,7 +115,8 @@ public class MusicianeerView extends ShadowDomBuilder {
 
   public void renderSongInfo(SongInfo songInfo) {
     Parent songBody = getElementById("song-body");
-    appendChild(songBody, createSongTableRow(songInfo));
+    appendChild(songBody, createSongTableRow1(songInfo));
+    appendChild(songBody, createSongTableRow2(songInfo));
   }
 
   public void renderStaff(Song song, int channel, int transposition) {
@@ -250,17 +249,24 @@ public class MusicianeerView extends ShadowDomBuilder {
     return select;
   }
 
-  private Parent createSongTableRow(SongInfo songInfo) {
+  private Parent createSongTableRow1(SongInfo songInfo) {
     int songIndex = songInfo.getSongIndex();
     TableRow row = new TableRow("#song-index-" + songIndex);
     row.add(td() //
+        .rowSpan(2) //
         .add(text(songIndex))) //
         .add(td() //
-            .add(text(songInfo.getTitle()))) //
-        .add(td() //
-            .add(text(songInfo.getDuration())))
-        .add(td() //
-            .add(text(songInfo.getParts())))
+            .colSpan(7)//
+            .add(text(songInfo.getTitle())));
+    return row;
+  }
+
+  private Parent createSongTableRow2(SongInfo songInfo) {
+    int songIndex = songInfo.getSongIndex();
+    TableRow row = new TableRow("#song-index-" + songIndex);
+    row.add(td() //
+        .add(text(songInfo.getDuration()))).add(td() //
+            .add(text(songInfo.getActiveChannels().length)))
         .add(td() //
             .add(text(songInfo.getBeatsPerMinute())))
         .add(td() //

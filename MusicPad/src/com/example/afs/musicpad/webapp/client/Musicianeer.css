@@ -104,32 +104,36 @@ select {
     width: 50%;
 }
 
-.scrollable-table {
-	table-layout: fixed;
-	width: 100%;
+#song table {
+    table-layout: fixed;
+    width: 100%;
 }
 
-.scrollable-table thead tr {
-	display: block;
-	width: calc(100% - 16px);
+#song thead tr {
+    display: block;
+    width: calc(100% - 16px);
 }
 
-.scrollable-table th, .scrollable-table td {
-	width: 11%;
+#song th, #song td {
+    width: 11%;
 }
 
-.scrollable-table tbody {
-	display: block;
-	overflow-y: auto;
-	overflow-x: hidden;
-	height: 150px;
+#song tbody {
+    display: block;
+    overflow-y: auto;
+    overflow-x: hidden;
+    height: 150px;
+}
+
+#song td {
+    text-align: center;
 }
 
 #channel-table-wrapper {
-	margin: 0px 0px 0px 5px;
-	/* border: 1px solid #B4B7BA; */
-	overflow: auto;
-	width: 50%;
+    margin: 0px 0px 0px 5px;
+    /* border: 1px solid #B4B7BA; */
+    overflow: auto;
+    width: 50%;
 }
 
 #controls {

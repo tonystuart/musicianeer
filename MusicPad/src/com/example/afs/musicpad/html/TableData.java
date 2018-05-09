@@ -15,4 +15,16 @@ public class TableData extends Parent {
     super("td");
   }
 
+  public TableData colSpan(int colSpan) {
+    // NB: colspan value is not quoted, see https://html.spec.whatwg.org/multipage/tables.html
+    setProperty("colspan", colSpan);
+    return this;
+  }
+
+  public TableData rowSpan(int rowSpan) {
+    // NB: rowspan value is not quoted, see https://html.spec.whatwg.org/multipage/tables.html
+    setProperty("rowspan", rowSpan);
+    return this;
+  }
+
 }
