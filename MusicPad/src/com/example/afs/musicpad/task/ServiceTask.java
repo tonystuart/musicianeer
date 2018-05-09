@@ -55,7 +55,11 @@ public class ServiceTask extends MessageTask {
     @SuppressWarnings("unchecked")
     public <T> T receive() {
       try {
-        return (T) queue.take();
+        T value = (T) queue.take();
+        if (value == NULL_INDICATOR) {
+          value = null;
+        }
+        return value;
       } catch (InterruptedException e) {
         throw new RuntimeException(e);
       }
@@ -63,13 +67,19 @@ public class ServiceTask extends MessageTask {
 
     public <T> void transfer(T value) {
       try {
-        queue.put(value);
+        if (value == null) {
+          queue.put(NULL_INDICATOR);
+        } else {
+          queue.put(value);
+        }
       } catch (InterruptedException e) {
         throw new RuntimeException(e);
       }
     }
 
   }
+
+  private static final Object NULL_INDICATOR = "null";
 
   private static Map<Service<?>, ServiceTask> globalProviders = new HashMap<>();
 
