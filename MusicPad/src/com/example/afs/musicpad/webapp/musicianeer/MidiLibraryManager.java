@@ -25,8 +25,11 @@ public class MidiLibraryManager extends ServiceTask {
     private LinkedHashMap<String, SongInfo> songInfoMap;
   }
 
-  private static final String SONG_INFO = "songInfo";
+  private static final String SONG_INFO = "songInfo.v1.json";
 
+  private static final int SAVE_COUNT = 50;
+
+  private int savePending;
   private int currentIndex;
   private MidiLibrary midiLibrary;
   private SongInfoFactory songInfoFactory;
@@ -60,14 +63,14 @@ public class MidiLibraryManager extends ServiceTask {
 
   @Override
   protected void onTimeout() throws InterruptedException {
-    System.out.println("onTimeout: currentIndex=" + currentIndex);
     if (currentIndex < midiLibrary.size()) {
       File midiFile = midiLibrary.get(currentIndex);
       String fileName = midiFile.getName();
       SongInfo songInfo = songInfoMap.get(fileName);
-      if (songInfo == null) {
+      if (songInfo == null || songInfo.getTimeLastModified() != midiFile.lastModified()) {
         songInfo = songInfoFactory.getSongInfo(currentIndex);
         songInfoMap.put(fileName, songInfo);
+        savePending++;
       }
       publish(new OnSongInfo(songInfo));
       if (currentIndex == 0) {
@@ -75,7 +78,17 @@ public class MidiLibraryManager extends ServiceTask {
       }
       currentIndex++;
     }
+    applyCachePolicy();
     setCallbackTimeout();
+  }
+
+  private void applyCachePolicy() {
+    if (savePending > 0) {
+      if (currentIndex == midiLibrary.size() || (savePending == SAVE_COUNT)) {
+        System.out.println("applyCachePolicy: currentIndex=" + currentIndex + ", midiLibrary.size()=" + midiLibrary.size() + ", savePending=" + savePending);
+        saveCache();
+      }
+    }
   }
 
   private void doSelectSong(OnSelectSong message) {
@@ -85,6 +98,13 @@ public class MidiLibraryManager extends ServiceTask {
 
   private MidiLibrary getMidiLibrary() {
     return midiLibrary;
+  }
+
+  private void saveCache() {
+    FileContents fileContents = new FileContents();
+    fileContents.songInfoMap = songInfoMap;
+    JsonUtilities.toJsonFile(SONG_INFO, fileContents);
+    savePending = 0;
   }
 
   private void selectSong(int songIndex) {

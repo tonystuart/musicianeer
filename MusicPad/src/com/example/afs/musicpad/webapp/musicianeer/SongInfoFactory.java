@@ -25,9 +25,9 @@ public class SongInfoFactory {
     private double complexity;
     private String duration;
     private int easyTransposition;
-    private int parts;
     private String predominantKey;
     private int songIndex;
+    private long timeLastModified;
     private String timeSignature;
     private String title;
 
@@ -51,16 +51,16 @@ public class SongInfoFactory {
       return easyTransposition;
     }
 
-    public int getParts() {
-      return parts;
-    }
-
     public String getPredominantKey() {
       return predominantKey;
     }
 
     public int getSongIndex() {
       return songIndex;
+    }
+
+    public long getTimeLastModified() {
+      return timeLastModified;
     }
 
     public String getTimeSignature() {
@@ -77,7 +77,7 @@ public class SongInfoFactory {
 
     @Override
     public String toString() {
-      return "SongInfo [activeChannels=" + Arrays.toString(activeChannels) + ", beatsPerMinute=" + beatsPerMinute + ", complexity=" + complexity + ", duration=" + duration + ", easyTransposition=" + easyTransposition + ", parts=" + parts + ", predominantKey=" + predominantKey + ", songIndex=" + songIndex + ", timeSignature=" + timeSignature + ", title=" + title + "]";
+      return "SongInfo [activeChannels=" + Arrays.toString(activeChannels) + ", beatsPerMinute=" + beatsPerMinute + ", complexity=" + complexity + ", duration=" + duration + ", easyTransposition=" + easyTransposition + ", predominantKey=" + predominantKey + ", songIndex=" + songIndex + ", timeLastModified=" + timeLastModified + ", timeSignature=" + timeSignature + ", title=" + title + "]";
     }
 
   }
@@ -138,38 +138,16 @@ public class SongInfoFactory {
     songInfo.complexity = getComplexity(song);
     songInfo.duration = getDuration(song);
     songInfo.easyTransposition = getEasyTransposition(song);
-    songInfo.parts = song.getActiveChannelCount();
     songInfo.predominantKey = getPredominantKey(song);
     songInfo.songIndex = songIndex;
+    songInfo.timeLastModified = song.getFile().lastModified();
     songInfo.timeSignature = song.getBeatsPerMeasure(0) + "/" + song.getBeatUnit(0);
     songInfo.title = song.getTitle();
     return songInfo;
   }
 
   private int getEasyTransposition(Song song) {
-    int melodyChannel = song.getPresumedMelodyChannel();
-    int lowestMidiNote = song.getLowestMidiNote(melodyChannel);
-    int highestMidiNote = song.getHighestMidiNote(melodyChannel);
     int distanceToWhiteKeys = song.getDistanceToWhiteKeys();
-    System.out.println("song=" + song);
-    System.out.println("melodyChannel=" + melodyChannel + ", distanceToWhiteKeys=" + distanceToWhiteKeys + ", lowestMidiNote=" + lowestMidiNote + ", highestMidiNote=" + highestMidiNote);
-    lowestMidiNote += distanceToWhiteKeys;
-    highestMidiNote += distanceToWhiteKeys;
-    int octaveTransposition = 0;
-    if (lowestMidiNote < Musicianeer.LOWEST_NOTE) {
-      int octaveOutOfRange = (Musicianeer.LOWEST_NOTE - lowestMidiNote) / Midi.SEMITONES_PER_OCTAVE;
-      if (octaveOutOfRange > 0) {
-        octaveTransposition = octaveOutOfRange * Midi.SEMITONES_PER_OCTAVE;
-        System.out.println("keyboardTransposition=" + octaveTransposition);
-      }
-    } else if (highestMidiNote > Musicianeer.HIGHEST_NOTE) {
-      int octaveOutOfRange = (lowestMidiNote - Musicianeer.LOWEST_NOTE) / Midi.SEMITONES_PER_OCTAVE;
-      if (octaveOutOfRange > 0) {
-        octaveTransposition = -octaveOutOfRange * Midi.SEMITONES_PER_OCTAVE;
-        System.out.println("keyboardTransposition=" + octaveTransposition);
-      }
-    }
-    // distanceToWhiteKeys += keyboardTransposition;
     int easyTransposition = 0;
     if (distanceToWhiteKeys < 0) {
       int minimumTransposition = song.getMinimumTransposition();
