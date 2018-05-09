@@ -34,6 +34,7 @@ public class MusicianeerController extends ControllerTask {
   private MusicianeerView musicianeerView;
   private Set<Integer> cueMidiNotes = new HashSet<>();
   private Set<Integer> playerMidiNotes = new HashSet<>();
+  private int loadIndex;
 
   public MusicianeerController(MessageBroker messageBroker) {
     super(messageBroker);
@@ -88,14 +89,7 @@ public class MusicianeerController extends ControllerTask {
 
   @Override
   protected void doLoad() {
-    addShadowUpdate(new OnShadowUpdate(Action.REPLACE_CHILDREN, "body", musicianeerView.render()));
-    musicianeerView.setAlternative("full");
-    Iterable<SongInfo> songInfoList = request(Services.getSongInfoList);
-    for (SongInfo songInfo : songInfoList) {
-      renderSongInfo(songInfo);
-    }
-    initializeCurrentSong(request(Services.getCurrentSong));
-    // TODO: Eliminate SongInfo timing window here
+    // NB: We are single threaded by virtue of our input queue
     subscribe(OnSongInfo.class, message -> doSongInfo(message));
     subscribe(OnSongSelected.class, message -> doSongSelected(message));
     subscribe(OnTransportPlay.class, message -> doTransportPlay(message));
@@ -103,6 +97,17 @@ public class MusicianeerController extends ControllerTask {
     subscribe(OnTransportNoteOff.class, message -> doTransportNoteOff(message));
     subscribe(OnCueNoteOn.class, message -> doCueNoteOn(message));
     subscribe(OnCueNoteOff.class, message -> doCueNoteOff(message));
+    addShadowUpdate(new OnShadowUpdate(Action.REPLACE_CHILDREN, "body", musicianeerView.render()));
+    musicianeerView.setAlternative("full");
+    Iterable<SongInfo> songInfoList = request(Services.getSongInfoList);
+    for (SongInfo songInfo : songInfoList) {
+      renderSongInfo(songInfo);
+      loadIndex = songInfo.getSongIndex();
+    }
+    CurrentSong initialSong = request(Services.getCurrentSong);
+    if (initialSong != null) {
+      initializeCurrentSong(initialSong);
+    }
   }
 
   @Override
@@ -157,7 +162,12 @@ public class MusicianeerController extends ControllerTask {
   }
 
   private void doSongInfo(OnSongInfo message) {
-    renderSongInfo(message.getSongInfo());
+    // Exclude songs received after listening but before processing initial load
+    if (message.getSongInfo().getSongIndex() > loadIndex) {
+      renderSongInfo(message.getSongInfo());
+    } else {
+      System.err.println("Discarding duplicate songInfo for " + message.getSongInfo());
+    }
   }
 
   private void doSongSelected(OnSongSelected message) {
