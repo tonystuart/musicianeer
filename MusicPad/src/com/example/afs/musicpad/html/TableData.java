@@ -12,7 +12,7 @@ package com.example.afs.musicpad.html;
 public class TableData extends Parent {
 
   public TableData(String... properties) {
-    super("td");
+    super("td", properties);
   }
 
   public TableData colSpan(int colSpan) {
