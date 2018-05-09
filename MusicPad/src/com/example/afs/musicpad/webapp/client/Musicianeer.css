@@ -116,7 +116,7 @@ select {
 }
 
 #song th, #song td {
-    width: 11%;
+    width: calc(100% / 8);
 }
 
 #song tbody {
@@ -124,6 +124,10 @@ select {
     overflow-y: auto;
     overflow-x: hidden;
     height: 250px;
+}
+
+#song tr {
+	/* display: block; */
 }
 
 #song .divider-row {
