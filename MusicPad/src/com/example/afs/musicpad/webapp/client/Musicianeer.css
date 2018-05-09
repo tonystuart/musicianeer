@@ -107,6 +107,7 @@ select {
 #song table {
     table-layout: fixed;
     width: 100%;
+    border-collapse: collapse;
 }
 
 #song thead tr {
@@ -122,11 +123,17 @@ select {
     display: block;
     overflow-y: auto;
     overflow-x: hidden;
-    height: 150px;
+    height: 250px;
+}
+
+#song .song-title {
+    font-weight: bold;
+    border-bottom: 1px solid #B4B7BA;
 }
 
 #song td {
     text-align: center;
+    padding: 2px;
 }
 
 #channel-table-wrapper {
@@ -172,7 +179,7 @@ select {
 .keyboard {
     display: flex;
     margin-top: 60px;
-    flex: 1;
+    flex: .7;
 }
 
 .keyboard div:hover {

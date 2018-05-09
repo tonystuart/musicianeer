@@ -253,19 +253,10 @@ public class MusicianeerView extends ShadowDomBuilder {
     int songIndex = songInfo.getSongIndex();
     TableRow row = new TableRow("#song-index-" + songIndex);
     row.add(td() //
-        .rowSpan(2) //
         .add(text(songIndex))) //
         .add(td() //
-            .colSpan(7)//
-            .add(text(songInfo.getTitle())));
-    return row;
-  }
-
-  private Parent createSongTableRow2(SongInfo songInfo) {
-    int songIndex = songInfo.getSongIndex();
-    TableRow row = new TableRow("#song-index-" + songIndex);
-    row.add(td() //
-        .add(text(songInfo.getDuration()))).add(td() //
+            .add(text(songInfo.getDuration())))
+        .add(td() //
             .add(text(songInfo.getActiveChannels().length)))
         .add(td() //
             .add(text(songInfo.getBeatsPerMinute())))
@@ -277,6 +268,15 @@ public class MusicianeerView extends ShadowDomBuilder {
             .add(text(songInfo.getEasyTransposition())))
         .add(td() //
             .add(text(songInfo.getComplexity())));
+    return row;
+  }
+
+  private Parent createSongTableRow2(SongInfo songInfo) {
+    int songIndex = songInfo.getSongIndex();
+    TableRow row = new TableRow("#song-index-" + songIndex);
+    row.add(td(".song-title") //
+        .colSpan(8)//
+        .add(text(songInfo.getTitle())));
     return row;
   }
 
@@ -306,6 +306,7 @@ public class MusicianeerView extends ShadowDomBuilder {
     return keyboard;
   }
 
+  @SuppressWarnings("unused")
   private Division midiSlider(String id, int value) {
     Division div = new Division(".slider");
     div.add(text(id));
