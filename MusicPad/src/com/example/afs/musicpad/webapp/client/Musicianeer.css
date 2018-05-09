@@ -126,7 +126,7 @@ select {
     height: 250px;
 }
 
-#song .song-title {
+#song .divider-row {
     font-weight: bold;
     border-bottom: 1px solid #B4B7BA;
 }

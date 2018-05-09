@@ -46,13 +46,13 @@ public class MusicianeerView extends ShadowDomBuilder {
                         .add(th() //
                             .add(text("Parts"))) //
                         .add(th() //
-                            .add(text("Beats per Minute"))) //
+                            .add(text("BPM"))) //
                         .add(th() //
-                            .add(text("Time Signature"))) //
+                            .add(text("Time"))) //
                         .add(th() //
-                            .add(text("Presumed Key"))) //
+                            .add(text("Key"))) //
                         .add(th() //
-                            .add(text("EZ Transpose"))) //
+                            .add(text("Transpose"))) //
                         .add(th() //
                             .add(text("Complexity")))) //
                     .add(tbody("#song-body")) //
@@ -61,9 +61,7 @@ public class MusicianeerView extends ShadowDomBuilder {
                 .add(table("#channel-table") //
                     .add(thead() //
                         .add(th() //
-                            .add(text("Channel"))) //
-                        .add(th() //
-                            .add(text("Instrument"))) //
+                            .add(text("Part"))) //
                         .add(th() //
                             .add(text("Mute"))) //
                         .add(th() //
@@ -210,27 +208,37 @@ public class MusicianeerView extends ShadowDomBuilder {
     channelBody.addClickHandler();
     for (int channel : song.getActiveChannels()) {
       ChannelInfo channelInfo = channelInfoFactory.getChannelInfo(channel);
-      channelBody.add(row("#channel-index-" + channel) //
-          .add(td() //
-              .add(text(channel))) //
-          .add(td() //
-              .add(text(channelInfo.getProgramNames()))) //
-          .add(td() //
-              .add(checkbox("#channel-mute-" + channel))) //
-          .add(td() //
-              .add(checkbox("#channel-mute-" + channel))) //
-          .add(td() //
-              .add(text(channelInfo.getPercentMeasuresPlayed() + "%"))) //
-          .add(td() //
-              .add(text(channelInfo.getPercentMelody() + "%"))) //
-          .add(td() //
-              .add(text(channelInfo.getOccupancy() + "%"))) //
-          .add(td() //
-              .add(text(channelInfo.getConcurrency() + "%"))) //
-          .add(td() //
-              .add(text(channelInfo.getUniqueSounds()))));
+      channelBody.add(createChannelTableRow1(channel, channelInfo));
+      channelBody.add(createChannelTableRow2(channel, channelInfo));
     }
     return channelBody;
+  }
+
+  private Parent createChannelTableRow1(int channel, ChannelInfo channelInfo) {
+    return row("#channel-index-" + channel) //
+        .add(td() //
+            .add(text(channel + 1))) //
+        .add(td() //
+            .add(checkbox("#channel-mute-" + channel))) //
+        .add(td() //
+            .add(checkbox("#channel-mute-" + channel))) //
+        .add(td() //
+            .add(text(channelInfo.getPercentMeasuresPlayed() + "%"))) //
+        .add(td() //
+            .add(text(channelInfo.getPercentMelody() + "%"))) //
+        .add(td() //
+            .add(text(channelInfo.getOccupancy() + "%"))) //
+        .add(td() //
+            .add(text(channelInfo.getConcurrency() + "%"))) //
+        .add(td() //
+            .add(text(channelInfo.getUniqueSounds())));
+  }
+
+  private Parent createChannelTableRow2(int channel, ChannelInfo channelInfo) {
+    return row("#channel-index-" + channel, ".divider-row") //
+        .add(td() //
+            .colSpan(8)//
+            .add(text(channelInfo.getProgramNames())));
   }
 
   private Select createInstrumentSelect() {
@@ -253,7 +261,7 @@ public class MusicianeerView extends ShadowDomBuilder {
     int songIndex = songInfo.getSongIndex();
     TableRow row = new TableRow("#song-index-" + songIndex);
     row.add(td() //
-        .add(text(songIndex))) //
+        .add(text(songIndex + 1))) //
         .add(td() //
             .add(text(songInfo.getDuration())))
         .add(td() //
@@ -273,8 +281,8 @@ public class MusicianeerView extends ShadowDomBuilder {
 
   private Parent createSongTableRow2(SongInfo songInfo) {
     int songIndex = songInfo.getSongIndex();
-    TableRow row = new TableRow("#song-index-" + songIndex);
-    row.add(td(".song-title") //
+    TableRow row = new TableRow("#song-index-" + songIndex, ".divider-row");
+    row.add(td() //
         .colSpan(8)//
         .add(text(songInfo.getTitle())));
     return row;
