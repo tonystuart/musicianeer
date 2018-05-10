@@ -67,6 +67,8 @@ public class Musicianeer extends ServiceTask {
     settings.set("synth.midi-channels", TOTAL_CHANNELS);
     settings.set("synth.cpu-cores", processors);
     Synthesizer synthesizer = new Synthesizer(settings);
+    synthesizer.setChannelType(mapChannel(Midi.DRUM), FluidSynth.CHANNEL_TYPE_DRUM);
+    synthesizer.changeProgram(mapChannel(Midi.DRUM), 0); // initialize fluid_synth.c channel
     return synthesizer;
   }
 
