@@ -68,9 +68,9 @@ public class MusicianeerView extends ShadowDomBuilder {
                         .add(th() //
                             .add(text("Solo"))) //
                         .add(th() //
-                            .add(text("Measures"))) //
-                        .add(th() //
                             .add(text("Melody"))) //
+                        .add(th() //
+                            .add(text("Measures"))) //
                         .add(th() //
                             .add(text("Occupancy"))) //
                         .add(th() //
@@ -226,7 +226,7 @@ public class MusicianeerView extends ShadowDomBuilder {
   private Parent createChannelTableRow(int channel, ChannelInfo channelInfo) {
     return row("#channel-index-" + channel) //
         .add(td() //
-            .add(text(channelInfo.getProgramNames()))) //
+            .add(text((channel + 1) + ". " + channelInfo.getProgramNames()))) //
         .add(td() //
             .add(checkbox("#channel-mute-" + channel) //
                 .addCheckHandler())) //
@@ -234,9 +234,9 @@ public class MusicianeerView extends ShadowDomBuilder {
             .add(checkbox("#channel-solo-" + channel) //
                 .addCheckHandler())) //
         .add(td() //
-            .add(text(channelInfo.getPercentMeasuresPlayed() + "%"))) //
-        .add(td() //
             .add(text(channelInfo.getPercentMelody() + "%"))) //
+        .add(td() //
+            .add(text(channelInfo.getPercentMeasuresPlayed() + "%"))) //
         .add(td() //
             .add(text(channelInfo.getOccupancy() + "%"))) //
         .add(td() //
@@ -265,7 +265,7 @@ public class MusicianeerView extends ShadowDomBuilder {
     int songIndex = songInfo.getSongIndex();
     TableRow row = new TableRow("#song-index-" + songIndex);
     row.add(td() //
-        .add(text(songInfo.getTitle()))) //
+        .add(text((songInfo.getSongIndex() + 1) + ". " + songInfo.getTitle()))) //
         .add(td() //
             .add(text(songInfo.getDuration())))
         .add(td() //
@@ -275,7 +275,7 @@ public class MusicianeerView extends ShadowDomBuilder {
         .add(td() //
             .add(text(songInfo.getTimeSignature())))
         .add(td() //
-            .add(text(songInfo.getPredominantKey())))
+            .add(text(songInfo.getPredominantKey().replace(" ", "&nbsp;"))))
         .add(td() //
             .add(text(songInfo.getEasyTransposition())))
         .add(td() //

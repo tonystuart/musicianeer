@@ -115,10 +115,14 @@ table {
 }
 
 td {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 225px;
 	text-align: center;
 }
 
-th:nth-child(1), td:nth-child(1) {
+td:nth-child(1) {
 	text-align: left;
 }
 
