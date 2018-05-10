@@ -54,6 +54,7 @@ public class Musicianeer extends ServiceTask {
     subscribe(OnNoteOff.class, message -> doNoteOff(message));
     subscribe(OnSongSelected.class, message -> doSongSelected(message));
     subscribe(OnProgramChange.class, message -> doProgramChange(message));
+    subscribe(OnTransposition.class, message -> doTransposition(message));
     subscribe(OnProgramOverride.class, message -> doProgramOverride(message));
     subscribe(OnSetPercentTempo.class, message -> doSetPercentTempo(message));
     subscribe(OnSetAccompanimentType.class, message -> doSetAccompanimentType(message));
@@ -153,6 +154,11 @@ public class Musicianeer extends ServiceTask {
 
   private void doStop(OnStop message) {
     transport.stop();
+  }
+
+  private void doTransposition(OnTransposition message) {
+    transport.setCurrentTransposition(message.getTransposition());
+    synthesizer.allNotesOff();
   }
 
   private CurrentSong getCurrentSong() {

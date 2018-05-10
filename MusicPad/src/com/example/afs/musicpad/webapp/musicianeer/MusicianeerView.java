@@ -88,7 +88,8 @@ public class MusicianeerView extends ShadowDomBuilder {
             .add(percentSlider("volume", Transport.DEFAULT_PERCENT_GAIN)) //
             .add(div(".name-value") //
                 .add(text("Transposition:&nbsp;")) //
-                .add(numberInput("#transposition"))) //
+                .add(numberInput("#transposition") //
+                    .addInputHandler())) //
             .add(div(".name-value") //
                 .add(text("Instrument:&nbsp;")) //
                 .add(createInstrumentSelect())) //

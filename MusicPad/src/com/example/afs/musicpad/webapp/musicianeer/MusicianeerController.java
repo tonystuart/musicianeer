@@ -28,6 +28,7 @@ public class MusicianeerController extends ControllerTask {
   private static final int DEFAULT_VELOCITY = 24;
 
   private int channel;
+  private int loadIndex;
   private boolean isDown;
   private int transposition;
 
@@ -35,7 +36,6 @@ public class MusicianeerController extends ControllerTask {
   private MusicianeerView musicianeerView;
   private Set<Integer> cueMidiNotes = new HashSet<>();
   private Set<Integer> playerMidiNotes = new HashSet<>();
-  private int loadIndex;
 
   public MusicianeerController(MessageBroker messageBroker) {
     super(messageBroker);
@@ -81,11 +81,14 @@ public class MusicianeerController extends ControllerTask {
       renderSolo(Integer.parseInt(id.substring("channel-solo-".length())), Integer.parseInt(value));
     }
     switch (id) {
+    case "instrument":
+      publish(new OnProgramOverride(channel, Integer.parseInt(value)));
+      break;
     case "tempo":
       publish(new OnSetPercentTempo(Integer.parseInt(value)));
       break;
-    case "instrument":
-      publish(new OnProgramOverride(channel, Integer.parseInt(value)));
+    case "transposition":
+      publish(new OnTransposition(Integer.parseInt(value)));
       break;
     case "volume":
       publish(new OnSetPercentMasterGain(Integer.parseInt(value)));
@@ -100,6 +103,7 @@ public class MusicianeerController extends ControllerTask {
     subscribe(OnSolo.class, message -> doSolo(message));
     subscribe(OnSongInfo.class, message -> doSongInfo(message));
     subscribe(OnSongSelected.class, message -> doSongSelected(message));
+    subscribe(OnTransposition.class, message -> doTransposition(message));
     subscribe(OnTransportPlay.class, message -> doTransportPlay(message));
     subscribe(OnTransportNoteOn.class, message -> doTransportNoteOn(message));
     subscribe(OnTransportNoteOff.class, message -> doTransportNoteOff(message));
@@ -209,6 +213,12 @@ public class MusicianeerController extends ControllerTask {
 
   private void doTransportPlay(OnTransportPlay message) {
     playCurrentSong(message.getCurrentSong());
+  }
+
+  private void doTransposition(OnTransposition message) {
+    this.transposition = message.getTransposition();
+    musicianeerView.renderStaff(currentSong.getSong(), channel, transposition);
+    musicianeerView.resetMidiNoteLeds();
   }
 
   private void initializeCurrentSong(CurrentSong currentSong) {
