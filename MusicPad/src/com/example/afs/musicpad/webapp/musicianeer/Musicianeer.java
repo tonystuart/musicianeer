@@ -9,6 +9,9 @@
 
 package com.example.afs.musicpad.webapp.musicianeer;
 
+import java.util.Arrays;
+import java.util.Set;
+
 import com.example.afs.fluidsynth.Synthesizer;
 import com.example.afs.fluidsynth.Synthesizer.Settings;
 import com.example.afs.jni.FluidSynth;
@@ -59,6 +62,13 @@ public class Musicianeer extends ServiceTask {
     transport = new Transport(messageBroker, synthesizer);
   }
 
+  private void changeProgram(int channel, int program) {
+    defaultPrograms[channel] = program;
+    if (programOverrides[channel] == OnProgramOverride.DEFAULT) {
+      setProgram(channel, program);
+    }
+  }
+
   private Synthesizer createSynthesizer() {
     System.loadLibrary(FluidSynth.NATIVE_LIBRARY_NAME);
     int processors = Runtime.getRuntime().availableProcessors();
@@ -93,20 +103,19 @@ public class Musicianeer extends ServiceTask {
   private void doProgramChange(OnProgramChange message) {
     int channel = message.getChannel();
     int program = message.getProgram();
-    defaultPrograms[channel] = program;
-    if (programOverrides[channel] == OnProgramOverride.DEFAULT) {
-      setProgram(channel, program);
-    }
+    changeProgram(channel, program);
   }
 
   private void doProgramOverride(OnProgramOverride message) {
     int channel = message.getChannel();
-    int newProgram = message.getProgram();
-    programOverrides[channel] = newProgram;
-    if (newProgram == OnProgramOverride.DEFAULT) {
-      setProgram(channel, defaultPrograms[channel]);
-    } else {
-      setProgram(channel, newProgram);
+    if (channel != Midi.DRUM) {
+      int newProgram = message.getProgram();
+      programOverrides[channel] = newProgram;
+      if (newProgram == OnProgramOverride.DEFAULT) {
+        setProgram(channel, defaultPrograms[channel]);
+      } else {
+        setProgram(channel, newProgram);
+      }
     }
   }
 
@@ -131,6 +140,14 @@ public class Musicianeer extends ServiceTask {
     synthesizer.muteAllChannels(false);
     synthesizer.soloAllChannels(false);
     transport.setCurrentTransposition(currentSong.getSongInfo().getEasyTransposition());
+    Arrays.fill(programOverrides, OnProgramOverride.DEFAULT);
+    for (int channel : currentSong.getSong().getActiveChannels()) {
+      Set<Integer> programs = currentSong.getSong().getPrograms(channel);
+      if (programs.size() > 0) {
+        int program = programs.iterator().next();
+        changeProgram(channel, program);
+      }
+    }
     playCurrentSong();
   }
 
