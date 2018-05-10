@@ -15,6 +15,9 @@ import com.example.afs.musicpad.webapp.musicianeer.SongInfoFactory.SongInfo;
 
 public class Services {
 
+  public static Service<CurrentPrograms> getCurrentPrograms = new Service<CurrentPrograms>() {
+  };
+
   public static final Service<CurrentSong> getCurrentSong = new Service<CurrentSong>() {
   };
 
@@ -32,4 +35,5 @@ public class Services {
 
   public static final Service<SynthesizerSettings> getSynthesizerSettings = new Service<SynthesizerSettings>() {
   };
+
 }

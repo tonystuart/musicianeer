@@ -189,6 +189,11 @@ public class MusicianeerView extends ShadowDomBuilder {
     onSetProperty(checkBox, "checked", isMute);
   }
 
+  public void setProgram(int program) {
+    Element instrumentSelector = getElementById("instrument");
+    onSetProperty(instrumentSelector, "value", program);
+  }
+
   public void setSolo(int channel, boolean isSolo) {
     CheckBox checkBox = getElementById("channel-solo-" + channel);
     onSetProperty(checkBox, "checked", isSolo);
@@ -247,10 +252,10 @@ public class MusicianeerView extends ShadowDomBuilder {
   }
 
   private Select createInstrumentSelect() {
-    Select select = new Select("#instrument-select");
+    Select select = new Select("#instrument");
     select.addInputHandler();
     select.required();
-    select.add(option("Default", -1));
+    select.add(option("Default", OnProgramOverride.DEFAULT));
     int program = 0;
     for (int category = 0; category < 16; category++) {
       select.add(optionGroup(Instruments.getCategoryName(category)));

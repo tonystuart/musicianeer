@@ -187,7 +187,7 @@ public class MusicianeerController extends ControllerTask {
     if (message.getSongInfo().getSongIndex() > loadIndex) {
       renderSongInfo(message.getSongInfo());
     } else {
-      System.err.println("Discarding duplicate songInfo for " + message.getSongInfo());
+      System.err.println("Discarding duplicate songInfo received during initial load " + message.getSongInfo());
     }
   }
 
@@ -255,6 +255,16 @@ public class MusicianeerController extends ControllerTask {
     this.channel = channel;
     musicianeerView.resetMidiNoteLeds();
     musicianeerView.selectChannel(currentSong.getSong(), channel, transposition);
+    CurrentPrograms currentPrograms = request(Services.getCurrentPrograms);
+    if (currentPrograms != null) {
+      int currentProgram;
+      if (channel == Midi.DRUM) {
+        currentProgram = OnProgramOverride.DEFAULT;
+      } else {
+        currentProgram = currentPrograms.getPrograms()[channel];
+      }
+      musicianeerView.setProgram(currentProgram);
+    }
   }
 
   private void renderMute(int channel, int value) {

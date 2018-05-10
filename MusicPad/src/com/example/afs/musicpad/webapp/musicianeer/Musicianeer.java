@@ -44,6 +44,7 @@ public class Musicianeer extends ServiceTask {
     super(messageBroker);
     provide(Services.getCurrentSong, () -> getCurrentSong());
     provide(Services.getPercentTempo, () -> getPercentTempo());
+    provide(Services.getCurrentPrograms, () -> getCurrentPrograms());
     provide(Services.getPercentMasterGain, () -> getPercentMasterGain());
     provide(Services.getSynthesizerSettings, () -> getSynthesizerSettings());
     subscribe(OnMute.class, message -> doMute(message));
@@ -159,6 +160,18 @@ public class Musicianeer extends ServiceTask {
   private void doTransposition(OnTransposition message) {
     transport.setCurrentTransposition(message.getTransposition());
     synthesizer.allNotesOff();
+  }
+
+  private CurrentPrograms getCurrentPrograms() {
+    int[] programs = new int[Midi.CHANNELS];
+    for (int channel = 0; channel < Midi.CHANNELS; channel++) {
+      if (programOverrides[channel] == OnProgramOverride.DEFAULT) {
+        programs[channel] = defaultPrograms[channel];
+      } else {
+        programs[channel] = programOverrides[channel];
+      }
+    }
+    return new CurrentPrograms(programs);
   }
 
   private CurrentSong getCurrentSong() {
