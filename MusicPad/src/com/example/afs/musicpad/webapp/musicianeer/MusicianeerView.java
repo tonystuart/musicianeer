@@ -76,7 +76,7 @@ public class MusicianeerView extends ShadowDomBuilder {
                         .add(th() //
                             .add(text("Concurrency"))) //
                         .add(th() //
-                            .add(text("Total Notes")))) //
+                            .add(text("Notes")))) //
                     .add(tbody("#channel-body"))))) //
         .add(div("#staff-container") //
             .add(div("#staff-cursor")) //
@@ -114,8 +114,7 @@ public class MusicianeerView extends ShadowDomBuilder {
 
   public void renderSongInfo(SongInfo songInfo) {
     Parent songBody = getElementById("song-body");
-    appendChild(songBody, createSongTableRow1(songInfo));
-    appendChild(songBody, createSongTableRow2(songInfo));
+    appendChild(songBody, createSongTableRow(songInfo));
   }
 
   public void renderStaff(Song song, int channel, int transposition) {
@@ -219,16 +218,15 @@ public class MusicianeerView extends ShadowDomBuilder {
     channelBody.addClickHandler();
     for (int channel : song.getActiveChannels()) {
       ChannelInfo channelInfo = channelInfoFactory.getChannelInfo(channel);
-      channelBody.add(createChannelTableRow1(channel, channelInfo));
-      channelBody.add(createChannelTableRow2(channel, channelInfo));
+      channelBody.add(createChannelTableRow(channel, channelInfo));
     }
     return channelBody;
   }
 
-  private Parent createChannelTableRow1(int channel, ChannelInfo channelInfo) {
+  private Parent createChannelTableRow(int channel, ChannelInfo channelInfo) {
     return row("#channel-index-" + channel) //
         .add(td() //
-            .add(text(channel + 1))) //
+            .add(text(channelInfo.getProgramNames()))) //
         .add(td() //
             .add(checkbox("#channel-mute-" + channel) //
                 .addCheckHandler())) //
@@ -247,13 +245,6 @@ public class MusicianeerView extends ShadowDomBuilder {
             .add(text(channelInfo.getUniqueSounds())));
   }
 
-  private Parent createChannelTableRow2(int channel, ChannelInfo channelInfo) {
-    return row("#channel-index-" + channel, ".divider-row") //
-        .add(td() //
-            .colSpan(8)//
-            .add(text(channelInfo.getProgramNames())));
-  }
-
   private Select createInstrumentSelect() {
     Select select = new Select("#instrument-select");
     select.addInputHandler();
@@ -270,11 +261,11 @@ public class MusicianeerView extends ShadowDomBuilder {
     return select;
   }
 
-  private Parent createSongTableRow1(SongInfo songInfo) {
+  private Parent createSongTableRow(SongInfo songInfo) {
     int songIndex = songInfo.getSongIndex();
     TableRow row = new TableRow("#song-index-" + songIndex);
     row.add(td() //
-        .add(text(songIndex + 1))) //
+        .add(text(songInfo.getTitle()))) //
         .add(td() //
             .add(text(songInfo.getDuration())))
         .add(td() //
@@ -289,15 +280,6 @@ public class MusicianeerView extends ShadowDomBuilder {
             .add(text(songInfo.getEasyTransposition())))
         .add(td() //
             .add(text(songInfo.getComplexity())));
-    return row;
-  }
-
-  private Parent createSongTableRow2(SongInfo songInfo) {
-    int songIndex = songInfo.getSongIndex();
-    TableRow row = new TableRow("#song-index-" + songIndex, ".divider-row");
-    row.add(td() //
-        .colSpan(8)//
-        .add(text(songInfo.getTitle())));
     return row;
   }
 

@@ -23,13 +23,6 @@ fieldset {
     flex-grow: 0;
 }
 
-tbody {
-    background-color: black;
-    border: 1px solid #B4B7BA;
-    color: #B4B7BA;
-    height 10)%: auto;
-}
-
 svg {
     fill: #B4B7BA;
     height: 95%;
@@ -94,57 +87,39 @@ select {
 #song {
     display: flex;
     flex-direction: row;
-    /* flex: 1; */
     margin-bottom: 10px;
 }
 
 #song-table-wrapper {
     margin: 0px 5px 0px 0px;
-    /* border: 1px solid #B4B7BA; */
     width: 50%;
-}
-
-#song table {
-    table-layout: fixed;
-    width: 100%;
-    border-collapse: collapse;
-}
-
-#song thead tr {
-    display: block;
-    width: calc(100% - 16px);
-}
-
-#song th, #song td {
-    width: calc(100% / 8);
-}
-
-#song tbody {
-    display: block;
+    height: 200px;
     overflow-y: auto;
     overflow-x: hidden;
-    height: 250px;
-}
-
-#song tr {
-	/* display: block; */
-}
-
-#song .divider-row {
-    font-weight: bold;
-    border-bottom: 1px solid #B4B7BA;
-}
-
-#song td {
-    text-align: center;
-    padding: 2px;
 }
 
 #channel-table-wrapper {
     margin: 0px 0px 0px 5px;
-    /* border: 1px solid #B4B7BA; */
     overflow: auto;
     width: 50%;
+    height: 200px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+table {
+    width: 100%;
+    max-height: 200px;
+    /* border-spacing: 0; */
+    table-layout: auto;
+}
+
+td {
+	text-align: center;
+}
+
+th:nth-child(1), td:nth-child(1) {
+	text-align: left;
 }
 
 #controls {
