@@ -29,4 +29,7 @@ public class Services {
 
   public static final Service<Iterable<SongInfo>> getSongInfoList = new Service<Iterable<SongInfo>>() {
   };
+
+  public static final Service<SynthesizerSettings> getSynthesizerSettings = new Service<SynthesizerSettings>() {
+  };
 }

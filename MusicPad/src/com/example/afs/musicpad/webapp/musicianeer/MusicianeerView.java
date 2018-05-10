@@ -9,6 +9,7 @@
 
 package com.example.afs.musicpad.webapp.musicianeer;
 
+import com.example.afs.musicpad.html.CheckBox;
 import com.example.afs.musicpad.html.Division;
 import com.example.afs.musicpad.html.Element;
 import com.example.afs.musicpad.html.NumberInput;
@@ -183,6 +184,16 @@ public class MusicianeerView extends ShadowDomBuilder {
     }
   }
 
+  public void setMute(int channel, boolean isMute) {
+    CheckBox checkBox = getElementById("channel-mute-" + channel);
+    onSetProperty(checkBox, "checked", isMute);
+  }
+
+  public void setSolo(int channel, boolean isSolo) {
+    CheckBox checkBox = getElementById("channel-solo-" + channel);
+    onSetProperty(checkBox, "checked", isSolo);
+  }
+
   private Parent alternative(String name, String legend) {
     return label() // 
         .add(radio("#" + legend.toLowerCase()) //
@@ -219,9 +230,11 @@ public class MusicianeerView extends ShadowDomBuilder {
         .add(td() //
             .add(text(channel + 1))) //
         .add(td() //
-            .add(checkbox("#channel-mute-" + channel))) //
+            .add(checkbox("#channel-mute-" + channel) //
+                .addCheckHandler())) //
         .add(td() //
-            .add(checkbox("#channel-mute-" + channel))) //
+            .add(checkbox("#channel-solo-" + channel) //
+                .addCheckHandler())) //
         .add(td() //
             .add(text(channelInfo.getPercentMeasuresPlayed() + "%"))) //
         .add(td() //

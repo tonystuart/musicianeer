@@ -9,10 +9,10 @@
 
 package com.example.afs.fluidsynth;
 
-import java.util.Arrays;
-
 import com.example.afs.jni.FluidSynth;
+import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.player.Player;
+import com.example.afs.musicpad.webapp.musicianeer.BooleanArray;
 
 public class Synthesizer {
 
@@ -66,7 +66,8 @@ public class Synthesizer {
 
   private long synth;
   private float gain = DEFAULT_GAIN;
-  private boolean[] isMuted = new boolean[16];
+  private BooleanArray muteValues = new BooleanArray(Midi.CHANNELS);
+  private BooleanArray soloValues = new BooleanArray(Midi.CHANNELS);
 
   public Synthesizer() {
     this(createDefaultSettings());
@@ -109,21 +110,24 @@ public class Synthesizer {
     return gain;
   }
 
-  public boolean isMuted(int channel) {
-    return isMuted[channel];
+  public boolean isMute(int channel) {
+    return muteValues.isSet(channel);
   }
 
-  public void muteAllChannels(boolean isMuted) {
-    Arrays.fill(this.isMuted, isMuted);
+  public boolean isSolo(int channel) {
+    return soloValues.isSet(channel);
   }
 
-  public void muteChannel(int channel, boolean isMuted) {
-    this.isMuted[channel] = isMuted;
+  public void muteAllChannels(boolean isMute) {
+    muteValues.setAll(isMute);
+  }
+
+  public void muteChannel(int channel, boolean isMute) {
+    muteValues.set(channel, isMute);
   }
 
   public void pressKey(int channel, int key, int velocity) {
-    if (channel >= isMuted.length || !isMuted[channel]) {
-      // NB: currently only supports 16 base MIDI channels
+    if (isActive(channel)) {
       FluidSynth.fluid_synth_noteon(synth, channel, key, velocity);
     }
   }
@@ -157,5 +161,25 @@ public class Synthesizer {
   public void setGain(float gain) {
     this.gain = gain;
     FluidSynth.fluid_synth_set_gain(synth, gain);
+  }
+
+  public void soloAllChannels(boolean isSolo) {
+    soloValues.setAll(isSolo);
+  }
+
+  public void soloChannel(int channel, boolean isSolo) {
+    soloValues.set(channel, isSolo);
+  }
+
+  private boolean isActive(int channel) {
+    boolean isActive;
+    if (channel >= Midi.CHANNELS) {
+      isActive = true;
+    } else if (soloValues.getSetCount() == 0) {
+      isActive = !muteValues.isSet(channel);
+    } else {
+      isActive = soloValues.isSet(channel);
+    }
+    return isActive;
   }
 }

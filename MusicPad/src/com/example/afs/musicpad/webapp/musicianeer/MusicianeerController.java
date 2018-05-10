@@ -14,6 +14,7 @@ import java.util.Set;
 
 import com.example.afs.musicpad.message.OnShadowUpdate;
 import com.example.afs.musicpad.message.OnShadowUpdate.Action;
+import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.task.ControllerTask;
 import com.example.afs.musicpad.task.MessageBroker;
 import com.example.afs.musicpad.webapp.musicianeer.MusicianeerView.LedState;
@@ -74,6 +75,11 @@ public class MusicianeerController extends ControllerTask {
 
   @Override
   protected void doInput(String id, String value) {
+    if (id.startsWith("channel-mute-")) {
+      renderMute(Integer.parseInt(id.substring("channel-mute-".length())), Integer.parseInt(value));
+    } else if (id.startsWith("channel-solo-")) {
+      renderSolo(Integer.parseInt(id.substring("channel-solo-".length())), Integer.parseInt(value));
+    }
     switch (id) {
     case "tempo":
       publish(new OnSetPercentTempo(Integer.parseInt(value)));
@@ -90,6 +96,8 @@ public class MusicianeerController extends ControllerTask {
   @Override
   protected void doLoad() {
     // NB: We are single threaded by virtue of our input queue
+    subscribe(OnMute.class, message -> doMute(message));
+    subscribe(OnSolo.class, message -> doSolo(message));
     subscribe(OnSongInfo.class, message -> doSongInfo(message));
     subscribe(OnSongSelected.class, message -> doSongSelected(message));
     subscribe(OnTransportPlay.class, message -> doTransportPlay(message));
@@ -107,6 +115,7 @@ public class MusicianeerController extends ControllerTask {
     CurrentSong initialSong = request(Services.getCurrentSong);
     if (initialSong != null) {
       initializeCurrentSong(initialSong);
+      initializeSynthesizerSettings();
     }
   }
 
@@ -161,6 +170,14 @@ public class MusicianeerController extends ControllerTask {
     }
   }
 
+  private void doMute(OnMute message) {
+    musicianeerView.setMute(message.getChannel(), message.isMute());
+  }
+
+  private void doSolo(OnSolo message) {
+    musicianeerView.setSolo(message.getChannel(), message.isSolo());
+  }
+
   private void doSongInfo(OnSongInfo message) {
     // Exclude songs received after listening but before processing initial load
     if (message.getSongInfo().getSongIndex() > loadIndex) {
@@ -204,6 +221,22 @@ public class MusicianeerController extends ControllerTask {
     renderChannel(currentSong.getSongInfo().getActiveChannels()[0]);
   }
 
+  private void initializeSynthesizerSettings() {
+    SynthesizerSettings synthesizerSettings = request(Services.getSynthesizerSettings);
+    boolean[] muteSettings = synthesizerSettings.getMuteSettings();
+    boolean[] soloSettings = synthesizerSettings.getSoloSettings();
+    for (int channel = 0; channel < Midi.CHANNELS; channel++) {
+      boolean isMute = muteSettings[channel];
+      if (isMute) {
+        musicianeerView.setMute(channel, isMute);
+      }
+      boolean isSolo = soloSettings[channel];
+      if (isSolo) {
+        musicianeerView.setSolo(channel, isSolo);
+      }
+    }
+  }
+
   private void playCurrentSong(CurrentSong currentSong) {
     musicianeerView.resetMidiNoteLeds();
   }
@@ -212,6 +245,16 @@ public class MusicianeerController extends ControllerTask {
     this.channel = channel;
     musicianeerView.resetMidiNoteLeds();
     musicianeerView.selectChannel(currentSong.getSong(), channel, transposition);
+  }
+
+  private void renderMute(int channel, int value) {
+    boolean isMute = value > 0;
+    publish(new OnMute(channel, isMute));
+  }
+
+  private void renderSolo(int channel, int value) {
+    boolean isSolo = value > 0;
+    publish(new OnSolo(channel, isSolo));
   }
 
   private void renderSongInfo(SongInfo songInfo) {

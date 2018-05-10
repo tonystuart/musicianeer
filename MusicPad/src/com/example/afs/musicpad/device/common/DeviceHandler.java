@@ -65,7 +65,7 @@ public class DeviceHandler extends ServiceTask {
     subscribe(OnConfigurationChange.class, message -> doConfigurationChange(message));
     provide(new PlayerDetailService(deviceIndex), () -> getPlayerDetail());
     provide(new PlayerVelocityService(deviceIndex), () -> getPercentVelocity());
-    provide(new BackgroundMuteService(deviceIndex), () -> synthesizer.isMuted(channel));
+    provide(new BackgroundMuteService(deviceIndex), () -> synthesizer.isMute(channel));
     provide(new DeviceControllerService(deviceIndex), () -> controller);
   }
 

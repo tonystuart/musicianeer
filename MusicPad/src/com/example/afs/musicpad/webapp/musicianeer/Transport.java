@@ -250,7 +250,6 @@ public class Transport {
         currentPrograms[channel] = program;
         publish(new OnProgramChange(channel, program));
       }
-      publish(new OnTransportNoteOn(channel, midiNote));
       int scaledVelocity = Velocity.scale(velocity, percentVelocity);
       switch (accompanimentType) {
       case DRUMS:
@@ -273,6 +272,7 @@ public class Transport {
       default:
         break;
       }
+      publish(new OnTransportNoteOn(channel, midiNote));
       break;
     }
     case TICK:

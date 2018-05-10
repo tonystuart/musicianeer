@@ -42,7 +42,10 @@ public class Musicianeer extends ServiceTask {
     provide(Services.getCurrentSong, () -> getCurrentSong());
     provide(Services.getPercentTempo, () -> getPercentTempo());
     provide(Services.getPercentMasterGain, () -> getPercentMasterGain());
+    provide(Services.getSynthesizerSettings, () -> getSynthesizerSettings());
+    subscribe(OnMute.class, message -> doMute(message));
     subscribe(OnPlay.class, message -> doPlay(message));
+    subscribe(OnSolo.class, message -> doSolo(message));
     subscribe(OnStop.class, message -> doStop(message));
     subscribe(OnNoteOn.class, message -> doNoteOn(message));
     subscribe(OnNoteOff.class, message -> doNoteOff(message));
@@ -65,6 +68,10 @@ public class Musicianeer extends ServiceTask {
     settings.set("synth.cpu-cores", processors);
     Synthesizer synthesizer = new Synthesizer(settings);
     return synthesizer;
+  }
+
+  private void doMute(OnMute message) {
+    synthesizer.muteChannel(message.getChannel(), message.isMute());
   }
 
   private void doNoteOff(OnNoteOff message) {
@@ -113,8 +120,14 @@ public class Musicianeer extends ServiceTask {
     transport.setPercentTempo(message.getPercentTempo());
   }
 
+  private void doSolo(OnSolo message) {
+    synthesizer.soloChannel(message.getChannel(), message.isSolo());
+  }
+
   private void doSongSelected(OnSongSelected message) {
     currentSong = message.getCurrentSong();
+    synthesizer.muteAllChannels(false);
+    synthesizer.soloAllChannels(false);
     transport.setCurrentTransposition(currentSong.getSongInfo().getEasyTransposition());
     playCurrentSong();
   }
@@ -133,6 +146,17 @@ public class Musicianeer extends ServiceTask {
 
   private int getPercentTempo() {
     return transport.getPercentTempo();
+  }
+
+  private SynthesizerSettings getSynthesizerSettings() {
+    boolean[] muteSettings = new boolean[Midi.CHANNELS];
+    boolean[] soloSettings = new boolean[Midi.CHANNELS];
+    for (int channel = 0; channel < Midi.CHANNELS; channel++) {
+      muteSettings[channel] = synthesizer.isMute(channel);
+      soloSettings[channel] = synthesizer.isSolo(channel);
+    }
+    SynthesizerSettings synthesizerSettings = new SynthesizerSettings(muteSettings, soloSettings);
+    return synthesizerSettings;
   }
 
   private void playCurrentSong() {
