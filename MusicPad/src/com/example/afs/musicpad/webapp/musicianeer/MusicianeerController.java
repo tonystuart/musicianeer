@@ -31,6 +31,7 @@ public class MusicianeerController extends ControllerTask {
   private int loadIndex;
   private boolean isDown;
   private int transposition;
+  private int inputDeviceIndex = MidiHandle.MIDI_HANDLE_NA;
 
   private CurrentSong currentSong;
   private MusicianeerView musicianeerView;
@@ -79,6 +80,9 @@ public class MusicianeerController extends ControllerTask {
       renderMute(Integer.parseInt(id.substring("channel-mute-".length())), Integer.parseInt(value));
     } else if (id.startsWith("channel-solo-")) {
       renderSolo(Integer.parseInt(id.substring("channel-solo-".length())), Integer.parseInt(value));
+    } else if (id.equals("midi-input")) {
+      inputDeviceIndex = Integer.parseInt(value);
+      publish(new OnMidiInputSelected(channel, inputDeviceIndex));
     }
     switch (id) {
     case "instrument":
@@ -102,6 +106,7 @@ public class MusicianeerController extends ControllerTask {
     subscribe(OnMute.class, message -> doMute(message));
     subscribe(OnSolo.class, message -> doSolo(message));
     subscribe(OnSongInfo.class, message -> doSongInfo(message));
+    subscribe(OnMidiHandles.class, message -> doMidiHandles(message));
     subscribe(OnSongSelected.class, message -> doSongSelected(message));
     subscribe(OnTransposition.class, message -> doTransposition(message));
     subscribe(OnTransportPlay.class, message -> doTransportPlay(message));
@@ -121,6 +126,7 @@ public class MusicianeerController extends ControllerTask {
       initializeCurrentSong(initialSong);
       initializeSynthesizerSettings();
     }
+    renderMidiHandles(request(Services.getMidiHandles));
   }
 
   @Override
@@ -172,6 +178,10 @@ public class MusicianeerController extends ControllerTask {
       cueMidiNotes.add(midiNote);
       musicianeerView.setLedState(midiNote, LedState.YELLOW);
     }
+  }
+
+  private void doMidiHandles(OnMidiHandles message) {
+    renderMidiHandles(message.getMidiHandles());
   }
 
   private void doMute(OnMute message) {
@@ -265,6 +275,13 @@ public class MusicianeerController extends ControllerTask {
       }
       musicianeerView.setProgram(currentProgram);
     }
+    if (inputDeviceIndex != MidiHandle.MIDI_HANDLE_NA) {
+      publish(new OnMidiInputSelected(channel, inputDeviceIndex));
+    }
+  }
+
+  private void renderMidiHandles(Iterable<MidiHandle> midiHandles) {
+    musicianeerView.renderMidiHandles(midiHandles);
   }
 
   private void renderMute(int channel, int value) {

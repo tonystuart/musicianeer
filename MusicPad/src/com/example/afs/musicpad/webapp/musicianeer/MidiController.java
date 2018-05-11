@@ -40,17 +40,39 @@ public class MidiController extends MessageTask {
     }
   }
 
+  private int channel;
+  private int deviceIndex;
+
   private String deviceName;
   private MidiDeviceBundle deviceBundle;
-  private int channel;
 
-  public MidiController(MessageBroker messageBroker, String deviceName, MidiDeviceBundle deviceBundle) {
+  public MidiController(MessageBroker messageBroker, String deviceName, MidiDeviceBundle deviceBundle, int deviceIndex) {
     super(messageBroker);
     this.deviceName = deviceName;
     this.deviceBundle = deviceBundle;
+    this.deviceIndex = deviceIndex;
+    subscribe(OnMidiInputSelected.class, message -> doMidiInputSelected(message));
   }
 
-  public void detach() {
+  public int getDeviceIndex() {
+    return deviceIndex;
+  }
+
+  public String getDeviceName() {
+    return deviceName;
+  }
+
+  public void setDeviceIndex(int deviceIndex) {
+    this.deviceIndex = deviceIndex;
+  }
+
+  public void setDeviceName(String deviceName) {
+    this.deviceName = deviceName;
+  }
+
+  @Override
+  public String toString() {
+    return "MidiController [channel=" + channel + ", deviceIndex=" + deviceIndex + ", deviceName=" + deviceName + ", deviceBundle=" + deviceBundle + "]";
   }
 
   @Override
@@ -83,6 +105,12 @@ public class MidiController extends MessageTask {
     for (MidiInputDevice midiInputDevice : deviceBundle.getInputDevices()) {
       MidiDevice midiDevice = midiInputDevice.getMidiDevice();
       midiDevice.close();
+    }
+  }
+
+  private void doMidiInputSelected(OnMidiInputSelected message) {
+    if (message.getDeviceIndex() == deviceIndex) {
+      channel = message.getChannel();
     }
   }
 

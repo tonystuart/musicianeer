@@ -21,10 +21,13 @@ public class Services {
   public static final Service<CurrentSong> getCurrentSong = new Service<CurrentSong>() {
   };
 
-  public static final Service<Integer> getPercentMasterGain = new Service<Integer>() {
+  public static final Service<Iterable<MidiHandle>> getMidiHandles = new Service<Iterable<MidiHandle>>() {
   };
 
   public static final Service<MidiLibrary> getMidiLibrary = new Service<MidiLibrary>() {
+  };
+
+  public static final Service<Integer> getPercentMasterGain = new Service<Integer>() {
   };
 
   public static final Service<Integer> getPercentTempo = new Service<Integer>() {

@@ -25,12 +25,32 @@ import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.task.ControllerTask;
 import com.example.afs.musicpad.webapp.musicianeer.ChannelInfoFactory.ChannelInfo;
+import com.example.afs.musicpad.webapp.musicianeer.MidiHandle.Type;
 import com.example.afs.musicpad.webapp.musicianeer.SongInfoFactory.SongInfo;
 
 public class MusicianeerView extends ShadowDomBuilder {
 
   public enum LedState {
     OFF, GREEN, YELLOW, RED, BLUE
+  }
+
+  public class MidiHandleSelect extends Select {
+
+    public MidiHandleSelect(String id, Iterable<MidiHandle> midiHandles, Type type) {
+      super("#" + id);
+      addInputHandler();
+      required();
+      add(option("N/A", MidiHandle.MIDI_HANDLE_NA));
+      for (MidiHandle midiHandle : midiHandles) {
+        if (midiHandle.getType() == type) {
+          add(option(midiHandle.getName(), midiHandle.getIndex()));
+        }
+      }
+    }
+
+    public void replace(Parent parent) {
+      replaceElement(parent, getElementById(getId()), this, false);
+    }
   }
 
   public MusicianeerView(ControllerTask controllerTask) {
@@ -90,6 +110,12 @@ public class MusicianeerView extends ShadowDomBuilder {
                 .add(text("Transposition:&nbsp;")) //
                 .add(numberInput("#transposition") //
                     .addInputHandler())) //
+            .add(div("#midi-input-container", ".name-value") //
+                .add(text("Input:&nbsp;")) //
+                .add(div("#midi-input"))) //
+            .add(div("#midi-prompter-container", ".name-value") //
+                .add(text("Output:&nbsp;")) //
+                .add(div("#midi-prompter"))) //
             .add(div(".name-value") //
                 .add(text("Instrument:&nbsp;")) //
                 .add(createInstrumentSelect())) //
@@ -102,6 +128,13 @@ public class MusicianeerView extends ShadowDomBuilder {
                 .add(alternative("accompaniment", "Drums")))) //
         .add(keyboard()) //
         .addMouseUpHandler()); //
+  }
+
+  public void renderMidiHandles(Iterable<MidiHandle> midiHandles) {
+    MidiHandleSelect input = new MidiHandleSelect("midi-input", midiHandles, Type.INPUT);
+    input.replace(getElementById("midi-input-container"));
+    MidiHandleSelect prompter = new MidiHandleSelect("midi-prompter", midiHandles, Type.PROMPTER);
+    prompter.replace(getElementById("midi-prompter-container"));
   }
 
   public void renderSongDetails(CurrentSong currentSong) {

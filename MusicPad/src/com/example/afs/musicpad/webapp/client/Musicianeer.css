@@ -159,6 +159,14 @@ td:nth-child(1) {
     transform-origin: 0 0;
 }
 
+#transposition {
+	width: 5vh
+}
+
+#midi-input, #midi-prompter {
+	width: 10vh;
+}
+
 .keyboard {
     display: flex;
     margin-top: 60px;

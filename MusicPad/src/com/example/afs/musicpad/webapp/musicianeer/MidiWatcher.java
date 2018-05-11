@@ -25,16 +25,21 @@ import javax.sound.midi.MidiUnavailableException;
 
 import com.example.afs.musicpad.device.midi.MidiDeviceBundle;
 import com.example.afs.musicpad.task.MessageBroker;
-import com.example.afs.musicpad.task.MessageTask;
+import com.example.afs.musicpad.task.ServiceTask;
+import com.example.afs.musicpad.util.DirectList;
+import com.example.afs.musicpad.util.RandomAccessList;
+import com.example.afs.musicpad.webapp.musicianeer.MidiHandle.Type;
 
-public class MidiWatcher extends MessageTask {
+public class MidiWatcher extends ServiceTask {
 
   private static final Pattern PATTERN = Pattern.compile("^(.*) \\[hw\\:([0-9]+),([0-9]+),([0-9]+)\\]$");
 
+  private int deviceIndex;
   private Map<String, MidiController> oldDevices = new HashMap<>();
 
   public MidiWatcher(MessageBroker broker) {
     super(broker, 1000);
+    provide(Services.getMidiHandles, () -> getMidiHandles());
   }
 
   public Set<String> getDeviceNames() {
@@ -56,23 +61,29 @@ public class MidiWatcher extends MessageTask {
 
   @Override
   public void onTimeout() throws InterruptedException {
+    boolean isUpdate = false;
     Set<String> newDeviceNames = getDeviceNames();
     Iterator<Entry<String, MidiController>> oldIterator = oldDevices.entrySet().iterator();
     while (oldIterator.hasNext()) {
       Entry<String, MidiController> next = oldIterator.next();
       String oldDeviceName = next.getKey();
       if (!newDeviceNames.contains(oldDeviceName)) {
-        next.getValue().detach();
+        isUpdate = true;
+        next.getValue().tsTerminate();
         oldIterator.remove();
       }
     }
     for (String newDeviceName : newDeviceNames) {
       if (!oldDevices.containsKey(newDeviceName)) {
+        isUpdate = true;
         MidiDeviceBundle midiDeviceBundle = getMidiDeviceBundle(newDeviceName);
-        MidiController midiController = new MidiController(tsGetBroker(), newDeviceName, midiDeviceBundle);
+        MidiController midiController = new MidiController(tsGetBroker(), newDeviceName, midiDeviceBundle, deviceIndex++);
         midiController.tsStart();
         oldDevices.put(newDeviceName, midiController);
       }
+    }
+    if (isUpdate) {
+      publish(new OnMidiHandles(getMidiHandles()));
     }
   }
 
@@ -107,6 +118,14 @@ public class MidiWatcher extends MessageTask {
     } catch (MidiUnavailableException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  private Iterable<MidiHandle> getMidiHandles() {
+    RandomAccessList<MidiHandle> midiHandles = new DirectList<>();
+    for (MidiController midiController : oldDevices.values()) {
+      midiHandles.add(new MidiHandle(midiController.getDeviceIndex(), Type.INPUT, midiController.getDeviceName()));
+    }
+    return midiHandles;
   }
 
 }
