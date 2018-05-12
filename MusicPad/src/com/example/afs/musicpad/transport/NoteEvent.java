@@ -15,7 +15,6 @@ public class NoteEvent implements Comparable<NoteEvent> {
 
   public enum Type { // Ordinal is used by compareTo
     TICK, //
-    CUE_NOTE_OFF, //
     CUE_NOTE_ON, //
     NOTE_OFF, //
     NOTE_ON, // 

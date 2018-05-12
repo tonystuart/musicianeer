@@ -122,7 +122,6 @@ public class Transport {
       inputQueue.add(new NoteEvent(Type.NOTE_ON, beginTick, note));
       inputQueue.add(new NoteEvent(Type.CUE_NOTE_ON, beginTick - 1024, note));
       inputQueue.add(new NoteEvent(Type.NOTE_OFF, endTick, note));
-      inputQueue.add(new NoteEvent(Type.CUE_NOTE_OFF, endTick - 1024, note));
       beatsPerMinute = note.getBeatsPerMinute();
     }
     long lastTickRoundedUp = ((lastTick + 1) / Default.RESOLUTION) * Default.RESOLUTION;
@@ -278,12 +277,6 @@ public class Transport {
     case TICK:
       publish(new OnTick(noteEvent.getTick()));
       break;
-    case CUE_NOTE_OFF: {
-      int channel = note.getChannel();
-      int midiNote = getTransposedMidiNote(note, channel);
-      publish(new OnCueNoteOff(channel, midiNote));
-      break;
-    }
     case CUE_NOTE_ON:
       int channel = note.getChannel();
       int midiNote = getTransposedMidiNote(note, channel);

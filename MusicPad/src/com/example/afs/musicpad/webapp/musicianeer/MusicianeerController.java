@@ -35,7 +35,6 @@ public class MusicianeerController extends ControllerTask {
 
   private CurrentSong currentSong;
   private MusicianeerView musicianeerView;
-  private Set<Integer> cueMidiNotes = new HashSet<>();
   private Set<Integer> playerMidiNotes = new HashSet<>();
 
   public MusicianeerController(MessageBroker messageBroker) {
@@ -113,7 +112,6 @@ public class MusicianeerController extends ControllerTask {
     subscribe(OnTransportNoteOn.class, message -> doTransportNoteOn(message));
     subscribe(OnTransportNoteOff.class, message -> doTransportNoteOff(message));
     subscribe(OnCueNoteOn.class, message -> doCueNoteOn(message));
-    subscribe(OnCueNoteOff.class, message -> doCueNoteOff(message));
     addShadowUpdate(new OnShadowUpdate(Action.REPLACE_CHILDREN, "body", musicianeerView.render()));
     musicianeerView.setAlternative("full");
     Iterable<SongInfo> songInfoList = request(Services.getSongInfoList);
@@ -136,9 +134,6 @@ public class MusicianeerController extends ControllerTask {
       int mouseMidiNote = Integer.parseInt(id.substring("midi-note-".length()));
       publish(new OnNoteOn(channel, mouseMidiNote, DEFAULT_VELOCITY));
       playerMidiNotes.add(mouseMidiNote);
-      if (cueMidiNotes.contains(mouseMidiNote)) {
-        musicianeerView.setLedState(mouseMidiNote, LedState.GREEN);
-      }
     }
   }
 
@@ -164,18 +159,9 @@ public class MusicianeerController extends ControllerTask {
     playerMidiNotes.clear();
   }
 
-  private void doCueNoteOff(OnCueNoteOff message) {
-    if (message.getChannel() == channel) {
-      int midiNote = message.getMidiNote();
-      cueMidiNotes.remove(midiNote);
-      musicianeerView.setLedState(midiNote, LedState.BLUE);
-    }
-  }
-
   private void doCueNoteOn(OnCueNoteOn message) {
     if (message.getChannel() == channel) {
       int midiNote = message.getMidiNote();
-      cueMidiNotes.add(midiNote);
       musicianeerView.setLedState(midiNote, LedState.YELLOW);
     }
   }
