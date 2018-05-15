@@ -9,6 +9,7 @@
 
 package com.example.afs.musicpad.webapp.musicianeer;
 
+import java.awt.event.KeyEvent;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -36,6 +37,7 @@ public class MusicianeerController extends ControllerTask {
   private CurrentSong currentSong;
   private MusicianeerView musicianeerView;
   private Set<Integer> playerMidiNotes = new HashSet<>();
+  private boolean isShift;
 
   public MusicianeerController(MessageBroker messageBroker) {
     super(messageBroker);
@@ -96,6 +98,44 @@ public class MusicianeerController extends ControllerTask {
     case "volume":
       publish(new OnSetPercentMasterGain(Integer.parseInt(value)));
       break;
+    }
+  }
+
+  @Override
+  protected void doKeyDown(String id, String value) {
+    System.out.println("id=" + id + ", keyDown=" + value);
+    if (id == null || id.isEmpty()) {
+      int keyCode = Integer.parseInt(value);
+      if (keyCode == KeyMap.SHIFT) {
+        isShift = true;
+      } else {
+        int midiNote = KeyMap.toMidiNote(keyCode);
+        if (midiNote != KeyMap.UNDEFINED) {
+          if (isShift) {
+            midiNote++;
+          }
+          publish(new OnNoteOn(channel, midiNote, DEFAULT_VELOCITY));
+        }
+      }
+    }
+  }
+
+  @Override
+  protected void doKeyUp(String id, String value) {
+    System.out.println("id=" + id + ", keyUp=" + value);
+    if (id == null || id.isEmpty()) {
+      int keyCode = Integer.parseInt(value);
+      if (keyCode == KeyEvent.VK_SHIFT) {
+        isShift = false;
+      } else {
+        int midiNote = KeyMap.toMidiNote(keyCode);
+        if (midiNote != KeyMap.UNDEFINED) {
+          if (isShift) {
+            midiNote++;
+          }
+          publish(new OnNoteOff(channel, midiNote));
+        }
+      }
     }
   }
 

@@ -11,6 +11,33 @@
 var musicianeer = musicianeer || {};
 
 musicianeer.ticksPerPixel = 5;
+musicianeer.activeKeys = [];
+
+musicianeer.onKeyDown = function(event) {
+    const id = event.target.id;
+    const keyCode = event.keyCode;
+    if (!musicianeer.activeKeys[keyCode]) {
+        musicPad.send(JSON.stringify({
+            type: 'OnBrowserEvent',
+            action: 'KEY_DOWN',
+            id: id,
+            value: keyCode
+        }));
+        musicianeer.activeKeys[keyCode] = true;
+    }
+}
+
+musicianeer.onKeyUp = function(event) {
+    const id = event.target.id;
+    const keyCode = event.keyCode;
+    musicPad.send(JSON.stringify({
+        type: 'OnBrowserEvent',
+        action: 'KEY_UP',
+        id: id,
+        value: keyCode
+    }));
+    musicianeer.activeKeys[keyCode] = false;
+}
 
 musicianeer.onLoad = function() {
     let url = 'ws://' + location.host + '/v1/musicianeer';

@@ -40,6 +40,12 @@ public abstract class ControllerTask extends ServiceTask {
   protected void doInput(String id, String value) {
   }
 
+  protected void doKeyDown(String id, String keyCode) {
+  }
+
+  protected void doKeyUp(String id, String keyCode) {
+  }
+
   protected void doLoad() {
     // Defer processing that could send shadow update messages until here
   }
@@ -69,6 +75,12 @@ public abstract class ControllerTask extends ServiceTask {
       break;
     case INPUT:
       doInput(message.getId(), message.getValue());
+      break;
+    case KEY_DOWN:
+      doKeyDown(message.getId(), message.getValue());
+      break;
+    case KEY_UP:
+      doKeyUp(message.getId(), message.getValue());
       break;
     case LOAD:
       doLoad();
