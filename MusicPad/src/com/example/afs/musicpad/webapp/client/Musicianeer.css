@@ -115,15 +115,15 @@ table {
 }
 
 td {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 225px;
-	text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 225px;
+    text-align: center;
 }
 
 td:nth-child(1) {
-	text-align: left;
+    text-align: left;
 }
 
 #controls {
@@ -160,17 +160,37 @@ td:nth-child(1) {
 }
 
 #transposition {
-	width: 5vh
+    width: 5vh
 }
 
 #midi-input, #midi-prompter {
-	width: 10vh;
+    width: 10vh;
 }
 
 .keyboard {
     display: flex;
     margin-top: 60px;
     flex: .7;
+}
+
+.note-label {
+    color: #2E4A62;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+}
+
+.note-center {
+    display: flex;
+}
+
+.note-legend {
+    margin: auto;
+}
+
+.note-name {
+    margin: auto;
 }
 
 .keyboard div:hover {

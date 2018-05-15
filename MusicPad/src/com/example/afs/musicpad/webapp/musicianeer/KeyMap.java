@@ -14,56 +14,63 @@ import com.example.afs.musicpad.midi.Midi;
 public class KeyMap {
 
   // See: https://lists.w3.org/Archives/Public/www-dom/2010JulSep/att-0182/keyCode-spec.html
-  public static final int SHIFT = 16;
-  public static final int SEMICOLON = 186;
-  public static final int SINGLEQUOTE = 222;
+  public static final char SHIFT = 16;
+  public static final char SEMICOLON = 186;
+  public static final char SINGLEQUOTE = 222;
 
   public static final int UNDEFINED = 0;
 
-  private static final int[] keyCodeToMidiNote = new int[256];
-  private static final int[] midiNoteToKeyCode = new int[Midi.MAX_VALUE];
+  private static final byte[] keyCodeToMidiNote = new byte[256];
+  private static final char[] midiNoteToLegend = new char[Midi.MAX_VALUE];
+  private static final char[] midiNoteToKeyCode = new char[Midi.MAX_VALUE];
 
   static {
-    add(MidiNotes.C2, 'Q');
-    add(MidiNotes.D2, 'W');
-    add(MidiNotes.E2, 'E');
-    add(MidiNotes.F2, 'R');
-    add(MidiNotes.G2, 'T');
-    add(MidiNotes.A3, 'Y');
-    add(MidiNotes.B3, 'U');
-    add(MidiNotes.C3, 'I');
-    add(MidiNotes.D3, 'O');
-    add(MidiNotes.E3, 'P');
-    add(MidiNotes.F3, 'A');
-    add(MidiNotes.G3, 'S');
-    add(MidiNotes.A4, 'D');
-    add(MidiNotes.B4, 'F');
-    add(MidiNotes.C4, 'G');
-    add(MidiNotes.D4, 'H');
-    add(MidiNotes.E4, 'J');
-    add(MidiNotes.F4, 'K');
-    add(MidiNotes.G4, 'L');
-    add(MidiNotes.A5, SEMICOLON);
-    add(MidiNotes.B5, SINGLEQUOTE);
-    add(MidiNotes.C5, 'Z');
-    add(MidiNotes.D5, 'X');
-    add(MidiNotes.E5, 'C');
-    add(MidiNotes.F5, 'V');
-    add(MidiNotes.G5, 'B');
-    add(MidiNotes.A6, 'N');
-    add(MidiNotes.B6, 'M');
+    add(MidiNotes.C2, 'q', 'Q');
+    add(MidiNotes.D2, 'w', 'W');
+    add(MidiNotes.E2, 'e', 'E');
+    add(MidiNotes.F2, 'r', 'R');
+    add(MidiNotes.G2, 't', 'T');
+    add(MidiNotes.A3, 'y', 'Y');
+    add(MidiNotes.B3, 'u', 'U');
+    add(MidiNotes.C3, 'i', 'I');
+    add(MidiNotes.D3, 'o', 'O');
+    add(MidiNotes.E3, 'p', 'P');
+    add(MidiNotes.F3, 'a', 'A');
+    add(MidiNotes.G3, 's', 'S');
+    add(MidiNotes.A4, 'd', 'D');
+    add(MidiNotes.B4, 'f', 'F');
+    add(MidiNotes.C4, 'g', 'G');
+    add(MidiNotes.D4, 'h', 'H');
+    add(MidiNotes.E4, 'j', 'J');
+    add(MidiNotes.F4, 'k', 'K');
+    add(MidiNotes.G4, 'l', 'L');
+    add(MidiNotes.A5, ';', SEMICOLON);
+    add(MidiNotes.B5, '\'', SINGLEQUOTE);
+    add(MidiNotes.C5, 'z', 'Z');
+    add(MidiNotes.D5, 'x', 'X');
+    add(MidiNotes.E5, 'c', 'C');
+    add(MidiNotes.F5, 'v', 'V');
+    add(MidiNotes.G5, 'b', 'B');
+    add(MidiNotes.A6, 'n', 'N');
+    add(MidiNotes.B6, 'm', 'M');
+    add(MidiNotes.C6, ',', 'M');
   }
 
   public static int toKeyCode(int midiNote) {
     return midiNoteToKeyCode[midiNote];
   }
 
+  public static char toLegend(int midiNote) {
+    return midiNoteToLegend[midiNote];
+  }
+
   public static int toMidiNote(int keyCode) {
     return keyCodeToMidiNote[keyCode];
   }
 
-  private static void add(int midiNote, int keyCode) {
+  private static void add(byte midiNote, char legend, char keyCode) {
     midiNoteToKeyCode[midiNote] = keyCode;
+    midiNoteToLegend[midiNote] = legend;
     keyCodeToMidiNote[keyCode] = midiNote;
   }
 }

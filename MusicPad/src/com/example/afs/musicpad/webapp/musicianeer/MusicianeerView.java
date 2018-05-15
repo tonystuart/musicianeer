@@ -9,6 +9,7 @@
 
 package com.example.afs.musicpad.webapp.musicianeer;
 
+import com.example.afs.musicpad.analyzer.Names;
 import com.example.afs.musicpad.html.CheckBox;
 import com.example.afs.musicpad.html.Division;
 import com.example.afs.musicpad.html.Element;
@@ -241,7 +242,7 @@ public class MusicianeerView extends ShadowDomBuilder {
         .add(text(legend));
   }
 
-  private Division blackKey(int midiNote) {
+  private Parent blackKey(int midiNote) {
     return key(midiNote, "black-key");
   }
 
@@ -322,13 +323,12 @@ public class MusicianeerView extends ShadowDomBuilder {
     return row;
   }
 
-  private Division key(int midiNote, String className) {
-    Division key = div("#midi-note-" + midiNote, "." + className);
-    key.addMouseDownHandler();
-    key.addMouseOutHandler();
-    key.addMouseOverHandler();
-    key.add(div("#midi-note-led-" + midiNote, "." + className + "-led"));
-    return key;
+  private Parent key(int midiNote, String className) {
+    return (Parent) div("#midi-note-" + midiNote, "." + className) //
+        .add(div("#midi-note-led-" + midiNote, "." + className + "-led")) //
+        .addMouseDownHandler() //
+        .addMouseOutHandler() //
+        .addMouseOverHandler(); //
   }
 
   private Parent keyboard() {
@@ -370,8 +370,15 @@ public class MusicianeerView extends ShadowDomBuilder {
     return div;
   }
 
-  private Division whiteKey(int midiNote) {
-    return key(midiNote, "white-key");
+  private Parent whiteKey(int midiNote) {
+    return key(midiNote, "white-key") //
+        .add(div(".note-label") //
+            .add(div(".note-center") //
+                .add(div(".note-legend") //
+                    .add(text(Character.toString(KeyMap.toLegend(midiNote)))))) //
+            .add(div(".note-center") //
+                .add(div(".note-name") //
+                    .add(text(Names.formatNoteName(midiNote)))))); //
   }
 
 }

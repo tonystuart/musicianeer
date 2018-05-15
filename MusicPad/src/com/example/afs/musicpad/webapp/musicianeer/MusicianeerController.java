@@ -26,7 +26,7 @@ public class MusicianeerController extends ControllerTask {
 
   public static final int MAX_PERCENT_TEMPO = 100;
   public static final int MAX_PERCENT_GAIN = 100;
-  private static final int DEFAULT_VELOCITY = 24;
+  private static final int DEFAULT_VELOCITY = 64;
 
   private int channel;
   private int loadIndex;
@@ -103,38 +103,32 @@ public class MusicianeerController extends ControllerTask {
 
   @Override
   protected void doKeyDown(String id, String value) {
-    System.out.println("id=" + id + ", keyDown=" + value);
-    if (id == null || id.isEmpty()) {
-      int keyCode = Integer.parseInt(value);
-      if (keyCode == KeyMap.SHIFT) {
-        isShift = true;
-      } else {
-        int midiNote = KeyMap.toMidiNote(keyCode);
-        if (midiNote != KeyMap.UNDEFINED) {
-          if (isShift) {
-            midiNote++;
-          }
-          publish(new OnNoteOn(channel, midiNote, DEFAULT_VELOCITY));
+    int keyCode = Integer.parseInt(value);
+    if (keyCode == KeyMap.SHIFT) {
+      isShift = true;
+    } else {
+      int midiNote = KeyMap.toMidiNote(keyCode);
+      if (midiNote != KeyMap.UNDEFINED) {
+        if (isShift) {
+          midiNote++;
         }
+        publish(new OnNoteOn(channel, midiNote, DEFAULT_VELOCITY));
       }
     }
   }
 
   @Override
   protected void doKeyUp(String id, String value) {
-    System.out.println("id=" + id + ", keyUp=" + value);
-    if (id == null || id.isEmpty()) {
-      int keyCode = Integer.parseInt(value);
-      if (keyCode == KeyEvent.VK_SHIFT) {
-        isShift = false;
-      } else {
-        int midiNote = KeyMap.toMidiNote(keyCode);
-        if (midiNote != KeyMap.UNDEFINED) {
-          if (isShift) {
-            midiNote++;
-          }
-          publish(new OnNoteOff(channel, midiNote));
+    int keyCode = Integer.parseInt(value);
+    if (keyCode == KeyEvent.VK_SHIFT) {
+      isShift = false;
+    } else {
+      int midiNote = KeyMap.toMidiNote(keyCode);
+      if (midiNote != KeyMap.UNDEFINED) {
+        if (isShift) {
+          midiNote++;
         }
+        publish(new OnNoteOff(channel, midiNote));
       }
     }
   }
