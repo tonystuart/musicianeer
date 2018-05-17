@@ -193,6 +193,13 @@ public class MusicianeerController extends ControllerTask {
     playerMidiNotes.clear();
   }
 
+  @Override
+  protected void doScroll(String id, String value) {
+    if (id.equals("staff-scroller")) {
+      publish(new OnSeek((long) Double.parseDouble(value)));
+    }
+  }
+
   private void doCueNoteOn(OnCueNoteOn message) {
     if (message.getChannel() == channel) {
       int midiNote = message.getMidiNote();

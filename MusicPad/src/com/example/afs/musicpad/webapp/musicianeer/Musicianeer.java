@@ -19,6 +19,7 @@ import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.task.MessageBroker;
 import com.example.afs.musicpad.task.ServiceTask;
+import com.example.afs.musicpad.webapp.musicianeer.Transport.Whence;
 
 public class Musicianeer extends ServiceTask {
 
@@ -50,6 +51,7 @@ public class Musicianeer extends ServiceTask {
     subscribe(OnMute.class, message -> doMute(message));
     subscribe(OnPlay.class, message -> doPlay(message));
     subscribe(OnSolo.class, message -> doSolo(message));
+    subscribe(OnSeek.class, message -> doSeek(message));
     subscribe(OnStop.class, message -> doStop(message));
     subscribe(OnNoteOn.class, message -> doNoteOn(message));
     subscribe(OnNoteOff.class, message -> doNoteOff(message));
@@ -119,6 +121,11 @@ public class Musicianeer extends ServiceTask {
         setProgram(channel, newProgram);
       }
     }
+  }
+
+  private void doSeek(OnSeek message) {
+    System.out.println("doSeek: tick=" + message.getTick());
+    transport.seek(message.getTick(), Whence.ABSOLUTE);
   }
 
   private void doSetAccompanimentType(OnSetAccompanimentType message) {

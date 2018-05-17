@@ -65,6 +65,9 @@ public abstract class ControllerTask extends ServiceTask {
   protected void doMove(String id, String value) {
   }
 
+  protected void doScroll(String id, String value) {
+  }
+
   protected void doSubmit(String id, String value) {
   }
 
@@ -99,6 +102,9 @@ public abstract class ControllerTask extends ServiceTask {
       break;
     case MOUSE_UP:
       doMouseUp(message.getId());
+      break;
+    case SCROLL:
+      doScroll(message.getId(), message.getValue());
       break;
     case SUBMIT:
       doSubmit(message.getId(), message.getValue());

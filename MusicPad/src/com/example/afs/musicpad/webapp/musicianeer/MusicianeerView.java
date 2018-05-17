@@ -129,6 +129,9 @@ public class MusicianeerView extends ShadowDomBuilder {
                 .add(alternative("accompaniment", "Drums")))) //
         .add(keyboard()) //
         .addMouseUpHandler()); //
+    ((Element) getElementById("staff-scroller")).setProperty("onmousedown", "musicianeer.onStaffMouseDown(event);");
+    ((Element) getElementById("staff-scroller")).setProperty("onmouseup", "musicianeer.onStaffMouseUp(event);");
+    ((Element) getElementById("staff-scroller")).setProperty("onscroll", "musicianeer.onStaffScroll(event);");
   }
 
   public void renderMidiHandles(Iterable<MidiHandle> midiHandles) {

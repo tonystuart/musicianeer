@@ -12,7 +12,7 @@ package com.example.afs.musicpad.message;
 public class OnBrowserEvent extends TypedMessage {
 
   public enum Action {
-    CLICK, INPUT, KEY_DOWN, KEY_UP, LOAD, MOUSE_DOWN, MOUSE_OUT, MOUSE_OVER, MOUSE_UP, MOVE, SUBMIT
+    CLICK, INPUT, KEY_DOWN, KEY_UP, LOAD, MOUSE_DOWN, MOUSE_OUT, MOUSE_OVER, MOUSE_UP, MOVE, SCROLL, SUBMIT
   }
 
   private String id;

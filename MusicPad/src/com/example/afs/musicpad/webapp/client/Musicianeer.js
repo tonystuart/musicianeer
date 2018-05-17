@@ -44,17 +44,43 @@ musicianeer.onLoad = function() {
     musicPad.createWebSocketClient(url, musicianeer.onWebSocketMessage, musicianeer.onWebSocketClose);
 }
 
+musicianeer.onStaffMouseDown = function(event) {
+    musicianeer.staffMouseDown = true;
+    console.log("mouseDown");
+}
+
+musicianeer.onStaffMouseUp = function(event) {
+    musicianeer.staffMouseDown = false;
+    console.log("mouseUp");
+}
+
+musicianeer.onStaffScroll = function(event) {
+    if (musicianeer.staffMouseDown) {
+        const svg = document.querySelector('svg');
+        const ctm = svg.getScreenCTM();
+        const midPoint = event.target.offsetWidth / 2;
+        const left = (event.target.offsetLeft + midPoint + -ctm.e) / ctm.a;
+        const tick = left * musicianeer.ticksPerPixel;
+        musicPad.send(JSON.stringify({
+            type: 'OnBrowserEvent',
+            action: 'SCROLL',
+            id: event.target.id,
+            value: tick
+        }));
+        console.log('onScroll: svg_left=' + left + ', tick=' + tick);
+    }
+}
+
 musicianeer.onTick = function(tick) {
-    let scroller = document.getElementById('staff-scroller');
-    if (scroller) {
-        let svg = scroller.querySelector('svg');
-        if (svg) {
-            let scaledTick = tick / musicianeer.ticksPerPixel;
-            let screenX = musicPad.toScreen(svg, scaledTick);
-            let width = scroller.offsetWidth;
-            let midPoint = width / 2;
-            scroller.scrollLeft += screenX - midPoint;
-        }
+    if (!musicianeer.staffMouseDown) {
+        const svg = document.querySelector('svg');
+        const ctm = svg.getScreenCTM();
+        const scroller = document.getElementById('staff-scroller');
+        const midPoint = scroller.offsetWidth / 2;
+        const pixels = tick / musicianeer.ticksPerPixel;
+        const left = pixels * ctm.a;
+        console.log('onTick: tick=' + tick + ', dom_left=' + left + ', width=' + scroller.scrollWidth);
+        scroller.scrollLeft = left;
     }
 }
 
