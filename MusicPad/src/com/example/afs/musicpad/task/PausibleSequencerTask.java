@@ -29,7 +29,8 @@ public class PausibleSequencerTask<T> extends SequencerTask<T> {
     return !isPaused && tsGetInputQueue().size() > 0;
   }
 
-  public void setPaused(boolean isPaused) {
+  // NB: See 180517 for synchronization rules
+  public synchronized void setPaused(boolean isPaused) {
     this.isPaused = isPaused;
   }
 

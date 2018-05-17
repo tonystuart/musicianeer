@@ -35,7 +35,8 @@ public class SequencerTask<T> extends BrokerTask<T> {
   }
 
   @Override
-  protected void processMessage(T message) throws InterruptedException {
+  // NB: See 180517 for synchronization rules
+  protected synchronized void processMessage(T message) throws InterruptedException {
     long currentTimestamp = System.currentTimeMillis();
     long eventTimestamp = scheduler.getEventTimeMillis(message);
     if (eventTimestamp > currentTimestamp) {
