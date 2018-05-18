@@ -34,7 +34,7 @@ public class TickScheduler {
   }
 
   public long getEventTimeMillis(long noteTick, int beatsPerMinute) {
-    if (baseTimeMillis == INITIALIZE_ON_NEXT_EVENT) {
+    if (baseTimeMillis == INITIALIZE_ON_NEXT_EVENT || noteTick < baseTick) {
       baseTimeMillis = System.currentTimeMillis();
     }
     long deltaTick = noteTick - baseTick;
