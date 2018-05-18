@@ -127,8 +127,7 @@ public class MusicianeerView extends ShadowDomBuilder {
                 .add(alternative("accompaniment", "Piano")) //
                 .add(alternative("accompaniment", "Rhythm")) //
                 .add(alternative("accompaniment", "Drums")))) //
-        .add(keyboard()) //
-        .addMouseUpHandler()); //
+        .add(keyboard())); //
     ((Element) getElementById("staff-scroller")).setProperty("onmousedown", "musicianeer.onStaffMouseDown(event);");
     ((Element) getElementById("musicianeer")).setProperty("onmouseup", "musicianeer.onStaffMouseUp(event);");
     ((Element) getElementById("staff-scroller")).setProperty("onscroll", "musicianeer.onStaffScroll(event);");

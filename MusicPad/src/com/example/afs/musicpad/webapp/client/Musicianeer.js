@@ -50,6 +50,7 @@ musicianeer.onStaffMouseDown = function(event) {
 
 musicianeer.onStaffMouseUp = function(event) {
     musicianeer.staffMouseDown = false;
+    musicPad.onMouseUp(event);
 }
 
 musicianeer.onStaffScroll = function(event) {
