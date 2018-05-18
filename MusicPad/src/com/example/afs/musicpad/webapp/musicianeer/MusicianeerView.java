@@ -101,7 +101,9 @@ public class MusicianeerView extends ShadowDomBuilder {
                     .add(tbody("#channel-body"))))) //
         .add(div("#staff-container") //
             .add(div("#staff-cursor")) //
-            .add(div("#staff-scroller"))) //
+            .add(div("#staff-scroller")//
+                .setProperty("onmousedown", "musicianeer.onStaffMouseDown(event);") //
+                .setProperty("onscroll", "musicianeer.onStaffScroll(event);"))) //
         .add(div("#controls") //
             .add(clicker("stop", "STOP")) //
             .add(clicker("play", "PLAY")) //
@@ -127,10 +129,8 @@ public class MusicianeerView extends ShadowDomBuilder {
                 .add(alternative("accompaniment", "Piano")) //
                 .add(alternative("accompaniment", "Rhythm")) //
                 .add(alternative("accompaniment", "Drums")))) //
-        .add(keyboard())); //
-    ((Element) getElementById("staff-scroller")).setProperty("onmousedown", "musicianeer.onStaffMouseDown(event);");
-    ((Element) getElementById("musicianeer")).setProperty("onmouseup", "musicianeer.onStaffMouseUp(event);");
-    ((Element) getElementById("staff-scroller")).setProperty("onscroll", "musicianeer.onStaffScroll(event);");
+        .add(keyboard()) //
+        .setProperty("onmouseup", "musicianeer.onStaffMouseUp(event);"));
   }
 
   public void renderMidiHandles(Iterable<MidiHandle> midiHandles) {

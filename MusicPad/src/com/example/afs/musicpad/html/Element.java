@@ -143,15 +143,16 @@ public class Element extends Node {
     this.id = id;
   }
 
-  public void setProperty(String name) {
-    setProperty(name, null);
+  public Element setProperty(String name) {
+    return setProperty(name, null);
   }
 
-  public void setProperty(String name, Object value) {
+  public Element setProperty(String name, Object value) {
     if (attributes == null) {
       attributes = new HashMap<>();
     }
     attributes.put(name, value);
+    return this;
   }
 
   public Element style(String newStyle) {
