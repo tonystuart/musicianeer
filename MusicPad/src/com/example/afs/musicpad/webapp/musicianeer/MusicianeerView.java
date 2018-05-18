@@ -130,7 +130,7 @@ public class MusicianeerView extends ShadowDomBuilder {
         .add(keyboard()) //
         .addMouseUpHandler()); //
     ((Element) getElementById("staff-scroller")).setProperty("onmousedown", "musicianeer.onStaffMouseDown(event);");
-    ((Element) getElementById("staff-scroller")).setProperty("onmouseup", "musicianeer.onStaffMouseUp(event);");
+    ((Element) getElementById("musicianeer")).setProperty("onmouseup", "musicianeer.onStaffMouseUp(event);");
     ((Element) getElementById("staff-scroller")).setProperty("onscroll", "musicianeer.onStaffScroll(event);");
   }
 
