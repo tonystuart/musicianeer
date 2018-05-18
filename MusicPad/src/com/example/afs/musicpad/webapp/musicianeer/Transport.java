@@ -178,6 +178,7 @@ public class Transport {
     } else {
       publish(new OnTick(newTick));
     }
+    publish(new OnSeekFinished(tick, whence));
   }
 
   public void setAccompaniment(OnSetAccompanimentType.AccompanimentType accompanimentType) {

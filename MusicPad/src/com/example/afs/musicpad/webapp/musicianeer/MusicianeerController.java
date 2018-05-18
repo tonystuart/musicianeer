@@ -139,13 +139,14 @@ public class MusicianeerController extends ControllerTask {
     subscribe(OnMute.class, message -> doMute(message));
     subscribe(OnSolo.class, message -> doSolo(message));
     subscribe(OnSongInfo.class, message -> doSongInfo(message));
+    subscribe(OnCueNoteOn.class, message -> doCueNoteOn(message));
     subscribe(OnMidiHandles.class, message -> doMidiHandles(message));
+    subscribe(OnSeekFinished.class, message -> doSeekFinished(message));
     subscribe(OnSongSelected.class, message -> doSongSelected(message));
     subscribe(OnTransposition.class, message -> doTransposition(message));
     subscribe(OnTransportPlay.class, message -> doTransportPlay(message));
     subscribe(OnTransportNoteOn.class, message -> doTransportNoteOn(message));
     subscribe(OnTransportNoteOff.class, message -> doTransportNoteOff(message));
-    subscribe(OnCueNoteOn.class, message -> doCueNoteOn(message));
     addShadowUpdate(new OnShadowUpdate(Action.REPLACE_CHILDREN, "body", musicianeerView.render()));
     musicianeerView.setAlternative("full");
     Iterable<SongInfo> songInfoList = request(Services.getSongInfoList);
@@ -213,6 +214,10 @@ public class MusicianeerController extends ControllerTask {
 
   private void doMute(OnMute message) {
     musicianeerView.setMute(message.getChannel(), message.isMute());
+  }
+
+  private void doSeekFinished(OnSeekFinished message) {
+    musicianeerView.resetMidiNoteLeds();
   }
 
   private void doSolo(OnSolo message) {
