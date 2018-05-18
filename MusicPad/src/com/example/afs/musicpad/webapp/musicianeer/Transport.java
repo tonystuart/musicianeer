@@ -159,14 +159,16 @@ public class Transport {
       }
     } else {
       boolean isInRange = true;
-      Iterator<NoteEvent> iterator = reviewQueue.descendingIterator();
-      while (iterator.hasNext() && isInRange) {
-        NoteEvent noteEvent = iterator.next();
-        long noteEventTick = noteEvent.getTick();
-        isInRange = noteEventTick > newTick;
-        if (isInRange) {
-          inputQueue.add(noteEvent);
-          iterator.remove();
+      synchronized (reviewQueue) {
+        Iterator<NoteEvent> iterator = reviewQueue.descendingIterator();
+        while (iterator.hasNext() && isInRange) {
+          NoteEvent noteEvent = iterator.next();
+          long noteEventTick = noteEvent.getTick();
+          isInRange = noteEventTick > newTick;
+          if (isInRange) {
+            inputQueue.add(noteEvent);
+            iterator.remove();
+          }
         }
       }
     }
@@ -286,7 +288,9 @@ public class Transport {
     default:
       throw new UnsupportedOperationException();
     }
-    reviewQueue.add(noteEvent);
+    synchronized (reviewQueue) {
+      reviewQueue.add(noteEvent);
+    }
   }
 
   private void publish(Message message) {
