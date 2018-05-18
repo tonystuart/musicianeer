@@ -187,34 +187,34 @@ public class MusicianeerView extends ShadowDomBuilder {
   public void setLedState(int midiNote, LedState ledState) {
     switch (ledState) {
     case GREEN:
-      removeClass("midi-note-led-" + midiNote, "led-yellow");
-      removeClass("midi-note-led-" + midiNote, "led-red");
-      removeClass("midi-note-led-" + midiNote, "led-blue");
-      addClass("midi-note-led-" + midiNote, "led-green");
+      removeClass("midi-led-" + midiNote, "led-yellow");
+      removeClass("midi-led-" + midiNote, "led-red");
+      removeClass("midi-led-" + midiNote, "led-blue");
+      addClass("midi-led-" + midiNote, "led-green");
       break;
     case YELLOW:
-      removeClass("midi-note-led-" + midiNote, "led-green");
-      removeClass("midi-note-led-" + midiNote, "led-red");
-      removeClass("midi-note-led-" + midiNote, "led-blue");
-      addClass("midi-note-led-" + midiNote, "led-yellow");
+      removeClass("midi-led-" + midiNote, "led-green");
+      removeClass("midi-led-" + midiNote, "led-red");
+      removeClass("midi-led-" + midiNote, "led-blue");
+      addClass("midi-led-" + midiNote, "led-yellow");
       break;
     case RED:
-      removeClass("midi-note-led-" + midiNote, "led-green");
-      removeClass("midi-note-led-" + midiNote, "led-yellow");
-      removeClass("midi-note-led-" + midiNote, "led-blue");
-      addClass("midi-note-led-" + midiNote, "led-red");
+      removeClass("midi-led-" + midiNote, "led-green");
+      removeClass("midi-led-" + midiNote, "led-yellow");
+      removeClass("midi-led-" + midiNote, "led-blue");
+      addClass("midi-led-" + midiNote, "led-red");
       break;
     case BLUE:
-      removeClass("midi-note-led-" + midiNote, "led-green");
-      removeClass("midi-note-led-" + midiNote, "led-yellow");
-      removeClass("midi-note-led-" + midiNote, "led-red");
-      addClass("midi-note-led-" + midiNote, "led-blue");
+      removeClass("midi-led-" + midiNote, "led-green");
+      removeClass("midi-led-" + midiNote, "led-yellow");
+      removeClass("midi-led-" + midiNote, "led-red");
+      addClass("midi-led-" + midiNote, "led-blue");
       break;
     case OFF:
-      removeClass("midi-note-led-" + midiNote, "led-green");
-      removeClass("midi-note-led-" + midiNote, "led-yellow");
-      removeClass("midi-note-led-" + midiNote, "led-red");
-      removeClass("midi-note-led-" + midiNote, "led-blue");
+      removeClass("midi-led-" + midiNote, "led-green");
+      removeClass("midi-led-" + midiNote, "led-yellow");
+      removeClass("midi-led-" + midiNote, "led-red");
+      removeClass("midi-led-" + midiNote, "led-blue");
       break;
     default:
       throw new UnsupportedOperationException();
@@ -328,7 +328,7 @@ public class MusicianeerView extends ShadowDomBuilder {
 
   private Parent key(int midiNote, String className) {
     return (Parent) div("#midi-note-" + midiNote, "." + className) //
-        .add(div("#midi-note-led-" + midiNote, "." + className + "-led")) //
+        .add(div("#midi-led-" + midiNote, "." + className + "-led")) //
         .addMouseDownHandler() //
         .addMouseOutHandler() //
         .addMouseOverHandler(); //
