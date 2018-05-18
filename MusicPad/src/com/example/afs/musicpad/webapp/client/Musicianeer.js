@@ -46,12 +46,10 @@ musicianeer.onLoad = function() {
 
 musicianeer.onStaffMouseDown = function(event) {
     musicianeer.staffMouseDown = true;
-    console.log("mouseDown");
 }
 
 musicianeer.onStaffMouseUp = function(event) {
     musicianeer.staffMouseDown = false;
-    console.log("mouseUp");
 }
 
 musicianeer.onStaffScroll = function(event) {

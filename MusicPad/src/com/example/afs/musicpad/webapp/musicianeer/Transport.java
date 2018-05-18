@@ -174,7 +174,6 @@ public class Transport {
     }
     setBaseTick(newTick);
     if (wasPlaying) {
-      System.out.println("Transport: resume");
       resume();
     } else {
       publish(new OnTick(newTick));

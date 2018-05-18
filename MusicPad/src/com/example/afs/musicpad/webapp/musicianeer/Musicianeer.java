@@ -124,7 +124,6 @@ public class Musicianeer extends ServiceTask {
   }
 
   private void doSeek(OnSeek message) {
-    System.out.println("doSeek: tick=" + message.getTick());
     transport.seek(message.getTick(), Whence.ABSOLUTE);
   }
 
