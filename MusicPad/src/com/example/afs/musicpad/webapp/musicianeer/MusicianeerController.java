@@ -10,7 +10,9 @@
 package com.example.afs.musicpad.webapp.musicianeer;
 
 import java.awt.event.KeyEvent;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import com.example.afs.musicpad.message.OnShadowUpdate;
@@ -18,6 +20,7 @@ import com.example.afs.musicpad.message.OnShadowUpdate.Action;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.task.ControllerTask;
 import com.example.afs.musicpad.task.MessageBroker;
+import com.example.afs.musicpad.webapp.musicianeer.MidiHandle.Type;
 import com.example.afs.musicpad.webapp.musicianeer.MusicianeerView.LedState;
 import com.example.afs.musicpad.webapp.musicianeer.OnSetAccompanimentType.AccompanimentType;
 import com.example.afs.musicpad.webapp.musicianeer.SongInfoFactory.SongInfo;
@@ -31,13 +34,15 @@ public class MusicianeerController extends ControllerTask {
   private int channel;
   private int loadIndex;
   private boolean isDown;
+  private boolean isShift;
   private int transposition;
   private int inputDeviceIndex = MidiHandle.MIDI_HANDLE_NA;
+  private int prompterDeviceIndex = MidiHandle.MIDI_HANDLE_NA;
 
   private CurrentSong currentSong;
   private MusicianeerView musicianeerView;
   private Set<Integer> playerMidiNotes = new HashSet<>();
-  private boolean isShift;
+  private Map<String, Integer> activeKeys = new HashMap<>();
 
   public MusicianeerController(MessageBroker messageBroker) {
     super(messageBroker);
@@ -112,6 +117,7 @@ public class MusicianeerController extends ControllerTask {
         if (isShift) {
           midiNote++;
         }
+        activeKeys.put(value, midiNote);
         publish(new OnNoteOn(channel, midiNote, DEFAULT_VELOCITY));
       }
     }
@@ -123,11 +129,8 @@ public class MusicianeerController extends ControllerTask {
     if (keyCode == KeyEvent.VK_SHIFT) {
       isShift = false;
     } else {
-      int midiNote = KeyMap.toMidiNote(keyCode);
-      if (midiNote != KeyMap.UNDEFINED) {
-        if (isShift) {
-          midiNote++;
-        }
+      Integer midiNote = activeKeys.remove(value);
+      if (midiNote != null) {
         publish(new OnNoteOff(channel, midiNote));
       }
     }
@@ -138,6 +141,8 @@ public class MusicianeerController extends ControllerTask {
     // NB: We are single threaded by virtue of our input queue
     subscribe(OnMute.class, message -> doMute(message));
     subscribe(OnSolo.class, message -> doSolo(message));
+    subscribe(OnNoteOn.class, message -> doNoteOn(message));
+    subscribe(OnNoteOff.class, message -> doNoteOff(message));
     subscribe(OnSongInfo.class, message -> doSongInfo(message));
     subscribe(OnCueNoteOn.class, message -> doCueNoteOn(message));
     subscribe(OnMidiHandles.class, message -> doMidiHandles(message));
@@ -216,6 +221,18 @@ public class MusicianeerController extends ControllerTask {
     musicianeerView.setMute(message.getChannel(), message.isMute());
   }
 
+  private void doNoteOff(OnNoteOff message) {
+    if (message.getChannel() == channel) {
+      musicianeerView.renderKeyReleased(message.getData1());
+    }
+  }
+
+  private void doNoteOn(OnNoteOn message) {
+    if (message.getChannel() == channel) {
+      musicianeerView.renderKeyPressed(message.getData1());
+    }
+  }
+
   private void doSeekFinished(OnSeekFinished message) {
     musicianeerView.resetMidiNoteLeds();
   }
@@ -261,6 +278,24 @@ public class MusicianeerController extends ControllerTask {
     this.transposition = message.getTransposition();
     musicianeerView.renderStaff(currentSong.getSong(), channel, transposition);
     musicianeerView.resetMidiNoteLeds();
+  }
+
+  private int findBestFit(Iterable<MidiHandle> midiHandles, Type type, int index) {
+    MidiHandle first = null;
+    for (MidiHandle midiHandle : midiHandles) {
+      if (midiHandle.getType() == type) {
+        if (first == null) {
+          if (index == MidiHandle.MIDI_HANDLE_NA) {
+            return midiHandle.getIndex();
+          }
+          first = midiHandle;
+        }
+        if (index != MidiHandle.MIDI_HANDLE_NA && midiHandle.getIndex() == index) {
+          return midiHandle.getIndex();
+        }
+      }
+    }
+    return first == null ? MidiHandle.MIDI_HANDLE_NA : first.getIndex();
   }
 
   private void initializeCurrentSong(CurrentSong currentSong) {
@@ -313,7 +348,10 @@ public class MusicianeerController extends ControllerTask {
   }
 
   private void renderMidiHandles(Iterable<MidiHandle> midiHandles) {
-    musicianeerView.renderMidiHandles(midiHandles);
+    inputDeviceIndex = findBestFit(midiHandles, Type.INPUT, inputDeviceIndex);
+    prompterDeviceIndex = findBestFit(midiHandles, Type.PROMPTER, prompterDeviceIndex);
+    musicianeerView.renderMidiHandles(midiHandles, inputDeviceIndex, prompterDeviceIndex);
+    publish(new OnMidiInputSelected(channel, inputDeviceIndex));
   }
 
   private void renderMute(int channel, int value) {

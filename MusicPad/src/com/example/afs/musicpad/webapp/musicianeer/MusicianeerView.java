@@ -37,14 +37,15 @@ public class MusicianeerView extends ShadowDomBuilder {
 
   public class MidiHandleSelect extends Select {
 
-    public MidiHandleSelect(String id, Iterable<MidiHandle> midiHandles, Type type) {
+    public MidiHandleSelect(String id, Iterable<MidiHandle> midiHandles, Type type, int selectedIndex) {
       super("#" + id);
       addInputHandler();
       required();
-      add(option("N/A", MidiHandle.MIDI_HANDLE_NA));
+      add(option("N/A", MidiHandle.MIDI_HANDLE_NA)); // default if no others are selected
       for (MidiHandle midiHandle : midiHandles) {
         if (midiHandle.getType() == type) {
-          add(option(midiHandle.getName(), midiHandle.getIndex()));
+          int index = midiHandle.getIndex();
+          add(option(midiHandle.getName(), index, index == selectedIndex));
         }
       }
     }
@@ -133,10 +134,18 @@ public class MusicianeerView extends ShadowDomBuilder {
         .setProperty("onmouseup", "musicianeer.onStaffMouseUp(event);"));
   }
 
-  public void renderMidiHandles(Iterable<MidiHandle> midiHandles) {
-    MidiHandleSelect input = new MidiHandleSelect("midi-input", midiHandles, Type.INPUT);
+  public void renderKeyPressed(int midiNote) {
+    addClass("midi-note-" + midiNote, "key-pressed");
+  }
+
+  public void renderKeyReleased(int midiNote) {
+    removeClass("midi-note-" + midiNote, "key-pressed");
+  }
+
+  public void renderMidiHandles(Iterable<MidiHandle> midiHandles, int inputDeviceIndex, int prompterDeviceIndex) {
+    MidiHandleSelect input = new MidiHandleSelect("midi-input", midiHandles, Type.INPUT, inputDeviceIndex);
     input.replace(getElementById("midi-input-container"));
-    MidiHandleSelect prompter = new MidiHandleSelect("midi-prompter", midiHandles, Type.PROMPTER);
+    MidiHandleSelect prompter = new MidiHandleSelect("midi-prompter", midiHandles, Type.PROMPTER, prompterDeviceIndex);
     prompter.replace(getElementById("midi-prompter-container"));
   }
 

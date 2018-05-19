@@ -24,13 +24,13 @@ public class Option extends Parent {
     }
   }
 
-  public Option setValue(Object value) {
-    setProperty("value", value);
+  public Option setSelected() {
+    setProperty("selected");
     return this;
   }
 
-  private Option setSelected() {
-    setProperty("selected");
+  public Option setValue(Object value) {
+    setProperty("value", value);
     return this;
   }
 

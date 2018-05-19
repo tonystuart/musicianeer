@@ -66,20 +66,23 @@ musicianeer.onStaffScroll = function(event) {
             id: event.target.id,
             value: tick
         }));
-        console.log('onScroll: svg_left=' + left + ', tick=' + tick);
+        //console.log('onScroll: svg_left=' + left + ', tick=' + tick);
     }
 }
 
 musicianeer.onTick = function(tick) {
     if (!musicianeer.staffMouseDown) {
         const svg = document.querySelector('svg');
-        const ctm = svg.getScreenCTM();
-        const scroller = document.getElementById('staff-scroller');
-        const midPoint = scroller.offsetWidth / 2;
-        const pixels = tick / musicianeer.ticksPerPixel;
-        const left = pixels * ctm.a;
-        console.log('onTick: tick=' + tick + ', dom_left=' + left + ', width=' + scroller.scrollWidth);
-        scroller.scrollLeft = left;
+        if (svg) {
+            // not present before channel selection
+            const ctm = svg.getScreenCTM();
+            const scroller = document.getElementById('staff-scroller');
+            const midPoint = scroller.offsetWidth / 2;
+            const pixels = tick / musicianeer.ticksPerPixel;
+            const left = pixels * ctm.a;
+            //console.log('onTick: tick=' + tick + ', dom_left=' + left + ', width=' + scroller.scrollWidth);
+            scroller.scrollLeft = left;
+        }
     }
 }
 

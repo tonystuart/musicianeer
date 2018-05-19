@@ -72,6 +72,10 @@ public class ShadowDomBuilder extends ShadowDom {
     return new Option(text, value);
   }
 
+  public Option option(String text, Object value, boolean isSelected) {
+    return new Option(text, value, isSelected);
+  }
+
   public OptionGroup optionGroup(String label) {
     return new OptionGroup(label);
   }

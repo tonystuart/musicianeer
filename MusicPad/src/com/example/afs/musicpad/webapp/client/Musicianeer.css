@@ -193,18 +193,6 @@ td:nth-child(1) {
     margin: auto;
 }
 
-.keyboard div:hover {
-    background-color: #B4B7BA;
-}
-
-.white-key .black-key :not ( :hover ) {
-    background-color : red ;
-}
-
-.keyboard div:active {
-    background-color: #2E4A62;
-}
-
 .key-parent {
     position: relative;
     flex: 1;
@@ -224,7 +212,7 @@ td:nth-child(1) {
 
 .white-key {
     background-color: white;
-    border: 1px solid blue;
+    border: 1px solid #2E4A62;
     flex: 1;
 }
 
@@ -245,6 +233,14 @@ td:nth-child(1) {
 .white-key-led {
     left: 19px;
     top: -30px;
+}
+
+.white-key:hover, .black-key:hover {
+	background-color: #f0f0f0;
+}
+
+.keyboard div:hover .key-pressed, .key-pressed {
+    background-color: #B4B7BA;
 }
 
 .led-green {
