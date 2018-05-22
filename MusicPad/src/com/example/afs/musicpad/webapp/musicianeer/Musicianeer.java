@@ -58,6 +58,7 @@ public class Musicianeer extends ServiceTask {
     subscribe(OnSongSelected.class, message -> doSongSelected(message));
     subscribe(OnProgramChange.class, message -> doProgramChange(message));
     subscribe(OnTransposition.class, message -> doTransposition(message));
+    subscribe(OnSetPercentVelocity.class, message -> doPercentVelocity(message));
     subscribe(OnProgramOverride.class, message -> doProgramOverride(message));
     subscribe(OnSetPercentTempo.class, message -> doSetPercentTempo(message));
     subscribe(OnSetAccompanimentType.class, message -> doSetAccompanimentType(message));
@@ -96,6 +97,10 @@ public class Musicianeer extends ServiceTask {
 
   private void doNoteOn(OnNoteOn message) {
     synthesizer.pressKey(mapChannel(message.getChannel()), message.getData1(), message.getData2());
+  }
+
+  private void doPercentVelocity(OnSetPercentVelocity message) {
+    transport.setPercentVelocity(message.getPercentVelocity());
   }
 
   private void doPlay(OnPlay message) {

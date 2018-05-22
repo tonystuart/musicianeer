@@ -27,15 +27,14 @@ import com.example.afs.musicpad.webapp.musicianeer.SongInfoFactory.SongInfo;
 
 public class MusicianeerController extends ControllerTask {
 
-  public static final int MAX_PERCENT_TEMPO = 100;
-  public static final int MAX_PERCENT_GAIN = 100;
-  private static final int DEFAULT_VELOCITY = 64;
+  public static final int DEFAULT_VELOCITY = 64;
 
   private int channel;
   private int loadIndex;
   private boolean isDown;
   private boolean isShift;
   private int transposition;
+  private int channelVelocity = DEFAULT_VELOCITY;
   private int inputDeviceIndex = MidiHandle.MIDI_HANDLE_NA;
   private int prompterDeviceIndex = MidiHandle.MIDI_HANDLE_NA;
 
@@ -91,17 +90,23 @@ public class MusicianeerController extends ControllerTask {
       publish(new OnMidiInputSelected(channel, inputDeviceIndex));
     }
     switch (id) {
+    case "background-volume":
+      publish(new OnSetPercentVelocity(Integer.parseInt(value)));
+      break;
+    case "channel-volume":
+      channelVelocity = Integer.parseInt(value);
+      break;
     case "instrument":
       publish(new OnProgramOverride(channel, Integer.parseInt(value)));
+      break;
+    case "master-volume":
+      publish(new OnSetPercentMasterGain(Integer.parseInt(value)));
       break;
     case "tempo":
       publish(new OnSetPercentTempo(Integer.parseInt(value)));
       break;
     case "transposition":
       publish(new OnTransposition(Integer.parseInt(value)));
-      break;
-    case "volume":
-      publish(new OnSetPercentMasterGain(Integer.parseInt(value)));
       break;
     }
   }
@@ -118,7 +123,7 @@ public class MusicianeerController extends ControllerTask {
           midiNote++;
         }
         activeKeys.put(value, midiNote);
-        publish(new OnNoteOn(channel, midiNote, DEFAULT_VELOCITY));
+        publish(new OnNoteOn(channel, midiNote, channelVelocity));
       }
     }
   }
@@ -150,8 +155,11 @@ public class MusicianeerController extends ControllerTask {
     subscribe(OnSongSelected.class, message -> doSongSelected(message));
     subscribe(OnTransposition.class, message -> doTransposition(message));
     subscribe(OnTransportPlay.class, message -> doTransportPlay(message));
+    subscribe(OnSetPercentTempo.class, message -> doSetPercentTempo(message));
     subscribe(OnTransportNoteOn.class, message -> doTransportNoteOn(message));
     subscribe(OnTransportNoteOff.class, message -> doTransportNoteOff(message));
+    subscribe(OnSetPercentVelocity.class, message -> doSetPercentVelocity(message));
+    subscribe(OnSetPercentMasterGain.class, message -> doSetPercentMasterGain(message));
     addShadowUpdate(new OnShadowUpdate(Action.REPLACE_CHILDREN, "body", musicianeerView.render()));
     musicianeerView.setAlternative("full");
     Iterable<SongInfo> songInfoList = request(Services.getSongInfoList);
@@ -172,7 +180,7 @@ public class MusicianeerController extends ControllerTask {
     isDown = true;
     if (id.startsWith("midi-note-")) {
       int mouseMidiNote = Integer.parseInt(id.substring("midi-note-".length()));
-      publish(new OnNoteOn(channel, mouseMidiNote, DEFAULT_VELOCITY));
+      publish(new OnNoteOn(channel, mouseMidiNote, channelVelocity));
       playerMidiNotes.add(mouseMidiNote);
     }
   }
@@ -187,7 +195,7 @@ public class MusicianeerController extends ControllerTask {
   protected void doMouseOver(String id) {
     if (isDown && id.startsWith("midi-note-")) {
       int mouseMidiNote = Integer.parseInt(id.substring("midi-note-".length()));
-      publish(new OnNoteOn(channel, mouseMidiNote, DEFAULT_VELOCITY));
+      publish(new OnNoteOn(channel, mouseMidiNote, channelVelocity));
       playerMidiNotes.add(mouseMidiNote);
     }
   }
@@ -235,6 +243,18 @@ public class MusicianeerController extends ControllerTask {
 
   private void doSeekFinished(OnSeekFinished message) {
     musicianeerView.resetMidiNoteLeds();
+  }
+
+  private void doSetPercentMasterGain(OnSetPercentMasterGain message) {
+    musicianeerView.setPercentMasterGain(message.getPercentMasterGain());
+  }
+
+  private void doSetPercentTempo(OnSetPercentTempo message) {
+    musicianeerView.setPercentTempo(message.getPercentTempo());
+  }
+
+  private void doSetPercentVelocity(OnSetPercentVelocity message) {
+    musicianeerView.setPercentVelocity(message.getPercentVelocity());
   }
 
   private void doSolo(OnSolo message) {

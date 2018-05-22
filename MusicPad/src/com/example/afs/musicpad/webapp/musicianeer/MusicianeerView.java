@@ -15,14 +15,12 @@ import com.example.afs.musicpad.html.Division;
 import com.example.afs.musicpad.html.Element;
 import com.example.afs.musicpad.html.NumberInput;
 import com.example.afs.musicpad.html.Parent;
-import com.example.afs.musicpad.html.PercentRange;
 import com.example.afs.musicpad.html.Radio;
 import com.example.afs.musicpad.html.Range;
 import com.example.afs.musicpad.html.Select;
 import com.example.afs.musicpad.html.ShadowDomBuilder;
 import com.example.afs.musicpad.html.TableRow;
 import com.example.afs.musicpad.midi.Instruments;
-import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.task.ControllerTask;
 import com.example.afs.musicpad.webapp.musicianeer.ChannelInfoFactory.ChannelInfo;
@@ -67,7 +65,7 @@ public class MusicianeerView extends ShadowDomBuilder {
                         .add(th() //
                             .add(text("Duration"))) //
                         .add(th() //
-                            .add(text("Parts"))) //
+                            .add(text("Channels"))) //
                         .add(th() //
                             .add(text("BPM"))) //
                         .add(th() //
@@ -84,7 +82,7 @@ public class MusicianeerView extends ShadowDomBuilder {
                 .add(table("#channel-table") //
                     .add(thead() //
                         .add(th() //
-                            .add(text("Part"))) //
+                            .add(text("Channel"))) //
                         .add(th() //
                             .add(text("Mute"))) //
                         .add(th() //
@@ -108,8 +106,10 @@ public class MusicianeerView extends ShadowDomBuilder {
         .add(div("#controls") //
             .add(clicker("stop", "STOP")) //
             .add(clicker("play", "PLAY")) //
-            .add(percentSlider("tempo", Transport.DEFAULT_PERCENT_TEMPO)) //
-            .add(percentSlider("volume", Transport.DEFAULT_PERCENT_GAIN)) //
+            .add(slider("Tempo", "tempo", Transport.DEFAULT_PERCENT_TEMPO, 0, 100)) //
+            .add(slider("Channel Volume", "channel-volume", MusicianeerController.DEFAULT_VELOCITY, 0, 127)) //
+            .add(slider("Background Volume", "background-volume", Transport.DEFAULT_PERCENT_VELOCITY, 0, 100)) //
+            .add(slider("Master Volume", "master-volume", Transport.DEFAULT_PERCENT_GAIN, 0, 100)) //
             .add(div(".name-value") //
                 .add(text("Transposition:&nbsp;")) //
                 .add(numberInput("#transposition") //
@@ -232,6 +232,18 @@ public class MusicianeerView extends ShadowDomBuilder {
   public void setMute(int channel, boolean isMute) {
     CheckBox checkBox = getElementById("channel-mute-" + channel);
     onSetProperty(checkBox, "checked", isMute);
+  }
+
+  public void setPercentMasterGain(int percentMasterGain) {
+    setProperty(getElementById("master-volume"), "value", percentMasterGain);
+  }
+
+  public void setPercentTempo(int percentTempo) {
+    setProperty(getElementById("tempo"), "value", percentTempo);
+  }
+
+  public void setPercentVelocity(int percentVelocity) {
+    setProperty(getElementById("background-volume"), "value", percentVelocity);
   }
 
   public void setProgram(int program) {
@@ -359,24 +371,15 @@ public class MusicianeerView extends ShadowDomBuilder {
     return keyboard;
   }
 
-  @SuppressWarnings("unused")
-  private Division midiSlider(String id, int value) {
+  private Division slider(String label, String id, int value, int minimum, int maximum) {
     Division div = new Division(".slider");
-    div.add(text(id));
+    div.add(text(label + ":"));
     Range slider = new Range("#" + id);
-    slider.setMaximum(Midi.MAX_VALUE);
     slider.addInputHandler();
     slider.setValue(value);
-    div.add(slider);
-    return div;
-  }
-
-  private Division percentSlider(String id, int value) {
-    Division div = new Division(".slider");
-    div.add(text(Utils.capitalize(id) + ":&nbsp;"));
-    Range slider = new PercentRange("#" + id);
-    slider.addInputHandler();
-    slider.setValue(value);
+    slider.setMinimum(minimum);
+    slider.setMaximum(maximum);
+    slider.setStep(1);
     div.add(slider);
     return div;
   }
