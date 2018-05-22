@@ -8,18 +8,45 @@ options please contact the copyright owner.
 This program is made available on an "as is" basis, without
 warranties or conditions of any kind, either express or implied.
 */
-@CHARSET "UTF-8"; body {
+@CHARSET "UTF-8"; html {
+    font-family: sans-serif;
+}
+
+body {
     color: #B4B7BA;
     /* harbor mist */
     background-color: #2E4A62;
     /* sailor blue */
     font-size: 1.7vh;
+    cursor: default;
+    user-select: none;
+    margin: 0px;
+    padding: 0px;
 }
 
 fieldset {
+    flex-shrink: 0;
     border: 1px solid #B4B7BA;
     color: #B4B7BA;
     font-size: 1.5vh;
+}
+
+input[type=number], input[type=text] {
+    padding: 5px;
+    margin: 5px;
+    vertical-align: middle;
+    background-color: black;
+    color: #B4B7BA;
+    border: 1px solid #B4B7BA;
+}
+
+select {
+    padding: 5px;
+    margin: 5px;
+    vertical-align: middle;
+    color: white;
+    background-color: black;
+    border: 1px solid #B4B7BA;
     flex-grow: 0;
 }
 
@@ -41,20 +68,6 @@ circle {
 
 text {
     font-size: 11pt;
-}
-
-input[type=number], input[type=text] {
-    color: #B4B7BA;
-    border: 1px solid #B4B7BA;
-}
-
-select {
-    border: 1px solid #B4B7BA;
-    flex-grow: 0;
-}
-
-::-webkit-scrollbar {
-    background-color: #B4B7BA;
 }
 
 #musicianeer {
@@ -107,14 +120,14 @@ select {
     overflow-x: hidden;
 }
 
-table {
+#song table {
     width: 100%;
     max-height: 200px;
     /* border-spacing: 0; */
     table-layout: auto;
 }
 
-td {
+#song td {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -122,7 +135,7 @@ td {
     text-align: center;
 }
 
-td:nth-child(1) {
+#song td:nth-child(1) {
     text-align: left;
 }
 
@@ -236,7 +249,7 @@ td:nth-child(1) {
 }
 
 .white-key:hover, .black-key:hover {
-	background-color: #f0f0f0;
+    background-color: #f0f0f0;
 }
 
 .keyboard div:hover .key-pressed, .key-pressed {
@@ -267,10 +280,13 @@ td:nth-child(1) {
 }
 
 .slider {
-    display: flex;
-    align-items: center;
+    text-align: center;
 }
 
 .buttons {
     display: flex;
+}
+
+.name-value {
+    text-align: center;
 }
