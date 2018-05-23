@@ -104,7 +104,9 @@ public class Musicianeer extends ServiceTask {
   }
 
   private void doPlay(OnPlay message) {
-    if (currentSong != null) {
+    if (transport.isPaused()) {
+      transport.resume();
+    } else if (currentSong != null) {
       transport.play(currentSong.getSong().getNotes());
     }
   }
@@ -165,7 +167,12 @@ public class Musicianeer extends ServiceTask {
   }
 
   private void doStop(OnStop message) {
-    transport.stop();
+    if (transport.isPaused()) {
+      transport.stop();
+      publish(new OnTick(0));
+    } else {
+      transport.pause();
+    }
   }
 
   private void doTransposition(OnTransposition message) {
