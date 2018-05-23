@@ -65,6 +65,7 @@ public class Musicianeer extends ServiceTask {
     subscribe(OnSetPercentMasterGain.class, message -> doSetPercentMasterGain(message));
     synthesizer = createSynthesizer();
     transport = new Transport(messageBroker, synthesizer);
+    transport.tsStart(); // TODO: Consider instantiating and starting in WebAppMain
   }
 
   private void changeProgram(int channel, int program) {
