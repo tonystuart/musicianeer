@@ -16,7 +16,7 @@ import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.song.Default;
 import com.example.afs.musicpad.song.Note;
 import com.example.afs.musicpad.task.MessageBroker;
-import com.example.afs.musicpad.task.MessageTask;
+import com.example.afs.musicpad.task.ServiceTask;
 import com.example.afs.musicpad.transport.NoteEvent;
 import com.example.afs.musicpad.transport.NoteEvent.Type;
 import com.example.afs.musicpad.util.DirectList;
@@ -25,7 +25,7 @@ import com.example.afs.musicpad.util.Range;
 import com.example.afs.musicpad.util.Tick;
 import com.example.afs.musicpad.util.Velocity;
 
-public class Transport extends MessageTask {
+public class Transport extends ServiceTask {
 
   public enum Whence {
     RELATIVE, ABSOLUTE
@@ -44,43 +44,156 @@ public class Transport extends MessageTask {
   private int percentVelocity = DEFAULT_PERCENT_VELOCITY;
   private int[] currentPrograms = new int[Midi.CHANNELS];
 
-  private Synthesizer synthesizer;
-  private RandomAccessList<NoteEvent> noteEvents = new DirectList<>();
-  private OnSetAccompanimentType.AccompanimentType accompanimentType = OnSetAccompanimentType.AccompanimentType.FULL;
-
   private long baseTick;
+  private boolean isPaused;
   private long baseTimeMillis;
   private int percentTempo = 100;
   private int appliedPercentTempo = percentTempo;
-  private boolean isPaused;
+
+  private Iterable<Note> notes;
+  private Synthesizer synthesizer;
+  private RandomAccessList<NoteEvent> noteEvents = new DirectList<>();
+  private OnSetAccompanimentType.AccompanimentType accompanimentType = OnSetAccompanimentType.AccompanimentType.FULL;
 
   public Transport(MessageBroker messageBroker, Synthesizer synthesizer) {
     super(messageBroker);
     this.synthesizer = synthesizer;
     setPercentGain(DEFAULT_PERCENT_GAIN);
+    provide(Services.getPercentTempo, () -> getPercentTempo());
+    provide(Services.getPercentMasterGain, () -> getPercentMasterGain());
+    subscribe(OnPlay.class, message -> doPlay(message));
+    subscribe(OnStop.class, message -> doStop(message));
+    subscribe(OnSeek.class, message -> doSeek(message));
+    subscribe(OnNotes.class, message -> doNotes(message));
     subscribe(OnNoteEvent.class, message -> doNoteEvent(message));
+    subscribe(OnTransposition.class, message -> doTransposition(message));
+    subscribe(OnSetPercentTempo.class, message -> doSetPercentTempo(message));
+    subscribe(OnSetPercentVelocity.class, message -> doPercentVelocity(message));
+    subscribe(OnSetAccompanimentType.class, message -> doSetAccompanimentType(message));
+    subscribe(OnSetPercentMasterGain.class, message -> doSetPercentMasterGain(message));
   }
 
-  public int getPercentGain() {
+  private void clear() {
+    noteEvents.clear();
+    tsGetInputQueue().clear();
+    synthesizer.allNotesOff();
+    isPaused = false;
+    baseTick = 0;
+    baseTimeMillis = INITIALIZE_ON_NEXT_EVENT;
+  }
+
+  private void doNoteEvent(OnNoteEvent message) {
+    long currentTimestamp = System.currentTimeMillis();
+    NoteEvent noteEvent = message.getNoteEvent();
+    long eventTimestamp = getEventTimeMillis(noteEvent);
+    if (eventTimestamp > currentTimestamp) {
+      long sleepInterval = eventTimestamp - currentTimestamp;
+      try {
+        Thread.sleep(sleepInterval);
+      } catch (InterruptedException e) {
+        throw new RuntimeException(e);
+      }
+    }
+    processNoteEvent(noteEvent);
+    if (!isPaused) {
+      schedule();
+    }
+  }
+
+  private void doNotes(OnNotes message) {
+    notes = message.getNotes();
+    play(notes);
+  }
+
+  private void doPercentVelocity(OnSetPercentVelocity message) {
+    this.percentVelocity = message.getPercentVelocity();
+  }
+
+  private void doPlay(OnPlay message) {
+    if (isPaused) {
+      resume();
+    } else if (notes != null) {
+      play(notes);
+    }
+  }
+
+  private void doSeek(OnSeek message) {
+    seek(message.getTick(), Whence.ABSOLUTE);
+  }
+
+  private void doSetAccompanimentType(OnSetAccompanimentType message) {
+    setAccompaniment(message.getAccompanimentType());
+  }
+
+  private void doSetPercentMasterGain(OnSetPercentMasterGain message) {
+    setPercentGain(message.getPercentMasterGain());
+  }
+
+  private void doSetPercentTempo(OnSetPercentTempo message) {
+    setPercentTempo(message.getPercentTempo());
+  }
+
+  private void doStop(OnStop message) {
+    if (isPaused) {
+      stop();
+      publish(new OnTick(0));
+    } else {
+      pause();
+    }
+  }
+
+  private void doTransposition(OnTransposition message) {
+    setCurrentTransposition(message.getTransposition());
+    synthesizer.allNotesOff();
+  }
+
+  private long getEventTimeMillis(long noteTick, int beatsPerMinute) {
+    if (baseTimeMillis == INITIALIZE_ON_NEXT_EVENT) {
+      baseTimeMillis = System.currentTimeMillis();
+    }
+    long deltaTick = noteTick - baseTick;
+    deltaTick = (deltaTick * 100) / appliedPercentTempo;
+    long deltaMillis = Tick.convertTickToMillis(beatsPerMinute, deltaTick);
+    long eventTimeMillis = baseTimeMillis + deltaMillis;
+    // Update base values to handle changes in beats per minute
+    baseTick = noteTick;
+    baseTimeMillis = eventTimeMillis;
+    return eventTimeMillis;
+  }
+
+  private long getEventTimeMillis(NoteEvent noteEvent) {
+    return getEventTimeMillis(noteEvent.getTick(), noteEvent.getBeatsPerMinute());
+  }
+
+  private int getPercentMasterGain() {
     return (int) Range.scale(0, 100, Synthesizer.MINIMUM_GAIN, Synthesizer.MAXIMUM_GAIN, synthesizer.getGain());
   }
 
-  public int getPercentTempo() {
+  private int getPercentTempo() {
     return Range.scale(0, 100, 0, 200, percentTempo);
   }
 
-  public boolean isPaused() {
-    return isPaused;
+  private int getTransposedMidiNote(Note note, int channel) {
+    int midiNote = note.getMidiNote();
+    if (currentTransposition != 0 && channel != Midi.DRUM) {
+      midiNote += currentTransposition;
+    }
+    return midiNote;
   }
 
-  public void pause() {
+  private boolean isPlaying() {
+    return !isPaused && index < noteEvents.size();
+  }
+
+  private void pause() {
     isPaused = true;
     baseTimeMillis = INITIALIZE_ON_NEXT_EVENT;
     synthesizer.allNotesOff();
   }
 
-  public void play(Iterable<Note> notes) {
+  private void play(Iterable<Note> notes) {
     clear();
+    index = 0;
     long firstTick = -1;
     long lastTick = -1;
     long metronomeTick = -1;
@@ -112,137 +225,6 @@ public class Transport extends MessageTask {
     }
     Collections.sort(noteEvents);
     schedule();
-  }
-
-  public void resume() {
-    isPaused = false;
-    baseTimeMillis = INITIALIZE_ON_NEXT_EVENT;
-    schedule();
-  }
-
-  public void seek(long tick, Whence whence) {
-    boolean wasPlaying = isPlaying();
-    pause();
-    long newTick;
-    long currentTick = baseTick;
-    switch (whence) {
-    case RELATIVE:
-      newTick = currentTick + tick;
-      break;
-    case ABSOLUTE:
-      newTick = tick;
-      break;
-    default:
-      throw new UnsupportedOperationException();
-    }
-    if (newTick > currentTick) {
-      while (noteEvents.get(index).getTick() < newTick && index < noteEvents.size()) {
-        index++;
-      }
-    } else {
-      while (noteEvents.get(index).getTick() > newTick && index > 0) {
-        index--;
-      }
-    }
-    baseTick = newTick;
-    baseTimeMillis = INITIALIZE_ON_NEXT_EVENT;
-    if (wasPlaying) {
-      resume();
-    } else {
-      publish(new OnTick(newTick));
-    }
-    publish(new OnSeekFinished(tick, whence));
-  }
-
-  public void setAccompaniment(OnSetAccompanimentType.AccompanimentType accompanimentType) {
-    this.accompanimentType = accompanimentType;
-    if (accompanimentType == OnSetAccompanimentType.AccompanimentType.PIANO) {
-      masterProgram = 0;
-    } else {
-      masterProgram = DEFAULT_MASTER_PROGRAM_OFF;
-    }
-  }
-
-  public void setCurrentTransposition(int currentTransposition) {
-    this.currentTransposition = currentTransposition;
-  }
-
-  public void setPercentGain(int gain) {
-    synthesizer.setGain(Range.scale(Synthesizer.MINIMUM_GAIN, Synthesizer.MAXIMUM_GAIN, 0, 100, gain));
-  }
-
-  public void setPercentTempo(int percentTempo) {
-    this.percentTempo = Range.scale(0, 200, 0, 100, percentTempo);
-    if (percentTempo == 0) {
-      appliedPercentTempo = 1;
-    } else {
-      appliedPercentTempo = this.percentTempo;
-    }
-  }
-
-  public void setPercentVelocity(int percentVelocity) {
-    this.percentVelocity = percentVelocity;
-  }
-
-  public void stop() {
-    clear();
-  }
-
-  private void clear() {
-    noteEvents.clear();
-    tsGetInputQueue().clear();
-    synthesizer.allNotesOff();
-    isPaused = false;
-    baseTick = 0;
-    baseTimeMillis = INITIALIZE_ON_NEXT_EVENT;
-  }
-
-  private void doNoteEvent(OnNoteEvent message) {
-    long currentTimestamp = System.currentTimeMillis();
-    NoteEvent noteEvent = message.getNoteEvent();
-    long eventTimestamp = getEventTimeMillis(noteEvent);
-    if (eventTimestamp > currentTimestamp) {
-      long sleepInterval = eventTimestamp - currentTimestamp;
-      try {
-        Thread.sleep(sleepInterval);
-      } catch (InterruptedException e) {
-        throw new RuntimeException(e);
-      }
-    }
-    processNoteEvent(noteEvent);
-    if (!isPaused) {
-      schedule();
-    }
-  }
-
-  private long getEventTimeMillis(long noteTick, int beatsPerMinute) {
-    if (baseTimeMillis == INITIALIZE_ON_NEXT_EVENT) {
-      baseTimeMillis = System.currentTimeMillis();
-    }
-    long deltaTick = noteTick - baseTick;
-    deltaTick = (deltaTick * 100) / appliedPercentTempo;
-    long deltaMillis = Tick.convertTickToMillis(beatsPerMinute, deltaTick);
-    long eventTimeMillis = baseTimeMillis + deltaMillis;
-    // Update base values to handle changes in beats per minute
-    baseTick = noteTick;
-    baseTimeMillis = eventTimeMillis;
-    return eventTimeMillis;
-  }
-
-  private long getEventTimeMillis(NoteEvent noteEvent) {
-    return getEventTimeMillis(noteEvent.getTick(), noteEvent.getBeatsPerMinute());
-  }
-
-  private int getTransposedMidiNote(Note note, int channel) {
-    int midiNote = note.getMidiNote();
-    if (currentTransposition != 0 && channel != Midi.DRUM) {
-      midiNote += currentTransposition;
-    }
-    return midiNote;
-  }
-
-  private boolean isPlaying() {
-    return !isPaused && index < noteEvents.size();
   }
 
   private void processNoteEvent(NoteEvent noteEvent) {
@@ -307,11 +289,82 @@ public class Transport extends MessageTask {
     }
   }
 
+  private void resume() {
+    isPaused = false;
+    baseTimeMillis = INITIALIZE_ON_NEXT_EVENT;
+    schedule();
+  }
+
   private void schedule() {
     if (index < noteEvents.size()) {
       NoteEvent noteEvent = noteEvents.get(index++);
       tsGetInputQueue().add(new OnNoteEvent(noteEvent));
     }
+  }
+
+  private void seek(long tick, Whence whence) {
+    boolean wasPlaying = isPlaying();
+    pause();
+    tsGetInputQueue().clear(); // e.g. scheduled note events from previous seeks
+    long newTick;
+    long currentTick = baseTick;
+    switch (whence) {
+    case RELATIVE:
+      newTick = currentTick + tick;
+      break;
+    case ABSOLUTE:
+      newTick = tick;
+      break;
+    default:
+      throw new UnsupportedOperationException();
+    }
+    if (newTick > currentTick) {
+      while (noteEvents.get(index).getTick() < newTick && index < noteEvents.size()) {
+        index++;
+      }
+    } else {
+      while (noteEvents.get(index).getTick() > newTick && index > 0) {
+        index--;
+      }
+    }
+    baseTick = newTick;
+    baseTimeMillis = INITIALIZE_ON_NEXT_EVENT;
+    if (wasPlaying) {
+      resume();
+    } else {
+      publish(new OnTick(newTick));
+    }
+    publish(new OnSeekFinished(tick, whence));
+  }
+
+  private void setAccompaniment(OnSetAccompanimentType.AccompanimentType accompanimentType) {
+    this.accompanimentType = accompanimentType;
+    if (accompanimentType == OnSetAccompanimentType.AccompanimentType.PIANO) {
+      masterProgram = 0;
+    } else {
+      masterProgram = DEFAULT_MASTER_PROGRAM_OFF;
+    }
+  }
+
+  private void setCurrentTransposition(int currentTransposition) {
+    this.currentTransposition = currentTransposition;
+  }
+
+  private void setPercentGain(int gain) {
+    synthesizer.setGain(Range.scale(Synthesizer.MINIMUM_GAIN, Synthesizer.MAXIMUM_GAIN, 0, 100, gain));
+  }
+
+  private void setPercentTempo(int percentTempo) {
+    this.percentTempo = Range.scale(0, 200, 0, 100, percentTempo);
+    if (percentTempo == 0) {
+      appliedPercentTempo = 1;
+    } else {
+      appliedPercentTempo = this.percentTempo;
+    }
+  }
+
+  private void stop() {
+    clear();
   }
 
 }

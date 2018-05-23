@@ -19,7 +19,6 @@ import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.task.MessageBroker;
 import com.example.afs.musicpad.task.ServiceTask;
-import com.example.afs.musicpad.webapp.musicianeer.Transport.Whence;
 
 public class Musicianeer extends ServiceTask {
 
@@ -43,29 +42,24 @@ public class Musicianeer extends ServiceTask {
 
   public Musicianeer(MessageBroker messageBroker) {
     super(messageBroker);
+    synthesizer = createSynthesizer();
+    transport = new Transport(messageBroker, synthesizer);
     provide(Services.getCurrentSong, () -> getCurrentSong());
-    provide(Services.getPercentTempo, () -> getPercentTempo());
     provide(Services.getCurrentPrograms, () -> getCurrentPrograms());
-    provide(Services.getPercentMasterGain, () -> getPercentMasterGain());
     provide(Services.getSynthesizerSettings, () -> getSynthesizerSettings());
     subscribe(OnMute.class, message -> doMute(message));
-    subscribe(OnPlay.class, message -> doPlay(message));
     subscribe(OnSolo.class, message -> doSolo(message));
-    subscribe(OnSeek.class, message -> doSeek(message));
-    subscribe(OnStop.class, message -> doStop(message));
     subscribe(OnNoteOn.class, message -> doNoteOn(message));
     subscribe(OnNoteOff.class, message -> doNoteOff(message));
     subscribe(OnSongSelected.class, message -> doSongSelected(message));
     subscribe(OnProgramChange.class, message -> doProgramChange(message));
-    subscribe(OnTransposition.class, message -> doTransposition(message));
-    subscribe(OnSetPercentVelocity.class, message -> doPercentVelocity(message));
     subscribe(OnProgramOverride.class, message -> doProgramOverride(message));
-    subscribe(OnSetPercentTempo.class, message -> doSetPercentTempo(message));
-    subscribe(OnSetAccompanimentType.class, message -> doSetAccompanimentType(message));
-    subscribe(OnSetPercentMasterGain.class, message -> doSetPercentMasterGain(message));
-    synthesizer = createSynthesizer();
-    transport = new Transport(messageBroker, synthesizer);
-    transport.tsStart(); // TODO: Consider instantiating and starting in WebAppMain
+  }
+
+  @Override
+  public synchronized void tsStart() {
+    super.tsStart();
+    transport.tsStart();
   }
 
   private void changeProgram(int channel, int program) {
@@ -100,18 +94,6 @@ public class Musicianeer extends ServiceTask {
     synthesizer.pressKey(mapChannel(message.getChannel()), message.getData1(), message.getData2());
   }
 
-  private void doPercentVelocity(OnSetPercentVelocity message) {
-    transport.setPercentVelocity(message.getPercentVelocity());
-  }
-
-  private void doPlay(OnPlay message) {
-    if (transport.isPaused()) {
-      transport.resume();
-    } else if (currentSong != null) {
-      transport.play(currentSong.getSong().getNotes());
-    }
-  }
-
   private void doProgramChange(OnProgramChange message) {
     int channel = message.getChannel();
     int program = message.getProgram();
@@ -131,22 +113,6 @@ public class Musicianeer extends ServiceTask {
     }
   }
 
-  private void doSeek(OnSeek message) {
-    transport.seek(message.getTick(), Whence.ABSOLUTE);
-  }
-
-  private void doSetAccompanimentType(OnSetAccompanimentType message) {
-    transport.setAccompaniment(message.getAccompanimentType());
-  }
-
-  private void doSetPercentMasterGain(OnSetPercentMasterGain message) {
-    transport.setPercentGain(message.getPercentMasterGain());
-  }
-
-  private void doSetPercentTempo(OnSetPercentTempo message) {
-    transport.setPercentTempo(message.getPercentTempo());
-  }
-
   private void doSolo(OnSolo message) {
     synthesizer.soloChannel(message.getChannel(), message.isSolo());
   }
@@ -155,7 +121,7 @@ public class Musicianeer extends ServiceTask {
     currentSong = message.getCurrentSong();
     synthesizer.muteAllChannels(false);
     synthesizer.soloAllChannels(false);
-    transport.setCurrentTransposition(currentSong.getSongInfo().getEasyTransposition());
+    publish(new OnTransposition(currentSong.getSongInfo().getEasyTransposition()));
     Arrays.fill(programOverrides, OnProgramOverride.DEFAULT);
     for (int channel : currentSong.getSong().getActiveChannels()) {
       Set<Integer> programs = currentSong.getSong().getPrograms(channel);
@@ -165,20 +131,6 @@ public class Musicianeer extends ServiceTask {
       }
     }
     playCurrentSong();
-  }
-
-  private void doStop(OnStop message) {
-    if (transport.isPaused()) {
-      transport.stop();
-      publish(new OnTick(0));
-    } else {
-      transport.pause();
-    }
-  }
-
-  private void doTransposition(OnTransposition message) {
-    transport.setCurrentTransposition(message.getTransposition());
-    synthesizer.allNotesOff();
   }
 
   private CurrentPrograms getCurrentPrograms() {
@@ -197,14 +149,6 @@ public class Musicianeer extends ServiceTask {
     return currentSong;
   }
 
-  private int getPercentMasterGain() {
-    return transport.getPercentGain();
-  }
-
-  private int getPercentTempo() {
-    return transport.getPercentTempo();
-  }
-
   private SynthesizerSettings getSynthesizerSettings() {
     boolean[] muteSettings = new boolean[Midi.CHANNELS];
     boolean[] soloSettings = new boolean[Midi.CHANNELS];
@@ -218,7 +162,7 @@ public class Musicianeer extends ServiceTask {
 
   private void playCurrentSong() {
     Song song = currentSong.getSong();
-    transport.play(song.getNotes());
+    publish(new OnNotes(song.getNotes()));
     publish(new OnTransportPlay(currentSong));
   }
 
