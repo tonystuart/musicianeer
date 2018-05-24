@@ -287,9 +287,11 @@ public class MusicianeerView extends ShadowDomBuilder {
   }
 
   private Parent createChannelTableRow(int channel, ChannelInfo channelInfo) {
+    String programNames = channelInfo.getProgramNames();
     return row("#channel-index-" + channel) //
         .add(td() //
-            .add(text((channel + 1) + ". " + channelInfo.getProgramNames()))) //
+            .add(text((channel + 1) + ". " + programNames)) //
+            .setProperty("title", programNames)) //
         .add(td() //
             .add(checkbox("#channel-mute-" + channel) //
                 .addCheckHandler())) //
@@ -325,10 +327,13 @@ public class MusicianeerView extends ShadowDomBuilder {
   }
 
   private Parent createSongTableRow(SongInfo songInfo) {
+    String title = songInfo.getTitle();
     int songIndex = songInfo.getSongIndex();
     TableRow row = new TableRow("#song-index-" + songIndex);
-    row.add(td() //
-        .add(text((songInfo.getSongIndex() + 1) + ". " + songInfo.getTitle()))) //
+    row //
+        .add(td() //
+            .add(text((songInfo.getSongIndex() + 1) + ". " + title)) //
+            .setProperty("title", title)) //
         .add(td() //
             .add(text(songInfo.getDuration())))
         .add(td() //
