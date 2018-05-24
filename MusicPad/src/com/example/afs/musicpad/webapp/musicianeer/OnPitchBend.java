@@ -13,19 +13,25 @@ import com.example.afs.musicpad.task.Message;
 
 public class OnPitchBend implements Message {
 
-  private int program;
+  private int channel;
+  private int value;
 
-  public OnPitchBend(int program) {
-    this.program = program;
+  public OnPitchBend(int channel, int value) {
+    this.channel = channel;
+    this.value = value;
   }
 
-  public int getProgram() {
-    return program;
+  public int getChannel() {
+    return channel;
+  }
+
+  public int getValue() {
+    return value;
   }
 
   @Override
   public String toString() {
-    return "OnProgramChange [program=" + program + "]";
+    return "OnPitchBend [channel=" + channel + ", value=" + value + "]";
   }
 
 }

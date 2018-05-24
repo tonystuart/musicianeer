@@ -22,6 +22,11 @@ import com.example.afs.musicpad.task.ServiceTask;
 
 public class Musicianeer extends ServiceTask {
 
+  public static class CC {
+    public static final int MODULATION = 1;
+    public static final int VOLUME = 7;
+  }
+
   public static final int LOWEST_NOTE = 36;
   public static final int HIGHEST_NOTE = 84;
 
@@ -51,8 +56,11 @@ public class Musicianeer extends ServiceTask {
     subscribe(OnSolo.class, message -> doSolo(message));
     subscribe(OnNoteOn.class, message -> doNoteOn(message));
     subscribe(OnNoteOff.class, message -> doNoteOff(message));
+    subscribe(OnPitchBend.class, message -> doPitchBend(message));
     subscribe(OnSongSelected.class, message -> doSongSelected(message));
+    subscribe(OnControlChange.class, message -> doControlChange(message));
     subscribe(OnProgramChange.class, message -> doProgramChange(message));
+    subscribe(OnChannelPressure.class, message -> doChannelPressure(message));
     subscribe(OnProgramOverride.class, message -> doProgramOverride(message));
   }
 
@@ -82,6 +90,27 @@ public class Musicianeer extends ServiceTask {
     return synthesizer;
   }
 
+  private void doChannelPressure(OnChannelPressure message) {
+    synthesizer.setChannelPressure(mapChannel(message.getChannel()), message.getPressure());
+  }
+
+  private void doControlChange(OnControlChange message) {
+    int channel = message.getChannel();
+    int control = message.getControl();
+    int value = message.getValue();
+    System.out.println("MIDI CC " + control + " " + value);
+    switch (control) {
+    case CC.MODULATION:
+      synthesizer.changeControl(mapChannel(channel), control, value);
+      break;
+    case CC.VOLUME:
+      publish(new OnSetChannelVolume(channel, value));
+      break;
+    default:
+      break;
+    }
+  }
+
   private void doMute(OnMute message) {
     synthesizer.muteChannel(message.getChannel(), message.isMute());
   }
@@ -92,6 +121,10 @@ public class Musicianeer extends ServiceTask {
 
   private void doNoteOn(OnNoteOn message) {
     synthesizer.pressKey(mapChannel(message.getChannel()), message.getData1(), message.getData2());
+  }
+
+  private void doPitchBend(OnPitchBend message) {
+    synthesizer.bendPitch(mapChannel(message.getChannel()), message.getValue());
   }
 
   private void doProgramChange(OnProgramChange message) {

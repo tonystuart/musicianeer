@@ -13,25 +13,25 @@ import com.example.afs.musicpad.task.Message;
 
 public class OnChannelPressure implements Message {
 
-  private int data1;
-  private int data2;
+  private int channel;
+  private int pressure;
 
-  public OnChannelPressure(int data1, int data2) {
-    this.data1 = data1;
-    this.data2 = data2;
+  public OnChannelPressure(int channel, int pressure) {
+    this.channel = channel;
+    this.pressure = pressure;
   }
 
-  public int getData1() {
-    return data1;
+  public int getChannel() {
+    return channel;
   }
 
-  public int getData2() {
-    return data2;
+  public int getPressure() {
+    return pressure;
   }
 
   @Override
   public String toString() {
-    return "OnChannelPressure [data1=" + data1 + ", data2=" + data2 + "]";
+    return "OnChannelPressure [channel=" + channel + ", pressure=" + pressure + "]";
   }
 
 }

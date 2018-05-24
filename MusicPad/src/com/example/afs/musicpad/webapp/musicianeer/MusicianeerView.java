@@ -192,6 +192,10 @@ public class MusicianeerView extends ShadowDomBuilder {
     }
   }
 
+  public void setChannelVolume(int channelVolume) {
+    setProperty(getElementById("channel-volume"), "value", channelVolume);
+  }
+
   public void setLedState(int midiNote, LedState ledState) {
     switch (ledState) {
     case GREEN:

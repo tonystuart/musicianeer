@@ -11,33 +11,27 @@ package com.example.afs.musicpad.webapp.musicianeer;
 
 import com.example.afs.musicpad.task.Message;
 
-public class OnControlChange implements Message {
+public class OnSetChannelVolume implements Message {
 
   private int channel;
-  private int control;
-  private int value;
+  private int volume;
 
-  public OnControlChange(int channel, int control, int value) {
+  public OnSetChannelVolume(int channel, int volume) {
     this.channel = channel;
-    this.control = control;
-    this.value = value;
+    this.volume = volume;
   }
 
   public int getChannel() {
     return channel;
   }
 
-  public int getControl() {
-    return control;
-  }
-
-  public int getValue() {
-    return value;
+  public int getVolume() {
+    return volume;
   }
 
   @Override
   public String toString() {
-    return "OnControlChange [channel=" + channel + ", control=" + control + ", value=" + value + "]";
+    return "OnSetChannelVolume [channel=" + channel + ", volume=" + volume + "]";
   }
 
 }
