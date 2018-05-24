@@ -296,8 +296,12 @@ public class Transport extends ServiceTask {
   }
 
   private void schedule() {
-    if (index < noteEvents.size()) {
-      NoteEvent noteEvent = noteEvents.get(index++);
+    NoteEvent noteEvent = null;
+    long currentTimeMillis = System.currentTimeMillis();
+    while (index < noteEvents.size() && getEventTimeMillis((noteEvent = noteEvents.get(index++))) <= currentTimeMillis) {
+      processNoteEvent(noteEvent);
+    }
+    if (noteEvent != null) {
       tsGetInputQueue().add(new OnNoteEvent(noteEvent));
     }
   }
