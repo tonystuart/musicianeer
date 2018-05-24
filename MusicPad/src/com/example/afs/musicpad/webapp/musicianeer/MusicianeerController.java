@@ -158,7 +158,7 @@ public class MusicianeerController extends ControllerTask {
     subscribe(OnSetPercentTempo.class, message -> doSetPercentTempo(message));
     subscribe(OnTransportNoteOn.class, message -> doTransportNoteOn(message));
     subscribe(OnTransportNoteOff.class, message -> doTransportNoteOff(message));
-    subscribe(OnSetChannelVolume.class, message -> doSetChannelVelocity(message));
+    subscribe(OnSetChannelVolume.class, message -> doSetChannelVolume(message));
     subscribe(OnSetPercentVelocity.class, message -> doSetPercentVelocity(message));
     subscribe(OnSetPercentMasterGain.class, message -> doSetPercentMasterGain(message));
     addShadowUpdate(new OnShadowUpdate(Action.REPLACE_CHILDREN, "body", musicianeerView.render()));
@@ -246,7 +246,7 @@ public class MusicianeerController extends ControllerTask {
     musicianeerView.resetMidiNoteLeds();
   }
 
-  private void doSetChannelVelocity(OnSetChannelVolume message) {
+  private void doSetChannelVolume(OnSetChannelVolume message) {
     if (message.getChannel() == channel) {
       channelVelocity = message.getVolume();
       musicianeerView.setChannelVolume(channelVelocity);

@@ -17,8 +17,10 @@ import javax.sound.midi.ShortMessage;
 
 import com.example.afs.musicpad.device.midi.MidiDeviceBundle;
 import com.example.afs.musicpad.device.midi.MidiInputDevice;
+import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.task.MessageBroker;
 import com.example.afs.musicpad.task.MessageTask;
+import com.example.afs.musicpad.util.Range;
 
 public class MidiController extends MessageTask {
 
@@ -42,6 +44,7 @@ public class MidiController extends MessageTask {
 
   private int channel;
   private int deviceIndex;
+  private int channelVelocity = MusicianeerController.DEFAULT_VELOCITY;
 
   private String deviceName;
   private MidiDeviceBundle deviceBundle;
@@ -51,6 +54,7 @@ public class MidiController extends MessageTask {
     this.deviceName = deviceName;
     this.deviceBundle = deviceBundle;
     this.deviceIndex = deviceIndex;
+    subscribe(OnSetChannelVolume.class, message -> doSetChannelVolume(message));
     subscribe(OnMidiInputSelected.class, message -> doMidiInputSelected(message));
   }
 
@@ -114,12 +118,19 @@ public class MidiController extends MessageTask {
     }
   }
 
+  private void doSetChannelVolume(OnSetChannelVolume message) {
+    if (message.getChannel() == channel) {
+      channelVelocity = message.getVolume();
+    }
+  }
+
   private void processUnmappedMessage(ShortMessage shortMessage) {
     int command = shortMessage.getCommand();
     int data1 = shortMessage.getData1();
     int data2 = shortMessage.getData2();
     if (command == ShortMessage.NOTE_ON) {
-      publish(new OnNoteOn(channel, data1, data2));
+      int velocity = Range.scale(channelVelocity, Math.min(Midi.MAX_VALUE, channelVelocity + 32), 0, Midi.MAX_VALUE, data2);
+      publish(new OnNoteOn(channel, data1, velocity));
     } else if (command == ShortMessage.NOTE_OFF) {
       publish(new OnNoteOff(channel, data1));
     } else if (command == ShortMessage.POLY_PRESSURE) {
