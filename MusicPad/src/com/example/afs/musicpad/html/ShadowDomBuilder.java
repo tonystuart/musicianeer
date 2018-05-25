@@ -36,6 +36,10 @@ public class ShadowDomBuilder extends ShadowDom {
     return new FieldSet(properties);
   }
 
+  public File file(String... properties) {
+    return new File(properties);
+  }
+
   public Form form(String... properties) {
     return new Form(properties);
   }

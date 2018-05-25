@@ -15,11 +15,26 @@ public class Form extends Parent {
     super("form", properties);
   }
 
+  public Form action(String action) {
+    setProperty("action", action);
+    return this;
+  }
+
   public Form addSubmitHandler() {
     if (getId() == null) {
       throw new IllegalStateException();
     }
     setProperty("onsubmit", "musicPad.onSubmit(event)");
+    return this;
+  }
+
+  public Form enctype(String enctype) {
+    setProperty("enctype", enctype);
+    return this;
+  }
+
+  public Form method(String method) {
+    setProperty("method", method);
     return this;
   }
 

@@ -62,6 +62,12 @@ public class MusicianeerController extends ControllerTask {
       case "full":
         publish(new OnSetAccompanimentType(OnSetAccompanimentType.AccompanimentType.FULL));
         break;
+      case "import":
+        musicianeerView.setImportDialogVisibility(true);
+        break;
+      case "import-cancel":
+        musicianeerView.setImportDialogVisibility(false);
+        break;
       case "piano":
         publish(new OnSetAccompanimentType(OnSetAccompanimentType.AccompanimentType.PIANO));
         break;

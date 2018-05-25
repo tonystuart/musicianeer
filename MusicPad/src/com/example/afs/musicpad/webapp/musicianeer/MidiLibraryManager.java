@@ -10,7 +10,8 @@
 package com.example.afs.musicpad.webapp.musicianeer;
 
 import java.io.File;
-import java.util.LinkedHashMap;
+import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import com.example.afs.musicpad.midi.MidiLibrary;
 import com.example.afs.musicpad.song.Song;
@@ -22,31 +23,36 @@ import com.example.afs.musicpad.webapp.musicianeer.SongInfoFactory.SongInfo;
 public class MidiLibraryManager extends ServiceTask {
 
   private static class FileContents {
-    private LinkedHashMap<String, SongInfo> songInfoMap;
+    private TreeMap<String, SongInfo> songInfoMap;
   }
 
   private static final String SONG_INFO = "songInfo.v1.json";
-
   private static final int SAVE_COUNT = 50;
+
+  public static String getMidiLibraryPath() {
+    String path = System.getProperty("midiLibraryPath");
+    if (path == null) {
+      throw new IllegalStateException("midiLibraryPath property not set");
+    }
+    return path;
+  }
 
   private int savePending;
   private int currentIndex;
   private MidiLibrary midiLibrary;
   private SongInfoFactory songInfoFactory;
-  private LinkedHashMap<String, SongInfo> songInfoMap;
+
+  private TreeMap<String, SongInfo> songInfoMap;
 
   protected MidiLibraryManager(MessageBroker broker) {
     super(broker);
     FileContents fileContents = JsonUtilities.fromJsonFile(SONG_INFO, FileContents.class);
     if (fileContents == null) {
-      songInfoMap = new LinkedHashMap<>();
+      songInfoMap = new TreeMap<>();
     } else {
       songInfoMap = fileContents.songInfoMap;
     }
-    String path = System.getProperty("midiLibraryPath");
-    if (path == null) {
-      throw new IllegalStateException("midiLibraryPath property not set");
-    }
+    String path = getMidiLibraryPath();
     midiLibrary = new MidiLibrary(path);
     songInfoFactory = new SongInfoFactory(midiLibrary);
     provide(Services.getMidiLibrary, () -> getMidiLibrary());
@@ -101,8 +107,13 @@ public class MidiLibraryManager extends ServiceTask {
   }
 
   private void saveCache() {
+    int songIndex = 0;
     FileContents fileContents = new FileContents();
     fileContents.songInfoMap = songInfoMap;
+    for (Entry<String, SongInfo> entry : songInfoMap.entrySet()) {
+      System.out.println("song=" + entry.getKey() + ", index=" + songIndex);
+      entry.getValue().setSongIndex(songIndex++);
+    }
     JsonUtilities.toJsonFile(SONG_INFO, fileContents);
     savePending = 0;
   }

@@ -145,7 +145,7 @@ musicPad.onMoveOver = function(event) {
 
 musicPad.onMoveStart = function(event) {
     const element = event.target;
-    const scrollParent = element.closest(".scrollable");
+    const scrollParent = element.closest(".move-target") || element.closest(".scrollable");
     musicPad.moveData = {
         x: scrollParent.scrollLeft + event.x,
         y: scrollParent.scrollTop + event.y,

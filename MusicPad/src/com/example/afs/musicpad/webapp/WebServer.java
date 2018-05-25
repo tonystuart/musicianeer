@@ -105,6 +105,7 @@ public class WebServer extends MessageTask {
         "MusicPad.html"
     });
     context.addServlet(createDefaultServlet(), "/");
+    context.addServlet(FileUploadServlet.class, "/FileUploadServlet");
     context.addServlet(CurrentFrameServlet.class, "/currentFrame.jpg");
     context.addServlet(createRestServlet(), "/v1/rest/*");
     context.addServlet(createExampleServlet(), "/v1/example/*");

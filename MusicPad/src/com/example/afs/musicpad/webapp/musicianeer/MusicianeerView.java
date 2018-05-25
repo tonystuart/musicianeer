@@ -55,7 +55,7 @@ public class MusicianeerView extends ShadowDomBuilder {
 
   public MusicianeerView(ControllerTask controllerTask) {
     super(controllerTask);
-    add(div("#musicianeer") //
+    add(div("#musicianeer", ".move-target") //
         .add(div("#song") //
             .add(div("#song-table-wrapper") //
                 .add(table("#song-table") //
@@ -106,6 +106,7 @@ public class MusicianeerView extends ShadowDomBuilder {
         .add(div("#controls") //
             .add(clicker("stop", "STOP")) //
             .add(clicker("play", "PLAY")) //
+            .add(clicker("import", "IMPORT")) //
             .add(slider("Tempo", "tempo", Transport.DEFAULT_PERCENT_TEMPO, 0, 100)) //
             .add(slider("Channel Volume", "channel-volume", MusicianeerController.DEFAULT_VELOCITY, 0, 127)) //
             .add(slider("Background Volume", "background-volume", Transport.DEFAULT_PERCENT_VELOCITY, 0, 100)) //
@@ -131,6 +132,31 @@ public class MusicianeerView extends ShadowDomBuilder {
                 .add(alternative("accompaniment", "Rhythm")) //
                 .add(alternative("accompaniment", "Drums")))) //
         .add(keyboard()) //
+        .add(div("#import-dialog", ".hidden") //
+            .add(div("#import-heading") //
+                .add(text("Import"))) //
+            .add(div("#import-body") //
+                .add(form("#import-form") //
+                    .action("/FileUploadServlet") //
+                    .method("post") //
+                    .enctype("multipart/form-data") //
+                    .add(div("#import-instructions") //
+                        .add(text("Select MIDI (.mid) and Karaoke (.kar) files for upload"))) //
+                    .add(div("#import-file-input") //
+                        .add(file() //
+                            .multiple() //
+                            .accept(".mid,.kar") //
+                            .setName("files") //
+                            .setValue("Upload"))) //
+                    .add(submit("#import-submit") //
+                        .setValue("Import") //
+                        .addClickHandler())))) //
+        .add(div("#import-footer") //
+            .add(button("#import-cancel") //
+                .setValue("Cancel") //
+                .addClickHandler()) //
+            .addMoveSource()) //
+        .addMoveTarget() //
         .setProperty("onmouseup", "musicianeer.onStaffMouseUp(event);"));
   }
 
@@ -194,6 +220,14 @@ public class MusicianeerView extends ShadowDomBuilder {
 
   public void setChannelVolume(int channelVolume) {
     setProperty(getElementById("channel-volume"), "value", channelVolume);
+  }
+
+  public void setImportDialogVisibility(boolean isVisible) {
+    if (isVisible) {
+      removeClass("import-dialog", "hidden");
+    } else {
+      addClass("import-dialog", "hidden");
+    }
   }
 
   public void setLedState(int midiNote, LedState ledState) {
