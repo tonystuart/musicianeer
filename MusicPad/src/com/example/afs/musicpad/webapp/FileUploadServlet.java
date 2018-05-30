@@ -11,6 +11,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 
+import com.example.afs.musicpad.html.Division;
+import com.example.afs.musicpad.html.TextElement;
 import com.example.afs.musicpad.webapp.musicianeer.MidiLibraryManager;
 
 public class FileUploadServlet extends HttpServlet {
@@ -19,12 +21,25 @@ public class FileUploadServlet extends HttpServlet {
 
   @Override
   protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-    String midiLibraryPath = MidiLibraryManager.getMidiLibraryPath();
-    MultipartConfigElement multipartConfigElement = new MultipartConfigElement(midiLibraryPath);
-    request.setAttribute("org.eclipse.jetty.multipartConfig", multipartConfigElement);
-    for (Part part : request.getParts()) {
-      String fileName = getFileName(part);
-      part.write(fileName);
+    Division div = new Division();
+    div.style("color: #B4B7BA;");
+    try {
+      String midiLibraryPath = MidiLibraryManager.getMidiLibraryPath();
+      MultipartConfigElement multipartConfigElement = new MultipartConfigElement(midiLibraryPath);
+      request.setAttribute("org.eclipse.jetty.multipartConfig", multipartConfigElement);
+      for (Part part : request.getParts()) {
+        try {
+          String filename = getFileName(part);
+          part.write(filename);
+          div.add(new Division().add(new TextElement("Imported " + filename)));
+        } catch (RuntimeException | IOException e) {
+          div.add(new Division().add(new TextElement(e.toString())));
+        }
+      }
+    } catch (RuntimeException | ServletException | IOException e) {
+      div.add(new Division().add(new TextElement(e.toString())));
+    } finally {
+      response.getOutputStream().println(div.render());
     }
   }
 

@@ -48,6 +48,10 @@ public class ShadowDomBuilder extends ShadowDom {
     return new TableHeader(properties);
   }
 
+  public IFrame iframe(String... properties) {
+    return new IFrame(properties);
+  }
+
   public Label label(String... properties) {
     return new Label(properties);
   }

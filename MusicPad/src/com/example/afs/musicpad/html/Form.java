@@ -38,4 +38,9 @@ public class Form extends Parent {
     return this;
   }
 
+  public Form target(String target) {
+    setProperty("target", target);
+    return this;
+  }
+
 }
