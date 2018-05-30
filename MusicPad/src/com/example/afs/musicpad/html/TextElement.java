@@ -14,7 +14,7 @@ public class TextElement extends Node {
   private String text;
 
   public TextElement(Object value) {
-    this.text = value.toString();
+    this.text = HtmlUtilities.escape(value.toString());
   }
 
   public String getText() {

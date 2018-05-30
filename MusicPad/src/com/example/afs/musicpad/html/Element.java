@@ -140,6 +140,7 @@ public class Element extends Node {
   }
 
   public void setId(String id) {
+    HtmlUtilities.validate(id);
     this.id = id;
   }
 
@@ -151,6 +152,10 @@ public class Element extends Node {
     if (attributes == null) {
       attributes = new HashMap<>();
     }
+    HtmlUtilities.validate(name);
+    if (value instanceof String) {
+      HtmlUtilities.validate((String) value);
+    }
     attributes.put(name, value);
     return this;
   }
@@ -159,6 +164,7 @@ public class Element extends Node {
     if (!newStyle.endsWith(";")) {
       throw new IllegalArgumentException("Expected newStyle to end with semicolon");
     }
+    HtmlUtilities.validate(newStyle);
     if (style == null) {
       style = new StringBuilder();
     }
