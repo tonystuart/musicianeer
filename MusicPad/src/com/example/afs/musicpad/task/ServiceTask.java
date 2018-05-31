@@ -15,11 +15,40 @@ import java.util.concurrent.SynchronousQueue;
 
 public class ServiceTask extends MessageTask {
 
+  public interface ClassProvider<T> {
+    T onRequest(Service<T> service);
+  }
+
   public interface Provider<T> {
     T onRequest();
   }
 
   public interface Service<T> {
+
+  }
+
+  private class OnClassServiceRequested implements Message {
+
+    private Service<?> service;
+    private Rendezvous rendezvous;
+
+    public OnClassServiceRequested(Service<?> service, Rendezvous rendezvous) {
+      this.service = service;
+      this.rendezvous = rendezvous;
+    }
+
+    public Rendezvous getRendezvous() {
+      return rendezvous;
+    }
+
+    public Service<?> getService() {
+      return service;
+    }
+
+    @Override
+    public String toString() {
+      return "OnClassServiceRequested [service=" + service + "]";
+    }
 
   }
 
@@ -82,17 +111,31 @@ public class ServiceTask extends MessageTask {
   private static final Object NULL_INDICATOR = "null";
 
   private static Map<Service<?>, ServiceTask> globalProviders = new HashMap<>();
+  private static Map<Class<?>, ServiceTask> globalClassProviders = new HashMap<>();
 
   public Rendezvous rendezvous = new Rendezvous();
   private Map<Service<?>, Provider<?>> localProviders = new HashMap<>();
+  private Map<Class<?>, ClassProvider<?>> localClassProviders = new HashMap<>();;
 
   public ServiceTask(MessageBroker broker, long timeoutMillis) {
     super(broker, timeoutMillis);
     subscribe(OnServiceRequested.class, (message) -> doServiceRequested(message));
+    subscribe(OnClassServiceRequested.class, (message) -> doClassServiceRequested(message));
   }
 
   protected ServiceTask(MessageBroker broker) {
     this(broker, NO_TIMEOUT);
+  }
+
+  public <V, T extends Service<V>> void provide(Class<T> serviceClass, ClassProvider<V> classProvider) {
+    synchronized (globalClassProviders) {
+      ServiceTask serviceTask = globalClassProviders.get(serviceClass);
+      if (serviceTask != null) {
+        throw new IllegalStateException("Class " + serviceClass + " already has provider " + serviceTask.getClass().getName());
+      }
+      globalClassProviders.put(serviceClass, this);
+      localClassProviders.put(serviceClass, classProvider);
+    }
   }
 
   public <T> void provide(Service<T> service, Provider<T> provider) {
@@ -109,12 +152,20 @@ public class ServiceTask extends MessageTask {
   public <T> T request(Service<T> service) {
     synchronized (globalProviders) {
       ServiceTask serviceTask = globalProviders.get(service);
+      if (serviceTask != null) {
+        OnServiceRequested onServiceRequested = new OnServiceRequested(service, rendezvous);
+        publish(onServiceRequested);
+        return rendezvous.receive();
+      }
+    }
+    synchronized (globalClassProviders) {
+      ServiceTask serviceTask = globalClassProviders.get(service.getClass());
       if (serviceTask == null) {
         throw new IllegalStateException("Class " + service + " does not have a provider");
       }
     }
-    OnServiceRequested onServiceRequested = new OnServiceRequested(service, rendezvous);
-    publish(onServiceRequested);
+    OnClassServiceRequested onClassServiceRequested = new OnClassServiceRequested(service, rendezvous);
+    publish(onClassServiceRequested);
     return rendezvous.receive();
   }
 
@@ -126,6 +177,15 @@ public class ServiceTask extends MessageTask {
       }
     }
     super.tsTerminate();
+  }
+
+  @SuppressWarnings("unchecked")
+  private <T> void doClassServiceRequested(OnClassServiceRequested request) {
+    ClassProvider<T> classProvider = (ClassProvider<T>) localClassProviders.get(request.getService().getClass());
+    if (classProvider != null) {
+      T value = classProvider.onRequest((Service<T>) request.getService());
+      request.getRendezvous().transfer(value);
+    }
   }
 
   private <T> void doServiceRequested(OnServiceRequested request) {
