@@ -20,6 +20,7 @@ import com.example.afs.musicpad.message.OnShadowUpdate.Action;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.task.ControllerTask;
 import com.example.afs.musicpad.task.MessageBroker;
+import com.example.afs.musicpad.util.RandomAccessList;
 import com.example.afs.musicpad.webapp.musicianeer.MidiHandle.Type;
 import com.example.afs.musicpad.webapp.musicianeer.MusicianeerView.LedState;
 import com.example.afs.musicpad.webapp.musicianeer.OnSetAccompanimentType.AccompanimentType;
@@ -30,7 +31,6 @@ public class MusicianeerController extends ControllerTask {
   public static final int DEFAULT_VELOCITY = 64;
 
   private int channel;
-  private int loadIndex;
   private boolean isDown;
   private boolean isShift;
   private int transposition;
@@ -169,10 +169,9 @@ public class MusicianeerController extends ControllerTask {
     subscribe(OnSetPercentMasterGain.class, message -> doSetPercentMasterGain(message));
     addShadowUpdate(new OnShadowUpdate(Action.REPLACE_CHILDREN, "body", musicianeerView.render()));
     musicianeerView.setAlternative("full");
-    Iterable<SongInfo> songInfoList = request(Services.getSongInfoList);
-    for (SongInfo songInfo : songInfoList) {
-      renderSongInfo(songInfo);
-      loadIndex = songInfo.getSongIndex();
+    RandomAccessList<OnSongInfo> songInfoList = request(Services.getSongInfoList);
+    for (OnSongInfo onSongInfo : songInfoList) {
+      renderSongInfo(onSongInfo.getSongInfo(), onSongInfo.getSongIndex());
     }
     CurrentSong initialSong = request(Services.getCurrentSong);
     if (initialSong != null) {
@@ -276,12 +275,7 @@ public class MusicianeerController extends ControllerTask {
   }
 
   private void doSongInfo(OnSongInfo message) {
-    // Exclude songs received after listening but before processing initial load
-    if (message.getSongInfo().getSongIndex() > loadIndex) {
-      renderSongInfo(message.getSongInfo());
-    } else {
-      System.err.println("Discarding duplicate songInfo received during initial load " + message.getSongInfo());
-    }
+    renderSongInfo(message.getSongInfo(), message.getSongIndex());
   }
 
   private void doSongSelected(OnSongSelected message) {
@@ -337,7 +331,7 @@ public class MusicianeerController extends ControllerTask {
     SongInfo songInfo = currentSong.getSongInfo();
     this.transposition = songInfo.getEasyTransposition();
     musicianeerView.resetMidiNoteLeds();
-    musicianeerView.selectSong(songInfo.getSongIndex());
+    musicianeerView.selectSong(currentSong.getSongIndex());
     musicianeerView.renderSongDetails(currentSong);
     renderChannel(currentSong.getSongInfo().getActiveChannels()[0]);
   }
@@ -398,8 +392,8 @@ public class MusicianeerController extends ControllerTask {
     publish(new OnSolo(channel, isSolo));
   }
 
-  private void renderSongInfo(SongInfo songInfo) {
-    musicianeerView.renderSongInfo(songInfo);
+  private void renderSongInfo(SongInfo songInfo, int songIndex) {
+    musicianeerView.renderSongInfo(songInfo, songIndex);
   }
 
 }

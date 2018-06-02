@@ -10,14 +10,15 @@
 package com.example.afs.musicpad.webapp.musicianeer;
 
 import java.io.File;
-import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import com.example.afs.musicpad.midi.MidiLibrary;
 import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.task.MessageBroker;
 import com.example.afs.musicpad.task.ServiceTask;
+import com.example.afs.musicpad.util.DirectList;
 import com.example.afs.musicpad.util.JsonUtilities;
+import com.example.afs.musicpad.util.RandomAccessList;
 import com.example.afs.musicpad.webapp.musicianeer.SongInfoFactory.SongInfo;
 
 public class MidiLibraryManager extends ServiceTask {
@@ -39,9 +40,10 @@ public class MidiLibraryManager extends ServiceTask {
 
   private int savePending;
   private int currentIndex;
+  private boolean initialized;
+
   private MidiLibrary midiLibrary;
   private SongInfoFactory songInfoFactory;
-
   private TreeMap<String, SongInfo> songInfoMap;
 
   protected MidiLibraryManager(MessageBroker broker) {
@@ -52,34 +54,27 @@ public class MidiLibraryManager extends ServiceTask {
     } else {
       songInfoMap = fileContents.songInfoMap;
     }
-    String path = getMidiLibraryPath();
-    midiLibrary = new MidiLibrary(path);
-    songInfoFactory = new SongInfoFactory(midiLibrary);
-    provide(Services.getMidiLibrary, () -> getMidiLibrary());
-    provide(Services.getSongInfoList, () -> songInfoMap.values());
+    provide(Services.getSongInfoList, () -> getSongInfoList());
+    provide(Services.refreshMidiLibrary, () -> refreshMidiLibrary());
+    provide(ImportService.class, message -> doImportService(message));
     subscribe(OnSelectSong.class, message -> doSelectSong(message));
-    setCallbackTimeout();
+    refreshMidiLibrary();
   }
 
   @Override
   public synchronized void tsStart() {
     super.tsStart();
-    publish(new OnMidiLibrary(midiLibrary));
+    publish(new OnMidiLibraryRefresh(midiLibrary));
   }
 
   @Override
   protected void onTimeout() throws InterruptedException {
     if (currentIndex < midiLibrary.size()) {
       File midiFile = midiLibrary.get(currentIndex);
-      String fileName = midiFile.getName();
-      SongInfo songInfo = songInfoMap.get(fileName);
-      if (songInfo == null || songInfo.getTimeLastModified() != midiFile.lastModified()) {
-        songInfo = songInfoFactory.getSongInfo(currentIndex);
-        songInfoMap.put(fileName, songInfo);
-        savePending++;
-      }
-      publish(new OnSongInfo(songInfo));
-      if (currentIndex == 0) {
+      SongInfo songInfo = realizeSongInfo(midiFile);
+      publish(new OnSongInfo(songInfo, currentIndex));
+      if (!initialized) {
+        initialized = true;
         publish(new OnSelectSong(currentIndex));
       }
       currentIndex++;
@@ -97,23 +92,60 @@ public class MidiLibraryManager extends ServiceTask {
     }
   }
 
+  private SongInfo doImportService(Service<SongInfo> message) {
+    SongInfo songInfo;
+    ImportService importService = (ImportService) message;
+    String filename = importService.getFilename();
+    File file = new File(filename);
+    try {
+      songInfo = realizeSongInfo(file);
+    } catch (RuntimeException e) {
+      file.delete();
+      songInfo = null;
+    }
+    return songInfo;
+  }
+
   private void doSelectSong(OnSelectSong message) {
     int songIndex = message.getSongIndex();
     selectSong(songIndex);
   }
 
-  private MidiLibrary getMidiLibrary() {
+  private RandomAccessList<OnSongInfo> getSongInfoList() {
+    RandomAccessList<OnSongInfo> songInfoList = new DirectList<>();
+    for (int i = 0; i < currentIndex; i++) {
+      File file = midiLibrary.get(i);
+      SongInfo songInfo = songInfoMap.get(file.getName());
+      songInfoList.add(new OnSongInfo(songInfo, i));
+    }
+    return songInfoList;
+  }
+
+  private SongInfo realizeSongInfo(File midiFile) {
+    String fileName = midiFile.getName();
+    SongInfo songInfo = songInfoMap.get(fileName);
+    if (songInfo == null || songInfo.getTimeLastModified() != midiFile.lastModified()) {
+      songInfo = songInfoFactory.getSongInfo(midiFile);
+      songInfoMap.put(fileName, songInfo);
+      savePending++;
+    }
+    return songInfo;
+  }
+
+  private MidiLibrary refreshMidiLibrary() {
+    currentIndex = 0;
+    initialized = false;
+    String path = getMidiLibraryPath();
+    midiLibrary = new MidiLibrary(path);
+    songInfoFactory = new SongInfoFactory(midiLibrary);
+    setCallbackTimeout();
+    publish(new OnMidiLibraryRefresh(midiLibrary));
     return midiLibrary;
   }
 
   private void saveCache() {
-    int songIndex = 0;
     FileContents fileContents = new FileContents();
     fileContents.songInfoMap = songInfoMap;
-    for (Entry<String, SongInfo> entry : songInfoMap.entrySet()) {
-      System.out.println("song=" + entry.getKey() + ", index=" + songIndex);
-      entry.getValue().setSongIndex(songIndex++);
-    }
     JsonUtilities.toJsonFile(SONG_INFO, fileContents);
     savePending = 0;
   }
@@ -125,7 +157,7 @@ public class MidiLibraryManager extends ServiceTask {
     Song song = midiLibrary.readSong(songIndex);
     String fileName = song.getFile().getName();
     SongInfo songInfo = songInfoMap.get(fileName);
-    CurrentSong currentSong = new CurrentSong(song, songInfo);
+    CurrentSong currentSong = new CurrentSong(song, songInfo, songIndex);
     publish(new OnSongSelected(currentSong));
   }
 

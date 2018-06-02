@@ -185,9 +185,15 @@ public class MusicianeerView extends ShadowDomBuilder {
     setProperty(transposition, "value", songInfo.getEasyTransposition());
   }
 
-  public void renderSongInfo(SongInfo songInfo) {
+  public void renderSongInfo(SongInfo songInfo, int songIndex) {
     Parent songBody = getElementById("song-body");
-    appendChild(songBody, createSongTableRow(songInfo));
+    Parent newSongRow = createSongTableRow(songInfo, songIndex);
+    TableRow oldSongRow = getElementById("song-index-" + songIndex);
+    if (oldSongRow == null) {
+      appendChild(songBody, newSongRow);
+    } else {
+      replaceChildren(songBody, newSongRow);
+    }
   }
 
   public void renderStaff(Song song, int channel, int transposition) {
@@ -365,13 +371,12 @@ public class MusicianeerView extends ShadowDomBuilder {
     return select;
   }
 
-  private Parent createSongTableRow(SongInfo songInfo) {
+  private Parent createSongTableRow(SongInfo songInfo, int songIndex) {
     String title = songInfo.getTitle();
-    int songIndex = songInfo.getSongIndex();
     TableRow row = new TableRow("#song-index-" + songIndex);
     row //
         .add(td() //
-            .add(text((songInfo.getSongIndex() + 1) + ". " + title)) //
+            .add(text((songIndex + 1) + ". " + title)) //
             .setProperty("title", title)) //
         .add(td() //
             .add(text(songInfo.getDuration())))

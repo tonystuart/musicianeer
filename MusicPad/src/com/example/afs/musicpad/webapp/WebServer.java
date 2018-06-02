@@ -32,8 +32,9 @@ import com.example.afs.musicpad.webapp.staff.StaffWebAppFactory;
 public class WebServer extends MessageTask {
 
   private static final Logger LOG = Log.getLogger(WebServer.class);
-  private static final int PORT = 8080;
 
+  private static final int PORT = 8080;
+  
   private Server server;
   private ExampleWebAppFactory exampleWebAppFactory;
   private KaraokeWebAppFactory karaokeWebAppFactory;
@@ -105,7 +106,7 @@ public class WebServer extends MessageTask {
         "MusicPad.html"
     });
     context.addServlet(createDefaultServlet(), "/");
-    context.addServlet(FileUploadServlet.class, "/FileUploadServlet");
+    context.addServlet(new ServletHolder(new FileUploadServlet(tsGetBroker())), "/FileUploadServlet");
     context.addServlet(CurrentFrameServlet.class, "/currentFrame.jpg");
     context.addServlet(createRestServlet(), "/v1/rest/*");
     context.addServlet(createExampleServlet(), "/v1/example/*");

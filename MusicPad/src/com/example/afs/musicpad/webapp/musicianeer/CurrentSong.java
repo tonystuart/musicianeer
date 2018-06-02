@@ -16,14 +16,20 @@ public class CurrentSong {
 
   private Song song;
   private SongInfo songInfo;
+  private int songIndex;
 
-  public CurrentSong(Song song, SongInfo songInfo) {
+  public CurrentSong(Song song, SongInfo songInfo, int songIndex) {
     this.song = song;
     this.songInfo = songInfo;
+    this.songIndex = songIndex;
   }
 
   public Song getSong() {
     return song;
+  }
+
+  public int getSongIndex() {
+    return songIndex;
   }
 
   public SongInfo getSongInfo() {
@@ -32,7 +38,7 @@ public class CurrentSong {
 
   @Override
   public String toString() {
-    return "CurrentSong [song=" + song + ", songInfo=" + songInfo + "]";
+    return "CurrentSong [song=" + song + ", songInfo=" + songInfo + ", songIndex=" + songIndex + "]";
   }
 
 }

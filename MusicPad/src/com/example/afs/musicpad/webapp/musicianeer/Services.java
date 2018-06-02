@@ -11,7 +11,7 @@ package com.example.afs.musicpad.webapp.musicianeer;
 
 import com.example.afs.musicpad.midi.MidiLibrary;
 import com.example.afs.musicpad.task.ServiceTask.Service;
-import com.example.afs.musicpad.webapp.musicianeer.SongInfoFactory.SongInfo;
+import com.example.afs.musicpad.util.RandomAccessList;
 
 public class Services {
 
@@ -24,19 +24,19 @@ public class Services {
   public static final Service<Iterable<MidiHandle>> getMidiHandles = new Service<Iterable<MidiHandle>>() {
   };
 
-  public static final Service<MidiLibrary> getMidiLibrary = new Service<MidiLibrary>() {
-  };
-
   public static final Service<Integer> getPercentMasterGain = new Service<Integer>() {
   };
 
   public static final Service<Integer> getPercentTempo = new Service<Integer>() {
   };
 
-  public static final Service<Iterable<SongInfo>> getSongInfoList = new Service<Iterable<SongInfo>>() {
+  public static final Service<RandomAccessList<OnSongInfo>> getSongInfoList = new Service<RandomAccessList<OnSongInfo>>() {
   };
 
   public static final Service<SynthesizerSettings> getSynthesizerSettings = new Service<SynthesizerSettings>() {
+  };
+
+  public static final Service<MidiLibrary> refreshMidiLibrary = new Service<MidiLibrary>() {
   };
 
 }

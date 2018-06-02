@@ -9,30 +9,24 @@
 
 package com.example.afs.musicpad.webapp.musicianeer;
 
+import com.example.afs.musicpad.midi.MidiLibrary;
 import com.example.afs.musicpad.task.Message;
-import com.example.afs.musicpad.webapp.musicianeer.SongInfoFactory.SongInfo;
 
-public class OnSongInfo implements Message {
+public class OnMidiLibraryRefresh implements Message {
 
-  private SongInfo songInfo;
-  private int songIndex;
+  private MidiLibrary midiLibrary;
 
-  public OnSongInfo(SongInfo songInfo, int songIndex) {
-    this.songInfo = songInfo;
-    this.songIndex = songIndex;
+  public OnMidiLibraryRefresh(MidiLibrary midiLibrary) {
+    this.midiLibrary = midiLibrary;
   }
 
-  public int getSongIndex() {
-    return songIndex;
-  }
-
-  public SongInfo getSongInfo() {
-    return songInfo;
+  public MidiLibrary getMidiLibrary() {
+    return midiLibrary;
   }
 
   @Override
   public String toString() {
-    return "OnSongInfo [songInfo=" + songInfo + ", songIndex=" + songIndex + "]";
+    return "OnMidiLibrary [midiLibrary=" + midiLibrary + "]";
   }
 
 }

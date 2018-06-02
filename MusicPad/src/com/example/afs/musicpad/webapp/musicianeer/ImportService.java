@@ -9,24 +9,24 @@
 
 package com.example.afs.musicpad.webapp.musicianeer;
 
-import com.example.afs.musicpad.midi.MidiLibrary;
-import com.example.afs.musicpad.task.Message;
+import com.example.afs.musicpad.task.ServiceTask.Service;
+import com.example.afs.musicpad.webapp.musicianeer.SongInfoFactory.SongInfo;
 
-public class OnMidiLibrary implements Message {
+public class ImportService implements Service<SongInfo> {
 
-  private MidiLibrary midiLibrary;
+  private String filename;
 
-  public OnMidiLibrary(MidiLibrary midiLibrary) {
-    this.midiLibrary = midiLibrary;
+  public ImportService(String filename) {
+    this.filename = filename;
   }
 
-  public MidiLibrary getMidiLibrary() {
-    return midiLibrary;
+  public String getFilename() {
+    return filename;
   }
 
   @Override
   public String toString() {
-    return "OnMidiLibrary [midiLibrary=" + midiLibrary + "]";
+    return "ImportService [filename=" + filename + "]";
   }
 
 }

@@ -9,6 +9,7 @@
 
 package com.example.afs.musicpad.webapp.musicianeer;
 
+import java.io.File;
 import java.util.Arrays;
 
 import com.example.afs.musicpad.analyzer.KeyScore;
@@ -26,7 +27,6 @@ public class SongInfoFactory {
     private String duration;
     private int easyTransposition;
     private String predominantKey;
-    private int songIndex;
     private long timeLastModified;
     private String timeSignature;
     private String title;
@@ -55,10 +55,6 @@ public class SongInfoFactory {
       return predominantKey;
     }
 
-    public int getSongIndex() {
-      return songIndex;
-    }
-
     public long getTimeLastModified() {
       return timeLastModified;
     }
@@ -71,13 +67,9 @@ public class SongInfoFactory {
       return title;
     }
 
-    public void setSongIndex(int songIndex) {
-      this.songIndex = songIndex;
-    }
-
     @Override
     public String toString() {
-      return "SongInfo [activeChannels=" + Arrays.toString(activeChannels) + ", beatsPerMinute=" + beatsPerMinute + ", complexity=" + complexity + ", duration=" + duration + ", easyTransposition=" + easyTransposition + ", predominantKey=" + predominantKey + ", songIndex=" + songIndex + ", timeLastModified=" + timeLastModified + ", timeSignature=" + timeSignature + ", title=" + title + "]";
+      return "SongInfo [activeChannels=" + Arrays.toString(activeChannels) + ", beatsPerMinute=" + beatsPerMinute + ", complexity=" + complexity + ", duration=" + duration + ", easyTransposition=" + easyTransposition + ", predominantKey=" + predominantKey + ", timeLastModified=" + timeLastModified + ", timeSignature=" + timeSignature + ", title=" + title + "]";
     }
 
   }
@@ -130,17 +122,16 @@ public class SongInfoFactory {
     return key;
   }
 
-  public SongInfo getSongInfo(int songIndex) {
+  public SongInfo getSongInfo(File midiFile) {
     SongInfo songInfo = new SongInfo();
-    Song song = midiLibrary.readSong(songIndex);
+    Song song = midiLibrary.readSong(midiFile);
     songInfo.activeChannels = song.getActiveChannels();
     songInfo.beatsPerMinute = song.getBeatsPerMinute(0);
     songInfo.complexity = getComplexity(song);
     songInfo.duration = getDuration(song);
     songInfo.easyTransposition = getEasyTransposition(song);
     songInfo.predominantKey = getPredominantKey(song);
-    songInfo.songIndex = songIndex;
-    songInfo.timeLastModified = song.getFile().lastModified();
+    songInfo.timeLastModified = midiFile.lastModified();
     songInfo.timeSignature = song.getBeatsPerMeasure(0) + "/" + song.getBeatUnit(0);
     songInfo.title = song.getTitle();
     return songInfo;
