@@ -141,17 +141,17 @@ public class MusicianeerView extends ShadowDomBuilder {
                     .target("import-response") //
                     .add(div(".dialog-header") //
                         .add(text("Import"))) //
-                    .add(div("#import-instructions") //
+                    .add(div(".center") //
                         .add(text("Select MIDI (.mid) and Karaoke (.kar) files for upload:"))) //
                     .add(div("#import-file-container") //
-                        .add(file("#import-file") //
+                        .add(file("#import-file", ".center") //
                             .multiple() //
                             .accept(".mid,.midi,.kar") //
                             .setName("files") //
                             .required()) //
                         .add(iframe("#import-response") //
                             .name("import-response"))) //
-                    .add(div("#import-instructions") //
+                    .add(div(".center") //
                         .add(text("Click Upload to import, click Close when done.")))
                     .add(div(".dialog-footer") //
                         .add(button("#import-cancel") //
@@ -165,7 +165,8 @@ public class MusicianeerView extends ShadowDomBuilder {
                 .add(div(".dialog-header") //
                     .add(text("Delete MIDI File"))) //
                 .add(div(".dialog-body") //
-                    .add(div("#delete-text"))) //
+                    .add(div(".center").add(text("Would you like to delete this file?"))) //
+                    .add(div("#delete-text", ".center"))) //
                 .add(div(".dialog-footer") //
                     .add(button("#delete-cancel") //
                         .setValue("Cancel") //

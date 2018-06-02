@@ -347,8 +347,9 @@ text {
     justify-content: flex-end;
 }
 
-#import-instructions {
-    margin: auto;
+.center {
+	margin: auto;
+	text-align: center;
 }
 
 #import-file-container {
@@ -356,15 +357,7 @@ text {
     flex-direction: column;
 }
 
-#import-file {
-    margin: auto;
-}
-
 #import-response {
     border: 0;
     height: 10vh;
-}
-
-#delete-text {
-    margin: auto;
 }

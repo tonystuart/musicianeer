@@ -150,7 +150,7 @@ public class MusicianeerController extends ControllerTask {
       isShift = false;
     } else if (keyCode == 46) {
       deleteFilename = currentSong.getSong().getFile().getName();
-      musicianeerView.setDeleteText("Would you like to delete " + deleteFilename + "?");
+      musicianeerView.setDeleteText(deleteFilename);
       musicianeerView.showDeleteDialogBox(true);
     } else {
       Integer midiNote = activeKeys.remove(value);
