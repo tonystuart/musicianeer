@@ -178,6 +178,7 @@ public class MusicianeerController extends ControllerTask {
     subscribe(OnTransportNoteOn.class, message -> doTransportNoteOn(message));
     subscribe(OnTransportNoteOff.class, message -> doTransportNoteOff(message));
     subscribe(OnSetChannelVolume.class, message -> doSetChannelVolume(message));
+    subscribe(OnMidiLibraryRefresh.class, message -> doMidiLibraryRefresh(message));
     subscribe(OnSetPercentVelocity.class, message -> doSetPercentVelocity(message));
     subscribe(OnSetPercentMasterGain.class, message -> doSetPercentMasterGain(message));
     addShadowUpdate(new OnShadowUpdate(Action.REPLACE_CHILDREN, "body", musicianeerView.render()));
@@ -242,6 +243,11 @@ public class MusicianeerController extends ControllerTask {
 
   private void doMidiHandles(OnMidiHandles message) {
     renderMidiHandles(message.getMidiHandles());
+  }
+
+  private void doMidiLibraryRefresh(OnMidiLibraryRefresh message) {
+    // As an alternative to redrawing the song table, we truncate it and let OnSongInfo replace the remaining rows
+    musicianeerView.truncateSongTable(message.getMidiLibrary().getMidiFiles().size());
   }
 
   private void doMute(OnMute message) {

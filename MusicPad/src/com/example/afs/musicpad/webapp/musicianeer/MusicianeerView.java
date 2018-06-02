@@ -207,7 +207,7 @@ public class MusicianeerView extends ShadowDomBuilder {
     if (oldSongRow == null) {
       appendChild(songBody, newSongRow);
     } else {
-      replaceChildren(songBody, newSongRow);
+      replaceElement(songBody, oldSongRow, newSongRow);
     }
   }
 
@@ -325,6 +325,15 @@ public class MusicianeerView extends ShadowDomBuilder {
       addClass("import-modal", "visible");
     } else {
       removeClass("import-modal", "visible");
+    }
+  }
+
+  public void truncateSongTable(int index) {
+    Element element;
+    Parent parent = getElementById("song-body");
+    while ((element = getElementById("song-index-" + index)) != null) {
+      remove(parent, element);
+      index++;
     }
   }
 
