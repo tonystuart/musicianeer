@@ -58,6 +58,7 @@ public class MidiLibraryManager extends ServiceTask {
     provide(Services.refreshMidiLibrary, () -> refreshMidiLibrary());
     provide(ImportService.class, message -> doImportService(message));
     subscribe(OnSelectSong.class, message -> doSelectSong(message));
+    subscribe(OnDeleteMidiFile.class, message -> doDeleteMidiFile(message));
     refreshMidiLibrary();
   }
 
@@ -90,6 +91,11 @@ public class MidiLibraryManager extends ServiceTask {
         saveCache();
       }
     }
+  }
+
+  private void doDeleteMidiFile(OnDeleteMidiFile message) {
+    midiLibrary.delete(message.getFilename());
+    refreshMidiLibrary();
   }
 
   private SongInfo doImportService(Service<SongInfo> message) {

@@ -43,6 +43,8 @@ public class MusicianeerController extends ControllerTask {
   private Set<Integer> playerMidiNotes = new HashSet<>();
   private Map<String, Integer> activeKeys = new HashMap<>();
 
+  private String deleteFilename;
+
   public MusicianeerController(MessageBroker messageBroker) {
     super(messageBroker);
     musicianeerView = new MusicianeerView(this);
@@ -56,6 +58,13 @@ public class MusicianeerController extends ControllerTask {
       renderChannel(Integer.parseInt(id.substring("channel-index-".length())));
     } else {
       switch (id) {
+      case "delete-cancel":
+        musicianeerView.showDeleteDialogBox(false);
+        break;
+      case "delete-okay":
+        publish(new OnDeleteMidiFile(deleteFilename));
+        musicianeerView.showDeleteDialogBox(false);
+        break;
       case "drums":
         publish(new OnSetAccompanimentType(AccompanimentType.DRUMS));
         break;
@@ -63,10 +72,10 @@ public class MusicianeerController extends ControllerTask {
         publish(new OnSetAccompanimentType(OnSetAccompanimentType.AccompanimentType.FULL));
         break;
       case "import":
-        musicianeerView.setImportDialogVisibility(true);
+        musicianeerView.showImportDialogBox(true);
         break;
       case "import-cancel":
-        musicianeerView.setImportDialogVisibility(false);
+        musicianeerView.showImportDialogBox(false);
         break;
       case "piano":
         publish(new OnSetAccompanimentType(OnSetAccompanimentType.AccompanimentType.PIANO));
@@ -139,6 +148,10 @@ public class MusicianeerController extends ControllerTask {
     int keyCode = Integer.parseInt(value);
     if (keyCode == KeyEvent.VK_SHIFT) {
       isShift = false;
+    } else if (keyCode == 46) {
+      deleteFilename = currentSong.getSong().getFile().getName();
+      musicianeerView.setDeleteText("Would you like to delete " + deleteFilename + "?");
+      musicianeerView.showDeleteDialogBox(true);
     } else {
       Integer midiNote = activeKeys.remove(value);
       if (midiNote != null) {
