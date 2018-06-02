@@ -143,8 +143,8 @@ public class MusicianeerView extends ShadowDomBuilder {
                         .add(text("Import"))) //
                     .add(div("#import-instructions") //
                         .add(text("Select MIDI (.mid) and Karaoke (.kar) files for upload:"))) //
-                    .add(div("#import-file-input") //
-                        .add(file() //
+                    .add(div("#import-file-container") //
+                        .add(file("#import-file") //
                             .multiple() //
                             .accept(".mid,.midi,.kar") //
                             .setName("files") //
@@ -322,6 +322,8 @@ public class MusicianeerView extends ShadowDomBuilder {
 
   public void showImportDialogBox(boolean isVisible) {
     if (isVisible) {
+      setProperty(getElementById("import-file"), "value", "");
+      replaceElement(getElementById("import-file-container"), getElementById("import-response"), iframe("#import-response").name("import-response"));
       addClass("import-modal", "visible");
     } else {
       removeClass("import-modal", "visible");

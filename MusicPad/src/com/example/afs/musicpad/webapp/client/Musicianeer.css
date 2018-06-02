@@ -351,12 +351,12 @@ text {
     margin: auto;
 }
 
-#import-file-input {
+#import-file-container {
     display: flex;
     flex-direction: column;
 }
 
-#import-file-input input {
+#import-file {
     margin: auto;
 }
 
