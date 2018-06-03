@@ -10,6 +10,7 @@
 package com.example.afs.musicpad.webapp.musicianeer;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.TreeMap;
 
 import com.example.afs.musicpad.midi.MidiLibrary;
@@ -27,15 +28,27 @@ public class MidiLibraryManager extends ServiceTask {
     private TreeMap<String, SongInfo> songInfoMap;
   }
 
-  private static final String SONG_INFO = "songInfo.v1.json";
   private static final int SAVE_COUNT = 50;
 
   public static String getMidiLibraryPath() {
-    String path = System.getProperty("midiLibraryPath");
-    if (path == null) {
-      throw new IllegalStateException("midiLibraryPath property not set");
+    return getPath("midiLibraryPath", "musicianeer/midi");
+  }
+
+  public static String getSongInfoPath() {
+    return getPath("songInfoPath", "musicianeer/midi.v1.json");
+  }
+
+  private static String getPath(String systemProperty, String defaultPath) {
+    try {
+      String path = System.getProperty(systemProperty);
+      if (path == null) {
+        path = defaultPath;
+      }
+      String canonicalPath = new File(path).getCanonicalPath();
+      return canonicalPath;
+    } catch (IOException e) {
+      throw new RuntimeException(e);
     }
-    return path;
   }
 
   private int savePending;
@@ -48,7 +61,8 @@ public class MidiLibraryManager extends ServiceTask {
 
   protected MidiLibraryManager(MessageBroker broker) {
     super(broker);
-    FileContents fileContents = JsonUtilities.fromJsonFile(SONG_INFO, FileContents.class);
+    initializeDirectories();
+    FileContents fileContents = JsonUtilities.fromJsonFile(getSongInfoPath(), FileContents.class);
     if (fileContents == null) {
       songInfoMap = new TreeMap<>();
     } else {
@@ -127,6 +141,17 @@ public class MidiLibraryManager extends ServiceTask {
     return songInfoList;
   }
 
+  private void initializeDirectories() {
+    String midiLibraryPath = getMidiLibraryPath();
+    File midiLibraryFile = new File(midiLibraryPath);
+    midiLibraryFile.mkdirs();
+    System.out.println("MidiLibraryManager.initializeDirectories: midiLibraryPath=" + midiLibraryPath);
+    String songInfoPath = getSongInfoPath();
+    File songInfoFile = new File(songInfoPath);
+    songInfoFile.getParentFile().mkdirs();
+    System.out.println("MidiLibraryManager.initializeDirectories: songInfoPath=" + songInfoPath);
+  }
+
   private SongInfo realizeSongInfo(File midiFile) {
     String fileName = midiFile.getName();
     SongInfo songInfo = songInfoMap.get(fileName);
@@ -152,7 +177,7 @@ public class MidiLibraryManager extends ServiceTask {
   private void saveCache() {
     FileContents fileContents = new FileContents();
     fileContents.songInfoMap = songInfoMap;
-    JsonUtilities.toJsonFile(SONG_INFO, fileContents);
+    JsonUtilities.toJsonFile(getSongInfoPath(), fileContents);
     savePending = 0;
   }
 

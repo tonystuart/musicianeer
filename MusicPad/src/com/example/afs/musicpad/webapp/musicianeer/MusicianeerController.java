@@ -188,7 +188,9 @@ public class MusicianeerController extends ControllerTask {
       renderSongInfo(onSongInfo.getSongInfo(), onSongInfo.getSongIndex());
     }
     CurrentSong initialSong = request(Services.getCurrentSong);
-    if (initialSong != null) {
+    if (initialSong == null) {
+      musicianeerView.showImportDialogBox(true);
+    } else {
       initializeCurrentSong(initialSong);
       initializeSynthesizerSettings();
     }
@@ -247,7 +249,11 @@ public class MusicianeerController extends ControllerTask {
 
   private void doMidiLibraryRefresh(OnMidiLibraryRefresh message) {
     // As an alternative to redrawing the song table, we truncate it and let OnSongInfo replace the remaining rows
-    musicianeerView.truncateSongTable(message.getMidiLibrary().getMidiFiles().size());
+    int midiLibrarySize = message.getMidiLibrary().getMidiFiles().size();
+    musicianeerView.truncateSongTable(midiLibrarySize);
+    if (midiLibrarySize == 0) {
+      musicianeerView.showImportDialogBox(true);
+    }
   }
 
   private void doMute(OnMute message) {

@@ -48,6 +48,7 @@ public class FileUploadServlet extends HttpServlet {
     Division div = new Division();
     div.style("color: #B4B7BA;");
     try {
+      // NB: relative pathnames will be rooted in /tmp
       String midiLibraryPath = MidiLibraryManager.getMidiLibraryPath();
       MultipartConfigElement multipartConfigElement = new MultipartConfigElement(midiLibraryPath);
       request.setAttribute("org.eclipse.jetty.multipartConfig", multipartConfigElement);

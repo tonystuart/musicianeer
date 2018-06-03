@@ -140,7 +140,7 @@ public class MusicianeerView extends ShadowDomBuilder {
                     .enctype("multipart/form-data") //
                     .target("import-response") //
                     .add(div(".dialog-header") //
-                        .add(text("Import"))) //
+                        .add(text("Import Music"))) //
                     .add(div(".center") //
                         .add(text("Select MIDI (.mid) and Karaoke (.kar) files for upload:"))) //
                     .add(div("#import-file-container") //

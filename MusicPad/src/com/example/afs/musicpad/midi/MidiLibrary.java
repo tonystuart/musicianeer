@@ -26,9 +26,6 @@ public class MidiLibrary implements Iterable<File> {
   public MidiLibrary(String path) {
     this.midiFiles = new DirectList<>();
     listMidiFiles(midiFiles, new File(path));
-    if (midiFiles.size() == 0) {
-      throw new IllegalArgumentException(path + " does not contain any .mid or .kar files");
-    }
     midiFiles.sort((o1, o2) -> o1.getPath().compareTo(o2.getPath()));
   }
 
