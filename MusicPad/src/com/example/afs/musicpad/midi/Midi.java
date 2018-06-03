@@ -24,7 +24,7 @@ public class Midi {
   public static final int PIANO = 0;
   public static final int DRUM = 9;
 
-  public static final int DRUM_BASE = 35;
+  public static final int DRUM_BASE = 33;
 
   public static final int MM_TEMPO = 0x51;
   public static final int MM_TIME_SIGNATURE = 0x58;

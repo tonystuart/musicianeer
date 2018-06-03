@@ -11,7 +11,9 @@ package com.example.afs.musicpad.midi;
 
 public class Instruments {
 
-  private final static String[] DRUMS = new String[] {
+  private final static String[] DRUM_NAMES = new String[] {
+      "Metronome Click", //
+      "Metronome Bell", //
       "Acoustic Bass Drum", //
       "Bass Drum 1", //
       "Side Stick", //
@@ -21,11 +23,11 @@ public class Instruments {
       "Low Floor Tom", //
       "Closed Hi Hat",
       "High Floor Tom", //
-      "Pedal Hi-Hat", //
+      "Pedal Hi Hat", //
       "Low Tom", //
-      "Open Hi-Hat",
-      "Low-Mid Tom", //
-      "Hi-Mid Tom", //
+      "Open Hi Hat",
+      "Low Mid Tom", //
+      "Hi Mid Tom", //
       "Crash Cymbal 1", //
       "High Tom", //
       "Ride Cymbal 1", //
@@ -59,6 +61,58 @@ public class Instruments {
       "Open Cuica", //
       "Mute Triangle", //
       "Open Triangle" //
+  };
+
+  private final static String[] SHORT_DRUM_NAMES = new String[] {
+      "MC",
+      "MB",
+      "ABD",
+      "BD1",
+      "SS",
+      "AS",
+      "HC",
+      "ES",
+      "LFT",
+      "CHH",
+      "HFT",
+      "PHH",
+      "LT",
+      "OHH",
+      "LMT",
+      "HMT",
+      "CC1",
+      "HT",
+      "RC1",
+      "CC",
+      "RB",
+      "T",
+      "SC",
+      "C",
+      "CC2",
+      "V",
+      "RC2",
+      "HB",
+      "LB",
+      "MHC",
+      "OHC",
+      "LC",
+      "HT",
+      "LT",
+      "HA",
+      "LA",
+      "C",
+      "M",
+      "SW",
+      "LW",
+      "SG",
+      "LG",
+      "C",
+      "HWB",
+      "LWB",
+      "MC",
+      "OC",
+      "MT",
+      "OT",
   };
 
   private static String[] INSTRUMENTS = new String[] { //
@@ -216,15 +270,15 @@ public class Instruments {
   }
 
   public static int getDrum(String name) {
-    return findIndex(DRUMS, name);
+    return findIndex(DRUM_NAMES, name);
   }
 
   public static int getDrumCount() {
-    return DRUMS.length;
+    return DRUM_NAMES.length;
   }
 
   public static String getDrumName(int midiNote) {
-    return findElement(DRUMS, midiNote - Midi.DRUM_BASE);
+    return findElement(DRUM_NAMES, midiNote - Midi.DRUM_BASE);
   }
 
   public static int getInstrument(String name) {
@@ -233,6 +287,10 @@ public class Instruments {
 
   public static String getProgramName(int program) {
     return findElement(INSTRUMENTS, program);
+  }
+
+  public static String getShortDrumName(int midiNote) {
+    return findElement(SHORT_DRUM_NAMES, midiNote - Midi.DRUM_BASE);
   }
 
   private static String findElement(String[] array, int arrayIndex) {

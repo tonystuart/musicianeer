@@ -12,6 +12,7 @@ package com.example.afs.musicpad.webapp.musicianeer;
 import java.util.SortedSet;
 
 import com.example.afs.musicpad.html.Parent;
+import com.example.afs.musicpad.midi.Instruments;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.player.PlayableMap.OutputType;
 import com.example.afs.musicpad.player.Sound;
@@ -137,6 +138,7 @@ public class Engraver {
   private static final int RADIUS = 10; // spacing is r, diameter is 2r
   private static final int LEDGER_WIDTH = RADIUS * 2;
   private static final int INTER_CLEF = RADIUS * 6;
+  private static final int DRUM_HEAD = RADIUS / 2;
 
   private static final int TOP = RADIUS * 1;
   private static final int SPAN = (POSITION[HIGHEST] - POSITION[LOWEST]) + 1;
@@ -168,6 +170,19 @@ public class Engraver {
     return getStaff(song, channel, transposition);
   }
 
+  private void drawDrumNames(Svg staff, Sounds sounds) {
+    for (Sound sound : sounds) {
+      int wordX = getX(sound.getBeginTick() - RADIUS); // align with left edge of note head
+      RandomAccessList<Note> drums = sound.getNotes();
+      int drumCount = drums.size();
+      for (int i = 0; i < drumCount; i++) {
+        Note drum = drums.get(i);
+        String drumName = Instruments.getShortDrumName(drum.getMidiNote());
+        staff.add(new Text(wordX, 10 * RADIUS - (i * (2 * RADIUS)), drumName));
+      }
+    }
+  }
+
   private void drawHead(Svg staff, Context context, int noteX, int noteY) {
     switch (context.getNoteType()) {
     case EIGHTH:
@@ -179,8 +194,8 @@ public class Engraver {
       staff.add(new Circle(noteX, noteY, RADIUS, OPEN));
       break;
     case DRUM:
-      staff.add(new Line(noteX - RADIUS, noteY + RADIUS, noteX + RADIUS, noteY - RADIUS));
-      staff.add(new Line(noteX - RADIUS, noteY - RADIUS, noteX + RADIUS, noteY + RADIUS));
+      staff.add(new Line(noteX - DRUM_HEAD, noteY + DRUM_HEAD, noteX + DRUM_HEAD, noteY - DRUM_HEAD));
+      staff.add(new Line(noteX - DRUM_HEAD, noteY - DRUM_HEAD, noteX + DRUM_HEAD, noteY + DRUM_HEAD));
       break;
     default:
       throw new UnsupportedOperationException();
@@ -392,9 +407,16 @@ public class Engraver {
     long duration = song.getDuration();
     Svg staff = drawStaff(song, channel, duration);
     drawMeasures(song, staff, duration);
-    Sounds sounds = new Sounds(OutputType.TICK, new Transposer(song.getChannelNotes(channel), transposition));
-    drawNotes(staff, sounds);
-    drawNoteNames(staff, sounds);
+    Iterable<Note> notes = song.getChannelNotes(channel);
+    if (channel == Midi.DRUM) {
+      Sounds sounds = new Sounds(OutputType.TICK, notes);
+      drawNotes(staff, sounds);
+      drawDrumNames(staff, sounds);
+    } else {
+      Sounds sounds = new Sounds(OutputType.TICK, new Transposer(notes, transposition));
+      drawNotes(staff, sounds);
+      drawNoteNames(staff, sounds);
+    }
     drawWords(song, staff);
     return staff;
   }
