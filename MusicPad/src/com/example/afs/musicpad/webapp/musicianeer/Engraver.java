@@ -67,7 +67,7 @@ public class Engraver {
   }
 
   private enum NoteType {
-    EIGHTH, QUARTER, HALF, WHOLE
+    EIGHTH, QUARTER, HALF, WHOLE, DRUM
   }
 
   private enum Stem {
@@ -178,6 +178,10 @@ public class Engraver {
     case WHOLE:
       staff.add(new Circle(noteX, noteY, RADIUS, OPEN));
       break;
+    case DRUM:
+      staff.add(new Line(noteX - RADIUS, noteY + RADIUS, noteX + RADIUS, noteY - RADIUS));
+      staff.add(new Line(noteX - RADIUS, noteY - RADIUS, noteX + RADIUS, noteY + RADIUS));
+      break;
     default:
       throw new UnsupportedOperationException();
     }
@@ -254,7 +258,9 @@ public class Engraver {
         }
         drawHead(staff, context, noteX, noteY);
       }
-      drawStem(staff, firstTick, context);
+      if (context.getNoteType() != NoteType.DRUM) {
+        drawStem(staff, firstTick, context);
+      }
     }
   }
 
@@ -366,7 +372,10 @@ public class Engraver {
       stem = Stem.DOWN;
     }
     long averageDuration = totalDuration / notes.size();
-    if (averageDuration < Default.TICKS_PER_BEAT / 2 + Default.GAP_BEAT_UNIT) {
+    boolean isDrum = notes.size() > 0 && notes.get(0).getChannel() == Midi.DRUM;
+    if (isDrum) {
+      noteType = NoteType.DRUM;
+    } else if (averageDuration < Default.TICKS_PER_BEAT / 2 + Default.GAP_BEAT_UNIT) {
       noteType = NoteType.EIGHTH;
     } else if (averageDuration < Default.TICKS_PER_BEAT + Default.GAP_BEAT_UNIT) {
       noteType = NoteType.QUARTER;
