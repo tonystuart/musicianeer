@@ -181,8 +181,9 @@ public class MusicianeerController extends ControllerTask {
     subscribe(OnMidiLibraryRefresh.class, message -> doMidiLibraryRefresh(message));
     subscribe(OnSetPercentVelocity.class, message -> doSetPercentVelocity(message));
     subscribe(OnSetPercentMasterGain.class, message -> doSetPercentMasterGain(message));
+    subscribe(OnSetAccompanimentType.class, message -> doSetAccompanimentType(message));
     addShadowUpdate(new OnShadowUpdate(Action.REPLACE_CHILDREN, "body", musicianeerView.render()));
-    musicianeerView.setAlternative("full");
+    musicianeerView.setAccompanimentType(request(Services.getAccompanimentType));
     RandomAccessList<OnSongInfo> songInfoList = request(Services.getSongInfoList);
     for (OnSongInfo onSongInfo : songInfoList) {
       renderSongInfo(onSongInfo.getSongInfo(), onSongInfo.getSongIndex());
@@ -274,6 +275,10 @@ public class MusicianeerController extends ControllerTask {
 
   private void doSeekFinished(OnSeekFinished message) {
     musicianeerView.resetMidiNoteLeds();
+  }
+
+  private void doSetAccompanimentType(OnSetAccompanimentType message) {
+    musicianeerView.setAccompanimentType(message.getAccompanimentType());
   }
 
   private void doSetChannelVolume(OnSetChannelVolume message) {

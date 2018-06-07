@@ -60,6 +60,7 @@ public class Transport extends ServiceTask {
     this.synthesizer = synthesizer;
     setPercentGain(DEFAULT_PERCENT_GAIN);
     provide(Services.getPercentTempo, () -> getPercentTempo());
+    provide(Services.getAccompanimentType, () -> accompanimentType);
     provide(Services.getPercentMasterGain, () -> getPercentMasterGain());
     subscribe(OnPlay.class, message -> doPlay(message));
     subscribe(OnStop.class, message -> doStop(message));

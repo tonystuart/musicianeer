@@ -25,6 +25,7 @@ import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.task.ControllerTask;
 import com.example.afs.musicpad.webapp.musicianeer.ChannelInfoFactory.ChannelInfo;
 import com.example.afs.musicpad.webapp.musicianeer.MidiHandle.Type;
+import com.example.afs.musicpad.webapp.musicianeer.OnSetAccompanimentType.AccompanimentType;
 import com.example.afs.musicpad.webapp.musicianeer.SongInfoFactory.SongInfo;
 
 public class MusicianeerView extends ShadowDomBuilder {
@@ -234,8 +235,8 @@ public class MusicianeerView extends ShadowDomBuilder {
     selectElement("song-index-" + songIndex, "selected-song");
   }
 
-  public void setAlternative(String id) {
-    Radio radio = getElementById(id);
+  public void setAccompanimentType(AccompanimentType accompanimentType) {
+    Radio radio = getElementById(accompanimentType.name().toLowerCase());
     if (radio != null) {
       setProperty(radio, "checked", 1);
     }

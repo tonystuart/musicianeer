@@ -12,8 +12,12 @@ package com.example.afs.musicpad.webapp.musicianeer;
 import com.example.afs.musicpad.midi.MidiLibrary;
 import com.example.afs.musicpad.task.ServiceTask.Service;
 import com.example.afs.musicpad.util.RandomAccessList;
+import com.example.afs.musicpad.webapp.musicianeer.OnSetAccompanimentType.AccompanimentType;
 
 public class Services {
+
+  public static final Service<AccompanimentType> getAccompanimentType = new Service<AccompanimentType>() {
+  };
 
   public static Service<CurrentPrograms> getCurrentPrograms = new Service<CurrentPrograms>() {
   };
