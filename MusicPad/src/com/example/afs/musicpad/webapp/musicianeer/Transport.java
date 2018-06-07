@@ -323,11 +323,13 @@ public class Transport extends ServiceTask {
       throw new UnsupportedOperationException();
     }
     if (newTick > currentTick) {
-      while (noteEvents.get(index).getTick() < newTick && index < noteEvents.size()) {
+      index = Math.max(0, index);
+      while (index < noteEvents.size() && noteEvents.get(index).getTick() < newTick) {
         index++;
       }
     } else {
-      while (noteEvents.get(index).getTick() > newTick && index > 0) {
+      index = Math.min(noteEvents.size() - 1, index);
+      while (index > 0 && noteEvents.get(index).getTick() > newTick) {
         index--;
       }
     }
