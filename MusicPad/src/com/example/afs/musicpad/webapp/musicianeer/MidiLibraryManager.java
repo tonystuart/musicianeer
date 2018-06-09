@@ -53,8 +53,8 @@ public class MidiLibraryManager extends ServiceTask {
   }
 
   private int savePending;
-  private int randomIndex;
   private int currentIndex;
+  private int selectedIndex = -1;
 
   private MidiLibrary midiLibrary;
   private SongInfo mostRecentImport;
@@ -91,8 +91,10 @@ public class MidiLibraryManager extends ServiceTask {
       File midiFile = midiLibrary.get(currentIndex);
       SongInfo songInfo = realizeSongInfo(midiFile);
       publish(new OnSongInfo(songInfo, currentIndex));
-      if (songInfo == mostRecentImport || currentIndex == randomIndex) {
+      if (songInfo == mostRecentImport || currentIndex == selectedIndex) {
         publish(new OnSelectSong(currentIndex));
+        mostRecentImport = null;
+        selectedIndex = -1;
       }
       currentIndex++;
     }
@@ -110,7 +112,10 @@ public class MidiLibraryManager extends ServiceTask {
   }
 
   private void doDeleteMidiFile(OnDeleteMidiFile message) {
-    midiLibrary.delete(message.getFilename());
+    selectedIndex = midiLibrary.delete(message.getFilename());
+    if (selectedIndex == midiLibrary.size()) {
+      selectedIndex--; // may end up -1
+    }
     refreshMidiLibrary();
   }
 
@@ -173,10 +178,10 @@ public class MidiLibraryManager extends ServiceTask {
     songInfoFactory = new SongInfoFactory(midiLibrary);
     setCallbackTimeout();
     publish(new OnMidiLibraryRefresh(midiLibrary));
-    if (mostRecentImport == null) {
-      randomIndex = random.nextInt(Math.min(midiLibrary.size(), 100));
-    } else {
-      randomIndex = -1;
+    if (selectedIndex == -1) {
+      if (mostRecentImport == null) {
+        selectedIndex = random.nextInt(Math.min(midiLibrary.size(), 100));
+      }
     }
     return midiLibrary;
   }

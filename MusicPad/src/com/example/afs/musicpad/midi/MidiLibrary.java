@@ -29,15 +29,16 @@ public class MidiLibrary implements Iterable<File> {
     midiFiles.sort((o1, o2) -> o1.getPath().compareTo(o2.getPath()));
   }
 
-  public void delete(String filename) {
+  public int delete(String filename) {
     for (int i = 0; i < midiFiles.size(); i++) {
       File midiFile = midiFiles.get(i);
       if (midiFile.getName().equals(filename)) {
         midiFile.delete();
         midiFiles.remove(i);
-        return;
+        return i;
       }
     }
+    return -1;
   }
 
   public File get(int fileIndex) {
