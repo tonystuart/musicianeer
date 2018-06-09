@@ -11,6 +11,7 @@ package com.example.afs.musicpad.webapp.musicianeer;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Random;
 import java.util.TreeMap;
 
 import com.example.afs.musicpad.midi.MidiLibrary;
@@ -52,10 +53,12 @@ public class MidiLibraryManager extends ServiceTask {
   }
 
   private int savePending;
+  private int randomIndex;
   private int currentIndex;
-  private boolean initialized;
 
   private MidiLibrary midiLibrary;
+  private SongInfo mostRecentImport;
+  private Random random = new Random();
   private SongInfoFactory songInfoFactory;
   private TreeMap<String, SongInfo> songInfoMap;
 
@@ -88,8 +91,7 @@ public class MidiLibraryManager extends ServiceTask {
       File midiFile = midiLibrary.get(currentIndex);
       SongInfo songInfo = realizeSongInfo(midiFile);
       publish(new OnSongInfo(songInfo, currentIndex));
-      if (!initialized) {
-        initialized = true;
+      if (songInfo == mostRecentImport || currentIndex == randomIndex) {
         publish(new OnSelectSong(currentIndex));
       }
       currentIndex++;
@@ -119,6 +121,7 @@ public class MidiLibraryManager extends ServiceTask {
     File file = new File(filename);
     try {
       songInfo = realizeSongInfo(file);
+      mostRecentImport = songInfo;
     } catch (RuntimeException e) {
       file.delete();
       songInfo = null;
@@ -165,12 +168,16 @@ public class MidiLibraryManager extends ServiceTask {
 
   private MidiLibrary refreshMidiLibrary() {
     currentIndex = 0;
-    initialized = false;
     String path = getMidiLibraryPath();
     midiLibrary = new MidiLibrary(path);
     songInfoFactory = new SongInfoFactory(midiLibrary);
     setCallbackTimeout();
     publish(new OnMidiLibraryRefresh(midiLibrary));
+    if (mostRecentImport == null) {
+      randomIndex = random.nextInt(Math.min(midiLibrary.size(), 100));
+    } else {
+      randomIndex = -1;
+    }
     return midiLibrary;
   }
 
