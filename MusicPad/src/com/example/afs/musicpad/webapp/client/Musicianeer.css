@@ -66,6 +66,11 @@ circle {
     stroke-width: 1;
 }
 
+circle.open {
+	fill: black;
+	stroke-width: 3;
+}
+
 text {
     font-size: 11pt;
 }
@@ -240,6 +245,10 @@ text {
 .black-key-led {
     left: 0px;
     top: -5vh;
+}
+
+.black-key .note-legend {
+	color: white;
 }
 
 .white-key-led {

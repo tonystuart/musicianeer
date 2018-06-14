@@ -351,7 +351,17 @@ public class MusicianeerView extends ShadowDomBuilder {
   }
 
   private Parent blackKey(int midiNote) {
-    return key(midiNote, "black-key");
+    char blackKeyLegend;
+    char whiteKeyLegend = KeyMap.toLegend(midiNote - 1);
+    if (whiteKeyLegend == ';') {
+      blackKeyLegend = ':';
+    } else { // NB: no black key for single quote and comma
+      blackKeyLegend = Character.toUpperCase(whiteKeyLegend);
+    }
+    return key(midiNote, "black-key").add(div(".note-label") //
+        .add(div(".note-center") //
+            .add(div(".note-legend") //
+                .add(text(Character.toString(blackKeyLegend))))));
   }
 
   private Element clicker(String id, String legend) {
