@@ -59,7 +59,7 @@ public class Sounds implements Iterable<Sound> {
         sound = new Sound();
       }
       // Suppress short grace notes / passing / non-chord tones
-      if ((note.getDuration() > Default.TICKS_PER_BEAT / 5) || note.getChannel() == Midi.DRUM) {
+      if ((note.getDuration() > Default.SHORT_NOTE) || note.getChannel() == Midi.DRUM) {
         sound.add(note);
       }
     }

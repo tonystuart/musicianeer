@@ -21,5 +21,6 @@ public class Default {
   public static final int OCTAVE = 3;
   public static final int OCTAVE_SEMITONE = OCTAVE * Midi.SEMITONES_PER_OCTAVE;
   public static final int RESOLUTION = TICKS_PER_BEAT / 2;
+  public static final long SHORT_NOTE = Default.TICKS_PER_BEAT / 16;
 
 }
