@@ -10,6 +10,7 @@
 package com.example.afs.musicpad.webapp.musicianeer;
 
 import java.awt.event.KeyEvent;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -38,11 +39,13 @@ public class MusicianeerController extends ControllerTask {
   private int inputDeviceIndex = MidiHandle.MIDI_HANDLE_NA;
   private int prompterDeviceIndex = MidiHandle.MIDI_HANDLE_NA;
 
+  private int[] transportCueCount = new int[Midi.NOTES];
+  private boolean[] transportNoteOn = new boolean[Midi.NOTES];
+
   private CurrentSong currentSong;
   private MusicianeerView musicianeerView;
   private Set<Integer> playerMidiNotes = new HashSet<>();
   private Map<String, Integer> activeKeys = new HashMap<>();
-
   private String deleteFilename;
 
   public MusicianeerController(MessageBroker messageBroker) {
@@ -88,7 +91,7 @@ public class MusicianeerController extends ControllerTask {
         break;
       case "stop":
         publish(new OnStop());
-        musicianeerView.resetMidiNoteLeds();
+        resetTransportNoteState();
         break;
       }
     }
@@ -240,7 +243,10 @@ public class MusicianeerController extends ControllerTask {
   private void doCueNoteOn(OnCueNoteOn message) {
     if (message.getChannel() == channel) {
       int midiNote = message.getMidiNote();
-      musicianeerView.setLedState(midiNote, LedState.YELLOW);
+      if (!transportNoteOn[midiNote]) {
+        musicianeerView.setLedState(midiNote, LedState.YELLOW);
+      }
+      transportCueCount[midiNote]++;
     }
   }
 
@@ -274,7 +280,7 @@ public class MusicianeerController extends ControllerTask {
   }
 
   private void doSeekFinished(OnSeekFinished message) {
-    musicianeerView.resetMidiNoteLeds();
+    resetTransportNoteState();
   }
 
   private void doSetAccompanimentType(OnSetAccompanimentType message) {
@@ -315,16 +321,20 @@ public class MusicianeerController extends ControllerTask {
   private void doTransportNoteOff(OnTransportNoteOff message) {
     if (message.getChannel() == channel) {
       int midiNote = message.getMidiNote();
-      musicianeerView.setLedState(midiNote, LedState.OFF);
+      transportNoteOn[midiNote] = false;
+      if (--transportCueCount[midiNote] > 0) {
+        musicianeerView.setLedState(midiNote, LedState.YELLOW);
+      } else {
+        musicianeerView.setLedState(midiNote, LedState.OFF);
+      }
     }
   }
 
   private void doTransportNoteOn(OnTransportNoteOn message) {
     if (message.getChannel() == channel) {
       int midiNote = message.getMidiNote();
-      if (!playerMidiNotes.contains(midiNote)) {
-        musicianeerView.setLedState(midiNote, LedState.RED);
-      }
+      transportNoteOn[midiNote] = true;
+      musicianeerView.setLedState(midiNote, LedState.RED);
     }
   }
 
@@ -335,7 +345,7 @@ public class MusicianeerController extends ControllerTask {
   private void doTransposition(OnTransposition message) {
     this.transposition = message.getTransposition();
     musicianeerView.renderStaff(currentSong.getSong(), channel, transposition);
-    musicianeerView.resetMidiNoteLeds();
+    resetTransportNoteState();
   }
 
   private int findBestFit(Iterable<MidiHandle> midiHandles, Type type, int index) {
@@ -360,7 +370,7 @@ public class MusicianeerController extends ControllerTask {
     this.currentSong = currentSong;
     SongInfo songInfo = currentSong.getSongInfo();
     this.transposition = songInfo.getEasyTransposition();
-    musicianeerView.resetMidiNoteLeds();
+    resetTransportNoteState();
     musicianeerView.selectSong(currentSong.getSongIndex());
     musicianeerView.renderSongDetails(currentSong);
     renderChannel(currentSong.getSongInfo().getActiveChannels()[0]);
@@ -383,12 +393,12 @@ public class MusicianeerController extends ControllerTask {
   }
 
   private void playCurrentSong(CurrentSong currentSong) {
-    musicianeerView.resetMidiNoteLeds();
+    resetTransportNoteState();
   }
 
   private void renderChannel(int channel) {
     this.channel = channel;
-    musicianeerView.resetMidiNoteLeds();
+    resetTransportNoteState();
     musicianeerView.selectChannel(currentSong.getSong(), channel, transposition);
     CurrentPrograms currentPrograms = request(Services.getCurrentPrograms);
     if (currentPrograms != null) {
@@ -424,6 +434,12 @@ public class MusicianeerController extends ControllerTask {
 
   private void renderSongInfo(SongInfo songInfo, int songIndex) {
     musicianeerView.renderSongInfo(songInfo, songIndex);
+  }
+
+  private void resetTransportNoteState() {
+    Arrays.fill(transportCueCount, 0);
+    Arrays.fill(transportNoteOn, false);
+    musicianeerView.resetMidiNoteLeds();
   }
 
 }
