@@ -17,7 +17,7 @@ body {
     /* harbor mist */
     background-color: #2E4A62;
     /* sailor blue */
-    font-size: 1.7vh;
+    font-size: .85vw;
     cursor: default;
     user-select: none;
     margin: 0px;
@@ -28,7 +28,7 @@ fieldset {
     flex-shrink: 0;
     border: 1px solid #B4B7BA;
     color: #B4B7BA;
-    font-size: 1.5vh;
+    font-size: .65vw;
 }
 
 input[type=number], input[type=text] {
@@ -72,7 +72,7 @@ circle.open {
 }
 
 text {
-    font-size: 11pt;
+    font-size: .75vw;
 }
 
 #musicianeer {
@@ -148,7 +148,7 @@ text {
     align-items: center;
     justify-content: space-around;
     padding: 5px;
-    font-size: 1.5vh;
+    font-size: .75vw;
 }
 
 #staff-container {
@@ -204,6 +204,7 @@ text {
 
 .note-legend {
     margin: auto;
+    font-size: .65vw;
 }
 
 .note-name {
