@@ -21,7 +21,7 @@ import com.example.afs.musicpad.song.Default;
 import com.example.afs.musicpad.song.Note;
 import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.song.Word;
-import com.example.afs.musicpad.svg.Circle;
+import com.example.afs.musicpad.svg.Ellipse;
 import com.example.afs.musicpad.svg.Line;
 import com.example.afs.musicpad.svg.Svg;
 import com.example.afs.musicpad.svg.Svg.Type;
@@ -135,14 +135,15 @@ public class Engraver {
   };
 
   private static final int[] POSITION = createPosition();
-  private static final int RADIUS = 10; // spacing is r, diameter is 2r
-  private static final int LEDGER_WIDTH = RADIUS * 2;
-  private static final int INTER_CLEF = RADIUS * 6;
-  private static final int DRUM_HEAD = RADIUS / 2;
+  private static final int X_RADIUS = 12; // spacing is r, diameter is 2r
+  private static final int Y_RADIUS = 10; // spacing is r, diameter is 2r
+  private static final int LEDGER_WIDTH = X_RADIUS * 2;
+  private static final int INTER_CLEF = Y_RADIUS * 6;
+  private static final int DRUM_HEAD = Y_RADIUS / 2;
 
-  private static final int TOP = RADIUS * 1;
+  private static final int TOP = Y_RADIUS * 1;
   private static final int SPAN = (POSITION[HIGHEST] - POSITION[LOWEST]) + 1;
-  private static final int BOTTOM = TOP + (SPAN * RADIUS) + INTER_CLEF;
+  private static final int BOTTOM = TOP + (SPAN * Y_RADIUS) + INTER_CLEF;
   private static final int WORDS = BOTTOM / 2;
 
   private static final String CLOSED = "closed";
@@ -172,13 +173,13 @@ public class Engraver {
 
   private void drawDrumNames(Svg staff, Sounds sounds) {
     for (Sound sound : sounds) {
-      int wordX = getX(sound.getBeginTick() - RADIUS); // align with left edge of note head
+      int wordX = getX(sound.getBeginTick() - X_RADIUS); // align with left edge of note head
       RandomAccessList<Note> drums = sound.getNotes();
       int drumCount = drums.size();
       for (int i = 0; i < drumCount; i++) {
         Note drum = drums.get(i);
         String drumName = Instruments.getShortDrumName(drum.getMidiNote());
-        staff.add(new Text(wordX, 10 * RADIUS - (i * (2 * RADIUS)), drumName));
+        staff.add(new Text(wordX, 10 * Y_RADIUS - (i * (2 * Y_RADIUS)), drumName));
       }
     }
   }
@@ -187,11 +188,11 @@ public class Engraver {
     switch (context.getNoteType()) {
     case EIGHTH:
     case QUARTER:
-      staff.add(new Circle(noteX, noteY, RADIUS, CLOSED));
+      staff.add(new Ellipse(noteX, noteY, X_RADIUS, Y_RADIUS, CLOSED));
       break;
     case HALF:
     case WHOLE:
-      staff.add(new Circle(noteX, noteY, RADIUS, OPEN));
+      staff.add(new Ellipse(noteX, noteY, X_RADIUS, Y_RADIUS, OPEN));
       break;
     case DRUM:
       staff.add(new Line(noteX - DRUM_HEAD, noteY + DRUM_HEAD, noteX + DRUM_HEAD, noteY - DRUM_HEAD));
@@ -241,7 +242,7 @@ public class Engraver {
     while (tick < duration) {
       int x = getX(tick);
       if (tick > 0) {
-        tick -= 2 * RADIUS; // so note doesn't land on it
+        tick -= 2 * X_RADIUS; // so note doesn't land on it
       }
       staff.add(new Line(x, getY(TREBLE_MIDI_NOTES[4]), x, getY(BASS_MIDI_NOTES[0])));
       tick += song.getTicksPerMeasure(tick);
@@ -250,9 +251,9 @@ public class Engraver {
 
   private void drawNoteNames(Svg staff, Sounds sounds) {
     for (Sound sound : sounds) {
-      int wordX = getX(sound.getBeginTick() - RADIUS); // align with left edge of note head
+      int wordX = getX(sound.getBeginTick() - X_RADIUS); // align with left edge of note head
       String name = sound.getName();
-      staff.add(new Text(wordX, 3 * RADIUS, name));
+      staff.add(new Text(wordX, 3 * Y_RADIUS, name));
     }
   }
 
@@ -286,13 +287,15 @@ public class Engraver {
   }
 
   private void drawSharp(Svg staff, int noteX, int y) {
-    int full = RADIUS;
-    int half = RADIUS / 2;
-    int x = noteX - 3 * RADIUS;
-    staff.add(new Line(x - full, y - half, x + full, y - half));
-    staff.add(new Line(x - full, y + half, x + full, y + half));
-    staff.add(new Line(x - half, y - full, x - half, y + full));
-    staff.add(new Line(x + half, y - full, x + half, y + full));
+    int xFull = X_RADIUS;
+    int xHalf = X_RADIUS / 2;
+    int yFull = Y_RADIUS;
+    int yHalf = Y_RADIUS / 2;
+    int x = noteX - 3 * X_RADIUS;
+    staff.add(new Line(x - xFull, y - yHalf, x + xFull, y - yHalf));
+    staff.add(new Line(x - xFull, y + yHalf, x + xFull, y + yHalf));
+    staff.add(new Line(x - xHalf, y - yFull, x - xHalf, y + yFull));
+    staff.add(new Line(x + xHalf, y - yFull, x + xHalf, y + yFull));
   }
 
   private void drawSound(Svg staff, Sound sound) {
@@ -329,21 +332,21 @@ public class Engraver {
     if (context.getNoteType() != NoteType.WHOLE) {
       int noteTop = getY(context.getHighestMidiNote());
       int noteBottom = getY(context.getLowestMidiNote());
-      int stemLength = 5 * RADIUS;
-      int flagLength = 2 * RADIUS;
+      int stemLength = 5 * Y_RADIUS;
+      int flagLength = 2 * Y_RADIUS;
       if (context.getStem() == Stem.UP) {
-        int x = getX(firstTick) + RADIUS;
+        int x = getX(firstTick) + X_RADIUS;
         int stemTop = noteTop - stemLength;
         staff.add(new Line(x, stemTop, x, noteBottom));
         if (context.getNoteType() == NoteType.EIGHTH) {
-          staff.add(new Line(x, stemTop, x + RADIUS, stemTop + flagLength));
+          staff.add(new Line(x, stemTop, x + X_RADIUS, stemTop + flagLength));
         }
       } else {
-        int x = getX(firstTick) - RADIUS;
+        int x = getX(firstTick) - X_RADIUS;
         int stemBottom = noteBottom + stemLength;
         staff.add(new Line(x, noteTop, x, stemBottom));
         if (context.getNoteType() == NoteType.EIGHTH) {
-          staff.add(new Line(x, stemBottom, x - RADIUS, stemBottom - flagLength));
+          staff.add(new Line(x, stemBottom, x - X_RADIUS, stemBottom - flagLength));
         }
       }
     }
@@ -353,7 +356,7 @@ public class Engraver {
     SortedSet<Word> words = song.getWords();
     for (Word word : words) {
       long tick = word.getTick();
-      long wordTick = tick - RADIUS; // align with left edge of note head
+      long wordTick = tick - X_RADIUS; // align with left edge of note head
       int wordX = getX(wordTick);
       staff.add(new Text(wordX, WORDS, formatText(word.getText())));
     }
@@ -428,9 +431,9 @@ public class Engraver {
   private int getY(int midiNote) {
     int y;
     if (midiNote < MIDDLE) {
-      y = BOTTOM - (POSITION[Math.max(midiNote, LOWEST)] * RADIUS);
+      y = BOTTOM - (POSITION[Math.max(midiNote, LOWEST)] * Y_RADIUS);
     } else {
-      y = TOP + ((POSITION[HIGHEST] - POSITION[Math.min(midiNote, HIGHEST)]) * RADIUS);
+      y = TOP + ((POSITION[HIGHEST] - POSITION[Math.min(midiNote, HIGHEST)]) * Y_RADIUS);
     }
     return y;
   }
