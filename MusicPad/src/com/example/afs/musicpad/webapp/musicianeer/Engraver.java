@@ -23,6 +23,7 @@ import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.song.Word;
 import com.example.afs.musicpad.svg.Ellipse;
 import com.example.afs.musicpad.svg.Line;
+import com.example.afs.musicpad.svg.Path;
 import com.example.afs.musicpad.svg.Svg;
 import com.example.afs.musicpad.svg.Svg.Type;
 import com.example.afs.musicpad.svg.Text;
@@ -68,7 +69,7 @@ public class Engraver {
   }
 
   private enum NoteType {
-    EIGHTH, QUARTER, HALF, WHOLE, DRUM
+    SIXTEENTH, EIGHTH, QUARTER, HALF, WHOLE, DRUM
   }
 
   private enum Stem {
@@ -151,6 +152,14 @@ public class Engraver {
 
   public static final int TICKS_PER_PIXEL = 5;
 
+  private static final int FLAG_LENGTH = (7 * Y_RADIUS) / 2;
+  private static final int FLAG_CY1 = (2 * FLAG_LENGTH) / 4;
+  private static final int FLAG_CY2 = (3 * FLAG_LENGTH) / 4;
+  private static final int FLAG_Y2 = (4 * FLAG_LENGTH) / 4;
+  private static final int FLAG_CX1 = (1 * X_RADIUS) / 4;
+  private static final int FLAG_CX2 = (8 * X_RADIUS) / 4;
+  private static final int FLAG_X2 = (3 * X_RADIUS) / 4;
+
   private static int[] createPosition() {
     int position = 0;
     int[] positions = new int[Midi.NOTES];
@@ -171,6 +180,46 @@ public class Engraver {
     return getStaff(song, channel, transposition);
   }
 
+  private void draw16thNoteFlag(Svg staff, Stem stem, int x1, int y1) {
+    switch (stem) {
+    case UP:
+      staff.add(new Path().moveTo(x1, y1) //
+          .setRelative(true) //
+          .curveTo(FLAG_CX1, FLAG_CY1, FLAG_CX2, FLAG_CY2, FLAG_X2, FLAG_Y2));
+      staff.add(new Path().moveTo(x1, y1 + 2 * Y_RADIUS) //
+          .setRelative(true) //
+          .curveTo(FLAG_CX1, FLAG_CY1, FLAG_CX2, FLAG_CY2, FLAG_X2, FLAG_Y2));
+      break;
+    case DOWN:
+      staff.add(new Path().moveTo(x1, y1) //
+          .setRelative(true) //
+          .curveTo(FLAG_CX1, -FLAG_CY1, FLAG_CX2, -FLAG_CY2, FLAG_X2, -FLAG_Y2));
+      staff.add(new Path().moveTo(x1, y1 - 2 * Y_RADIUS) //
+          .setRelative(true) //
+          .curveTo(FLAG_CX1, -FLAG_CY1, FLAG_CX2, -FLAG_CY2, FLAG_X2, -FLAG_Y2));
+      break;
+    default:
+      throw new UnsupportedOperationException();
+    }
+  }
+
+  private void draw8thNoteFlag(Svg staff, Stem stem, int x1, int y1) {
+    switch (stem) {
+    case UP:
+      staff.add(new Path().moveTo(x1, y1) //
+          .setRelative(true) //
+          .curveTo(FLAG_CX1, FLAG_CY1, FLAG_CX2, FLAG_CY2, FLAG_X2, FLAG_Y2));
+      break;
+    case DOWN:
+      staff.add(new Path().moveTo(x1, y1) //
+          .setRelative(true) //
+          .curveTo(FLAG_CX1, -FLAG_CY1, FLAG_CX2, -FLAG_CY2, FLAG_X2, -FLAG_Y2));
+      break;
+    default:
+      throw new UnsupportedOperationException();
+    }
+  }
+
   private void drawDrumNames(Svg staff, Sounds sounds) {
     for (Sound sound : sounds) {
       int wordX = getX(sound.getBeginTick() - X_RADIUS); // align with left edge of note head
@@ -186,6 +235,7 @@ public class Engraver {
 
   private void drawHead(Svg staff, Context context, int noteX, int noteY) {
     switch (context.getNoteType()) {
+    case SIXTEENTH:
     case EIGHTH:
     case QUARTER:
       staff.add(new Ellipse(noteX, noteY, X_RADIUS, Y_RADIUS, CLOSED));
@@ -332,21 +382,34 @@ public class Engraver {
     if (context.getNoteType() != NoteType.WHOLE) {
       int noteTop = getY(context.getHighestMidiNote());
       int noteBottom = getY(context.getLowestMidiNote());
-      int stemLength = 5 * Y_RADIUS;
-      int flagLength = 2 * Y_RADIUS;
+      int stemLength = 7 * Y_RADIUS;
       if (context.getStem() == Stem.UP) {
         int x = getX(firstTick) + X_RADIUS;
         int stemTop = noteTop - stemLength;
         staff.add(new Line(x, stemTop, x, noteBottom));
-        if (context.getNoteType() == NoteType.EIGHTH) {
-          staff.add(new Line(x, stemTop, x + X_RADIUS, stemTop + flagLength));
+        switch (context.getNoteType()) {
+        case EIGHTH:
+          draw8thNoteFlag(staff, context.stem, x, stemTop);
+          break;
+        case SIXTEENTH:
+          draw16thNoteFlag(staff, context.stem, x, stemTop);
+          break;
+        default:
+          break;
         }
       } else {
         int x = getX(firstTick) - X_RADIUS;
         int stemBottom = noteBottom + stemLength;
         staff.add(new Line(x, noteTop, x, stemBottom));
-        if (context.getNoteType() == NoteType.EIGHTH) {
-          staff.add(new Line(x, stemBottom, x - X_RADIUS, stemBottom - flagLength));
+        switch (context.getNoteType()) {
+        case EIGHTH:
+          draw8thNoteFlag(staff, context.stem, x, stemBottom);
+          break;
+        case SIXTEENTH:
+          draw16thNoteFlag(staff, context.stem, x, stemBottom);
+          break;
+        default:
+          break;
         }
       }
     }
@@ -393,7 +456,10 @@ public class Engraver {
     boolean isDrum = notes.size() > 0 && notes.get(0).getChannel() == Midi.DRUM;
     if (isDrum) {
       noteType = NoteType.DRUM;
+    } else if (averageDuration < Default.TICKS_PER_BEAT / 4 + Default.GAP_BEAT_UNIT) {
+      noteType = NoteType.SIXTEENTH;
     } else if (averageDuration < Default.TICKS_PER_BEAT / 2 + Default.GAP_BEAT_UNIT) {
+      System.out.println("channel=" + notes.get(0).getChannel() + ", tick=" + notes.get(0).getTick() + ", averageDuration=" + averageDuration);
       noteType = NoteType.EIGHTH;
     } else if (averageDuration < Default.TICKS_PER_BEAT + Default.GAP_BEAT_UNIT) {
       noteType = NoteType.QUARTER;
