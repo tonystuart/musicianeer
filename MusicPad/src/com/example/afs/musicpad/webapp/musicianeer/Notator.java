@@ -30,7 +30,7 @@ import com.example.afs.musicpad.svg.Text;
 import com.example.afs.musicpad.util.DirectList;
 import com.example.afs.musicpad.util.RandomAccessList;
 
-public class Engraver {
+public class Notator {
 
   private static class Context {
     private NoteType noteType;

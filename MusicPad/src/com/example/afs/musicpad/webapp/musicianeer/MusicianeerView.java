@@ -214,8 +214,8 @@ public class MusicianeerView extends ShadowDomBuilder {
   }
 
   public void renderStaff(Song song, int channel, int transposition) {
-    Engraver engraver = new Engraver();
-    Parent staff = engraver.notate(song, channel, transposition);
+    Notator notator = new Notator();
+    Parent staff = notator.notate(song, channel, transposition);
     Parent staffScroller = getElementById("staff-scroller");
     replaceChildren(staffScroller, staff, false);
   }
