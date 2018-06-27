@@ -11,7 +11,6 @@ package com.example.afs.fluidsynth;
 
 import com.example.afs.jni.FluidSynth;
 import com.example.afs.musicpad.midi.Midi;
-import com.example.afs.musicpad.player.Player;
 import com.example.afs.musicpad.webapp.musicianeer.BooleanArray;
 
 public class Synthesizer {
@@ -57,6 +56,7 @@ public class Synthesizer {
   public static final float MINIMUM_GAIN = 0f;
   public static final float MAXIMUM_GAIN = 10f;
   public static final float DEFAULT_GAIN = 0.200f;
+  public static final int PLAYER_TOTAL_CHANNELS = Midi.CHANNELS * 2;
 
   public static Settings createDefaultSettings() {
     Settings settings = new Settings();
@@ -80,7 +80,7 @@ public class Synthesizer {
   }
 
   public void allNotesOff() {
-    for (int i = 0; i < Player.TOTAL_CHANNELS; i++) {
+    for (int i = 0; i < PLAYER_TOTAL_CHANNELS; i++) {
       FluidSynth.fluid_synth_all_notes_off(synth, i);
     }
   }
