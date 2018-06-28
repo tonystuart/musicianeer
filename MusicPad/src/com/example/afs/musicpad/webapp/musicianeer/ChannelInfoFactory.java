@@ -13,9 +13,9 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import com.example.afs.musicpad.player.PlayableMap.OutputType;
 import com.example.afs.musicpad.player.Sound;
 import com.example.afs.musicpad.player.Sounds;
+import com.example.afs.musicpad.player.Sounds.OutputType;
 import com.example.afs.musicpad.player.Sounds.SoundCount;
 import com.example.afs.musicpad.song.ChannelNotes;
 import com.example.afs.musicpad.song.Note;

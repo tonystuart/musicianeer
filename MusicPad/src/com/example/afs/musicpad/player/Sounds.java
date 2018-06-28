@@ -14,7 +14,6 @@ import java.util.Iterator;
 import java.util.Map;
 
 import com.example.afs.musicpad.midi.Midi;
-import com.example.afs.musicpad.player.PlayableMap.OutputType;
 import com.example.afs.musicpad.song.Default;
 import com.example.afs.musicpad.song.Note;
 import com.example.afs.musicpad.util.Count;
@@ -22,6 +21,10 @@ import com.example.afs.musicpad.util.DirectList;
 import com.example.afs.musicpad.util.RandomAccessList;
 
 public class Sounds implements Iterable<Sound> {
+
+  public enum OutputType {
+    TICK, MEASURE
+  }
 
   public static class SoundCount extends Count<Sound> {
     public SoundCount(Sound value) {
