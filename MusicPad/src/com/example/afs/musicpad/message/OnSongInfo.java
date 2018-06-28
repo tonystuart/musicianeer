@@ -9,7 +9,6 @@
 
 package com.example.afs.musicpad.message;
 
-import com.example.afs.musicpad.midi.SongInfoFactory;
 import com.example.afs.musicpad.midi.SongInfoFactory.SongInfo;
 import com.example.afs.musicpad.task.Message;
 

@@ -10,7 +10,6 @@
 package com.example.afs.musicpad.message;
 
 import com.example.afs.musicpad.task.Message;
-import com.example.afs.musicpad.transport.Transport;
 import com.example.afs.musicpad.transport.Transport.Whence;
 
 public class OnSeekFinished implements Message {

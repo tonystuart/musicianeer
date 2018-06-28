@@ -10,8 +10,8 @@
 package com.example.afs.musicpad.main;
 
 import com.example.afs.musicpad.device.midi.MidiHandle;
-import com.example.afs.musicpad.message.OnSongInfo;
 import com.example.afs.musicpad.message.OnSetAccompanimentType.AccompanimentType;
+import com.example.afs.musicpad.message.OnSongInfo;
 import com.example.afs.musicpad.midi.MidiLibrary;
 import com.example.afs.musicpad.task.ServiceTask.Service;
 import com.example.afs.musicpad.util.RandomAccessList;
