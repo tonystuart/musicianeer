@@ -16,16 +16,43 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import com.example.afs.musicpad.device.midi.MidiHandle;
+import com.example.afs.musicpad.device.midi.MidiHandle.Type;
+import com.example.afs.musicpad.message.OnCueNoteOn;
+import com.example.afs.musicpad.message.OnDeleteMidiFile;
+import com.example.afs.musicpad.message.OnMidiHandles;
+import com.example.afs.musicpad.message.OnMidiInputSelected;
+import com.example.afs.musicpad.message.OnMidiLibraryRefresh;
+import com.example.afs.musicpad.message.OnMute;
+import com.example.afs.musicpad.message.OnNoteOff;
+import com.example.afs.musicpad.message.OnNoteOn;
+import com.example.afs.musicpad.message.OnPlay;
+import com.example.afs.musicpad.message.OnProgramOverride;
+import com.example.afs.musicpad.message.OnSeek;
+import com.example.afs.musicpad.message.OnSeekFinished;
+import com.example.afs.musicpad.message.OnSelectSong;
+import com.example.afs.musicpad.message.OnSetAccompanimentType;
+import com.example.afs.musicpad.message.OnSetChannelVolume;
+import com.example.afs.musicpad.message.OnSetPercentMasterGain;
+import com.example.afs.musicpad.message.OnSetPercentTempo;
+import com.example.afs.musicpad.message.OnSetPercentVelocity;
 import com.example.afs.musicpad.message.OnShadowUpdate;
+import com.example.afs.musicpad.message.OnSolo;
+import com.example.afs.musicpad.message.OnSongInfo;
+import com.example.afs.musicpad.message.OnSongSelected;
+import com.example.afs.musicpad.message.OnStop;
+import com.example.afs.musicpad.message.OnTransportNoteOff;
+import com.example.afs.musicpad.message.OnTransportNoteOn;
+import com.example.afs.musicpad.message.OnTransportPlay;
+import com.example.afs.musicpad.message.OnTransposition;
+import com.example.afs.musicpad.message.OnSetAccompanimentType.AccompanimentType;
 import com.example.afs.musicpad.message.OnShadowUpdate.Action;
 import com.example.afs.musicpad.midi.Midi;
+import com.example.afs.musicpad.midi.SongInfoFactory.SongInfo;
 import com.example.afs.musicpad.task.ControllerTask;
 import com.example.afs.musicpad.task.MessageBroker;
 import com.example.afs.musicpad.util.RandomAccessList;
-import com.example.afs.musicpad.webapp.musicianeer.MidiHandle.Type;
 import com.example.afs.musicpad.webapp.musicianeer.MusicianeerView.LedState;
-import com.example.afs.musicpad.webapp.musicianeer.OnSetAccompanimentType.AccompanimentType;
-import com.example.afs.musicpad.webapp.musicianeer.SongInfoFactory.SongInfo;
 
 public class MusicianeerController extends ControllerTask {
 

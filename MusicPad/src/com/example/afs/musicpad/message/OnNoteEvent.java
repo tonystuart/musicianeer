@@ -7,26 +7,26 @@
 // This program is made available on an "as is" basis, without
 // warranties or conditions of any kind, either express or implied.
 
-package com.example.afs.musicpad.webapp.musicianeer;
+package com.example.afs.musicpad.message;
 
-import com.example.afs.musicpad.midi.SongInfoFactory.SongInfo;
-import com.example.afs.musicpad.task.ServiceTask.Service;
+import com.example.afs.musicpad.task.Message;
+import com.example.afs.musicpad.transport.NoteEvent;
 
-public class ImportService implements Service<SongInfo> {
+public class OnNoteEvent implements Message {
 
-  private String filename;
+  private NoteEvent noteEvent;
 
-  public ImportService(String filename) {
-    this.filename = filename;
+  public OnNoteEvent(NoteEvent noteEvent) {
+    this.noteEvent = noteEvent;
   }
 
-  public String getFilename() {
-    return filename;
+  public NoteEvent getNoteEvent() {
+    return noteEvent;
   }
 
   @Override
   public String toString() {
-    return "ImportService [filename=" + filename + "]";
+    return "OnNoteEvent [noteEvent=" + noteEvent + "]";
   }
 
 }

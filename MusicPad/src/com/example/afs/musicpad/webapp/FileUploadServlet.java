@@ -14,12 +14,12 @@ import javax.servlet.http.Part;
 
 import com.example.afs.musicpad.html.Division;
 import com.example.afs.musicpad.html.TextElement;
+import com.example.afs.musicpad.midi.SongInfoFactory.SongInfo;
 import com.example.afs.musicpad.task.MessageBroker;
 import com.example.afs.musicpad.task.ServiceTask;
 import com.example.afs.musicpad.webapp.musicianeer.ImportService;
 import com.example.afs.musicpad.webapp.musicianeer.MidiLibraryManager;
 import com.example.afs.musicpad.webapp.musicianeer.Services;
-import com.example.afs.musicpad.webapp.musicianeer.SongInfoFactory.SongInfo;
 
 public class FileUploadServlet extends HttpServlet {
 

@@ -14,14 +14,20 @@ import java.io.IOException;
 import java.util.Random;
 import java.util.TreeMap;
 
+import com.example.afs.musicpad.message.OnDeleteMidiFile;
+import com.example.afs.musicpad.message.OnMidiLibraryRefresh;
+import com.example.afs.musicpad.message.OnSelectSong;
+import com.example.afs.musicpad.message.OnSongInfo;
+import com.example.afs.musicpad.message.OnSongSelected;
 import com.example.afs.musicpad.midi.MidiLibrary;
+import com.example.afs.musicpad.midi.SongInfoFactory;
+import com.example.afs.musicpad.midi.SongInfoFactory.SongInfo;
 import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.task.MessageBroker;
 import com.example.afs.musicpad.task.ServiceTask;
 import com.example.afs.musicpad.util.DirectList;
 import com.example.afs.musicpad.util.JsonUtilities;
 import com.example.afs.musicpad.util.RandomAccessList;
-import com.example.afs.musicpad.webapp.musicianeer.SongInfoFactory.SongInfo;
 
 public class MidiLibraryManager extends ServiceTask {
 

@@ -10,6 +10,7 @@
 package com.example.afs.musicpad.webapp.musicianeer;
 
 import com.example.afs.musicpad.midi.Midi;
+import com.example.afs.musicpad.theory.MidiNotes;
 
 public class KeyMap {
 

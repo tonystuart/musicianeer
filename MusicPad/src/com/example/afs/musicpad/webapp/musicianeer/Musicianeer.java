@@ -15,10 +15,25 @@ import java.util.Set;
 import com.example.afs.fluidsynth.Synthesizer;
 import com.example.afs.fluidsynth.Synthesizer.Settings;
 import com.example.afs.jni.FluidSynth;
+import com.example.afs.musicpad.message.OnChannelPressure;
+import com.example.afs.musicpad.message.OnControlChange;
+import com.example.afs.musicpad.message.OnMute;
+import com.example.afs.musicpad.message.OnNoteOff;
+import com.example.afs.musicpad.message.OnNoteOn;
+import com.example.afs.musicpad.message.OnNotes;
+import com.example.afs.musicpad.message.OnPitchBend;
+import com.example.afs.musicpad.message.OnProgramChange;
+import com.example.afs.musicpad.message.OnProgramOverride;
+import com.example.afs.musicpad.message.OnSetChannelVolume;
+import com.example.afs.musicpad.message.OnSolo;
+import com.example.afs.musicpad.message.OnSongSelected;
+import com.example.afs.musicpad.message.OnTransportPlay;
+import com.example.afs.musicpad.message.OnTransposition;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.task.MessageBroker;
 import com.example.afs.musicpad.task.ServiceTask;
+import com.example.afs.musicpad.transport.Transport;
 
 public class Musicianeer extends ServiceTask {
 

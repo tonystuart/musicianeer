@@ -7,25 +7,20 @@
 // This program is made available on an "as is" basis, without
 // warranties or conditions of any kind, either express or implied.
 
-package com.example.afs.musicpad.webapp.musicianeer;
+package com.example.afs.musicpad.message;
 
+import com.example.afs.musicpad.midi.SongInfoFactory;
 import com.example.afs.musicpad.midi.SongInfoFactory.SongInfo;
-import com.example.afs.musicpad.song.Song;
+import com.example.afs.musicpad.task.Message;
 
-public class CurrentSong {
+public class OnSongInfo implements Message {
 
-  private Song song;
   private SongInfo songInfo;
   private int songIndex;
 
-  public CurrentSong(Song song, SongInfo songInfo, int songIndex) {
-    this.song = song;
+  public OnSongInfo(SongInfo songInfo, int songIndex) {
     this.songInfo = songInfo;
     this.songIndex = songIndex;
-  }
-
-  public Song getSong() {
-    return song;
   }
 
   public int getSongIndex() {
@@ -38,7 +33,7 @@ public class CurrentSong {
 
   @Override
   public String toString() {
-    return "CurrentSong [song=" + song + ", songInfo=" + songInfo + ", songIndex=" + songIndex + "]";
+    return "OnSongInfo [songInfo=" + songInfo + ", songIndex=" + songIndex + "]";
   }
 
 }

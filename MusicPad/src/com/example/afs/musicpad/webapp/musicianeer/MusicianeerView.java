@@ -10,6 +10,8 @@
 package com.example.afs.musicpad.webapp.musicianeer;
 
 import com.example.afs.musicpad.analyzer.Names;
+import com.example.afs.musicpad.device.midi.MidiHandle;
+import com.example.afs.musicpad.device.midi.MidiHandle.Type;
 import com.example.afs.musicpad.html.CheckBox;
 import com.example.afs.musicpad.html.Division;
 import com.example.afs.musicpad.html.Element;
@@ -20,13 +22,16 @@ import com.example.afs.musicpad.html.Range;
 import com.example.afs.musicpad.html.Select;
 import com.example.afs.musicpad.html.ShadowDomBuilder;
 import com.example.afs.musicpad.html.TableRow;
+import com.example.afs.musicpad.message.OnProgramOverride;
+import com.example.afs.musicpad.message.OnSetAccompanimentType.AccompanimentType;
+import com.example.afs.musicpad.midi.ChannelInfoFactory;
 import com.example.afs.musicpad.midi.Instruments;
+import com.example.afs.musicpad.midi.ChannelInfoFactory.ChannelInfo;
+import com.example.afs.musicpad.midi.SongInfoFactory.SongInfo;
 import com.example.afs.musicpad.song.Song;
 import com.example.afs.musicpad.task.ControllerTask;
-import com.example.afs.musicpad.webapp.musicianeer.ChannelInfoFactory.ChannelInfo;
-import com.example.afs.musicpad.webapp.musicianeer.MidiHandle.Type;
-import com.example.afs.musicpad.webapp.musicianeer.OnSetAccompanimentType.AccompanimentType;
-import com.example.afs.musicpad.webapp.musicianeer.SongInfoFactory.SongInfo;
+import com.example.afs.musicpad.theory.Keyboard;
+import com.example.afs.musicpad.transport.Transport;
 
 public class MusicianeerView extends ShadowDomBuilder {
 
