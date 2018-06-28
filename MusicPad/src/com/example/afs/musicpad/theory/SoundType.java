@@ -11,7 +11,7 @@ package com.example.afs.musicpad.theory;
 
 import java.util.Arrays;
 
-import com.example.afs.musicpad.analyzer.Names;
+import com.example.afs.musicianeer.analyzer.Names;
 
 public class SoundType implements Comparable<SoundType> {
 

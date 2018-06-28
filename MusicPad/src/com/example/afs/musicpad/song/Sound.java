@@ -11,7 +11,7 @@ package com.example.afs.musicpad.song;
 
 import java.util.Iterator;
 
-import com.example.afs.musicpad.analyzer.Names;
+import com.example.afs.musicianeer.analyzer.Names;
 import com.example.afs.musicpad.theory.IntervalSet;
 import com.example.afs.musicpad.theory.SoundType;
 import com.example.afs.musicpad.util.DirectList;

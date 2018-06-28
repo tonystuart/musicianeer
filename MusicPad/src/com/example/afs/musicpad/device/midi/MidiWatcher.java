@@ -24,12 +24,12 @@ import javax.sound.midi.MidiSystem;
 import javax.sound.midi.MidiUnavailableException;
 
 import com.example.afs.musicpad.device.midi.MidiHandle.Type;
+import com.example.afs.musicpad.main.Services;
 import com.example.afs.musicpad.message.OnMidiHandles;
 import com.example.afs.musicpad.task.MessageBroker;
 import com.example.afs.musicpad.task.ServiceTask;
 import com.example.afs.musicpad.util.DirectList;
 import com.example.afs.musicpad.util.RandomAccessList;
-import com.example.afs.musicpad.webapp.musicianeer.Services;
 
 public class MidiWatcher extends ServiceTask {
 

@@ -12,6 +12,7 @@ package com.example.afs.musicpad.transport;
 import java.util.Collections;
 
 import com.example.afs.fluidsynth.Synthesizer;
+import com.example.afs.musicpad.main.Services;
 import com.example.afs.musicpad.message.OnCueNoteOn;
 import com.example.afs.musicpad.message.OnNoteEvent;
 import com.example.afs.musicpad.message.OnNotes;
@@ -39,7 +40,6 @@ import com.example.afs.musicpad.util.RandomAccessList;
 import com.example.afs.musicpad.util.Range;
 import com.example.afs.musicpad.util.Tick;
 import com.example.afs.musicpad.util.Velocity;
-import com.example.afs.musicpad.webapp.musicianeer.Services;
 
 public class Transport extends ServiceTask {
 

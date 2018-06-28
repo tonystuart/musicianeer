@@ -12,8 +12,8 @@ package com.example.afs.musicpad.midi;
 import java.io.File;
 import java.util.Arrays;
 
-import com.example.afs.musicpad.analyzer.KeyScore;
-import com.example.afs.musicpad.analyzer.KeySignatures;
+import com.example.afs.musicianeer.analyzer.KeyScore;
+import com.example.afs.musicianeer.analyzer.KeySignatures;
 import com.example.afs.musicpad.song.Song;
 
 public class SongInfoFactory {

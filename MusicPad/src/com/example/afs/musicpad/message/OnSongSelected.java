@@ -9,8 +9,8 @@
 
 package com.example.afs.musicpad.message;
 
+import com.example.afs.musicpad.main.CurrentSong;
 import com.example.afs.musicpad.task.Message;
-import com.example.afs.musicpad.webapp.musicianeer.CurrentSong;
 
 public class OnSongSelected implements Message {
 

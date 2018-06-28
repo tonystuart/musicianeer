@@ -7,25 +7,26 @@
 // This program is made available on an "as is" basis, without
 // warranties or conditions of any kind, either express or implied.
 
-package com.example.afs.musicpad.webapp.musicianeer;
+package com.example.afs.musicpad.main;
 
-import java.util.Arrays;
+import com.example.afs.musicpad.midi.SongInfoFactory.SongInfo;
+import com.example.afs.musicpad.task.ServiceTask.Service;
 
-public class CurrentPrograms {
+public class ImportService implements Service<SongInfo> {
 
-  private int[] programs;
+  private String filename;
 
-  public CurrentPrograms(int[] programs) {
-    this.programs = programs;
+  public ImportService(String filename) {
+    this.filename = filename;
   }
 
-  public int[] getPrograms() {
-    return programs;
+  public String getFilename() {
+    return filename;
   }
 
   @Override
   public String toString() {
-    return "CurrentPrograms [programs=" + Arrays.toString(programs) + "]";
+    return "ImportService [filename=" + filename + "]";
   }
 
 }

@@ -7,7 +7,7 @@
 // This program is made available on an "as is" basis, without
 // warranties or conditions of any kind, either express or implied.
 
-package com.example.afs.musicpad.webapp.musicianeer;
+package com.example.afs.musicpad.main;
 
 import com.example.afs.musicpad.device.midi.MidiWatcher;
 import com.example.afs.musicpad.task.MessageBroker;

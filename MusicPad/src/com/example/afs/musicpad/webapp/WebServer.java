@@ -21,9 +21,9 @@ import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.log.Log;
 import org.eclipse.jetty.util.log.Logger;
 
+import com.example.afs.musicpad.main.MusicianeerWebAppFactory;
 import com.example.afs.musicpad.task.MessageBroker;
 import com.example.afs.musicpad.task.MessageTask;
-import com.example.afs.musicpad.webapp.musicianeer.MusicianeerWebAppFactory;
 
 public class WebServer extends MessageTask {
 

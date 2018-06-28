@@ -15,6 +15,7 @@ import javax.sound.midi.MidiUnavailableException;
 import javax.sound.midi.Receiver;
 import javax.sound.midi.ShortMessage;
 
+import com.example.afs.musicpad.main.MusicianeerController;
 import com.example.afs.musicpad.message.OnChannelPressure;
 import com.example.afs.musicpad.message.OnControlChange;
 import com.example.afs.musicpad.message.OnMidiInputSelected;
@@ -26,7 +27,6 @@ import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.task.MessageBroker;
 import com.example.afs.musicpad.task.MessageTask;
 import com.example.afs.musicpad.util.Range;
-import com.example.afs.musicpad.webapp.musicianeer.MusicianeerController;
 
 public class MidiController extends MessageTask {
 

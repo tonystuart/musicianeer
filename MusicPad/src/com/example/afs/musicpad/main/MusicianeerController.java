@@ -7,7 +7,7 @@
 // This program is made available on an "as is" basis, without
 // warranties or conditions of any kind, either express or implied.
 
-package com.example.afs.musicpad.webapp.musicianeer;
+package com.example.afs.musicpad.main;
 
 import java.awt.event.KeyEvent;
 import java.util.Arrays;
@@ -18,6 +18,7 @@ import java.util.Set;
 
 import com.example.afs.musicpad.device.midi.MidiHandle;
 import com.example.afs.musicpad.device.midi.MidiHandle.Type;
+import com.example.afs.musicpad.main.MusicianeerView.LedState;
 import com.example.afs.musicpad.message.OnCueNoteOn;
 import com.example.afs.musicpad.message.OnDeleteMidiFile;
 import com.example.afs.musicpad.message.OnMidiHandles;
@@ -52,7 +53,6 @@ import com.example.afs.musicpad.midi.SongInfoFactory.SongInfo;
 import com.example.afs.musicpad.task.ControllerTask;
 import com.example.afs.musicpad.task.MessageBroker;
 import com.example.afs.musicpad.util.RandomAccessList;
-import com.example.afs.musicpad.webapp.musicianeer.MusicianeerView.LedState;
 
 public class MusicianeerController extends ControllerTask {
 

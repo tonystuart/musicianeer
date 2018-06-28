@@ -18,7 +18,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import com.example.afs.musicpad.analyzer.TranspositionFinder;
+import com.example.afs.musicianeer.analyzer.TranspositionFinder;
 import com.example.afs.musicpad.midi.Instruments;
 import com.example.afs.musicpad.midi.Midi;
 import com.example.afs.musicpad.song.Note.NoteBuilder;
