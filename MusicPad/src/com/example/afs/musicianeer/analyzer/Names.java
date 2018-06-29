@@ -11,9 +11,9 @@ package com.example.afs.musicianeer.analyzer;
 
 import java.util.List;
 
-import com.example.afs.musicpad.midi.Instruments;
-import com.example.afs.musicpad.midi.Midi;
-import com.example.afs.musicpad.song.Note;
+import com.example.afs.musicianeer.midi.Instruments;
+import com.example.afs.musicianeer.midi.Midi;
+import com.example.afs.musicianeer.song.Note;
 
 public class Names {
 

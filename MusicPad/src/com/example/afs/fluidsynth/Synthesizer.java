@@ -10,8 +10,8 @@
 package com.example.afs.fluidsynth;
 
 import com.example.afs.jni.FluidSynth;
-import com.example.afs.musicpad.midi.Midi;
-import com.example.afs.musicpad.util.BooleanArray;
+import com.example.afs.musicianeer.midi.Midi;
+import com.example.afs.musicianeer.util.BooleanArray;
 
 public class Synthesizer {
 

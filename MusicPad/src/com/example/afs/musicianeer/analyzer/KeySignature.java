@@ -9,7 +9,7 @@
 
 package com.example.afs.musicianeer.analyzer;
 
-import com.example.afs.musicpad.midi.Midi;
+import com.example.afs.musicianeer.midi.Midi;
 
 public final class KeySignature {
   private String notes;

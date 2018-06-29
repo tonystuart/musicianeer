@@ -9,8 +9,8 @@
 
 package com.example.afs.musicianeer.analyzer;
 
-import com.example.afs.musicpad.midi.Midi;
-import com.example.afs.musicpad.song.Song;
+import com.example.afs.musicianeer.midi.Midi;
+import com.example.afs.musicianeer.song.Song;
 
 public class TranspositionFinder {
 
