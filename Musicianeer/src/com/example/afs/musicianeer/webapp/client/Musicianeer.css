@@ -51,12 +51,21 @@ select {
 }
 
 svg {
+    stroke-linecap: round;
+}
+
+#staff-scroller svg {
     fill: #B4B7BA;
     height: 95%;
     margin-left: 50%;
     margin-right: 50%;
     stroke: #B4B7BA;
-    stroke-linecap: round;
+}
+
+.key-parent svg {
+	fill: black;
+	stroke: black;
+	width: 50px;
 }
 
 line {
