@@ -185,7 +185,7 @@ public class MidiLibraryManager extends ServiceTask {
     setCallbackTimeout();
     publish(new OnMidiLibraryRefresh(midiLibrary));
     if (selectedIndex == -1) {
-      if (mostRecentImport == null) {
+      if (mostRecentImport == null && midiLibrary.size() > 0) {
         selectedIndex = random.nextInt(Math.min(midiLibrary.size(), 100));
       }
     }
