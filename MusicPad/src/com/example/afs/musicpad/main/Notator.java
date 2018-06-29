@@ -460,7 +460,6 @@ public class Notator {
     } else if (averageDuration < Default.TICKS_PER_BEAT / 4 + Default.GAP_BEAT_UNIT) {
       noteType = NoteType.SIXTEENTH;
     } else if (averageDuration < Default.TICKS_PER_BEAT / 2 + Default.GAP_BEAT_UNIT) {
-      System.out.println("channel=" + notes.get(0).getChannel() + ", tick=" + notes.get(0).getTick() + ", averageDuration=" + averageDuration);
       noteType = NoteType.EIGHTH;
     } else if (averageDuration < Default.TICKS_PER_BEAT + Default.GAP_BEAT_UNIT) {
       noteType = NoteType.QUARTER;
