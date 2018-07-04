@@ -15,6 +15,7 @@ import com.example.afs.musicianeer.device.midi.MidiHandle.Type;
 import com.example.afs.musicianeer.html.CheckBox;
 import com.example.afs.musicianeer.html.Division;
 import com.example.afs.musicianeer.html.Element;
+import com.example.afs.musicianeer.html.Node;
 import com.example.afs.musicianeer.html.NumberInput;
 import com.example.afs.musicianeer.html.Parent;
 import com.example.afs.musicianeer.html.Radio;
@@ -32,6 +33,8 @@ import com.example.afs.musicianeer.song.Default;
 import com.example.afs.musicianeer.song.Note;
 import com.example.afs.musicianeer.song.Note.NoteBuilder;
 import com.example.afs.musicianeer.song.Song;
+import com.example.afs.musicianeer.svg.Line;
+import com.example.afs.musicianeer.svg.Svg;
 import com.example.afs.musicianeer.task.ControllerTask;
 import com.example.afs.musicianeer.theory.Keyboard;
 import com.example.afs.musicianeer.transport.Transport;
@@ -97,15 +100,15 @@ public class MusicianeerView extends ShadowDomBuilder {
                         .add(th() //
                             .add(text("Solo"))) //
                         .add(th() //
+                            .add(text("Notes"))) //
+                        .add(th() //
                             .add(text("Melody"))) //
                         .add(th() //
                             .add(text("Measures"))) //
                         .add(th() //
-                            .add(text("Occupancy"))) //
-                        .add(th() //
                             .add(text("Concurrency"))) //
                         .add(th() //
-                            .add(text("Notes")))) //
+                            .add(text("Profile")))) //
                     .add(tbody("#channel-body"))))) //
         .add(div("#staff-container") //
             .add(div("#staff-cursor")) //
@@ -404,15 +407,15 @@ public class MusicianeerView extends ShadowDomBuilder {
             .add(checkbox("#channel-solo-" + channel) //
                 .addCheckHandler())) //
         .add(td() //
+            .add(text(channelInfo.getUniqueSounds())))
+        .add(td() //
             .add(text(channelInfo.getPercentMelody() + "%"))) //
         .add(td() //
             .add(text(channelInfo.getPercentMeasuresPlayed() + "%"))) //
         .add(td() //
-            .add(text(channelInfo.getOccupancy() + "%"))) //
-        .add(td() //
             .add(text(channelInfo.getConcurrency() + "%"))) //
         .add(td() //
-            .add(text(channelInfo.getUniqueSounds())));
+            .add(getProfileGraphic(channel, channelInfo.getNoteCountsByMeasure())));
   }
 
   private Select createInstrumentSelect() {
@@ -464,6 +467,16 @@ public class MusicianeerView extends ShadowDomBuilder {
         .withDuration(Default.TICKS_PER_BEAT).create());
     Parent noteStaffPosition = notator.notate(song, 0, 0);
     return noteStaffPosition;
+  }
+
+  private Node getProfileGraphic(int channel, int[] noteCountsByMeasure) {
+    int measureCount = noteCountsByMeasure.length;
+    Svg svg = new Svg(Svg.Type.SCALE_TO_FIT, 0, 0, measureCount, 20, ".channel-" + channel);
+    svg.addClassName("profile");
+    for (int i = 0; i < measureCount; i++) {
+      svg.add(new Line(i, 0, i + 1, noteCountsByMeasure[i]));
+    }
+    return svg;
   }
 
   private Parent key(int midiNote, String className) {

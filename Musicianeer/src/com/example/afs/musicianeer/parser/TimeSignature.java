@@ -10,10 +10,14 @@
 package com.example.afs.musicianeer.parser;
 
 public class TimeSignature {
+  private long tick;
+  private int measure;
   private int beatsPerMeasure;
   private int beatUnit;
 
-  public TimeSignature(int beatsPerMeasure, int beatUnit) {
+  public TimeSignature(long tick, int measure, int beatsPerMeasure, int beatUnit) {
+    this.tick = tick;
+    this.measure = measure;
     this.beatsPerMeasure = beatsPerMeasure;
     this.beatUnit = beatUnit;
   }
@@ -26,8 +30,16 @@ public class TimeSignature {
     return beatUnit;
   }
 
+  public int getMeasure() {
+    return measure;
+  }
+
+  public long getTick() {
+    return tick;
+  }
+
   @Override
   public String toString() {
-    return "TimeSignature [beatsPerMeasure=" + beatsPerMeasure + ", beatUnit=" + beatUnit + "]";
+    return "TimeSignature [tick=" + tick + ", measure=" + measure + ", beatsPerMeasure=" + beatsPerMeasure + ", beatUnit=" + beatUnit + "]";
   }
 }

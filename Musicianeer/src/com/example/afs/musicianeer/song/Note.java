@@ -26,9 +26,10 @@ public class Note extends Item<Note> {
     private int beatsPerMinute = Default.BEATS_PER_MINUTE;
     private int beatsPerMeasure = Default.BEATS_PER_MEASURE;
     private int beatUnit = Default.BEAT_UNIT;
+    private int measure;
 
     public Note create() {
-      return new Note(tick, channel, midiNote, velocity, duration, program, startIndex, endIndex, beatsPerMinute, beatsPerMeasure, beatUnit);
+      return new Note(tick, channel, midiNote, velocity, duration, program, startIndex, endIndex, beatsPerMinute, beatsPerMeasure, beatUnit, measure);
     }
 
     public NoteBuilder withBeatsPerMeasure(int beatsPerMeasure) {
@@ -61,6 +62,11 @@ public class Note extends Item<Note> {
       return this;
     }
 
+    public NoteBuilder withMeasure(int measure) {
+      this.measure = measure;
+      return this;
+    }
+
     public NoteBuilder withMidiNote(int midiNote) {
       this.midiNote = midiNote;
       return this;
@@ -78,6 +84,7 @@ public class Note extends Item<Note> {
       beatsPerMinute = note.getBeatsPerMinute();
       beatsPerMeasure = note.getBeatsPerMeasure();
       beatUnit = note.getBeatUnit();
+      measure = note.getMeasure();
       return this;
     }
 
@@ -112,12 +119,13 @@ public class Note extends Item<Note> {
   private int beatsPerMinute;
   private int beatsPerMeasure;
   private int beatUnit;
+  private int measure;
 
   public Note(long tick) {
     super(tick);
   }
 
-  public Note(long tick, int channel, int midiNote, int velocity, long duration, int program, int startIndex, int endIndex, int beatsPerMinute, int beatsPerMeasure, int beatUnit) {
+  public Note(long tick, int channel, int midiNote, int velocity, long duration, int program, int startIndex, int endIndex, int beatsPerMinute, int beatsPerMeasure, int beatUnit, int measure) {
     super(tick);
     this.channel = channel;
     this.midiNote = midiNote;
@@ -129,6 +137,7 @@ public class Note extends Item<Note> {
     this.beatsPerMinute = beatsPerMinute;
     this.beatsPerMeasure = beatsPerMeasure;
     this.beatUnit = beatUnit;
+    this.measure = measure;
   }
 
   @Override
@@ -197,7 +206,7 @@ public class Note extends Item<Note> {
   }
 
   public int getMeasure() {
-    return (int) (tick / getTicksPerMeasure());
+    return measure;
   }
 
   public int getMidiNote() {

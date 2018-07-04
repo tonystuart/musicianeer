@@ -39,6 +39,7 @@ public class Song {
   private File file;
   private String title;
   private long duration;
+  private int lastMeasure;
 
   private Integer distanceToWhiteKeys;
   private TreeSet<Note> notes = new TreeSet<>();
@@ -62,6 +63,10 @@ public class Song {
     long noteEnd = note.getTick() + note.getDuration();
     if (noteEnd > duration) {
       duration = noteEnd;
+    }
+    int measure = note.getMeasure();
+    if (measure > lastMeasure) {
+      lastMeasure = measure;
     }
   }
 
@@ -234,6 +239,10 @@ public class Song {
     return channelFacets.getFacet(channel).getHighestMidiNote();
   }
 
+  public int getLastMeasure() {
+    return lastMeasure;
+  }
+
   public long getLastTick() {
     long length;
     if (notes.size() == 0) {
@@ -276,6 +285,14 @@ public class Song {
 
   public int getNoteCount() {
     return notes.size();
+  }
+
+  public int[] getNoteCountsByMeasure(int channel) {
+    int[] noteCounts = new int[lastMeasure + 1];
+    for (Note note : getChannelNotes(channel)) {
+      noteCounts[note.getMeasure()]++;
+    }
+    return noteCounts;
   }
 
   public TreeSet<Note> getNotes() {

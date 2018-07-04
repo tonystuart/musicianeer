@@ -74,6 +74,12 @@ svg {
 	vector-effect: non-scaling-stroke;
 }
 
+.profile {
+	height: 1.7vh;
+	width: 5vw;
+	stroke: red;
+}
+
 line {
 	stroke-width: 2;
 }
@@ -139,10 +145,9 @@ path {
 
 #channel-table-wrapper {
     margin: 0px 0px 0px 5px;
-    overflow: auto;
     width: 50%;
     height: 21vh;
-    overflow-y: auto;
+    overflow-y: scroll;
     overflow-x: hidden;
 }
 

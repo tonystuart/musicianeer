@@ -31,9 +31,14 @@ public class ChannelInfoFactory {
     private int percentMelody;
     private String programNames;
     private int uniqueSounds;
+    private int[] noteCountsByMeasure;
 
     public int getConcurrency() {
       return concurrency;
+    }
+
+    public int[] getNoteCountsByMeasure() {
+      return noteCountsByMeasure;
     }
 
     public int getOccupancy() {
@@ -77,6 +82,7 @@ public class ChannelInfoFactory {
     channelInfo.percentMelody = song.getPercentMelody(channel);
     channelInfo.programNames = getProgramNames(channel);
     channelInfo.uniqueSounds = getUniqueSounds(channel);
+    channelInfo.noteCountsByMeasure = song.getNoteCountsByMeasure(channel);
     return channelInfo;
   }
 

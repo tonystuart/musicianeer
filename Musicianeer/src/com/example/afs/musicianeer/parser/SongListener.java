@@ -20,7 +20,7 @@ import com.example.afs.musicianeer.song.Word;
 public class SongListener implements Listener {
 
   private static final Tempo DEFAULT_TEMPO = new Tempo(60000000 / Default.BEATS_PER_MINUTE, Default.BEATS_PER_MINUTE);
-  private static final TimeSignature DEFAULT_TIME_SIGNATURE = new TimeSignature(Default.BEATS_PER_MEASURE, Default.BEAT_UNIT);
+  private static final TimeSignature DEFAULT_TIME_SIGNATURE = new TimeSignature(0, 0, Default.BEATS_PER_MEASURE, Default.BEAT_UNIT);
 
   private Song song;
   private NavigableMap<Long, Tempo> tempos = new TreeMap<>();
@@ -59,7 +59,11 @@ public class SongListener implements Listener {
   public void onNote(long tick, int channel, int midiNote, int velocity, long duration, int program, int startIndex, int endIndex) {
     Tempo tempo = tempos.floorEntry(tick).getValue();
     TimeSignature timeSignature = timeSignatures.floorEntry(tick).getValue();
-    song.add(new Note(tick, channel, midiNote, velocity, duration, program, startIndex, endIndex, tempo.getQuarterNotesPerMinute(), timeSignature.getBeatsPerMeasure(), timeSignature.getBeatUnit()));
+    int beatsPerMinute = tempo.getQuarterNotesPerMinute();
+    int beatsPerMeasure = timeSignature.getBeatsPerMeasure();
+    int beatUnit = timeSignature.getBeatUnit();
+    int measure = getMeasure(tick, timeSignature);
+    song.add(new Note(tick, channel, midiNote, velocity, duration, program, startIndex, endIndex, beatsPerMinute, beatsPerMeasure, beatUnit, measure));
   }
 
   @Override
@@ -84,7 +88,10 @@ public class SongListener implements Listener {
 
   @Override
   public void onTimeSignatureChange(long tick, int beatsPerMeasure, int beatUnit) {
-    timeSignatures.put(tick, new TimeSignature(beatsPerMeasure, beatUnit));
+    System.out.println("song=" + song.getTitle() + ", tick=" + tick + ", beatsPerMeasure=" + beatsPerMeasure + ", beatUnit=" + beatUnit);
+    TimeSignature previousTimeSignature = timeSignatures.floorEntry(tick).getValue();
+    int measure = getMeasure(tick, previousTimeSignature);
+    timeSignatures.put(tick, new TimeSignature(tick, measure, beatsPerMeasure, beatUnit));
   }
 
   @Override
@@ -94,6 +101,14 @@ public class SongListener implements Listener {
 
   private void addWord(long tick, String text) {
     song.add(new Word(tick, text));
+  }
+
+  private int getMeasure(long tick, TimeSignature previousTimeSignature) {
+    long ticksSincePreviousTimeSignature = tick - previousTimeSignature.getTick();
+    long ticksPerPrevousTimeSignatureMeasure = previousTimeSignature.getBeatsPerMeasure() * Default.TICKS_PER_BEAT;
+    int measuresSincePreviousTimeSignature = (int) (ticksSincePreviousTimeSignature / ticksPerPrevousTimeSignatureMeasure);
+    int measure = previousTimeSignature.getMeasure() + measuresSincePreviousTimeSignature;
+    return measure;
   }
 
 }
