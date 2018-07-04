@@ -29,7 +29,6 @@ import com.example.afs.musicianeer.message.OnSetChannelVolume;
 import com.example.afs.musicianeer.message.OnSolo;
 import com.example.afs.musicianeer.message.OnSongSelected;
 import com.example.afs.musicianeer.message.OnStop;
-import com.example.afs.musicianeer.message.OnTransportPlay;
 import com.example.afs.musicianeer.message.OnTransposition;
 import com.example.afs.musicianeer.midi.Midi;
 import com.example.afs.musicianeer.song.Song;
@@ -221,7 +220,6 @@ public class Musicianeer extends ServiceTask {
   private void playCurrentSong() {
     Song song = currentSong.getSong();
     publish(new OnNotes(song.getNotes()));
-    publish(new OnTransportPlay(currentSong));
   }
 
   private void setProgram(int channel, int program) {

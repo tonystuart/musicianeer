@@ -30,24 +30,22 @@ import com.example.afs.musicianeer.message.OnNoteOn;
 import com.example.afs.musicianeer.message.OnPlay;
 import com.example.afs.musicianeer.message.OnProgramOverride;
 import com.example.afs.musicianeer.message.OnSeek;
-import com.example.afs.musicianeer.message.OnSeekFinished;
 import com.example.afs.musicianeer.message.OnSelectSong;
 import com.example.afs.musicianeer.message.OnSetAccompanimentType;
+import com.example.afs.musicianeer.message.OnSetAccompanimentType.AccompanimentType;
 import com.example.afs.musicianeer.message.OnSetChannelVolume;
 import com.example.afs.musicianeer.message.OnSetPercentMasterGain;
 import com.example.afs.musicianeer.message.OnSetPercentTempo;
 import com.example.afs.musicianeer.message.OnSetPercentVelocity;
 import com.example.afs.musicianeer.message.OnShadowUpdate;
+import com.example.afs.musicianeer.message.OnShadowUpdate.Action;
 import com.example.afs.musicianeer.message.OnSolo;
 import com.example.afs.musicianeer.message.OnSongInfo;
 import com.example.afs.musicianeer.message.OnSongSelected;
 import com.example.afs.musicianeer.message.OnStop;
 import com.example.afs.musicianeer.message.OnTransportNoteOff;
 import com.example.afs.musicianeer.message.OnTransportNoteOn;
-import com.example.afs.musicianeer.message.OnTransportPlay;
 import com.example.afs.musicianeer.message.OnTransposition;
-import com.example.afs.musicianeer.message.OnSetAccompanimentType.AccompanimentType;
-import com.example.afs.musicianeer.message.OnShadowUpdate.Action;
 import com.example.afs.musicianeer.midi.Midi;
 import com.example.afs.musicianeer.midi.SongInfoFactory.SongInfo;
 import com.example.afs.musicianeer.task.ControllerTask;
@@ -118,7 +116,6 @@ public class MusicianeerController extends ControllerTask {
         break;
       case "stop":
         publish(new OnStop());
-        resetTransportNoteState();
         break;
       }
     }
@@ -193,6 +190,8 @@ public class MusicianeerController extends ControllerTask {
   @Override
   protected void doLoad() {
     // NB: We are single threaded by virtue of our input queue
+    subscribe(OnPlay.class, message -> doPlay(message));
+    subscribe(OnSeek.class, message -> doSeek(message));
     subscribe(OnMute.class, message -> doMute(message));
     subscribe(OnSolo.class, message -> doSolo(message));
     subscribe(OnNoteOn.class, message -> doNoteOn(message));
@@ -200,10 +199,8 @@ public class MusicianeerController extends ControllerTask {
     subscribe(OnSongInfo.class, message -> doSongInfo(message));
     subscribe(OnCueNoteOn.class, message -> doCueNoteOn(message));
     subscribe(OnMidiHandles.class, message -> doMidiHandles(message));
-    subscribe(OnSeekFinished.class, message -> doSeekFinished(message));
     subscribe(OnSongSelected.class, message -> doSongSelected(message));
     subscribe(OnTransposition.class, message -> doTransposition(message));
-    subscribe(OnTransportPlay.class, message -> doTransportPlay(message));
     subscribe(OnSetPercentTempo.class, message -> doSetPercentTempo(message));
     subscribe(OnTransportNoteOn.class, message -> doTransportNoteOn(message));
     subscribe(OnTransportNoteOff.class, message -> doTransportNoteOff(message));
@@ -306,8 +303,12 @@ public class MusicianeerController extends ControllerTask {
     }
   }
 
-  private void doSeekFinished(OnSeekFinished message) {
-    resetTransportNoteState();
+  private void doPlay(OnPlay message) {
+    resetTransportNoteState(); // TODO: Remove this if we remove cue notes
+  }
+
+  private void doSeek(OnSeek message) {
+    //resetTransportNoteState(); // TODO: Remove this if we remove cue notes
   }
 
   private void doSetAccompanimentType(OnSetAccompanimentType message) {
@@ -365,10 +366,6 @@ public class MusicianeerController extends ControllerTask {
     }
   }
 
-  private void doTransportPlay(OnTransportPlay message) {
-    playCurrentSong(message.getCurrentSong());
-  }
-
   private void doTransposition(OnTransposition message) {
     this.transposition = message.getTransposition();
     musicianeerView.renderStaff(currentSong.getSong(), channel, transposition);
@@ -417,10 +414,6 @@ public class MusicianeerController extends ControllerTask {
         musicianeerView.setSolo(channel, isSolo);
       }
     }
-  }
-
-  private void playCurrentSong(CurrentSong currentSong) {
-    resetTransportNoteState();
   }
 
   private void renderChannel(int channel) {

@@ -19,7 +19,6 @@ import com.example.afs.musicianeer.message.OnNotes;
 import com.example.afs.musicianeer.message.OnPlay;
 import com.example.afs.musicianeer.message.OnProgramChange;
 import com.example.afs.musicianeer.message.OnSeek;
-import com.example.afs.musicianeer.message.OnSeekFinished;
 import com.example.afs.musicianeer.message.OnSetAccompanimentType;
 import com.example.afs.musicianeer.message.OnSetPercentMasterGain;
 import com.example.afs.musicianeer.message.OnSetPercentTempo;
@@ -47,11 +46,15 @@ public class Transport extends ServiceTask {
     RELATIVE, ABSOLUTE
   }
 
+  private enum State {
+    PLAY, PAUSE, STOP
+  }
+
   public static final int DEFAULT_PERCENT_GAIN = 10;
   public static final int DEFAULT_PERCENT_TEMPO = 50;
   public static final int DEFAULT_PERCENT_VELOCITY = 10;
-
   public static final int DEFAULT_MASTER_PROGRAM_OFF = Midi.MAX_VALUE;
+
   public static final long INITIALIZE_ON_NEXT_EVENT = -1;
 
   private int index;
@@ -61,11 +64,11 @@ public class Transport extends ServiceTask {
   private int[] currentPrograms = new int[Midi.CHANNELS];
 
   private long baseTick;
-  private boolean isPaused;
   private long baseTimeMillis;
   private int percentTempo = 100;
   private int appliedPercentTempo = percentTempo;
 
+  private State state;
   private Iterable<Note> notes;
   private Synthesizer synthesizer;
   private RandomAccessList<NoteEvent> noteEvents = new DirectList<>();
@@ -90,15 +93,6 @@ public class Transport extends ServiceTask {
     subscribe(OnSetPercentMasterGain.class, message -> doSetPercentMasterGain(message));
   }
 
-  private void clear() {
-    noteEvents.clear();
-    tsGetInputQueue().clear();
-    synthesizer.allNotesOff();
-    isPaused = false;
-    baseTick = 0;
-    baseTimeMillis = INITIALIZE_ON_NEXT_EVENT;
-  }
-
   private void doNoteEvent(OnNoteEvent message) {
     long currentTimestamp = System.currentTimeMillis();
     NoteEvent noteEvent = message.getNoteEvent();
@@ -112,7 +106,7 @@ public class Transport extends ServiceTask {
       }
     }
     processNoteEvent(noteEvent);
-    if (!isPaused) {
+    if (state == State.PLAY) {
       schedule();
     }
   }
@@ -127,7 +121,7 @@ public class Transport extends ServiceTask {
   }
 
   private void doPlay(OnPlay message) {
-    if (isPaused) {
+    if (state == State.PAUSE) {
       resume();
     } else if (notes != null) {
       play(notes);
@@ -151,9 +145,8 @@ public class Transport extends ServiceTask {
   }
 
   private void doStop(OnStop message) {
-    if (isPaused) {
+    if (state == State.PAUSE) {
       stop();
-      publish(new OnTick(0));
     } else {
       pause();
     }
@@ -199,18 +192,18 @@ public class Transport extends ServiceTask {
   }
 
   private boolean isPlaying() {
-    return !isPaused && index < noteEvents.size();
+    return state == State.PLAY && index < noteEvents.size();
   }
 
   private void pause() {
-    isPaused = true;
     baseTimeMillis = INITIALIZE_ON_NEXT_EVENT;
     synthesizer.allNotesOff();
+    state = State.PAUSE;
   }
 
   private void play(Iterable<Note> notes) {
-    clear();
-    index = 0;
+    reset();
+    noteEvents.clear();
     long firstTick = -1;
     long lastTick = -1;
     long metronomeTick = -1;
@@ -242,6 +235,7 @@ public class Transport extends ServiceTask {
     }
     Collections.sort(noteEvents);
     schedule();
+    state = State.PLAY;
   }
 
   private void processNoteEvent(NoteEvent noteEvent) {
@@ -306,8 +300,28 @@ public class Transport extends ServiceTask {
     }
   }
 
+  private void processSeekEvent(Type noteOnType, Type noteOffType) {
+    NoteEvent noteEvent = noteEvents.get(index);
+    Type type = noteEvent.getType();
+    if (type == noteOnType) {
+      Note note = noteEvent.getNote();
+      publish(new OnTransportNoteOn(note.getChannel(), note.getMidiNote()));
+    } else if (type == noteOffType) {
+      Note note = noteEvent.getNote();
+      publish(new OnTransportNoteOff(note.getChannel(), note.getMidiNote()));
+    }
+  }
+
+  private void reset() {
+    tsGetInputQueue().clear();
+    synthesizer.allNotesOff();
+    baseTick = 0;
+    baseTimeMillis = INITIALIZE_ON_NEXT_EVENT;
+    index = 0;
+  }
+
   private void resume() {
-    isPaused = false;
+    state = State.PLAY;
     baseTimeMillis = INITIALIZE_ON_NEXT_EVENT;
     schedule();
   }
@@ -342,11 +356,13 @@ public class Transport extends ServiceTask {
     if (newTick > currentTick) {
       index = Math.max(0, index);
       while (index < noteEvents.size() && noteEvents.get(index).getTick() < newTick) {
+        processSeekEvent(Type.NOTE_ON, Type.NOTE_OFF);
         index++;
       }
     } else {
       index = Math.min(noteEvents.size() - 1, index);
       while (index > 0 && noteEvents.get(index).getTick() > newTick) {
+        processSeekEvent(Type.NOTE_OFF, Type.NOTE_ON);
         index--;
       }
     }
@@ -357,7 +373,6 @@ public class Transport extends ServiceTask {
     } else {
       publish(new OnTick(newTick));
     }
-    publish(new OnSeekFinished(tick, whence));
   }
 
   private void setAccompaniment(OnSetAccompanimentType.AccompanimentType accompanimentType) {
@@ -387,7 +402,9 @@ public class Transport extends ServiceTask {
   }
 
   private void stop() {
-    clear();
+    reset();
+    publish(new OnTick(0));
+    state = State.STOP;
   }
 
 }
