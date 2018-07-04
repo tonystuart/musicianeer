@@ -39,7 +39,6 @@ public class Song {
   private File file;
   private String title;
   private long duration;
-  private int transposition;
 
   private Integer distanceToWhiteKeys;
   private TreeSet<Note> notes = new TreeSet<>();
@@ -265,13 +264,13 @@ public class Song {
 
   public int getMaximumTransposition() {
     int highestMidiNote = getHighestMidiNote();
-    int maximumTransposition = (Midi.MAX_VALUE - highestMidiNote) + transposition;
+    int maximumTransposition = (Midi.MAX_VALUE - highestMidiNote);
     return maximumTransposition;
   }
 
   public int getMinimumTransposition() {
     int lowestMidiNote = getLowestMidiNote();
-    int minimumTransposition = transposition - lowestMidiNote;
+    int minimumTransposition = lowestMidiNote;
     return minimumTransposition;
   }
 
@@ -419,10 +418,6 @@ public class Song {
     return title;
   }
 
-  public int getTransposition() {
-    return transposition;
-  }
-
   public TreeSet<Word> getWords() {
     return words;
   }
@@ -463,34 +458,7 @@ public class Song {
 
   @Override
   public String toString() {
-    return "Song [name=" + title + ", transposition=" + transposition + "]";
-  }
-
-  public void transposeBy(int distance) {
-    if (distance != 0) {
-      this.transposition += distance;
-      ChannelFacets newChannelFacets = new ChannelFacets();
-      for (int channel = 0; channel < Midi.CHANNELS; channel++) {
-        Facet channelFacet = channelFacets.getFacet(channel);
-        Facet newChannelFacet = newChannelFacets.getFacet(channel);
-        newChannelFacet.setConcurrency(channelFacet.getConcurrency());
-        newChannelFacet.setOccupancy(channelFacet.getOccupancy());
-      }
-      for (Note note : notes) {
-        int channel = note.getChannel();
-        if (channel != Midi.DRUM) {
-          note.transpose(distance);
-        }
-        newChannelFacets.add(note);
-      }
-      channelFacets = newChannelFacets;
-      distanceToWhiteKeys = null;
-    }
-  }
-
-  public void transposeTo(int desiredDistance) {
-    int distance = desiredDistance - this.transposition;
-    transposeBy(distance);
+    return "Song [title=" + title + "]";
   }
 
 }
