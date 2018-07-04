@@ -19,15 +19,15 @@ import com.example.afs.musicianeer.song.Note;
 import com.example.afs.musicianeer.song.Song;
 import com.example.afs.musicianeer.song.Sound;
 import com.example.afs.musicianeer.song.Sounds;
+import com.example.afs.musicianeer.song.Sounds.OutputType;
 import com.example.afs.musicianeer.song.Transposer;
 import com.example.afs.musicianeer.song.Word;
-import com.example.afs.musicianeer.song.Sounds.OutputType;
 import com.example.afs.musicianeer.svg.Ellipse;
 import com.example.afs.musicianeer.svg.Line;
 import com.example.afs.musicianeer.svg.Path;
 import com.example.afs.musicianeer.svg.Svg;
-import com.example.afs.musicianeer.svg.Text;
 import com.example.afs.musicianeer.svg.Svg.Type;
+import com.example.afs.musicianeer.svg.Text;
 import com.example.afs.musicianeer.util.DirectList;
 import com.example.afs.musicianeer.util.RandomAccessList;
 
@@ -177,6 +177,14 @@ public class Notator {
     return SHARPS[midiNote % SHARPS.length];
   }
 
+  private long songDuration;
+  private boolean isDrawNoteNames;
+
+  public Notator(long songDuration, boolean isDrawNoteName) {
+    this.songDuration = songDuration;
+    this.isDrawNoteNames = isDrawNoteName;
+  }
+
   public Parent notate(Song song, int channel, int transposition) {
     return getStaff(song, channel, transposition);
   }
@@ -288,15 +296,13 @@ public class Notator {
     }
   }
 
-  private void drawMeasures(Song song, Svg staff, long duration) {
+  private void drawMeasures(Song song, Svg staff) {
     long tick = 0;
-    while (tick < duration) {
+    while (tick <= songDuration) {
       int x = getX(tick);
-      if (tick > 0) {
-        tick -= 2 * X_RADIUS; // so note doesn't land on it
-      }
       staff.add(new Line(x, getY(TREBLE_MIDI_NOTES[4]), x, getY(BASS_MIDI_NOTES[0])));
-      tick += song.getTicksPerMeasure(tick);
+      int ticksPerMeasure = song.getTicksPerMeasure(tick);
+      tick += Math.min(ticksPerMeasure, songDuration);
     }
   }
 
@@ -364,9 +370,9 @@ public class Notator {
     drawNotes(staff, sound.getBeginTick(), bassNotes, BASS_MIDI_NOTES[2]);
   }
 
-  private Svg drawStaff(Song song, int channel, long duration) {
+  private Svg drawStaff(Song song, int channel) {
     int bottom = getY(POSITION[LOWEST]);
-    int width = getX(duration);
+    int width = getX(songDuration);
     Svg staff = new Svg(Type.SCALE_TO_FIT, 0, 0, width, bottom, ".channel-" + channel);
     for (int i = 0; i < TREBLE_MIDI_NOTES.length; i++) {
       int y = getY(TREBLE_MIDI_NOTES[i]);
@@ -473,9 +479,8 @@ public class Notator {
   }
 
   private Svg getStaff(Song song, int channel, int transposition) {
-    long duration = song.getDuration();
-    Svg staff = drawStaff(song, channel, duration);
-    drawMeasures(song, staff, duration);
+    Svg staff = drawStaff(song, channel);
+    drawMeasures(song, staff);
     Iterable<Note> notes = song.getChannelNotes(channel);
     if (channel == Midi.DRUM) {
       Sounds sounds = new Sounds(OutputType.TICK, notes);
@@ -484,7 +489,9 @@ public class Notator {
     } else {
       Sounds sounds = new Sounds(OutputType.TICK, new Transposer(notes, transposition));
       drawNotes(staff, sounds);
-      drawNoteNames(staff, sounds);
+      if (isDrawNoteNames) {
+        drawNoteNames(staff, sounds);
+      }
     }
     drawWords(song, staff);
     return staff;

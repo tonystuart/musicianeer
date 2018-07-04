@@ -28,6 +28,9 @@ import com.example.afs.musicianeer.midi.ChannelInfoFactory;
 import com.example.afs.musicianeer.midi.ChannelInfoFactory.ChannelInfo;
 import com.example.afs.musicianeer.midi.Instruments;
 import com.example.afs.musicianeer.midi.SongInfoFactory.SongInfo;
+import com.example.afs.musicianeer.song.Default;
+import com.example.afs.musicianeer.song.Note;
+import com.example.afs.musicianeer.song.Note.NoteBuilder;
 import com.example.afs.musicianeer.song.Song;
 import com.example.afs.musicianeer.task.ControllerTask;
 import com.example.afs.musicianeer.theory.Keyboard;
@@ -219,7 +222,9 @@ public class MusicianeerView extends ShadowDomBuilder {
   }
 
   public void renderStaff(Song song, int channel, int transposition) {
-    Notator notator = new Notator();
+    Note lastNote = song.getNotes().last();
+    long songDuration = lastNote.roundTickToNextMeasure();
+    Notator notator = new Notator(songDuration, true);
     Parent staff = notator.notate(song, channel, transposition);
     Parent staffScroller = getElementById("staff-scroller");
     replaceChildren(staffScroller, staff, false);
@@ -450,6 +455,17 @@ public class MusicianeerView extends ShadowDomBuilder {
     return row;
   }
 
+  private Parent getNoteStaffPosition(int midiNote) {
+    Notator notator = new Notator(Default.TICKS_PER_BEAT / 2, false);
+    Song song = new Song();
+    song.add(new NoteBuilder() //
+        .withMidiNote(midiNote) //
+        .withTick(Default.TICKS_PER_BEAT / 4) //
+        .withDuration(Default.TICKS_PER_BEAT).create());
+    Parent noteStaffPosition = notator.notate(song, 0, 0);
+    return noteStaffPosition;
+  }
+
   private Parent key(int midiNote, String className) {
     return (Parent) div("#midi-note-" + midiNote, "." + className) //
         .add(div("#midi-led-" + midiNote, "." + className + "-led")) //
@@ -495,6 +511,7 @@ public class MusicianeerView extends ShadowDomBuilder {
                 .add(div(".note-legend") //
                     .add(text(Character.toString(KeyMap.toLegend(midiNote)))))) //
             .add(div(".note-center") //
+                .add(getNoteStaffPosition(midiNote)) //
                 .add(div(".note-name") //
                     .add(text(Names.formatNoteName(midiNote)))))); //
   }

@@ -65,11 +65,17 @@ svg {
 .key-parent svg {
 	fill: black;
 	stroke: black;
-	width: 50px;
+	width: 1.6vw;
+	margin: auto;
+}
+
+.key-parent svg line {
+	stroke-width: 1;
+	vector-effect: non-scaling-stroke;
 }
 
 line {
-    stroke-width: 2;
+	stroke-width: 2;
 }
 
 circle, ellipse {
@@ -215,6 +221,7 @@ path {
 
 .note-center {
     display: flex;
+    flex-direction: column;
 }
 
 .note-legend {
