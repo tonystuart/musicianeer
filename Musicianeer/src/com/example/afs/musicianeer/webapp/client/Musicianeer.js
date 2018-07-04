@@ -55,7 +55,7 @@ musicianeer.onStaffMouseUp = function(event) {
 
 musicianeer.onStaffScroll = function(event) {
     if (musicianeer.staffMouseDown) {
-        const svg = document.querySelector('svg');
+        const svg = document.querySelector('#staff');
         const ctm = svg.getScreenCTM();
         const midPoint = event.target.offsetWidth / 2;
         const left = (event.target.offsetLeft + midPoint + -ctm.e) / ctm.a;
@@ -72,7 +72,7 @@ musicianeer.onStaffScroll = function(event) {
 
 musicianeer.onTick = function(tick) {
     if (!musicianeer.staffMouseDown) {
-        const svg = document.querySelector('svg');
+        const svg = document.querySelector('#staff');
         if (svg) {
             // not present before channel selection
             const ctm = svg.getScreenCTM();

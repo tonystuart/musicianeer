@@ -471,8 +471,7 @@ public class MusicianeerView extends ShadowDomBuilder {
 
   private Node getProfileGraphic(int channel, int[] noteCountsByMeasure) {
     int measureCount = noteCountsByMeasure.length;
-    Svg svg = new Svg(Svg.Type.SCALE_TO_FIT, 0, 0, measureCount, 20, ".channel-" + channel);
-    svg.addClassName("profile");
+    Svg svg = new Svg(Svg.Type.SCALE_TO_FIT, 0, 0, measureCount, 20, ".profile", ".channel-" + channel);
     for (int i = 0; i < measureCount; i++) {
       svg.add(new Line(i, 0, i + 1, noteCountsByMeasure[i]));
     }

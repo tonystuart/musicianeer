@@ -373,7 +373,7 @@ public class Notator {
   private Svg drawStaff(Song song, int channel) {
     int bottom = getY(POSITION[LOWEST]);
     int width = getX(songDuration);
-    Svg staff = new Svg(Type.SCALE_TO_FIT, 0, 0, width, bottom, ".channel-" + channel);
+    Svg staff = new Svg(Type.SCALE_TO_FIT, 0, 0, width, bottom, "#staff", ".channel-" + channel);
     for (int i = 0; i < TREBLE_MIDI_NOTES.length; i++) {
       int y = getY(TREBLE_MIDI_NOTES[i]);
       staff.add(new Line(0, y, width, y));
