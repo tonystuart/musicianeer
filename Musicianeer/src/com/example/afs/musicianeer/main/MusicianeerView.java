@@ -229,6 +229,8 @@ public class MusicianeerView extends ShadowDomBuilder {
     long songDuration = lastNote.roundTickToNextMeasure();
     Notator notator = new Notator(songDuration, true);
     Parent staff = notator.notate(song, channel, transposition);
+    staff.setId("staff");
+    staff.addClassName(".channel-" + channel);
     Parent staffScroller = getElementById("staff-scroller");
     replaceChildren(staffScroller, staff, false);
   }
