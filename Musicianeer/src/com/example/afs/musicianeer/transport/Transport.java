@@ -305,10 +305,12 @@ public class Transport extends ServiceTask {
     Type type = noteEvent.getType();
     if (type == noteOnType) {
       Note note = noteEvent.getNote();
-      publish(new OnTransportNoteOn(note.getChannel(), note.getMidiNote()));
+      int channel = note.getChannel();
+      publish(new OnTransportNoteOn(channel, getTransposedMidiNote(note, channel)));
     } else if (type == noteOffType) {
       Note note = noteEvent.getNote();
-      publish(new OnTransportNoteOff(note.getChannel(), note.getMidiNote()));
+      int channel = note.getChannel();
+      publish(new OnTransportNoteOff(channel, getTransposedMidiNote(note, channel)));
     }
   }
 
