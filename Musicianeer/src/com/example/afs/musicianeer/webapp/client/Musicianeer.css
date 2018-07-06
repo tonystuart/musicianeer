@@ -63,25 +63,25 @@ svg {
 }
 
 .key-parent svg {
-	fill: black;
-	stroke: black;
-	width: 1.6vw;
-	margin: auto;
+    fill: black;
+    stroke: black;
+    width: 1.6vw;
+    margin: auto;
 }
 
 .key-parent svg line {
-	stroke-width: 1;
-	vector-effect: non-scaling-stroke;
+    stroke-width: 1;
+    vector-effect: non-scaling-stroke;
 }
 
 .profile {
-	height: 1.7vh;
-	width: 5vw;
-	stroke: red;
+    height: 1.7vh;
+    width: 5vw;
+    stroke: red;
 }
 
 line {
-	stroke-width: 2;
+    stroke-width: 2;
 }
 
 circle, ellipse {
@@ -89,8 +89,8 @@ circle, ellipse {
 }
 
 circle.open, ellipse.open {
-	fill: black;
-	stroke-width: 3;
+    fill: black;
+    stroke-width: 3;
 }
 
 text {
@@ -98,8 +98,8 @@ text {
 }
 
 path {
-	fill: transparent;
-	stroke-width: 2;
+    fill: transparent;
+    stroke-width: 2;
 }
 
 #musicianeer {
@@ -276,7 +276,7 @@ path {
 }
 
 .black-key .note-legend {
-	color: white;
+    color: white;
 }
 
 .white-key-led {
@@ -383,8 +383,8 @@ path {
 }
 
 .center {
-	margin: auto;
-	text-align: center;
+    margin: auto;
+    text-align: center;
 }
 
 #import-file-container {
