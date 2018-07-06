@@ -65,6 +65,8 @@ public class MusicianeerView extends ShadowDomBuilder {
     }
   }
 
+  private static final int PROFILE_HEIGHT = 16;
+
   public MusicianeerView(ControllerTask controllerTask) {
     super(controllerTask);
     add(div("#musicianeer", ".move-target") //
@@ -473,9 +475,10 @@ public class MusicianeerView extends ShadowDomBuilder {
 
   private Node getProfileGraphic(int channel, int[] noteCountsByMeasure) {
     int measureCount = noteCountsByMeasure.length;
-    Svg svg = new Svg(Svg.Type.SCALE_TO_FIT, 0, 0, measureCount, 20, ".profile", ".channel-" + channel);
+    Svg svg = new Svg(Svg.Type.SCALE_TO_FIT, 0, 0, measureCount, PROFILE_HEIGHT, ".profile", ".channel-" + channel);
     for (int i = 0; i < measureCount; i++) {
-      svg.add(new Line(i, 0, i + 1, noteCountsByMeasure[i]));
+      int height = noteCountsByMeasure[i] / 2;
+      svg.add(new Line(i, (PROFILE_HEIGHT / 2) - height, i + 1, (PROFILE_HEIGHT / 2) + height));
     }
     return svg;
   }
