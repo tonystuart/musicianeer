@@ -232,7 +232,7 @@ public class MusicianeerView extends ShadowDomBuilder {
     Notator notator = new Notator(songDuration, true);
     Parent staff = notator.notate(song, channel, transposition);
     staff.setId("staff");
-    staff.addClassName(".channel-" + channel);
+    staff.addClassName("channel-" + channel);
     Parent staffScroller = getElementById("staff-scroller");
     replaceChildren(staffScroller, staff, false);
   }
