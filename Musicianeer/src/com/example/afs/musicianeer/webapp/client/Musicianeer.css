@@ -27,116 +27,86 @@ body {
 }
 
 .channel-0 {
-    /* red */
-    color: #ff0000;
-    stroke: #ff0000;
-    fill: #ff0000;
+    color: hsl(67, 100%, 75%);
+    stroke: hsl(67, 100%, 75%);
+    fill: hsl(67, 100%, 75%);
 }
-
 .channel-1 {
-    /* lime */
-    color: #32cd32;
-    stroke: #32cd32;
-    fill: #32cd32;
+    color: hsl(134, 100%, 75%);
+    stroke: hsl(134, 100%, 75%);
+    fill: hsl(134, 100%, 75%);
 }
-
 .channel-2 {
-    /* cyan */
-    color: #00ffff;
-    stroke: #00ffff;
-    fill: #00ffff;
+    color: hsl(201, 100%, 75%);
+    stroke: hsl(201, 100%, 75%);
+    fill: hsl(201, 100%, 75%);
 }
-
 .channel-3 {
-    /* yellow */
-    color: #ffff00;
-    stroke: #ffff00;
-    fill: #ffff00;
+    color: hsl(268, 100%, 75%);
+    stroke: hsl(268, 100%, 75%);
+    fill: hsl(268, 100%, 75%);
 }
-
 .channel-4 {
-    /* orange red */
-    color: #ff4500;
-    stroke: #ff4500;
-    fill: #ff4500;
+    color: hsl(335, 100%, 75%);
+    stroke: hsl(335, 100%, 75%);
+    fill: hsl(335, 100%, 75%);
 }
-
 .channel-5 {
-    /* dark sea green */
-    color: #8FBC8F;
-    stroke: #8FBC8F;
-    fill: #8FBC8F;
+    color: hsl(42, 100%, 75%);
+    stroke: hsl(42, 100%, 75%);
+    fill: hsl(42, 100%, 75%);
 }
-
 .channel-6 {
-    /* blue violet */
-    color: #8A2BE2;
-    stroke: #8A2BE2;
-    fill: #8A2BE2;
+    color: hsl(109, 100%, 75%);
+    stroke: hsl(109, 100%, 75%);
+    fill: hsl(109, 100%, 75%);
 }
-
 .channel-7 {
-    /* dark goldenrod */
-    color: #B8860B;
-    stroke: #B8860B;
-    fill: #B8860B;
+    color: hsl(176, 100%, 75%);
+    stroke: hsl(176, 100%, 75%);
+    fill: hsl(176, 100%, 75%);
 }
-
 .channel-8 {
-    /* violet */
-    color: #EE82EE;
-    stroke: #EE82EE;
-    fill: #EE82EE;
+    color: hsl(243, 100%, 75%);
+    stroke: hsl(243, 100%, 75%);
+    fill: hsl(243, 100%, 75%);
 }
-
 .channel-9 {
-    /* burlywood */
-    color: #DEB887;
-    stroke: #DEB887;
-    fill: #DEB887;
+    color: hsl(310, 100%, 75%);
+    stroke: hsl(310, 100%, 75%);
+    fill: hsl(310, 100%, 75%);
 }
-
 .channel-10 {
-    /* dodger blue */
-    color: #1E90FF;
-    stroke: #1E90FF;
-    fill: #1E90FF;
+    color: hsl(17, 100%, 75%);
+    stroke: hsl(17, 100%, 75%);
+    fill: hsl(17, 100%, 75%);
 }
-
 .channel-11 {
-    /* dark orange */
-    color: #FF8C00;
-    stroke: #FF8C00;
-    fill: #FF8C00;
+    color: hsl(84, 100%, 75%);
+    stroke: hsl(84, 100%, 75%);
+    fill: hsl(84, 100%, 75%);
 }
-
 .channel-12 {
-    /* salmon */
-    color: #FA8072;
-    stroke: #FA8072;
-    fill: #FA8072;
+    color: hsl(151, 100%, 75%);
+    stroke: hsl(151, 100%, 75%);
+    fill: hsl(151, 100%, 75%);
 }
-
 .channel-13 {
-    /* khaki */
-    color: #F0E68C;
-    stroke: #F0E68C;
-    fill: #F0E68C;
+    color: hsl(218, 100%, 75%);
+    stroke: hsl(218, 100%, 75%);
+    fill: hsl(218, 100%, 75%);
 }
-
 .channel-14 {
-    /* sienna */
-    color: #A0522D;
-    stroke: #A0522D;
-    fill: #A0522D;
+    color: hsl(285, 100%, 75%);
+    stroke: hsl(285, 100%, 75%);
+    fill: hsl(285, 100%, 75%);
+}
+.channel-15 {
+    color: hsl(352, 100%, 75%);
+    stroke: hsl(352, 100%, 75%);
+    fill: hsl(352, 100%, 75%);
 }
 
-.channel-15 {
-    /* gold */
-    color: #FFD700;
-    stroke: #FFD700;
-    fill: #FFD700;
-}
 
 fieldset {
     flex-shrink: 0;
@@ -405,7 +375,7 @@ path {
 }
 
 .led-yellow {
-    background-color: #800000;
+    background-color: #ffff00;
 }
 
 .led-red {
