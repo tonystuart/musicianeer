@@ -45,6 +45,7 @@ public class Musicianeer extends ServiceTask {
 
   public static final int LOWEST_NOTE = 36;
   public static final int HIGHEST_NOTE = 84;
+  public static final int NOTE_COUNT = HIGHEST_NOTE - LOWEST_NOTE;
 
   private static final int PLAYER_BASE = Midi.CHANNELS;
   private static final int PLAYER_CHANNELS = Midi.CHANNELS;

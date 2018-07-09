@@ -268,7 +268,7 @@ public class MusicianeerController extends ControllerTask {
     if (message.getChannel() == channel) {
       int midiNote = message.getMidiNote();
       if (!transportNoteOn[midiNote]) {
-        musicianeerView.setLedState(midiNote, LedState.YELLOW);
+        musicianeerView.setLedState(midiNote, LedState.LOW, channel);
       }
       transportCueCount[midiNote]++;
     }
@@ -351,9 +351,9 @@ public class MusicianeerController extends ControllerTask {
       int midiNote = message.getMidiNote();
       transportNoteOn[midiNote] = false;
       if (--transportCueCount[midiNote] > 0) {
-        musicianeerView.setLedState(midiNote, LedState.YELLOW);
+        musicianeerView.setLedState(midiNote, LedState.LOW, channel);
       } else {
-        musicianeerView.setLedState(midiNote, LedState.OFF);
+        musicianeerView.setLedState(midiNote, LedState.OFF, channel);
       }
     }
   }
@@ -362,7 +362,7 @@ public class MusicianeerController extends ControllerTask {
     if (message.getChannel() == channel) {
       int midiNote = message.getMidiNote();
       transportNoteOn[midiNote] = true;
-      musicianeerView.setLedState(midiNote, LedState.RED);
+      musicianeerView.setLedState(midiNote, LedState.HIGH, channel);
     }
   }
 

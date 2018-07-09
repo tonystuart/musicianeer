@@ -31,82 +31,224 @@ body {
     stroke: hsl(67, 100%, 75%);
     fill: hsl(67, 100%, 75%);
 }
+
+.key-led.led-low-0 {
+    background-color: hsl(67, 100%, 20%);
+}
+
+.key-led.led-high-0 {
+    background-color: hsl(67, 100%, 75%);
+}
+
 .channel-1 {
     color: hsl(134, 100%, 75%);
     stroke: hsl(134, 100%, 75%);
     fill: hsl(134, 100%, 75%);
 }
+
+.key-led.led-low-1 {
+    background-color: hsl(134, 100%, 20%);
+}
+
+.key-led.led-high-1 {
+    background-color: hsl(134, 100%, 75%);
+}
+
 .channel-2 {
     color: hsl(201, 100%, 75%);
     stroke: hsl(201, 100%, 75%);
     fill: hsl(201, 100%, 75%);
 }
+
+.key-led.led-low-2 {
+    background-color: hsl(201, 100%, 20%);
+}
+
+.key-led.led-high-2 {
+    background-color: hsl(201, 100%, 75%);
+}
+
 .channel-3 {
     color: hsl(268, 100%, 75%);
     stroke: hsl(268, 100%, 75%);
     fill: hsl(268, 100%, 75%);
 }
+
+.key-led.led-low-3 {
+    background-color: hsl(268, 100%, 20%);
+}
+
+.key-led.led-high-3 {
+    background-color: hsl(268, 100%, 75%);
+}
+
 .channel-4 {
     color: hsl(335, 100%, 75%);
     stroke: hsl(335, 100%, 75%);
     fill: hsl(335, 100%, 75%);
 }
+
+.key-led.led-low-4 {
+    background-color: hsl(335, 100%, 20%);
+}
+
+.key-led.led-high-4 {
+    background-color: hsl(335, 100%, 75%);
+}
+
 .channel-5 {
     color: hsl(42, 100%, 75%);
     stroke: hsl(42, 100%, 75%);
     fill: hsl(42, 100%, 75%);
 }
+
+.key-led.led-low-5 {
+    background-color: hsl(42, 100%, 20%);
+}
+
+.key-led.led-high-5 {
+    background-color: hsl(42, 100%, 75%);
+}
+
 .channel-6 {
     color: hsl(109, 100%, 75%);
     stroke: hsl(109, 100%, 75%);
     fill: hsl(109, 100%, 75%);
 }
+
+.key-led.led-low-6 {
+    background-color: hsl(109, 100%, 20%);
+}
+
+.key-led.led-high-6 {
+    background-color: hsl(109, 100%, 75%);
+}
+
 .channel-7 {
     color: hsl(176, 100%, 75%);
     stroke: hsl(176, 100%, 75%);
     fill: hsl(176, 100%, 75%);
 }
+
+.key-led.led-low-7 {
+    background-color: hsl(176, 100%, 20%);
+}
+
+.key-led.led-high-7 {
+    background-color: hsl(176, 100%, 75%);
+}
+
 .channel-8 {
     color: hsl(243, 100%, 75%);
     stroke: hsl(243, 100%, 75%);
     fill: hsl(243, 100%, 75%);
 }
+
+.key-led.led-low-8 {
+    background-color: hsl(243, 100%, 20%);
+}
+
+.key-led.led-high-8 {
+    background-color: hsl(243, 100%, 75%);
+}
+
 .channel-9 {
     color: hsl(310, 100%, 75%);
     stroke: hsl(310, 100%, 75%);
     fill: hsl(310, 100%, 75%);
 }
+
+.key-led.led-low-9 {
+    background-color: hsl(310, 100%, 20%);
+}
+
+.key-led.led-high-9 {
+    background-color: hsl(310, 100%, 75%);
+}
+
 .channel-10 {
     color: hsl(17, 100%, 75%);
     stroke: hsl(17, 100%, 75%);
     fill: hsl(17, 100%, 75%);
 }
+
+.key-led.led-low-10 {
+    background-color: hsl(17, 100%, 20%);
+}
+
+.key-led.led-high-10 {
+    background-color: hsl(17, 100%, 75%);
+}
+
 .channel-11 {
     color: hsl(84, 100%, 75%);
     stroke: hsl(84, 100%, 75%);
     fill: hsl(84, 100%, 75%);
 }
+
+.key-led.led-low-11 {
+    background-color: hsl(84, 100%, 20%);
+}
+
+.key-led.led-high-11 {
+    background-color: hsl(84, 100%, 75%);
+}
+
 .channel-12 {
     color: hsl(151, 100%, 75%);
     stroke: hsl(151, 100%, 75%);
     fill: hsl(151, 100%, 75%);
 }
+
+.key-led.led-low-12 {
+    background-color: hsl(151, 100%, 20%);
+}
+
+.key-led.led-high-12 {
+    background-color: hsl(151, 100%, 75%);
+}
+
 .channel-13 {
     color: hsl(218, 100%, 75%);
     stroke: hsl(218, 100%, 75%);
     fill: hsl(218, 100%, 75%);
 }
+
+.key-led.led-low-13 {
+    background-color: hsl(218, 100%, 20%);
+}
+
+.key-led.led-high-13 {
+    background-color: hsl(218, 100%, 75%);
+}
+
 .channel-14 {
     color: hsl(285, 100%, 75%);
     stroke: hsl(285, 100%, 75%);
     fill: hsl(285, 100%, 75%);
 }
+
+.key-led.led-low-14 {
+    background-color: hsl(285, 100%, 20%);
+}
+
+.key-led.led-high-14 {
+    background-color: hsl(285, 100%, 75%);
+}
+
 .channel-15 {
     color: hsl(352, 100%, 75%);
     stroke: hsl(352, 100%, 75%);
     fill: hsl(352, 100%, 75%);
 }
 
+.key-led.led-low-15 {
+    background-color: hsl(352, 100%, 20%);
+}
+
+.key-led.led-high-15 {
+    background-color: hsl(352, 100%, 75%);
+}
 
 fieldset {
     flex-shrink: 0;
@@ -339,7 +481,7 @@ path {
     flex: 1;
 }
 
-.black-key-led, .white-key-led {
+.key-led {
     position: absolute;
     width: .8vw;
     height: .8vw;
@@ -368,22 +510,6 @@ path {
 
 .keyboard div:hover .key-pressed, .key-pressed {
     background-color: #B4B7BA;
-}
-
-.led-green {
-    background-color: #00ff00;
-}
-
-.led-yellow {
-    background-color: #ffff00;
-}
-
-.led-red {
-    background-color: #ff0000;
-}
-
-.led-blue {
-    background-color: #00ffff;
 }
 
 .sliders {
