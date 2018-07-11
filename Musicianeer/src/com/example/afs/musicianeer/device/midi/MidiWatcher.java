@@ -20,6 +20,8 @@ import java.util.regex.Pattern;
 
 import javax.sound.midi.MidiDevice;
 import javax.sound.midi.MidiDevice.Info;
+import javax.sound.midi.MidiSystem;
+import javax.sound.midi.MidiUnavailableException;
 
 import com.example.afs.musicianeer.device.midi.MidiHandle.Type;
 import com.example.afs.musicianeer.main.Services;
@@ -28,9 +30,6 @@ import com.example.afs.musicianeer.task.MessageBroker;
 import com.example.afs.musicianeer.task.ServiceTask;
 import com.example.afs.musicianeer.util.DirectList;
 import com.example.afs.musicianeer.util.RandomAccessList;
-
-import javax.sound.midi.MidiSystem;
-import javax.sound.midi.MidiUnavailableException;
 
 public class MidiWatcher extends ServiceTask {
 
@@ -125,7 +124,12 @@ public class MidiWatcher extends ServiceTask {
   private Iterable<MidiHandle> getMidiHandles() {
     RandomAccessList<MidiHandle> midiHandles = new DirectList<>();
     for (MidiController midiController : oldDevices.values()) {
-      midiHandles.add(new MidiHandle(midiController.getDeviceIndex(), Type.INPUT, midiController.getDeviceName()));
+      if (midiController.isInputCapable()) {
+        midiHandles.add(new MidiHandle(midiController.getDeviceIndex(), Type.INPUT, midiController.getDeviceName()));
+      } // not else if
+      if (midiController.isOutputCapable()) {
+        midiHandles.add(new MidiHandle(midiController.getDeviceIndex(), Type.OUTPUT, midiController.getDeviceName()));
+      }
     }
     return midiHandles;
   }

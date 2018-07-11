@@ -12,7 +12,7 @@ package com.example.afs.musicianeer.device.midi;
 public class MidiHandle {
 
   public enum Type {
-    INPUT, PROMPTER
+    INPUT, OUTPUT
   }
 
   public static final int MIDI_HANDLE_NA = -1;

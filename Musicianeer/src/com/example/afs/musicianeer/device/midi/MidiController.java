@@ -9,6 +9,7 @@
 
 package com.example.afs.musicianeer.device.midi;
 
+import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.MidiDevice;
 import javax.sound.midi.MidiMessage;
 import javax.sound.midi.MidiUnavailableException;
@@ -19,13 +20,18 @@ import com.example.afs.musicianeer.main.MusicianeerController;
 import com.example.afs.musicianeer.message.OnChannelPressure;
 import com.example.afs.musicianeer.message.OnControlChange;
 import com.example.afs.musicianeer.message.OnMidiInputSelected;
+import com.example.afs.musicianeer.message.OnMidiOutputSelected;
 import com.example.afs.musicianeer.message.OnNoteOff;
 import com.example.afs.musicianeer.message.OnNoteOn;
 import com.example.afs.musicianeer.message.OnPitchBend;
+import com.example.afs.musicianeer.message.OnResetMidiNoteLeds;
 import com.example.afs.musicianeer.message.OnSetChannelVolume;
+import com.example.afs.musicianeer.message.OnSetMidiNoteLed;
 import com.example.afs.musicianeer.midi.Midi;
 import com.example.afs.musicianeer.task.MessageBroker;
 import com.example.afs.musicianeer.task.MessageTask;
+import com.example.afs.musicianeer.util.DirectList;
+import com.example.afs.musicianeer.util.RandomAccessList;
 import com.example.afs.musicianeer.util.Range;
 
 public class MidiController extends MessageTask {
@@ -48,20 +54,25 @@ public class MidiController extends MessageTask {
     }
   }
 
-  private int channel;
   private int deviceIndex;
+  private int inputChannel;
+  private int outputChannel;
   private int channelVelocity = MusicianeerController.DEFAULT_VELOCITY;
 
   private String deviceName;
   private MidiDeviceBundle deviceBundle;
+  private RandomAccessList<Receiver> receivers = new DirectList<>();
 
   public MidiController(MessageBroker messageBroker, String deviceName, MidiDeviceBundle deviceBundle, int deviceIndex) {
     super(messageBroker);
     this.deviceName = deviceName;
     this.deviceBundle = deviceBundle;
     this.deviceIndex = deviceIndex;
+    subscribe(OnSetMidiNoteLed.class, message -> doSetMidiNoteLed(message));
     subscribe(OnSetChannelVolume.class, message -> doSetChannelVolume(message));
     subscribe(OnMidiInputSelected.class, message -> doMidiInputSelected(message));
+    subscribe(OnMidiOutputSelected.class, message -> doMidiOutputSelected(message));
+    subscribe(OnResetMidiNoteLeds.class, message -> doResetMidiNoteLeds(message));
   }
 
   public int getDeviceIndex() {
@@ -70,6 +81,14 @@ public class MidiController extends MessageTask {
 
   public String getDeviceName() {
     return deviceName;
+  }
+
+  public boolean isInputCapable() {
+    return deviceBundle.getInputDevices().size() > 0;
+  }
+
+  public boolean isOutputCapable() {
+    return deviceBundle.getOutputDevices().size() > 0;
   }
 
   public void setDeviceIndex(int deviceIndex) {
@@ -82,7 +101,7 @@ public class MidiController extends MessageTask {
 
   @Override
   public String toString() {
-    return "MidiController [channel=" + channel + ", deviceIndex=" + deviceIndex + ", deviceName=" + deviceName + ", deviceBundle=" + deviceBundle + "]";
+    return "MidiController [deviceIndex=" + deviceIndex + ", inputChannel=" + inputChannel + ", outputChannel=" + outputChannel + ", channelVelocity=" + channelVelocity + ", deviceName=" + deviceName + ", deviceBundle=" + deviceBundle + "]";
   }
 
   @Override
@@ -105,6 +124,11 @@ public class MidiController extends MessageTask {
         midiDevice.open();
         midiDevice.getTransmitter().setReceiver(new MidiReceiver(midiInputDevice.getPort()));
       }
+      for (MidiOutputDevice midiOutputDevice : deviceBundle.getOutputDevices()) {
+        MidiDevice midiDevice = midiOutputDevice.getMidiDevice();
+        midiDevice.open();
+        receivers.add(midiDevice.getReceiver());
+      }
     } catch (MidiUnavailableException e) {
       throw new RuntimeException(e);
     }
@@ -120,13 +144,54 @@ public class MidiController extends MessageTask {
 
   private void doMidiInputSelected(OnMidiInputSelected message) {
     if (message.getDeviceIndex() == deviceIndex) {
-      channel = message.getChannel();
+      inputChannel = message.getChannel();
+    }
+  }
+
+  private void doMidiOutputSelected(OnMidiOutputSelected message) {
+    if (message.getDeviceIndex() == deviceIndex) {
+      outputChannel = message.getChannel();
+    }
+  }
+
+  private void doResetMidiNoteLeds(OnResetMidiNoteLeds message) {
+    try {
+      for (int midiNote = 0; midiNote < Midi.MAX_VALUE; midiNote++) {
+        send(new ShortMessage(ShortMessage.NOTE_OFF, 0, midiNote, 0));
+      }
+    } catch (InvalidMidiDataException e) {
+      throw new RuntimeException(e);
     }
   }
 
   private void doSetChannelVolume(OnSetChannelVolume message) {
-    if (message.getChannel() == channel) {
+    if (message.getChannel() == inputChannel) {
       channelVelocity = message.getVolume();
+    }
+  }
+
+  private void doSetMidiNoteLed(OnSetMidiNoteLed message) {
+    try {
+      if (message.getChannel() == outputChannel) {
+        int velocity;
+        switch (message.getState()) {
+        case HIGH:
+          velocity = Midi.MAX_VALUE;
+          break;
+        case LOW:
+          velocity = Midi.MAX_VALUE / 2;
+          break;
+        case OFF:
+          velocity = 0;
+          break;
+        default:
+          throw new UnsupportedOperationException();
+        }
+        ShortMessage shortMessage = new ShortMessage(ShortMessage.NOTE_ON, message.getChannel(), message.getMidiNote(), velocity);
+        send(shortMessage);
+      }
+    } catch (InvalidMidiDataException e) {
+      throw new RuntimeException(e);
     }
   }
 
@@ -136,15 +201,15 @@ public class MidiController extends MessageTask {
     int data2 = shortMessage.getData2();
     if (command == ShortMessage.NOTE_ON) {
       int velocity = Range.scale(channelVelocity, Math.min(Midi.MAX_VALUE, channelVelocity + 32), 0, Midi.MAX_VALUE, data2);
-      publish(new OnNoteOn(channel, data1, velocity));
+      publish(new OnNoteOn(inputChannel, data1, velocity));
     } else if (command == ShortMessage.NOTE_OFF) {
-      publish(new OnNoteOff(channel, data1));
+      publish(new OnNoteOff(inputChannel, data1));
     } else if (command == ShortMessage.POLY_PRESSURE) {
       publish(new OnChannelPressure(data1, data2));
     } else if (command == ShortMessage.CONTROL_CHANGE) {
       int control = data1;
       int value = data2;
-      publish(new OnControlChange(channel, control, value));
+      publish(new OnControlChange(inputChannel, control, value));
     } else if (command == ShortMessage.PITCH_BEND) {
       // Pitch bend is reported as a signed 14 bit value with MSB in data2 and LSB in data1
       // Options for converting it into values in the range 0 to 16384 include:
@@ -153,8 +218,16 @@ public class MidiController extends MessageTask {
       // We use the second approach
       int value = (data2 << 7) | data1;
       int pitchBend = value >= 8192 ? value - 8192 : value + 8192;
-      publish(new OnPitchBend(channel, pitchBend));
+      publish(new OnPitchBend(inputChannel, pitchBend));
     }
+  }
+
+  private void send(Receiver receiver, ShortMessage shortMessage) {
+    receiver.send(shortMessage, -1);
+  }
+
+  private void send(ShortMessage shortMessage) {
+    receivers.forEach(receiver -> send(receiver, shortMessage));
   }
 
   private void tsReceiveFromDevice(MidiMessage message, long timestamp, int port) {

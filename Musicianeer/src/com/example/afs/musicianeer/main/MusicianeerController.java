@@ -24,16 +24,19 @@ import com.example.afs.musicianeer.message.OnDeleteMidiFile;
 import com.example.afs.musicianeer.message.OnMidiHandles;
 import com.example.afs.musicianeer.message.OnMidiInputSelected;
 import com.example.afs.musicianeer.message.OnMidiLibraryRefresh;
+import com.example.afs.musicianeer.message.OnMidiOutputSelected;
 import com.example.afs.musicianeer.message.OnMute;
 import com.example.afs.musicianeer.message.OnNoteOff;
 import com.example.afs.musicianeer.message.OnNoteOn;
 import com.example.afs.musicianeer.message.OnPlay;
 import com.example.afs.musicianeer.message.OnProgramOverride;
+import com.example.afs.musicianeer.message.OnResetMidiNoteLeds;
 import com.example.afs.musicianeer.message.OnSeek;
 import com.example.afs.musicianeer.message.OnSelectSong;
 import com.example.afs.musicianeer.message.OnSetAccompanimentType;
 import com.example.afs.musicianeer.message.OnSetAccompanimentType.AccompanimentType;
 import com.example.afs.musicianeer.message.OnSetChannelVolume;
+import com.example.afs.musicianeer.message.OnSetMidiNoteLed;
 import com.example.afs.musicianeer.message.OnSetPercentMasterGain;
 import com.example.afs.musicianeer.message.OnSetPercentTempo;
 import com.example.afs.musicianeer.message.OnSetPercentVelocity;
@@ -56,13 +59,15 @@ public class MusicianeerController extends ControllerTask {
 
   public static final int DEFAULT_VELOCITY = 64;
 
+  private static final String PIANO_BAR = "Micro-";
+
   private int channel;
   private boolean isDown;
   private boolean isShift;
   private int transposition;
   private int channelVelocity = DEFAULT_VELOCITY;
   private int inputDeviceIndex = MidiHandle.MIDI_HANDLE_NA;
-  private int prompterDeviceIndex = MidiHandle.MIDI_HANDLE_NA;
+  private int outputDeviceIndex = MidiHandle.MIDI_HANDLE_NA;
 
   private int[] transportCueCount = new int[Midi.NOTES];
   private boolean[] transportNoteOn = new boolean[Midi.NOTES];
@@ -130,6 +135,9 @@ public class MusicianeerController extends ControllerTask {
     } else if (id.equals("midi-input")) {
       inputDeviceIndex = Integer.parseInt(value);
       publish(new OnMidiInputSelected(channel, inputDeviceIndex));
+    } else if (id.equals("midi-output")) {
+      outputDeviceIndex = Integer.parseInt(value);
+      publish(new OnMidiOutputSelected(channel, outputDeviceIndex));
     }
     switch (id) {
     case "background-volume":
@@ -268,7 +276,7 @@ public class MusicianeerController extends ControllerTask {
     if (message.getChannel() == channel) {
       int midiNote = message.getMidiNote();
       if (!transportNoteOn[midiNote]) {
-        musicianeerView.setLedState(midiNote, LedState.LOW, channel);
+        setMidiNoteLed(channel, midiNote, LedState.LOW);
       }
       transportCueCount[midiNote]++;
     }
@@ -304,7 +312,7 @@ public class MusicianeerController extends ControllerTask {
   }
 
   private void doPlay(OnPlay message) {
-    resetTransportNoteState(); // TODO: Remove this if we remove cue notes
+    resetMidiNoteLeds(); // TODO: Remove this if we remove cue notes
   }
 
   private void doSeek(OnSeek message) {
@@ -351,9 +359,9 @@ public class MusicianeerController extends ControllerTask {
       int midiNote = message.getMidiNote();
       transportNoteOn[midiNote] = false;
       if (--transportCueCount[midiNote] > 0) {
-        musicianeerView.setLedState(midiNote, LedState.LOW, channel);
+        setMidiNoteLed(channel, midiNote, LedState.LOW);
       } else {
-        musicianeerView.setLedState(midiNote, LedState.OFF, channel);
+        setMidiNoteLed(channel, midiNote, LedState.OFF);
       }
     }
   }
@@ -362,20 +370,23 @@ public class MusicianeerController extends ControllerTask {
     if (message.getChannel() == channel) {
       int midiNote = message.getMidiNote();
       transportNoteOn[midiNote] = true;
-      musicianeerView.setLedState(midiNote, LedState.HIGH, channel);
+      setMidiNoteLed(channel, midiNote, LedState.HIGH);
     }
   }
 
   private void doTransposition(OnTransposition message) {
     this.transposition = message.getTransposition();
     musicianeerView.renderStaff(currentSong.getSong(), channel, transposition);
-    resetTransportNoteState();
+    resetMidiNoteLeds();
   }
 
   private int findBestFit(Iterable<MidiHandle> midiHandles, Type type, int index) {
     MidiHandle first = null;
     for (MidiHandle midiHandle : midiHandles) {
-      if (midiHandle.getType() == type) {
+      boolean isPianoBar = midiHandle.getName().startsWith(PIANO_BAR);
+      if (midiHandle.getType() == type && //
+          ((type == Type.INPUT && !isPianoBar) || //
+              (type == Type.OUTPUT && isPianoBar))) {
         if (first == null) {
           if (index == MidiHandle.MIDI_HANDLE_NA) {
             return midiHandle.getIndex();
@@ -394,7 +405,7 @@ public class MusicianeerController extends ControllerTask {
     this.currentSong = currentSong;
     SongInfo songInfo = currentSong.getSongInfo();
     this.transposition = songInfo.getEasyTransposition();
-    resetTransportNoteState();
+    resetMidiNoteLeds();
     musicianeerView.selectSong(currentSong.getSongIndex());
     musicianeerView.renderSongDetails(currentSong);
     renderChannel(currentSong.getSongInfo().getActiveChannels()[0]);
@@ -418,7 +429,7 @@ public class MusicianeerController extends ControllerTask {
 
   private void renderChannel(int channel) {
     this.channel = channel;
-    resetTransportNoteState();
+    resetMidiNoteLeds();
     musicianeerView.selectChannel(currentSong.getSong(), channel, transposition);
     CurrentPrograms currentPrograms = request(Services.getCurrentPrograms);
     if (currentPrograms != null) {
@@ -433,13 +444,17 @@ public class MusicianeerController extends ControllerTask {
     if (inputDeviceIndex != MidiHandle.MIDI_HANDLE_NA) {
       publish(new OnMidiInputSelected(channel, inputDeviceIndex));
     }
+    if (outputDeviceIndex != MidiHandle.MIDI_HANDLE_NA) {
+      publish(new OnMidiOutputSelected(channel, outputDeviceIndex));
+    }
   }
 
   private void renderMidiHandles(Iterable<MidiHandle> midiHandles) {
     inputDeviceIndex = findBestFit(midiHandles, Type.INPUT, inputDeviceIndex);
-    prompterDeviceIndex = findBestFit(midiHandles, Type.PROMPTER, prompterDeviceIndex);
-    musicianeerView.renderMidiHandles(midiHandles, inputDeviceIndex, prompterDeviceIndex);
+    outputDeviceIndex = findBestFit(midiHandles, Type.OUTPUT, outputDeviceIndex);
+    musicianeerView.renderMidiHandles(midiHandles, inputDeviceIndex, outputDeviceIndex);
     publish(new OnMidiInputSelected(channel, inputDeviceIndex));
+    publish(new OnMidiOutputSelected(channel, outputDeviceIndex));
   }
 
   private void renderMute(int channel, int value) {
@@ -456,10 +471,16 @@ public class MusicianeerController extends ControllerTask {
     musicianeerView.renderSongInfo(songInfo, songIndex);
   }
 
-  private void resetTransportNoteState() {
+  private void resetMidiNoteLeds() {
     Arrays.fill(transportCueCount, 0);
     Arrays.fill(transportNoteOn, false);
     musicianeerView.resetMidiNoteLeds();
+    publish(new OnResetMidiNoteLeds());
+  }
+
+  private void setMidiNoteLed(int channel, int midiNote, LedState state) {
+    musicianeerView.setMidiNoteLed(channel, midiNote, state);
+    publish(new OnSetMidiNoteLed(channel, midiNote, state));
   }
 
 }

@@ -134,9 +134,9 @@ public class MusicianeerView extends ShadowDomBuilder {
             .add(div("#midi-input-container", ".name-value") //
                 .add(text("Input:&nbsp;")) //
                 .add(div("#midi-input"))) //
-            .add(div("#midi-prompter-container", ".name-value") //
+            .add(div("#midi-output-container", ".name-value") //
                 .add(text("Output:&nbsp;")) //
-                .add(div("#midi-prompter"))) //
+                .add(div("#midi-output"))) //
             .add(div(".name-value") //
                 .add(text("Instrument:&nbsp;")) //
                 .add(createInstrumentSelect())) //
@@ -201,11 +201,11 @@ public class MusicianeerView extends ShadowDomBuilder {
     removeClass("midi-note-" + midiNote, "key-pressed");
   }
 
-  public void renderMidiHandles(Iterable<MidiHandle> midiHandles, int inputDeviceIndex, int prompterDeviceIndex) {
+  public void renderMidiHandles(Iterable<MidiHandle> midiHandles, int inputDeviceIndex, int outputDeviceIndex) {
     MidiHandleSelect input = new MidiHandleSelect("midi-input", midiHandles, Type.INPUT, inputDeviceIndex);
     input.replace(getElementById("midi-input-container"));
-    MidiHandleSelect prompter = new MidiHandleSelect("midi-prompter", midiHandles, Type.PROMPTER, prompterDeviceIndex);
-    prompter.replace(getElementById("midi-prompter-container"));
+    MidiHandleSelect output = new MidiHandleSelect("midi-output", midiHandles, Type.OUTPUT, outputDeviceIndex);
+    output.replace(getElementById("midi-output-container"));
   }
 
   public void renderSongDetails(CurrentSong currentSong) {
@@ -272,7 +272,7 @@ public class MusicianeerView extends ShadowDomBuilder {
     replaceChildren(getElementById("delete-text"), text(text));
   }
 
-  public void setLedState(int midiNote, LedState state, int channel) {
+  public void setMidiNoteLed(int channel, int midiNote, LedState state) {
     if (midiNote >= Musicianeer.LOWEST_NOTE && midiNote <= Musicianeer.HIGHEST_NOTE) {
       String newState;
       int index = midiNote - Musicianeer.LOWEST_NOTE;
