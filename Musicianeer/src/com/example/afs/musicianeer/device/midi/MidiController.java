@@ -179,7 +179,7 @@ public class MidiController extends MessageTask {
           velocity = Midi.MAX_VALUE;
           break;
         case LOW:
-          velocity = Midi.MAX_VALUE / 2;
+          velocity = 0; // Midi.MAX_VALUE / 16;
           break;
         case OFF:
           velocity = 0;
