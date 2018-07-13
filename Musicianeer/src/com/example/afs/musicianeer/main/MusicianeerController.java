@@ -170,6 +170,10 @@ public class MusicianeerController extends ControllerTask {
       deleteFilename = currentSong.getSong().getFile().getName();
       musicianeerView.setDeleteText(deleteFilename);
       musicianeerView.showDeleteDialogBox(true);
+    } else if (isShift && keyCode == '1') {
+      publish(new OnSetDemoMode(true));
+    } else if (isShift && keyCode == '2') {
+      publish(new OnSetDemoMode(false));
     } else {
       int midiNote = KeyMap.toMidiNote(keyCode);
       if (midiNote != KeyMap.UNDEFINED) {

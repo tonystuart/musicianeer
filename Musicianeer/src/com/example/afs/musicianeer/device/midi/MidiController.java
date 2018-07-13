@@ -17,6 +17,7 @@ import javax.sound.midi.Receiver;
 import javax.sound.midi.ShortMessage;
 
 import com.example.afs.musicianeer.main.MusicianeerController;
+import com.example.afs.musicianeer.main.OnSetDemoMode;
 import com.example.afs.musicianeer.message.OnChannelPressure;
 import com.example.afs.musicianeer.message.OnControlChange;
 import com.example.afs.musicianeer.message.OnMidiInputSelected;
@@ -27,6 +28,8 @@ import com.example.afs.musicianeer.message.OnPitchBend;
 import com.example.afs.musicianeer.message.OnResetMidiNoteLeds;
 import com.example.afs.musicianeer.message.OnSetChannelVolume;
 import com.example.afs.musicianeer.message.OnSetMidiNoteLed;
+import com.example.afs.musicianeer.message.OnTransportNoteOff;
+import com.example.afs.musicianeer.message.OnTransportNoteOn;
 import com.example.afs.musicianeer.midi.Midi;
 import com.example.afs.musicianeer.task.MessageBroker;
 import com.example.afs.musicianeer.task.MessageTask;
@@ -54,9 +57,14 @@ public class MidiController extends MessageTask {
     }
   }
 
+  private static final int OFF = 0;
+  private static final int LOW = Midi.MAX_VALUE / 16;
+  private static final int HIGH = Midi.MAX_VALUE;
+
   private int deviceIndex;
   private int inputChannel;
   private int outputChannel;
+  private boolean isDemoMode;
   private int channelVelocity = MusicianeerController.DEFAULT_VELOCITY;
 
   private String deviceName;
@@ -68,11 +76,14 @@ public class MidiController extends MessageTask {
     this.deviceName = deviceName;
     this.deviceBundle = deviceBundle;
     this.deviceIndex = deviceIndex;
+    subscribe(OnSetDemoMode.class, message -> doSetDemoMode(message));
     subscribe(OnSetMidiNoteLed.class, message -> doSetMidiNoteLed(message));
     subscribe(OnSetChannelVolume.class, message -> doSetChannelVolume(message));
     subscribe(OnMidiInputSelected.class, message -> doMidiInputSelected(message));
     subscribe(OnMidiOutputSelected.class, message -> doMidiOutputSelected(message));
     subscribe(OnResetMidiNoteLeds.class, message -> doResetMidiNoteLeds(message));
+    subscribe(OnTransportNoteOn.class, message -> doTransportNoteOn(message));
+    subscribe(OnTransportNoteOff.class, message -> doTransportNoteOff(message));
   }
 
   public int getDeviceIndex() {
@@ -155,13 +166,7 @@ public class MidiController extends MessageTask {
   }
 
   private void doResetMidiNoteLeds(OnResetMidiNoteLeds message) {
-    try {
-      for (int midiNote = 0; midiNote < Midi.MAX_VALUE; midiNote++) {
-        send(new ShortMessage(ShortMessage.NOTE_OFF, 0, midiNote, 0));
-      }
-    } catch (InvalidMidiDataException e) {
-      throw new RuntimeException(e);
-    }
+    resetMidiNoteLeds();
   }
 
   private void doSetChannelVolume(OnSetChannelVolume message) {
@@ -170,24 +175,51 @@ public class MidiController extends MessageTask {
     }
   }
 
+  private void doSetDemoMode(OnSetDemoMode message) {
+    resetMidiNoteLeds();
+    isDemoMode = message.isDemoMode();
+  }
+
   private void doSetMidiNoteLed(OnSetMidiNoteLed message) {
     try {
-      if (message.getChannel() == outputChannel) {
+      if (!isDemoMode && (message.getChannel() == outputChannel)) {
         int velocity;
         switch (message.getState()) {
         case HIGH:
-          velocity = Midi.MAX_VALUE;
+          velocity = HIGH;
           break;
         case LOW:
-          velocity = 0; // Midi.MAX_VALUE / 16;
+          velocity = LOW;
           break;
         case OFF:
-          velocity = 0;
+          velocity = OFF;
           break;
         default:
           throw new UnsupportedOperationException();
         }
         ShortMessage shortMessage = new ShortMessage(ShortMessage.NOTE_ON, message.getChannel(), message.getMidiNote(), velocity);
+        send(shortMessage);
+      }
+    } catch (InvalidMidiDataException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  private void doTransportNoteOff(OnTransportNoteOff message) {
+    try {
+      if (isDemoMode) {
+        ShortMessage shortMessage = new ShortMessage(ShortMessage.NOTE_OFF, message.getChannel(), message.getMidiNote(), OFF);
+        send(shortMessage);
+      }
+    } catch (InvalidMidiDataException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  private void doTransportNoteOn(OnTransportNoteOn message) {
+    try {
+      if (isDemoMode) {
+        ShortMessage shortMessage = new ShortMessage(ShortMessage.NOTE_ON, message.getChannel(), message.getMidiNote(), HIGH);
         send(shortMessage);
       }
     } catch (InvalidMidiDataException e) {
@@ -219,6 +251,16 @@ public class MidiController extends MessageTask {
       int value = (data2 << 7) | data1;
       int pitchBend = value >= 8192 ? value - 8192 : value + 8192;
       publish(new OnPitchBend(inputChannel, pitchBend));
+    }
+  }
+
+  private void resetMidiNoteLeds() {
+    try {
+      for (int midiNote = 0; midiNote < Midi.MAX_VALUE; midiNote++) {
+        send(new ShortMessage(ShortMessage.NOTE_OFF, 0, midiNote, 0));
+      }
+    } catch (InvalidMidiDataException e) {
+      throw new RuntimeException(e);
     }
   }
 
