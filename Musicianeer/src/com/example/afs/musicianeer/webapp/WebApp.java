@@ -12,11 +12,11 @@ package com.example.afs.musicianeer.webapp;
 import java.nio.ByteBuffer;
 
 import com.example.afs.musicianeer.message.OnBrowserEvent;
+import com.example.afs.musicianeer.message.OnBrowserEvent.Action;
 import com.example.afs.musicianeer.message.OnWebSocketClose;
 import com.example.afs.musicianeer.message.OnWebSocketConnect;
 import com.example.afs.musicianeer.message.OnWebSocketText;
 import com.example.afs.musicianeer.message.TypedMessage;
-import com.example.afs.musicianeer.message.OnBrowserEvent.Action;
 import com.example.afs.musicianeer.task.ControllerTask;
 import com.example.afs.musicianeer.task.MessageBroker;
 import com.example.afs.musicianeer.task.ServiceTask;

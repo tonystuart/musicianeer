@@ -10,8 +10,8 @@
 package com.example.afs.musicianeer.main;
 
 import com.example.afs.musicianeer.device.midi.MidiHandle;
-import com.example.afs.musicianeer.message.OnSongInfo;
 import com.example.afs.musicianeer.message.OnSetAccompanimentType.AccompanimentType;
+import com.example.afs.musicianeer.message.OnSongInfo;
 import com.example.afs.musicianeer.midi.MidiLibrary;
 import com.example.afs.musicianeer.task.ServiceTask.Service;
 import com.example.afs.musicianeer.util.RandomAccessList;
