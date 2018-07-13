@@ -14,7 +14,11 @@ void setup() {
 		Serial.begin(57600);
 		FastLED.addLeds<WS2801,DATA_PIN, CLOCK_PIN>(leds, NUM_LEDS);
 		LEDS.setBrightness(84);
-		//cycle_leds();
+		cycle_leds();
+		Serial.print("Compiled at ");
+		Serial.print(__TIME__);
+		Serial.print(" on ");
+		Serial.println(__DATE__);
 }
 
 void loop() { 
@@ -29,10 +33,10 @@ void process_message(midiEventPacket_t message) {
 		if (command == 0x80) {
 				uint8_t channel = message.byte1 & 0xf;
 				uint8_t midi_note = message.byte2;
-				Serial.print("NOTE_OFF: channel=");
-				Serial.print(channel);
-				Serial.print(", midi_note=");
-				Serial.println(midi_note);
+				//Serial.print("NOTE_OFF: channel=");
+				//Serial.print(channel);
+				//Serial.print(", midi_note=");
+				//Serial.println(midi_note);
 				if (midi_note >= LOWEST_NOTE && midi_note <= HIGHEST_NOTE) {
 						uint8_t led_index = message.byte2 - LOWEST_NOTE;
 						leds[led_index] = 0;
@@ -42,12 +46,12 @@ void process_message(midiEventPacket_t message) {
 				uint8_t channel = message.byte1 & 0xf;
 				uint8_t midi_note = message.byte2;
 				uint8_t velocity = message.byte3;
-				Serial.print("NOTE_ON: channel=");
-				Serial.print(channel);
-				Serial.print(", midi_note=");
-				Serial.print(midi_note);
-				Serial.print(", velocity=");
-				Serial.println(velocity);
+				//Serial.print("NOTE_ON: channel=");
+				//Serial.print(channel);
+				//Serial.print(", midi_note=");
+				//Serial.print(midi_note);
+				//Serial.print(", velocity=");
+				//Serial.println(velocity);
 				if (midi_note >= LOWEST_NOTE && midi_note <= HIGHEST_NOTE) {
 						uint8_t led_index = message.byte2 - LOWEST_NOTE;
 						uint8_t i = channel / 4;
@@ -55,20 +59,19 @@ void process_message(midiEventPacket_t message) {
 						uint32_t degrees = (j * 90) + ((i * 90) / 4);
 						uint8_t hue = (degrees * 255) / 360;
 						uint8_t brightness = ((velocity * 255) / 127);
-						Serial.print("channel="+channel);
-						Serial.print(channel);
-						Serial.print(", i=");
-						Serial.print(i);
-						Serial.print(", j=");
-						Serial.print(j);
-						Serial.print(", degrees=");
-						Serial.print(degrees);
-						Serial.print(", hue=");
-						Serial.print(hue);
-						Serial.print(", brightness=");
-						Serial.println(brightness);
+						//Serial.print("channel="+channel);
+						//Serial.print(channel);
+						//Serial.print(", i=");
+						//Serial.print(i);
+						//Serial.print(", j=");
+						//Serial.print(j);
+						//Serial.print(", degrees=");
+						//Serial.print(degrees);
+						//Serial.print(", hue=");
+						//Serial.print(hue);
+						//Serial.print(", brightness=");
+						//Serial.println(brightness);
 						hsv2rgb_spectrum(CHSV(hue, 255, brightness), leds[led_index]);
-						//leds[led_index] = hsv2rgb_spectrum(hue, 255, brightness);
 						FastLED.show(); 
 				}
 		} else {
@@ -90,12 +93,26 @@ void fade_all() {
 }
 
 void cycle_leds() {
-		for (int i = 0; i < 256; i++) {
-				for (int j = 0; j < NUM_LEDS; j++) {
-						leds[j] = CHSV(i, 255, 255);
-						FastLED.show(); 
-						fade_all();
-						delay(10);
-				}
-		}}
+		uint8_t hue = 0;
+		uint8_t delta = (255 / NUM_LEDS) / 2; // half up, half back
+		if (delta == 0) {
+				delta = 1;
+		}
+		for (int i = 0; i < NUM_LEDS; i++) {
+				leds[i] = CHSV(hue, 255, 255);
+				FastLED.show();
+				delay(10);
+				hue += delta;
+		}
+		for (int i = NUM_LEDS - 1; i >= 0; i--) {
+				leds[i] = CHSV(hue, 255, 255);
+				FastLED.show();
+				delay(10);
+				hue += delta;
+		}
+		for (int i = 0; i < NUM_LEDS; i++) {
+				leds[i] = 0;
+				FastLED.show();
+		}
+}
 
