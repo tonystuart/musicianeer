@@ -164,7 +164,7 @@ public class MusicianeerController extends ControllerTask {
   @Override
   protected void doKeyDown(String id, String value) {
     int keyCode = Integer.parseInt(value);
-    if (keyCode == KeyMap.SHIFT) {
+    if (keyCode == KeyEvent.VK_SHIFT) {
       isShift = true;
     } else {
       int midiNote = KeyMap.toMidiNote(keyCode);
@@ -183,7 +183,7 @@ public class MusicianeerController extends ControllerTask {
     int keyCode = Integer.parseInt(value);
     if (keyCode == KeyEvent.VK_SHIFT) {
       isShift = false;
-    } else if (keyCode == 46) {
+    } else if (keyCode == KeyMap.DELETE) {
       deleteFilename = currentSong.getSong().getFile().getName();
       musicianeerView.setDeleteText(deleteFilename);
       musicianeerView.showDeleteDialogBox(true);

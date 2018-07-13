@@ -15,7 +15,7 @@ import com.example.afs.musicianeer.theory.MidiNotes;
 public class KeyMap {
 
   // See: https://lists.w3.org/Archives/Public/www-dom/2010JulSep/att-0182/keyCode-spec.html
-  public static final char SHIFT = 16;
+  public static final int DELETE = 46;
   public static final char COMMA = 188;
   public static final char SEMICOLON = 186;
   public static final char SINGLEQUOTE = 222;
