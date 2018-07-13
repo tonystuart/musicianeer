@@ -23,12 +23,14 @@ import com.example.afs.musicianeer.message.OnNoteOff;
 import com.example.afs.musicianeer.message.OnNoteOn;
 import com.example.afs.musicianeer.message.OnNotes;
 import com.example.afs.musicianeer.message.OnPitchBend;
-import com.example.afs.musicianeer.message.OnProgramChange;
 import com.example.afs.musicianeer.message.OnProgramOverride;
+import com.example.afs.musicianeer.message.OnSetAccompanimentType;
+import com.example.afs.musicianeer.message.OnSetAccompanimentType.AccompanimentType;
 import com.example.afs.musicianeer.message.OnSetChannelVolume;
 import com.example.afs.musicianeer.message.OnSolo;
 import com.example.afs.musicianeer.message.OnSongSelected;
 import com.example.afs.musicianeer.message.OnStop;
+import com.example.afs.musicianeer.message.OnTransportProgramChange;
 import com.example.afs.musicianeer.message.OnTransposition;
 import com.example.afs.musicianeer.midi.Midi;
 import com.example.afs.musicianeer.song.Song;
@@ -43,6 +45,7 @@ public class Musicianeer extends ServiceTask {
     public static final int VOLUME = 7;
   }
 
+  public static final int UNSET = -1;
   public static final int LOWEST_NOTE = 36;
   public static final int HIGHEST_NOTE = 84;
   public static final int NOTE_COUNT = HIGHEST_NOTE - LOWEST_NOTE;
@@ -55,12 +58,13 @@ public class Musicianeer extends ServiceTask {
     return PLAYER_BASE + channel;
   }
 
-  private int[] defaultPrograms = new int[Midi.CHANNELS];
+  private int[] programs = new int[Midi.CHANNELS];
   private int[] programOverrides = new int[Midi.CHANNELS];
 
   private Transport transport;
   private Synthesizer synthesizer;
   private CurrentSong currentSong;
+  private AccompanimentType accompanimentType;
 
   public Musicianeer(MessageBroker messageBroker) {
     super(messageBroker);
@@ -76,10 +80,11 @@ public class Musicianeer extends ServiceTask {
     subscribe(OnPitchBend.class, message -> doPitchBend(message));
     subscribe(OnSongSelected.class, message -> doSongSelected(message));
     subscribe(OnControlChange.class, message -> doControlChange(message));
-    subscribe(OnProgramChange.class, message -> doProgramChange(message));
+    subscribe(OnTransportProgramChange.class, message -> doTransportProgramChange(message));
     subscribe(OnDeleteMidiFile.class, message -> doDeleteMidiFile(message));
     subscribe(OnChannelPressure.class, message -> doChannelPressure(message));
     subscribe(OnProgramOverride.class, message -> doProgramOverride(message));
+    subscribe(OnSetAccompanimentType.class, message -> doSetAccompanimentType(message));
   }
 
   @Override
@@ -88,9 +93,45 @@ public class Musicianeer extends ServiceTask {
     transport.tsStart();
   }
 
-  private void changeProgram(int channel, int program) {
-    defaultPrograms[channel] = program;
-    if (programOverrides[channel] == OnProgramOverride.DEFAULT) {
+  private void changeProgramDueToAccompanimentChange() {
+    for (int channel = 0; channel < Midi.CHANNELS; channel++) {
+      if (accompanimentType == AccompanimentType.PIANO) {
+        setProgram(channel, 0);
+      } else if (programOverrides[channel] != UNSET) {
+        setProgram(channel, programOverrides[channel]);
+      } else {
+        setProgram(channel, programs[channel]);
+      }
+    }
+  }
+
+  private void changeProgramDueToNewSong(int channel, int program) {
+    programs[channel] = program;
+    System.out.println("DueToNewSong: channel=" + channel + ", program=" + program);
+    if (accompanimentType == AccompanimentType.PIANO) {
+      setProgram(channel, 0);
+    } else if (programOverrides[channel] != UNSET) {
+      setProgram(channel, programOverrides[channel]);
+    } else {
+      setProgram(channel, program);
+    }
+  }
+
+  private void changeProgramDueToProgramOverride(int channel, int newProgram) {
+    if (channel != Midi.DRUM) {
+      programOverrides[channel] = newProgram;
+      if (newProgram == UNSET) {
+        setProgram(channel, programs[channel]);
+      } else {
+        setProgram(channel, newProgram);
+      }
+    }
+  }
+
+  private void changeProgramDueToTransportProgramChange(int channel, int program) {
+    System.out.println("DueToTransport: channel=" + channel + ", program=" + program);
+    programs[channel] = program;
+    if (programOverrides[channel] == UNSET) {
       setProgram(channel, program);
     }
   }
@@ -152,23 +193,15 @@ public class Musicianeer extends ServiceTask {
     synthesizer.bendPitch(mapChannel(message.getChannel()), message.getValue());
   }
 
-  private void doProgramChange(OnProgramChange message) {
-    int channel = message.getChannel();
-    int program = message.getProgram();
-    changeProgram(channel, program);
-  }
-
   private void doProgramOverride(OnProgramOverride message) {
     int channel = message.getChannel();
-    if (channel != Midi.DRUM) {
-      int newProgram = message.getProgram();
-      programOverrides[channel] = newProgram;
-      if (newProgram == OnProgramOverride.DEFAULT) {
-        setProgram(channel, defaultPrograms[channel]);
-      } else {
-        setProgram(channel, newProgram);
-      }
-    }
+    int newProgram = message.getProgram();
+    changeProgramDueToProgramOverride(channel, newProgram);
+  }
+
+  private void doSetAccompanimentType(OnSetAccompanimentType message) {
+    accompanimentType = message.getAccompanimentType();
+    changeProgramDueToAccompanimentChange();
   }
 
   private void doSolo(OnSolo message) {
@@ -180,27 +213,33 @@ public class Musicianeer extends ServiceTask {
     synthesizer.muteAllChannels(false);
     synthesizer.soloAllChannels(false);
     publish(new OnTransposition(currentSong.getSongInfo().getEasyTransposition()));
-    Arrays.fill(programOverrides, OnProgramOverride.DEFAULT);
+    Arrays.fill(programOverrides, UNSET);
     for (int channel : currentSong.getSong().getActiveChannels()) {
       Set<Integer> programs = currentSong.getSong().getPrograms(channel);
       if (programs.size() > 0) {
         int program = programs.iterator().next();
-        changeProgram(channel, program);
+        changeProgramDueToNewSong(channel, program);
       }
     }
     playCurrentSong();
   }
 
+  private void doTransportProgramChange(OnTransportProgramChange message) {
+    int channel = message.getChannel();
+    int program = message.getProgram();
+    changeProgramDueToTransportProgramChange(channel, program);
+  }
+
   private CurrentPrograms getCurrentPrograms() {
-    int[] programs = new int[Midi.CHANNELS];
+    int[] currentPrograms = new int[Midi.CHANNELS];
     for (int channel = 0; channel < Midi.CHANNELS; channel++) {
-      if (programOverrides[channel] == OnProgramOverride.DEFAULT) {
-        programs[channel] = defaultPrograms[channel];
+      if (programOverrides[channel] == UNSET) {
+        currentPrograms[channel] = programs[channel];
       } else {
-        programs[channel] = programOverrides[channel];
+        currentPrograms[channel] = programOverrides[channel];
       }
     }
-    return new CurrentPrograms(programs);
+    return new CurrentPrograms(currentPrograms);
   }
 
   private CurrentSong getCurrentSong() {

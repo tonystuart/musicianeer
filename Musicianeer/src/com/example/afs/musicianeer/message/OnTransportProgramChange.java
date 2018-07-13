@@ -11,12 +11,12 @@ package com.example.afs.musicianeer.message;
 
 import com.example.afs.musicianeer.task.Message;
 
-public class OnProgramChange implements Message {
+public class OnTransportProgramChange implements Message {
 
   private int channel;
   private int program;
 
-  public OnProgramChange(int channel, int program) {
+  public OnTransportProgramChange(int channel, int program) {
     this.channel = channel;
     this.program = program;
   }
@@ -31,7 +31,7 @@ public class OnProgramChange implements Message {
 
   @Override
   public String toString() {
-    return "OnProgramChange [channel=" + channel + ", program=" + program + "]";
+    return "OnTransportProgramChange [channel=" + channel + ", program=" + program + "]";
   }
 
 }

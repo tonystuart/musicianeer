@@ -12,12 +12,12 @@ package com.example.afs.musicianeer.transport;
 import java.util.Collections;
 
 import com.example.afs.fluidsynth.Synthesizer;
+import com.example.afs.musicianeer.main.Musicianeer;
 import com.example.afs.musicianeer.main.Services;
 import com.example.afs.musicianeer.message.OnCueNoteOn;
 import com.example.afs.musicianeer.message.OnNoteEvent;
 import com.example.afs.musicianeer.message.OnNotes;
 import com.example.afs.musicianeer.message.OnPlay;
-import com.example.afs.musicianeer.message.OnProgramChange;
 import com.example.afs.musicianeer.message.OnSeek;
 import com.example.afs.musicianeer.message.OnSetAccompanimentType;
 import com.example.afs.musicianeer.message.OnSetPercentMasterGain;
@@ -27,6 +27,7 @@ import com.example.afs.musicianeer.message.OnStop;
 import com.example.afs.musicianeer.message.OnTick;
 import com.example.afs.musicianeer.message.OnTransportNoteOff;
 import com.example.afs.musicianeer.message.OnTransportNoteOn;
+import com.example.afs.musicianeer.message.OnTransportProgramChange;
 import com.example.afs.musicianeer.message.OnTransposition;
 import com.example.afs.musicianeer.midi.Midi;
 import com.example.afs.musicianeer.song.Default;
@@ -53,13 +54,12 @@ public class Transport extends ServiceTask {
   public static final int DEFAULT_PERCENT_GAIN = 10;
   public static final int DEFAULT_PERCENT_TEMPO = 50;
   public static final int DEFAULT_PERCENT_VELOCITY = 10;
-  public static final int DEFAULT_MASTER_PROGRAM_OFF = Midi.MAX_VALUE;
 
-  public static final long INITIALIZE_ON_NEXT_EVENT = -1;
+  private static final long INITIALIZE_ON_NEXT_EVENT = -1;
 
   private int index;
   private int currentTransposition;
-  private int masterProgram = DEFAULT_MASTER_PROGRAM_OFF;
+  private int masterProgramOverride = Musicianeer.UNSET;
   private int percentVelocity = DEFAULT_PERCENT_VELOCITY;
   private int[] currentPrograms = new int[Midi.CHANNELS];
 
@@ -254,13 +254,16 @@ public class Transport extends ServiceTask {
       int midiNote = getTransposedMidiNote(note, channel);
       int velocity = note.getVelocity();
       int program = note.getProgram();
-      if (channel != Midi.DRUM && masterProgram != DEFAULT_MASTER_PROGRAM_OFF) {
-        program = masterProgram;
+      if (channel != Midi.DRUM && masterProgramOverride != Musicianeer.UNSET) {
+        program = masterProgramOverride;
       }
       if (currentPrograms[channel] != program) {
-        synthesizer.changeProgram(channel, program);
+        // Defer all synthesizer program changes to Musicianeer to avoid piano accompaniment -> user override issues
+        // synthesizer.changeProgram(channel, program);
         currentPrograms[channel] = program;
-        publish(new OnProgramChange(channel, program));
+        if (masterProgramOverride == Musicianeer.UNSET) {
+          publish(new OnTransportProgramChange(channel, program));
+        }
       }
       int scaledVelocity = Velocity.scale(velocity, percentVelocity);
       switch (accompanimentType) {
@@ -380,9 +383,9 @@ public class Transport extends ServiceTask {
   private void setAccompaniment(OnSetAccompanimentType.AccompanimentType accompanimentType) {
     this.accompanimentType = accompanimentType;
     if (accompanimentType == OnSetAccompanimentType.AccompanimentType.PIANO) {
-      masterProgram = 0;
+      masterProgramOverride = 0;
     } else {
-      masterProgram = DEFAULT_MASTER_PROGRAM_OFF;
+      masterProgramOverride = Musicianeer.UNSET;
     }
   }
 

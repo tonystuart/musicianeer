@@ -13,8 +13,6 @@ import com.example.afs.musicianeer.task.Message;
 
 public class OnProgramOverride implements Message {
 
-  public static final int DEFAULT = -1;
-
   private int channel;
   private int program;
 

@@ -435,7 +435,7 @@ public class MusicianeerController extends ControllerTask {
     if (currentPrograms != null) {
       int currentProgram;
       if (channel == Midi.DRUM) {
-        currentProgram = OnProgramOverride.DEFAULT;
+        currentProgram = Musicianeer.UNSET;
       } else {
         currentProgram = currentPrograms.getPrograms()[channel];
       }

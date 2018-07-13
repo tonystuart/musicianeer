@@ -23,7 +23,6 @@ import com.example.afs.musicianeer.html.Range;
 import com.example.afs.musicianeer.html.Select;
 import com.example.afs.musicianeer.html.ShadowDomBuilder;
 import com.example.afs.musicianeer.html.TableRow;
-import com.example.afs.musicianeer.message.OnProgramOverride;
 import com.example.afs.musicianeer.message.OnSetAccompanimentType.AccompanimentType;
 import com.example.afs.musicianeer.midi.ChannelInfoFactory;
 import com.example.afs.musicianeer.midi.ChannelInfoFactory.ChannelInfo;
@@ -422,7 +421,7 @@ public class MusicianeerView extends ShadowDomBuilder {
     Select select = new Select("#instrument");
     select.addInputHandler();
     select.required();
-    select.add(option("Default", OnProgramOverride.DEFAULT));
+    select.add(option("Default", Musicianeer.UNSET));
     int program = 0;
     for (int category = 0; category < 16; category++) {
       select.add(optionGroup(Instruments.getCategoryName(category)));
