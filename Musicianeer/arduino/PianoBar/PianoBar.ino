@@ -8,7 +8,7 @@
 #define LOWEST_NOTE 35 // one less than Musicianeer
 #define HIGHEST_NOTE 84
 
-#define INACTIVITY_THRESHOLD (1000 * 60 * 2)
+#define INACTIVITY_THRESHOLD (1000L * 60 * 2)
 //#define INACTIVITY_THRESHOLD (1000 * 10)
 #define SPECTRUM_DELAY 40
 
