@@ -24,6 +24,7 @@ import com.example.afs.musicianeer.message.OnNoteOn;
 import com.example.afs.musicianeer.message.OnNotes;
 import com.example.afs.musicianeer.message.OnPitchBend;
 import com.example.afs.musicianeer.message.OnProgramOverride;
+import com.example.afs.musicianeer.message.OnSelectChannel;
 import com.example.afs.musicianeer.message.OnSetAccompanimentType;
 import com.example.afs.musicianeer.message.OnSetAccompanimentType.AccompanimentType;
 import com.example.afs.musicianeer.message.OnSetChannelVolume;
@@ -80,6 +81,7 @@ public class Musicianeer extends ServiceTask {
     subscribe(OnPitchBend.class, message -> doPitchBend(message));
     subscribe(OnSongSelected.class, message -> doSongSelected(message));
     subscribe(OnControlChange.class, message -> doControlChange(message));
+    subscribe(OnSelectChannel.class, message -> doSelectChannel(message));
     subscribe(OnTransportProgramChange.class, message -> doTransportProgramChange(message));
     subscribe(OnDeleteMidiFile.class, message -> doDeleteMidiFile(message));
     subscribe(OnChannelPressure.class, message -> doChannelPressure(message));
@@ -197,6 +199,12 @@ public class Musicianeer extends ServiceTask {
     int channel = message.getChannel();
     int newProgram = message.getProgram();
     changeProgramDueToProgramOverride(channel, newProgram);
+  }
+
+  private void doSelectChannel(OnSelectChannel message) {
+    for (int midiNote = 0; midiNote < Midi.MAX_VALUE; midiNote++) {
+      synthesizer.releaseKey(mapChannel(message.getOldChannel()), midiNote);
+    }
   }
 
   private void doSetAccompanimentType(OnSetAccompanimentType message) {

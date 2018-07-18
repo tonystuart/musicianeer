@@ -32,6 +32,7 @@ import com.example.afs.musicianeer.message.OnPlay;
 import com.example.afs.musicianeer.message.OnProgramOverride;
 import com.example.afs.musicianeer.message.OnResetMidiNoteLeds;
 import com.example.afs.musicianeer.message.OnSeek;
+import com.example.afs.musicianeer.message.OnSelectChannel;
 import com.example.afs.musicianeer.message.OnSelectSong;
 import com.example.afs.musicianeer.message.OnSetAccompanimentType;
 import com.example.afs.musicianeer.message.OnSetAccompanimentType.AccompanimentType;
@@ -88,7 +89,7 @@ public class MusicianeerController extends ControllerTask {
     if (id.startsWith("song-index-")) {
       publish(new OnSelectSong(Integer.parseInt(id.substring("song-index-".length()))));
     } else if (id.startsWith("channel-index-")) {
-      renderChannel(Integer.parseInt(id.substring("channel-index-".length())));
+      publish(new OnSelectChannel(channel, Integer.parseInt(id.substring("channel-index-".length()))));
     } else {
       switch (id) {
       case "delete-cancel":
@@ -212,6 +213,7 @@ public class MusicianeerController extends ControllerTask {
     subscribe(OnCueNoteOn.class, message -> doCueNoteOn(message));
     subscribe(OnMidiHandles.class, message -> doMidiHandles(message));
     subscribe(OnSongSelected.class, message -> doSongSelected(message));
+    subscribe(OnSelectChannel.class, message -> doSelectChannel(message));
     subscribe(OnTransposition.class, message -> doTransposition(message));
     subscribe(OnSetPercentTempo.class, message -> doSetPercentTempo(message));
     subscribe(OnTransportNoteOn.class, message -> doTransportNoteOn(message));
@@ -323,6 +325,10 @@ public class MusicianeerController extends ControllerTask {
     //resetTransportNoteState(); // TODO: Remove this if we remove cue notes
   }
 
+  private void doSelectChannel(OnSelectChannel message) {
+    setCurrentChannel(message.getNewChannel());
+  }
+
   private void doSetAccompanimentType(OnSetAccompanimentType message) {
     musicianeerView.setAccompanimentType(message.getAccompanimentType());
   }
@@ -412,7 +418,7 @@ public class MusicianeerController extends ControllerTask {
     resetMidiNoteLeds();
     musicianeerView.selectSong(currentSong.getSongIndex());
     musicianeerView.renderSongDetails(currentSong);
-    renderChannel(currentSong.getSongInfo().getActiveChannels()[0]);
+    setCurrentChannel(currentSong.getSongInfo().getActiveChannels()[0]);
   }
 
   private void initializeSynthesizerSettings() {
@@ -428,28 +434,6 @@ public class MusicianeerController extends ControllerTask {
       if (isSolo) {
         musicianeerView.setSolo(channel, isSolo);
       }
-    }
-  }
-
-  private void renderChannel(int channel) {
-    this.channel = channel;
-    resetMidiNoteLeds();
-    musicianeerView.selectChannel(currentSong.getSong(), channel, transposition);
-    CurrentPrograms currentPrograms = request(Services.getCurrentPrograms);
-    if (currentPrograms != null) {
-      int currentProgram;
-      if (channel == Midi.DRUM) {
-        currentProgram = Musicianeer.UNSET;
-      } else {
-        currentProgram = currentPrograms.getPrograms()[channel];
-      }
-      musicianeerView.setProgram(currentProgram);
-    }
-    if (inputDeviceIndex != MidiHandle.MIDI_HANDLE_NA) {
-      publish(new OnMidiInputSelected(channel, inputDeviceIndex));
-    }
-    if (outputDeviceIndex != MidiHandle.MIDI_HANDLE_NA) {
-      publish(new OnMidiOutputSelected(channel, outputDeviceIndex));
     }
   }
 
@@ -480,6 +464,28 @@ public class MusicianeerController extends ControllerTask {
     Arrays.fill(transportNoteOn, false);
     musicianeerView.resetMidiNoteLeds();
     publish(new OnResetMidiNoteLeds());
+  }
+
+  private void setCurrentChannel(int channel) {
+    this.channel = channel;
+    resetMidiNoteLeds();
+    musicianeerView.selectChannel(currentSong.getSong(), channel, transposition);
+    CurrentPrograms currentPrograms = request(Services.getCurrentPrograms);
+    if (currentPrograms != null) {
+      int currentProgram;
+      if (channel == Midi.DRUM) {
+        currentProgram = Musicianeer.UNSET;
+      } else {
+        currentProgram = currentPrograms.getPrograms()[channel];
+      }
+      musicianeerView.setProgram(currentProgram);
+    }
+    if (inputDeviceIndex != MidiHandle.MIDI_HANDLE_NA) {
+      publish(new OnMidiInputSelected(channel, inputDeviceIndex));
+    }
+    if (outputDeviceIndex != MidiHandle.MIDI_HANDLE_NA) {
+      publish(new OnMidiOutputSelected(channel, outputDeviceIndex));
+    }
   }
 
   private void setMidiNoteLed(int channel, int midiNote, LedState state) {
