@@ -50,9 +50,9 @@ void loop() {
 void process_message(midiEventPacket_t message) {
 		uint8_t command = message.byte1 & 0xf0;
 		if (command == 0x80) {
-				display_note_on(message);
-		} else if (command == 0x90) {
 				display_note_off(message);
+		} else if (command == 0x90) {
+				display_note_on(message);
 		} else {
 				print_unsupported_event(message);
 		}
@@ -74,7 +74,7 @@ void display_spectrum() {
 		delay(SPECTRUM_DELAY);
 }
 
-void display_note_on(midiEventPacket_t message) {
+void display_note_off(midiEventPacket_t message) {
 		uint8_t channel = message.byte1 & 0xf;
 		uint8_t midi_note = message.byte2;
 		//Serial.print("NOTE_OFF: channel=");
@@ -88,7 +88,7 @@ void display_note_on(midiEventPacket_t message) {
 		}
 }
 
-void display_note_off(midiEventPacket_t message) {
+void display_note_on(midiEventPacket_t message) {
 		uint8_t channel = message.byte1 & 0xf;
 		uint8_t midi_note = message.byte2;
 		uint8_t velocity = message.byte3;
