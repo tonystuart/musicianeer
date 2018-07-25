@@ -15,10 +15,12 @@ public class OnTransportNoteOn implements Message {
 
   private int channel;
   private int midiNote;
+  private int velocity;
 
-  public OnTransportNoteOn(int channel, int midiNote) {
+  public OnTransportNoteOn(int channel, int midiNote, int velocity) {
     this.channel = channel;
     this.midiNote = midiNote;
+    this.velocity = velocity;
   }
 
   public int getChannel() {
@@ -29,9 +31,13 @@ public class OnTransportNoteOn implements Message {
     return midiNote;
   }
 
+  public int getVelocity() {
+    return velocity;
+  }
+
   @Override
   public String toString() {
-    return "OnTransportNoteOn [channel=" + channel + ", midiNote=" + midiNote + "]";
+    return "OnTransportNoteOn [channel=" + channel + ", midiNote=" + midiNote + ", velocity=" + velocity + "]";
   }
 
 }

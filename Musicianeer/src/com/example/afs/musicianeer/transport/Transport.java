@@ -287,7 +287,7 @@ public class Transport extends ServiceTask {
       default:
         break;
       }
-      publish(new OnTransportNoteOn(channel, midiNote));
+      publish(new OnTransportNoteOn(channel, midiNote, velocity));
       break;
     }
     case TICK:
@@ -309,7 +309,8 @@ public class Transport extends ServiceTask {
     if (type == noteOnType) {
       Note note = noteEvent.getNote();
       int channel = note.getChannel();
-      publish(new OnTransportNoteOn(channel, getTransposedMidiNote(note, channel)));
+      int velocity = note.getVelocity();
+      publish(new OnTransportNoteOn(channel, getTransposedMidiNote(note, channel), velocity));
     } else if (type == noteOffType) {
       Note note = noteEvent.getNote();
       int channel = note.getChannel();

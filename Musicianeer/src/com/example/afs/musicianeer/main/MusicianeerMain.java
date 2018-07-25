@@ -10,6 +10,8 @@
 package com.example.afs.musicianeer.main;
 
 import com.example.afs.musicianeer.device.midi.MidiWatcher;
+import com.example.afs.musicianeer.mqtt.MqttBuilder;
+import com.example.afs.musicianeer.mqtt.MqttPublisher;
 import com.example.afs.musicianeer.task.MessageBroker;
 import com.example.afs.musicianeer.webapp.WebServer;
 
@@ -24,5 +26,13 @@ public class MusicianeerMain {
     midiWatcher.tsStart();
     musicianeer.tsStart();
     webServer.tsStart();
+    startOptionalMqttPublisher(messageBroker);
+  }
+
+  private static void startOptionalMqttPublisher(MessageBroker messageBroker) {
+    MqttPublisher mqttPublisher = new MqttBuilder(messageBroker).createFromOptionalConfiguration();
+    if (mqttPublisher != null) {
+      mqttPublisher.tsStart();
+    }
   }
 }
