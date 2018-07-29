@@ -11,7 +11,6 @@ package com.example.afs.musicianeer.mqtt;
 
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttException;
-import org.eclipse.paho.client.mqttv3.MqttMessage;
 
 import com.example.afs.musicianeer.message.OnNoteOff;
 import com.example.afs.musicianeer.message.OnNoteOn;
@@ -57,8 +56,8 @@ public class MqttPublisher extends MessageTask {
       MqttNoteMessage noteMessage = new MqttNoteMessage(source, type, channel, midiNote, velocity);
       String csv = noteMessage.asString();
       String json = JsonUtilities.toJson(noteMessage);
-      client.publish(Mqtt.NOTE_CSV, new MqttMessage(csv.getBytes()));
-      client.publish(Mqtt.NOTE_JSON, new MqttMessage(json.getBytes()));
+      client.publish(Mqtt.NOTE_CSV, csv.getBytes(), 0, false);
+      client.publish(Mqtt.NOTE_JSON, json.getBytes(), 0, false);
     } catch (MqttException e) {
       throw new RuntimeException(e);
     }
