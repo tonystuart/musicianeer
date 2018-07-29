@@ -20,7 +20,57 @@ uint8_t hue = 0;
 uint32_t inactivity_timer = 0;
 bool is_display_spectrum = true;
 
-uint8_t note_to_led_map[NOTE_COUNT] = { 1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31, 33, 35, 37, 39, 41, 43, 45, 47, 48, 50, 52, 54, 56, 58, 60, 62, 64, 66, 68, 70, 72, 74, 76, 78, 80, 82, 84, 86, 88, 90, 92, 94, 96 };
+uint8_t note_to_led_map[NOTE_COUNT] = {
+		1, // C2
+		3,
+		5,
+		7,
+		9,
+		11,
+		13, 
+		15,
+		17,
+		19,
+		21,
+		23,
+		25, // C3
+		27,
+		29,
+		31,
+		33,
+		35,
+		37,
+		39,
+		41,
+		43,
+		45,
+		47,
+		48, // C4
+		50,
+		52,
+		54,
+		56,
+		58,
+		60,
+		62,
+		64,
+		66,
+		68,
+		70,
+		72, // C5
+		74,
+		76,
+		78,
+		80,
+		82,
+		84,
+		86,
+		88,
+		90,
+		92,
+		94,
+		96 // C6
+};
 
 void setup() { 
 		Serial.begin(57600);
@@ -116,8 +166,8 @@ void print_unsupported_event(midiEventPacket_t message) {
 
 void show_note_to_led_map() {
 		for (int i = 0; i < NOTE_COUNT; i++) {
-			leds[note_to_led_map[i]] = CRGB(64,0,0);
-			FastLED.show();
+				leds[note_to_led_map[i]] = CRGB(64,0,0);
+				FastLED.show();
 		}
 }
 
