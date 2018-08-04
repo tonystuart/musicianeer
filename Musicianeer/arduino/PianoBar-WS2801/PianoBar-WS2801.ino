@@ -1,49 +1,66 @@
 #include "FastLED.h"
 #include "MIDIUSB.h"
 
-#define NUM_LEDS 50 
 #define DATA_PIN 16
 #define CLOCK_PIN 15
+#define NUM_LEDS 50
 
 #define LOWEST_NOTE 35 // one less than Musicianeer
 #define HIGHEST_NOTE 84
+#define NOTE_COUNT (HIGHEST_NOTE - LOWEST_NOTE) + 1
 
-#define INACTIVITY_THRESHOLD (1000L * 60 * 2)
-//#define INACTIVITY_THRESHOLD (1000 * 10)
 #define SPECTRUM_DELAY 40
+#define INACTIVITY_THRESHOLD (1000L * 60 * 2)
+#define RAMPUP_THRESHOLD 50
+
+// 120 bpm = 2 bps = 500 ms/b
 
 CRGB leds[NUM_LEDS];
 
+uint8_t m_hue[NOTE_COUNT];
+uint8_t m_saturation[NOTE_COUNT];
+uint8_t m_brightness[NOTE_COUNT];
+
 uint8_t hue = 0;
+uint32_t rampup_timer = 0;
 uint32_t inactivity_timer = 0;
 bool is_display_spectrum = true;
 
 void setup() { 
-		Serial.begin(57600);
-		FastLED.addLeds<WS2801,DATA_PIN, CLOCK_PIN>(leds, NUM_LEDS);
-		LEDS.setBrightness(84);
+		Serial.begin(9600);
+		delay(1000);
+		Serial.println("PianoBar for WS2801");
 		Serial.print("Compiled at ");
+		Serial.print("WS2801 version Compiled at ");
 		Serial.print(__TIME__);
 		Serial.print(" on ");
 		Serial.println(__DATE__);
+		delay(1000);
+		FastLED.addLeds<WS2801, DATA_PIN, CLOCK_PIN>(leds, NUM_LEDS);
+		LEDS.setBrightness(84);
 }
 
 void loop() { 
 		uint32_t current_millis = millis();
 		midiEventPacket_t message = MidiUSB.read();
 		if (message.header != 0) {
+				Serial.println("header=");
+				Serial.println(message.header);
 				if (is_display_spectrum) {
 						clear_leds();
 						is_display_spectrum = false;
 				}
-				inactivity_timer = millis();
+				inactivity_timer = current_millis;
 				process_message(message);
 		} else if (is_display_spectrum) {
 				display_spectrum();
 		} else if (current_millis < inactivity_timer) { // millis timer wrap (approx every 50 days)
-				inactivity_timer = millis();
+				inactivity_timer = current_millis;
 		} else if ((current_millis - inactivity_timer) > INACTIVITY_THRESHOLD) {
 				is_display_spectrum = true;
+		} else if ((current_millis - rampup_timer) > RAMPUP_THRESHOLD) {
+				rampup_timer = current_millis;
+				display_rampup();
 		}
 }
 
@@ -77,53 +94,80 @@ void display_spectrum() {
 void display_note_off(midiEventPacket_t message) {
 		uint8_t channel = message.byte1 & 0xf;
 		uint8_t midi_note = message.byte2;
-		//Serial.print("NOTE_OFF: channel=");
-		//Serial.print(channel);
-		//Serial.print(", midi_note=");
-		//Serial.println(midi_note);
 		if (midi_note >= LOWEST_NOTE && midi_note <= HIGHEST_NOTE) {
-				uint8_t led_index = message.byte2 - LOWEST_NOTE;
+				uint8_t note_index = message.byte2 - LOWEST_NOTE;
+				uint8_t led_index = map_note_to_led(note_index);
 				leds[led_index] = 0;
 				FastLED.show(); 
 		}
 }
 
 void display_note_on(midiEventPacket_t message) {
-		uint8_t channel = message.byte1 & 0xf;
 		uint8_t midi_note = message.byte2;
-		uint8_t velocity = message.byte3;
-		//Serial.print("NOTE_ON: channel=");
-		//Serial.print(channel);
-		//Serial.print(", midi_note=");
-		//Serial.print(midi_note);
-		//Serial.print(", velocity=");
-		//Serial.println(velocity);
 		if (midi_note >= LOWEST_NOTE && midi_note <= HIGHEST_NOTE) {
-				uint8_t led_index = message.byte2 - LOWEST_NOTE;
-				uint8_t i = channel / 4;
-				uint8_t j = channel % 4;
-				uint32_t degrees = (j * 90) + ((i * 90) / 4);
-				uint8_t hue = (degrees * 255) / 360;
-				uint8_t brightness = ((velocity * 255) / 127);
-				//Serial.print("channel="+channel);
-				//Serial.print(channel);
-				//Serial.print(", i=");
-				//Serial.print(i);
-				//Serial.print(", j=");
-				//Serial.print(j);
-				//Serial.print(", degrees=");
-				//Serial.print(degrees);
-				//Serial.print(", hue=");
-				//Serial.print(hue);
-				//Serial.print(", brightness=");
-				//Serial.println(brightness);
-				hsv2rgb_spectrum(CHSV(hue, 255, brightness), leds[led_index]);
+				uint8_t note_index = message.byte2 - LOWEST_NOTE;
+				uint8_t channel = message.byte1 & 0xf;
+				uint8_t velocity = message.byte3;
+				uint8_t led_index = map_note_to_led(note_index);
+				uint8_t hue = map_channel_to_hue(channel);
+				uint8_t saturation = 255;
+				uint8_t brightness = map_velocity_to_brightness(velocity);
+				hsv2rgb_spectrum(CHSV(hue, saturation, brightness), leds[led_index]);
+				m_hue[note_index] = hue;
+				m_saturation[note_index] = saturation;
+				m_brightness[note_index] = brightness;
 				FastLED.show(); 
 		}
 }
 
+void display_rampup() {
+		for (int i = 0; i < NOTE_COUNT; i++) {
+				if (m_brightness[i] > 0 && m_brightness[i] < 128) {
+						m_brightness[i] += 2;
+						// Serial.print("ms=");
+						// Serial.print(millis());
+						// Serial.print(", note=");
+						// Serial.print(i);
+						// Serial.print(", brightness=");
+						// Serial.println(m_brightness[i]);
+						uint8_t led_index = map_note_to_led(i);
+						hsv2rgb_spectrum(CHSV(m_hue[i], m_saturation[i], m_brightness[i]), leds[led_index]);
+				}
+		}
+		FastLED.show();
+}
+
+void display_note_to_led_map() {
+		for (int i = 0; i < NOTE_COUNT; i++) {
+				leds[map_note_to_led(i)] = CRGB(64,0,0);
+		}
+		FastLED.show();
+}
+
+uint8_t map_channel_to_hue(int channel) {
+		uint8_t i = channel / 4;
+		uint8_t j = channel % 4;
+		uint32_t degrees = (j * 90) + ((i * 90) / 4);
+		uint8_t hue = (degrees * 255) / 360; // integer muldiv
+		return hue;
+}
+
+uint8_t map_velocity_to_brightness(int velocity) {
+		return ((velocity * 255) / 127); // integer muldiv
+}
+
+uint8_t map_note_to_led(int note) {
+		return note;
+}
+
+boolean sharps[] = { false, true, false, true, false, false, true, false, true, false, true, false};
+
+boolean is_sharp(int midi_note) {
+		uint8_t note_type = midi_note % 12;
+		return sharps[note_type];
+}
+
 void print_unsupported_event(midiEventPacket_t message) {
-		Serial.print("Received: ");
 		Serial.print(message.header, HEX);
 		Serial.print("-");
 		Serial.print(message.byte1, HEX);
@@ -132,3 +176,4 @@ void print_unsupported_event(midiEventPacket_t message) {
 		Serial.print("-");
 		Serial.println(message.byte3, HEX);
 }
+
