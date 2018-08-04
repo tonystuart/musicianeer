@@ -10,16 +10,11 @@
 package com.example.afs.musicianeer.midi;
 
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import com.example.afs.musicianeer.song.ChannelNotes;
 import com.example.afs.musicianeer.song.Note;
 import com.example.afs.musicianeer.song.Song;
-import com.example.afs.musicianeer.song.Sound;
-import com.example.afs.musicianeer.song.Sounds;
-import com.example.afs.musicianeer.song.Sounds.OutputType;
-import com.example.afs.musicianeer.song.Sounds.SoundCount;
 
 public class ChannelInfoFactory {
 
@@ -30,11 +25,15 @@ public class ChannelInfoFactory {
     private int percentMeasuresPlayed;
     private int percentMelody;
     private String programNames;
-    private int uniqueSounds;
+    private int noteCount;
     private int[] noteCountsByMeasure;
 
     public int getConcurrency() {
       return concurrency;
+    }
+
+    public int getNoteCount() {
+      return noteCount;
     }
 
     public int[] getNoteCountsByMeasure() {
@@ -57,13 +56,9 @@ public class ChannelInfoFactory {
       return programNames;
     }
 
-    public int getUniqueSounds() {
-      return uniqueSounds;
-    }
-
     @Override
     public String toString() {
-      return "ChannelInfo [concurrency=" + concurrency + ", occupancy=" + occupancy + ", percentMeasuresPlayed=" + percentMeasuresPlayed + ", percentMelody=" + percentMelody + ", programNames=" + programNames + ", uniqueSounds=" + uniqueSounds + "]";
+      return "ChannelInfo [concurrency=" + concurrency + ", occupancy=" + occupancy + ", percentMeasuresPlayed=" + percentMeasuresPlayed + ", percentMelody=" + percentMelody + ", programNames=" + programNames + ", noteCount=" + noteCount + "]";
     }
 
   }
@@ -81,7 +76,7 @@ public class ChannelInfoFactory {
     channelInfo.percentMeasuresPlayed = getPercentMeasuresPlayed(channel);
     channelInfo.percentMelody = song.getPercentMelody(channel);
     channelInfo.programNames = getProgramNames(channel);
-    channelInfo.uniqueSounds = getUniqueSounds(channel);
+    channelInfo.noteCount = song.getTotalDistinctNoteCount(channel);
     channelInfo.noteCountsByMeasure = song.getNoteCountsByMeasure(channel);
     return channelInfo;
   }
@@ -109,13 +104,6 @@ public class ChannelInfoFactory {
       s.append(programName);
     }
     return s.toString();
-  }
-
-  private int getUniqueSounds(int channel) {
-    ChannelNotes notes = new ChannelNotes(song.getNotes(), channel);
-    Sounds sounds = new Sounds(OutputType.TICK, notes);
-    Map<Sound, SoundCount> uniqueSoundCounts = sounds.getUniqueSoundCounts();
-    return uniqueSoundCounts.size();
   }
 
 }

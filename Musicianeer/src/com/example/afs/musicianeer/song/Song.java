@@ -435,6 +435,16 @@ public class Song {
     return title;
   }
 
+  public int getTotalDistinctNoteCount(int channel) {
+    int totalDistinctNoteCount = 0;
+    for (int distinctNoteCount : getDistinctNoteCount(channel)) {
+      if (distinctNoteCount != 0) {
+        totalDistinctNoteCount++;
+      }
+    }
+    return totalDistinctNoteCount;
+  }
+
   public TreeSet<Word> getWords() {
     return words;
   }

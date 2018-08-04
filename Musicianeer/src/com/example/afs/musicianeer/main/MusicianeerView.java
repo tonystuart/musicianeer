@@ -406,7 +406,7 @@ public class MusicianeerView extends ShadowDomBuilder {
             .add(checkbox("#channel-solo-" + channel) //
                 .addCheckHandler())) //
         .add(td() //
-            .add(text(channelInfo.getUniqueSounds())))
+            .add(text(channelInfo.getNoteCount())))
         .add(td() //
             .add(text(channelInfo.getPercentMelody() + "%"))) //
         .add(td() //
