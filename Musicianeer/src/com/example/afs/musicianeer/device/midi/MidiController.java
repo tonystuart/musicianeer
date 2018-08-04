@@ -58,7 +58,7 @@ public class MidiController extends MessageTask {
   }
 
   private static final int OFF = 0;
-  private static final int LOW = Midi.MAX_VALUE / 16;
+  private static final int LOW = 1;
   private static final int HIGH = Midi.MAX_VALUE;
 
   private int deviceIndex;

@@ -107,7 +107,7 @@ void display_note_on(midiEventPacket_t message) {
 				uint8_t velocity = message.byte3;
 				uint8_t led_index = map_note_to_led(note_index);
 				uint8_t hue = map_channel_to_hue(channel);
-				uint8_t saturation = 255; // velocity == 127 ? 255 : 1;
+				uint8_t saturation = 255;
 				uint8_t brightness = map_velocity_to_brightness(velocity);
 				hsv2rgb_spectrum(CHSV(hue, saturation, brightness), leds[led_index]);
 				m_hue[note_index] = hue;
@@ -120,7 +120,7 @@ void display_note_on(midiEventPacket_t message) {
 void display_rampup() {
 		for (int i = 0; i < NOTE_COUNT; i++) {
 				if (m_brightness[i] > 0 && m_brightness[i] < 128) {
-						m_brightness[i] += 10;
+						m_brightness[i] += 2;
 						Serial.print("ms=");
 						Serial.print(millis());
 						Serial.print(", note=");
