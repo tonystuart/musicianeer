@@ -89,7 +89,9 @@ public class MusicianeerController extends ControllerTask {
     if (id.startsWith("song-index-")) {
       publish(new OnSelectSong(Integer.parseInt(id.substring("song-index-".length()))));
     } else if (id.startsWith("channel-index-")) {
-      publish(new OnSelectChannel(channel, Integer.parseInt(id.substring("channel-index-".length()))));
+      int newChannel = Integer.parseInt(id.substring("channel-index-".length()));
+      publish(new OnSelectChannel(channel, newChannel));
+      setCurrentChannel(newChannel); // NB: must be handled locally
     } else {
       switch (id) {
       case "delete-cancel":
@@ -213,7 +215,6 @@ public class MusicianeerController extends ControllerTask {
     subscribe(OnCueNoteOn.class, message -> doCueNoteOn(message));
     subscribe(OnMidiHandles.class, message -> doMidiHandles(message));
     subscribe(OnSongSelected.class, message -> doSongSelected(message));
-    subscribe(OnSelectChannel.class, message -> doSelectChannel(message));
     subscribe(OnTransposition.class, message -> doTransposition(message));
     subscribe(OnSetPercentTempo.class, message -> doSetPercentTempo(message));
     subscribe(OnTransportNoteOn.class, message -> doTransportNoteOn(message));
@@ -323,10 +324,6 @@ public class MusicianeerController extends ControllerTask {
 
   private void doSeek(OnSeek message) {
     //resetTransportNoteState(); // TODO: Remove this if we remove cue notes
-  }
-
-  private void doSelectChannel(OnSelectChannel message) {
-    setCurrentChannel(message.getNewChannel());
   }
 
   private void doSetAccompanimentType(OnSetAccompanimentType message) {
