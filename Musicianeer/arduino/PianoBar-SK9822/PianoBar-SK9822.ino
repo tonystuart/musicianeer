@@ -41,9 +41,7 @@ void setup() {
 void loop() { 
 		uint32_t current_millis = millis();
 		midiEventPacket_t message = MidiUSB.read();
-		if (m_brightness[0] && m_brightness[NOTE_COUNT-1]) {
-				display_note_to_led_map();
-		} else if (message.header != 0) {
+		if (message.header != 0) {
 				if (is_display_spectrum) {
 						clear_leds();
 						is_display_spectrum = false;
@@ -53,7 +51,7 @@ void loop() {
 		} else if (is_display_spectrum) {
 				display_spectrum();
 		} else if (current_millis < inactivity_timer) { // millis timer wrap (approx every 50 days)
-				inactivity_timer = millis();
+				inactivity_timer = current_millis;
 		} else if ((current_millis - inactivity_timer) > INACTIVITY_THRESHOLD) {
 				is_display_spectrum = true;
 		} else if ((current_millis - rampup_timer) > RAMPUP_THRESHOLD) {
