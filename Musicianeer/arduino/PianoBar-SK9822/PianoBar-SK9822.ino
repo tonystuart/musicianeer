@@ -91,7 +91,8 @@ void display_note_off(midiEventPacket_t message) {
 		uint8_t channel = message.byte1 & 0xf;
 		uint8_t midi_note = message.byte2;
 		if (midi_note >= LOWEST_NOTE && midi_note <= HIGHEST_NOTE) {
-				uint8_t led_index = map_note_to_led(message.byte2 - LOWEST_NOTE);
+				uint8_t note_index = message.byte2 - LOWEST_NOTE;
+				uint8_t led_index = map_note_to_led(note_index);
 				leds[led_index] = 0;
 				FastLED.show(); 
 		}
