@@ -161,6 +161,7 @@ public class MidiController extends MessageTask {
 
   private void doMidiOutputSelected(OnMidiOutputSelected message) {
     if (message.getDeviceIndex() == deviceIndex) {
+      resetMidiNoteLeds();
       outputChannel = message.getChannel();
     }
   }
