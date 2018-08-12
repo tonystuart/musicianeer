@@ -16,15 +16,21 @@ public class OnTransportNoteOn implements Message {
   private int channel;
   private int midiNote;
   private int velocity;
+  private int measure;
 
-  public OnTransportNoteOn(int channel, int midiNote, int velocity) {
+  public OnTransportNoteOn(int channel, int midiNote, int velocity, int measure) {
     this.channel = channel;
     this.midiNote = midiNote;
     this.velocity = velocity;
+    this.measure = measure;
   }
 
   public int getChannel() {
     return channel;
+  }
+
+  public int getMeasure() {
+    return measure;
   }
 
   public int getMidiNote() {
@@ -37,7 +43,7 @@ public class OnTransportNoteOn implements Message {
 
   @Override
   public String toString() {
-    return "OnTransportNoteOn [channel=" + channel + ", midiNote=" + midiNote + ", velocity=" + velocity + "]";
+    return "OnTransportNoteOn [channel=" + channel + ", midiNote=" + midiNote + ", velocity=" + velocity + ", measure=" + measure + "]";
   }
 
 }

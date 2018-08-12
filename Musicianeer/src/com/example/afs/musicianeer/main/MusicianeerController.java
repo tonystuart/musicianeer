@@ -66,6 +66,7 @@ public class MusicianeerController extends ControllerTask {
   private boolean isDown;
   private boolean isShift;
   private int transposition;
+  private int currentMeasure;
   private int channelVelocity = DEFAULT_VELOCITY;
   private int inputDeviceIndex = MidiHandle.MIDI_HANDLE_NA;
   private int outputDeviceIndex = MidiHandle.MIDI_HANDLE_NA;
@@ -378,6 +379,11 @@ public class MusicianeerController extends ControllerTask {
       int midiNote = message.getMidiNote();
       transportNoteOn[midiNote] = true;
       setMidiNoteLed(channel, midiNote, LedState.HIGH);
+    }
+    int measure = message.getMeasure();
+    if (measure != currentMeasure) {
+      currentMeasure = measure;
+      musicianeerView.setMeasure(channel, measure);
     }
   }
 

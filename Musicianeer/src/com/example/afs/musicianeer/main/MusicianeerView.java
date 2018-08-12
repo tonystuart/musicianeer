@@ -32,7 +32,7 @@ import com.example.afs.musicianeer.song.Default;
 import com.example.afs.musicianeer.song.Note;
 import com.example.afs.musicianeer.song.Note.NoteBuilder;
 import com.example.afs.musicianeer.song.Song;
-import com.example.afs.musicianeer.svg.Line;
+import com.example.afs.musicianeer.svg.LineElement;
 import com.example.afs.musicianeer.svg.Svg;
 import com.example.afs.musicianeer.task.ControllerTask;
 import com.example.afs.musicianeer.theory.Keyboard;
@@ -66,6 +66,7 @@ public class MusicianeerView extends ShadowDomBuilder {
 
   private static final int PROFILE_HEIGHT = 16;
 
+  private Element currentProfileElement;
   private String[] ledState = new String[Musicianeer.NOTE_COUNT];
 
   public MusicianeerView(ControllerTask controllerTask) {
@@ -271,6 +272,14 @@ public class MusicianeerView extends ShadowDomBuilder {
     replaceChildren(getElementById("delete-text"), text(text));
   }
 
+  public void setMeasure(int channel, int thisMeasure) {
+    if (currentProfileElement != null) {
+      removeClass(currentProfileElement, "current-measure");
+    }
+    currentProfileElement = getElementById("profile-" + channel + "-" + thisMeasure);
+    addClass(currentProfileElement, "current-measure");
+  }
+
   public void setMidiNoteLed(int channel, int midiNote, LedState state) {
     if (midiNote >= Musicianeer.LOWEST_NOTE && midiNote <= Musicianeer.HIGHEST_NOTE) {
       String newState;
@@ -473,7 +482,10 @@ public class MusicianeerView extends ShadowDomBuilder {
     Svg svg = new Svg(Svg.Type.SCALE_TO_FIT, 0, 0, measureCount, PROFILE_HEIGHT, ".profile", ".channel-" + channel);
     for (int i = 0; i < measureCount; i++) {
       int height = noteCountsByMeasure[i] / 2;
-      svg.add(new Line(i, (PROFILE_HEIGHT / 2) - height, i + 1, (PROFILE_HEIGHT / 2) + height));
+      int y1 = (PROFILE_HEIGHT / 2) - height;
+      int y2 = (PROFILE_HEIGHT / 2) + height;
+      String id = "#profile-" + channel + "-" + i;
+      svg.add(new LineElement(i, y1, i, y2, id));
     }
     return svg;
   }

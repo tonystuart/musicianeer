@@ -297,6 +297,10 @@ svg {
     width: 5vw;
 }
 
+.current-measure {
+    stroke: red;
+}
+
 line {
     stroke-width: 2;
 }
