@@ -246,39 +246,47 @@ public class ShadowDom {
   }
 
   protected void onAddClassName(Element element, String className) {
-    controllerTask.addShadowUpdate(new OnShadowUpdate(Action.ADD_CLASS, "#" + element.getId(), className));
+    controllerTask.addShadowUpdate(new OnShadowUpdate(Action.ADD_CLASS, "#" + getRequiredId(element), className));
   }
 
   protected void onAppendChild(Parent parent, String value) {
-    controllerTask.addShadowUpdate(new OnShadowUpdate(Action.APPEND_CHILD, "#" + parent.getId(), value));
+    controllerTask.addShadowUpdate(new OnShadowUpdate(Action.APPEND_CHILD, "#" + getRequiredId(parent), value));
   }
 
   protected void onEnsureVisible(Element element) {
-    controllerTask.addShadowUpdate(new OnShadowUpdate(Action.ENSURE_VISIBLE, "#" + element.getId()));
+    controllerTask.addShadowUpdate(new OnShadowUpdate(Action.ENSURE_VISIBLE, "#" + getRequiredId(element)));
   }
 
   protected void onInsertBefore(Element existingNode, String value) {
-    controllerTask.addShadowUpdate(new OnShadowUpdate(Action.INSERT_BEFORE, "#" + existingNode.getId(), value));
+    controllerTask.addShadowUpdate(new OnShadowUpdate(Action.INSERT_BEFORE, "#" + getRequiredId(existingNode), value));
   }
 
   protected void onRemoveChild(Element element) {
-    controllerTask.addShadowUpdate(new OnShadowUpdate(Action.REMOVE_CHILD, "#" + element.getId()));
+    controllerTask.addShadowUpdate(new OnShadowUpdate(Action.REMOVE_CHILD, "#" + getRequiredId(element)));
   }
 
   protected void onRemoveClassName(Element element, String className) {
-    controllerTask.addShadowUpdate(new OnShadowUpdate(Action.REMOVE_CLASS, "#" + element.getId(), className));
+    controllerTask.addShadowUpdate(new OnShadowUpdate(Action.REMOVE_CLASS, "#" + getRequiredId(element), className));
   }
 
   protected void onReplaceChildren(Parent parent, Node newChild) {
-    controllerTask.addShadowUpdate(new OnShadowUpdate(Action.REPLACE_CHILDREN, "#" + parent.getId(), newChild.render()));
+    controllerTask.addShadowUpdate(new OnShadowUpdate(Action.REPLACE_CHILDREN, "#" + getRequiredId(parent), newChild.render()));
   }
 
   protected void onReplaceElement(Element oldChild, Element newChild) {
-    controllerTask.addShadowUpdate(new OnShadowUpdate(Action.REPLACE_ELEMENT, "#" + oldChild.getId(), newChild.render()));
+    controllerTask.addShadowUpdate(new OnShadowUpdate(Action.REPLACE_ELEMENT, "#" + getRequiredId(oldChild), newChild.render()));
   }
 
   protected void onSetProperty(Element element, String name, Object value) {
-    controllerTask.addShadowUpdate(new OnShadowUpdate(Action.SET_PROPERTY, "#" + element.getId(), name, value));
+    controllerTask.addShadowUpdate(new OnShadowUpdate(Action.SET_PROPERTY, "#" + getRequiredId(element), name, value));
+  }
+
+  private String getRequiredId(Element element) {
+    String id = element.getId();
+    if (id == null) {
+      throw new IllegalArgumentException("Expected element to have a non-null id");
+    }
+    return id;
   }
 
   private Set<Element> realizeClass(String className) {
