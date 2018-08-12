@@ -21,6 +21,7 @@ public class Element extends Node {
   private StringBuilder style;
   private Set<String> classList;
   private Map<String, Object> attributes;
+  private boolean isSelfClosingTag;
 
   protected Element(String type) {
     this.type = type;
@@ -92,6 +93,10 @@ public class Element extends Node {
     return type;
   }
 
+  public boolean isSelfClosingTag() {
+    return isSelfClosingTag;
+  }
+
   public Set<String> realizeClassList() {
     if (classList == null) {
       classList = new HashSet<>();
@@ -136,6 +141,9 @@ public class Element extends Node {
         }
       }
     }
+    if (isSelfClosingTag) {
+      s.append(" /");
+    }
     s.append(">");
   }
 
@@ -158,6 +166,10 @@ public class Element extends Node {
     }
     attributes.put(name, value);
     return this;
+  }
+
+  public void setSelfClosingTag(boolean isSelfClosingTag) {
+    this.isSelfClosingTag = isSelfClosingTag;
   }
 
   public Element style(String newStyle) {
