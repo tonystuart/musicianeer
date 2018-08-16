@@ -19,7 +19,7 @@ body {
     fill: #B4B7BA;
     /* sailor blue */
     background-color: #2E4A62;
-    font-size: .85vw;
+    font-size: .75vw;
     cursor: default;
     user-select: none;
     margin: 0px;
@@ -293,12 +293,12 @@ svg {
 }
 
 .profile {
-    height: 1.7vh;
     width: 5vw;
 }
 
 .current-measure {
-    stroke: red;
+    stroke: black;
+    stroke-width: 10;
 }
 
 line {
@@ -384,6 +384,7 @@ path {
     text-overflow: ellipsis;
     max-width: 10vw;
     text-align: center;
+    height: 2vh;
 }
 
 #song td:nth-child(1) {
@@ -396,7 +397,6 @@ path {
     align-items: center;
     justify-content: space-around;
     padding: 5px;
-    font-size: .75vw;
 }
 
 #staff-container {
