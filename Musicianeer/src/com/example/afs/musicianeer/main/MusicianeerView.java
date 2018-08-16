@@ -481,7 +481,7 @@ public class MusicianeerView extends ShadowDomBuilder {
     int measureCount = noteCountsByMeasure.length;
     Svg svg = new Svg(Svg.Type.SCALE_TO_FIT, 0, 0, measureCount, PROFILE_HEIGHT, ".profile", ".channel-" + channel);
     for (int i = 0; i < measureCount; i++) {
-      int clippedNoteCountForMeasure = Math.min(PROFILE_HEIGHT - 4, noteCountsByMeasure[i]);
+      int clippedNoteCountForMeasure = Math.min(PROFILE_HEIGHT - 6, noteCountsByMeasure[i]);
       int height = clippedNoteCountForMeasure / 2;
       int y1 = (PROFILE_HEIGHT / 2) - height;
       int y2 = (PROFILE_HEIGHT / 2) + height;
