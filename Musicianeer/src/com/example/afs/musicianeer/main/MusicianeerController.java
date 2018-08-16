@@ -473,6 +473,7 @@ public class MusicianeerController extends ControllerTask {
     this.channel = channel;
     resetMidiNoteLeds();
     musicianeerView.selectChannel(currentSong.getSong(), channel, transposition);
+    musicianeerView.setMeasure(channel, currentMeasure);
     CurrentPrograms currentPrograms = request(Services.getCurrentPrograms);
     if (currentPrograms != null) {
       int currentProgram;
