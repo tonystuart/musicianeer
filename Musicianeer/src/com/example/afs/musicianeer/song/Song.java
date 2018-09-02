@@ -18,7 +18,6 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import com.example.afs.musicianeer.analyzer.TranspositionFinder;
 import com.example.afs.musicianeer.midi.Instruments;
 import com.example.afs.musicianeer.midi.Midi;
 import com.example.afs.musicianeer.song.Note.NoteBuilder;
@@ -41,7 +40,6 @@ public class Song {
   private long duration;
   private int lastMeasure;
 
-  private Integer distanceToWhiteKeys;
   private TreeSet<Note> notes = new TreeSet<>();
   private TreeSet<Word> words = new TreeSet<>();
   private ChannelFacets channelFacets = new ChannelFacets();
@@ -200,13 +198,6 @@ public class Song {
       controllingNote = notes.ceiling(tickNote);
     }
     return controllingNote;
-  }
-
-  public Integer getDistanceToWhiteKeys() {
-    if (distanceToWhiteKeys == null) {
-      distanceToWhiteKeys = TranspositionFinder.getDistanceToWhiteKeys(this);
-    }
-    return distanceToWhiteKeys;
   }
 
   public int[] getDistinctNoteCount(int channel) {

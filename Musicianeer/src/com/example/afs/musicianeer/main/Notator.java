@@ -482,14 +482,13 @@ public class Notator {
     Svg staff = drawStaff(song, channel);
     drawMeasures(song, staff);
     Iterable<Note> notes = song.getChannelNotes(channel);
-    if (channel == Midi.DRUM) {
-      Sounds sounds = new Sounds(OutputType.TICK, notes);
-      drawNotes(staff, sounds);
-      drawDrumNames(staff, sounds);
-    } else {
-      Sounds sounds = new Sounds(OutputType.TICK, new Transposer(notes, transposition));
-      drawNotes(staff, sounds);
-      if (isDrawNoteNames) {
+    Sounds sounds = new Sounds(OutputType.TICK, new Transposer(notes, transposition));
+    drawNotes(staff, sounds);
+    if (isDrawNoteNames) {
+      if (channel == Midi.DRUM) {
+        Sounds drumNames = new Sounds(OutputType.TICK, song.getChannelNotes(channel));
+        drawDrumNames(staff, drumNames);
+      } else {
         drawNoteNames(staff, sounds);
       }
     }

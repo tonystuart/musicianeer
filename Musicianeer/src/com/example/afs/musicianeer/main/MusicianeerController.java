@@ -16,6 +16,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import com.example.afs.musicianeer.analyzer.TranspositionFinder.EasyTransposition;
 import com.example.afs.musicianeer.device.midi.MidiHandle;
 import com.example.afs.musicianeer.device.midi.MidiHandle.Type;
 import com.example.afs.musicianeer.main.MusicianeerView.LedState;
@@ -65,12 +66,13 @@ public class MusicianeerController extends ControllerTask {
   private int channel;
   private boolean isDown;
   private boolean isShift;
-  private int transposition;
   private int currentMeasure;
+  private int currentTransposition;
   private int channelVelocity = DEFAULT_VELOCITY;
   private int inputDeviceIndex = MidiHandle.MIDI_HANDLE_NA;
   private int outputDeviceIndex = MidiHandle.MIDI_HANDLE_NA;
 
+  private int[] channelTranspositions;
   private int[] transportCueCount = new int[Midi.NOTES];
   private boolean[] transportNoteOn = new boolean[Midi.NOTES];
 
@@ -388,8 +390,8 @@ public class MusicianeerController extends ControllerTask {
   }
 
   private void doTransposition(OnTransposition message) {
-    this.transposition = message.getTransposition();
-    musicianeerView.renderStaff(currentSong.getSong(), channel, transposition);
+    currentTransposition = message.getTransposition();
+    musicianeerView.renderStaff(currentSong.getSong(), channel, getTransposition());
     resetMidiNoteLeds();
   }
 
@@ -414,10 +416,19 @@ public class MusicianeerController extends ControllerTask {
     return first == null ? MidiHandle.MIDI_HANDLE_NA : first.getIndex();
   }
 
+  private int getTransposition() {
+    int transposition = channelTranspositions[channel];
+    if (channel != Midi.DRUM) {
+      transposition += currentTransposition;
+    }
+    return transposition;
+  }
+
   private void initializeCurrentSong(CurrentSong currentSong) {
     this.currentSong = currentSong;
-    SongInfo songInfo = currentSong.getSongInfo();
-    this.transposition = songInfo.getEasyTransposition();
+    EasyTransposition easyTransposition = currentSong.getSongInfo().getEasyTransposition();
+    currentTransposition = easyTransposition.getSongTransposition();
+    channelTranspositions = easyTransposition.getChannelTranspositions();
     resetMidiNoteLeds();
     musicianeerView.selectSong(currentSong.getSongIndex());
     musicianeerView.renderSongDetails(currentSong);
@@ -472,7 +483,7 @@ public class MusicianeerController extends ControllerTask {
   private void setCurrentChannel(int channel) {
     this.channel = channel;
     resetMidiNoteLeds();
-    musicianeerView.selectChannel(currentSong.getSong(), channel, transposition);
+    musicianeerView.selectChannel(currentSong.getSong(), channel, getTransposition());
     musicianeerView.setMeasure(channel, currentMeasure);
     CurrentPrograms currentPrograms = request(Services.getCurrentPrograms);
     if (currentPrograms != null) {

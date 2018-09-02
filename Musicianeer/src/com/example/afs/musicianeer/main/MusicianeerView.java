@@ -112,6 +112,8 @@ public class MusicianeerView extends ShadowDomBuilder {
                         .add(th() //
                             .add(text("Concurrency"))) //
                         .add(th() //
+                            .add(text("Transpose"))) //
+                        .add(th() //
                             .add(text("Profile")))) //
                     .add(tbody("#channel-body"))))) //
         .add(div("#staff-container") //
@@ -212,9 +214,9 @@ public class MusicianeerView extends ShadowDomBuilder {
     SongInfo songInfo = currentSong.getSongInfo();
     Parent channelTable = getElementById("channel-table");
     Parent channelBody = getElementById("channel-body");
-    replaceElement(channelTable, channelBody, createChannelBody(currentSong.getSong()));
+    replaceElement(channelTable, channelBody, createChannelBody(currentSong));
     NumberInput transposition = getElementById("transposition");
-    setProperty(transposition, "value", songInfo.getEasyTransposition());
+    setProperty(transposition, "value", songInfo.getEasyTransposition().getSongTransposition());
   }
 
   public void renderSongInfo(SongInfo songInfo, int songIndex) {
@@ -391,18 +393,21 @@ public class MusicianeerView extends ShadowDomBuilder {
         .addClickHandler();
   }
 
-  private Parent createChannelBody(Song song) {
+  private Parent createChannelBody(CurrentSong currentSong) {
+    Song song = currentSong.getSong();
     ChannelInfoFactory channelInfoFactory = new ChannelInfoFactory(song);
     Parent channelBody = tbody("#channel-body");
     channelBody.addClickHandler();
+    int[] channelTranspositions = currentSong.getSongInfo().getEasyTransposition().getChannelTranspositions();
     for (int channel : song.getActiveChannels()) {
       ChannelInfo channelInfo = channelInfoFactory.getChannelInfo(channel);
-      channelBody.add(createChannelTableRow(channel, channelInfo));
+      int channelTransposition = channelTranspositions[channel];
+      channelBody.add(createChannelTableRow(channel, channelInfo, channelTransposition));
     }
     return channelBody;
   }
 
-  private Parent createChannelTableRow(int channel, ChannelInfo channelInfo) {
+  private Parent createChannelTableRow(int channel, ChannelInfo channelInfo, int channelTransposition) {
     String programNames = channelInfo.getProgramNames();
     return row("#channel-index-" + channel) //
         .add(td() //
@@ -422,6 +427,8 @@ public class MusicianeerView extends ShadowDomBuilder {
             .add(text(channelInfo.getPercentMeasuresPlayed() + "%"))) //
         .add(td() //
             .add(text(channelInfo.getConcurrency() + "%"))) //
+        .add(td() //
+            .add(text(channelTransposition))) //
         .add(td() //
             .add(getProfileGraphic(channel, channelInfo.getNoteCountsByMeasure())));
   }
@@ -460,7 +467,7 @@ public class MusicianeerView extends ShadowDomBuilder {
         .add(td() //
             .add(text(songInfo.getPredominantKey().replace(" ", "&nbsp;"))))
         .add(td() //
-            .add(text(songInfo.getEasyTransposition())))
+            .add(text(songInfo.getEasyTransposition().getSongTransposition())))
         .add(td() //
             .add(text(songInfo.getComplexity())));
     return row;

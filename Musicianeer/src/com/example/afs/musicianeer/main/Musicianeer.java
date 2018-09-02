@@ -32,7 +32,6 @@ import com.example.afs.musicianeer.message.OnSolo;
 import com.example.afs.musicianeer.message.OnSongSelected;
 import com.example.afs.musicianeer.message.OnStop;
 import com.example.afs.musicianeer.message.OnTransportProgramChange;
-import com.example.afs.musicianeer.message.OnTransposition;
 import com.example.afs.musicianeer.midi.Midi;
 import com.example.afs.musicianeer.song.Song;
 import com.example.afs.musicianeer.task.MessageBroker;
@@ -184,11 +183,16 @@ public class Musicianeer extends ServiceTask {
   }
 
   private void doNoteOff(OnNoteOff message) {
-    synthesizer.releaseKey(mapChannel(message.getChannel()), message.getData1());
+    int channel = message.getChannel();
+    int midiNote = message.getData1();
+    synthesizer.releaseKey(mapChannel(channel), transpose(channel, midiNote));
   }
 
   private void doNoteOn(OnNoteOn message) {
-    synthesizer.pressKey(mapChannel(message.getChannel()), message.getData1(), message.getData2());
+    int channel = message.getChannel();
+    int midiNote = message.getData1();
+    int velocity = message.getData2();
+    synthesizer.pressKey(mapChannel(channel), transpose(channel, midiNote), velocity);
   }
 
   private void doPitchBend(OnPitchBend message) {
@@ -220,7 +224,6 @@ public class Musicianeer extends ServiceTask {
     currentSong = message.getCurrentSong();
     synthesizer.muteAllChannels(false);
     synthesizer.soloAllChannels(false);
-    publish(new OnTransposition(currentSong.getSongInfo().getEasyTransposition()));
     Arrays.fill(programOverrides, UNSET);
     for (int channel : currentSong.getSong().getActiveChannels()) {
       Set<Integer> programs = currentSong.getSong().getPrograms(channel);
@@ -273,6 +276,10 @@ public class Musicianeer extends ServiceTask {
   private void setProgram(int channel, int program) {
     synthesizer.changeProgram(channel, program);
     synthesizer.changeProgram(mapChannel(channel), program);
+  }
+
+  private int transpose(int channel, int midiNote) {
+    return midiNote - currentSong.getSongInfo().getEasyTransposition().getChannelTranspositions()[channel];
   }
 
 }

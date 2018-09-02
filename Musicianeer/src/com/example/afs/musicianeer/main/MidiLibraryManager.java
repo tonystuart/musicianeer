@@ -28,6 +28,7 @@ import com.example.afs.musicianeer.task.ServiceTask;
 import com.example.afs.musicianeer.util.DirectList;
 import com.example.afs.musicianeer.util.JsonUtilities;
 import com.example.afs.musicianeer.util.RandomAccessList;
+import com.google.gson.JsonSyntaxException;
 
 public class MidiLibraryManager extends ServiceTask {
 
@@ -71,7 +72,13 @@ public class MidiLibraryManager extends ServiceTask {
   protected MidiLibraryManager(MessageBroker broker) {
     super(broker);
     initializeDirectories();
-    FileContents fileContents = JsonUtilities.fromJsonFile(getSongInfoPath(), FileContents.class);
+    FileContents fileContents;
+    try {
+      fileContents = JsonUtilities.fromJsonFile(getSongInfoPath(), FileContents.class);
+    } catch (JsonSyntaxException e) {
+      System.err.println("Reinitializing songInfo file due to presumed format change");
+      fileContents = null; // file will be recreated in correct format
+    }
     if (fileContents == null) {
       songInfoMap = new TreeMap<>();
     } else {

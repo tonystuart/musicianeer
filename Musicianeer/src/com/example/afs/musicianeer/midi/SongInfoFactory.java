@@ -14,6 +14,8 @@ import java.util.Arrays;
 
 import com.example.afs.musicianeer.analyzer.KeyScore;
 import com.example.afs.musicianeer.analyzer.KeySignatures;
+import com.example.afs.musicianeer.analyzer.TranspositionFinder;
+import com.example.afs.musicianeer.analyzer.TranspositionFinder.EasyTransposition;
 import com.example.afs.musicianeer.song.Song;
 
 public class SongInfoFactory {
@@ -23,7 +25,7 @@ public class SongInfoFactory {
     private int beatsPerMinute;
     private double complexity;
     private String duration;
-    private int easyTransposition;
+    private EasyTransposition easyTransposition;
     private String predominantKey;
     private long timeLastModified;
     private String timeSignature;
@@ -45,7 +47,7 @@ public class SongInfoFactory {
       return duration;
     }
 
-    public int getEasyTransposition() {
+    public EasyTransposition getEasyTransposition() {
       return easyTransposition;
     }
 
@@ -127,29 +129,12 @@ public class SongInfoFactory {
     songInfo.beatsPerMinute = song.getBeatsPerMinute(0);
     songInfo.complexity = getComplexity(song);
     songInfo.duration = getDuration(song);
-    songInfo.easyTransposition = getEasyTransposition(song);
+    songInfo.easyTransposition = new TranspositionFinder().findEasyTransposition(song);
     songInfo.predominantKey = getPredominantKey(song);
     songInfo.timeLastModified = midiFile.lastModified();
     songInfo.timeSignature = song.getBeatsPerMeasure(0) + "/" + song.getBeatUnit(0);
     songInfo.title = song.getTitle();
     return songInfo;
-  }
-
-  private int getEasyTransposition(Song song) {
-    int distanceToWhiteKeys = song.getDistanceToWhiteKeys();
-    int easyTransposition = 0;
-    if (distanceToWhiteKeys < 0) {
-      int minimumTransposition = song.getMinimumTransposition();
-      if (Math.abs(distanceToWhiteKeys) < Math.abs(minimumTransposition)) {
-        easyTransposition = distanceToWhiteKeys;
-      }
-    } else if (distanceToWhiteKeys > 0) {
-      int maximumTransposition = song.getMaximumTransposition();
-      if (distanceToWhiteKeys < maximumTransposition) {
-        easyTransposition = distanceToWhiteKeys;
-      }
-    }
-    return easyTransposition;
   }
 
 }

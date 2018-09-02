@@ -12,6 +12,7 @@ package com.example.afs.musicianeer.transport;
 import java.util.Collections;
 
 import com.example.afs.fluidsynth.Synthesizer;
+import com.example.afs.musicianeer.analyzer.TranspositionFinder.EasyTransposition;
 import com.example.afs.musicianeer.main.Musicianeer;
 import com.example.afs.musicianeer.main.Services;
 import com.example.afs.musicianeer.message.OnCueNoteOn;
@@ -23,6 +24,7 @@ import com.example.afs.musicianeer.message.OnSetAccompanimentType;
 import com.example.afs.musicianeer.message.OnSetPercentMasterGain;
 import com.example.afs.musicianeer.message.OnSetPercentTempo;
 import com.example.afs.musicianeer.message.OnSetPercentVelocity;
+import com.example.afs.musicianeer.message.OnSongSelected;
 import com.example.afs.musicianeer.message.OnStop;
 import com.example.afs.musicianeer.message.OnTick;
 import com.example.afs.musicianeer.message.OnTransportNoteOff;
@@ -59,6 +61,7 @@ public class Transport extends ServiceTask {
 
   private int index;
   private int currentTransposition;
+  private int[] channelTranspositions;
   private int masterProgramOverride = Musicianeer.UNSET;
   private int percentVelocity = DEFAULT_PERCENT_VELOCITY;
   private int[] currentPrograms = new int[Midi.CHANNELS];
@@ -86,6 +89,7 @@ public class Transport extends ServiceTask {
     subscribe(OnSeek.class, message -> doSeek(message));
     subscribe(OnNotes.class, message -> doNotes(message));
     subscribe(OnNoteEvent.class, message -> doNoteEvent(message));
+    subscribe(OnSongSelected.class, message -> doSongSelected(message));
     subscribe(OnTransposition.class, message -> doTransposition(message));
     subscribe(OnSetPercentTempo.class, message -> doSetPercentTempo(message));
     subscribe(OnSetPercentVelocity.class, message -> doPercentVelocity(message));
@@ -144,6 +148,13 @@ public class Transport extends ServiceTask {
     setPercentTempo(message.getPercentTempo());
   }
 
+  private void doSongSelected(OnSongSelected message) {
+    EasyTransposition easyTransposition = message.getCurrentSong().getSongInfo().getEasyTransposition();
+    currentTransposition = easyTransposition.getSongTransposition();
+    channelTranspositions = easyTransposition.getChannelTranspositions();
+    synthesizer.allNotesOff();
+  }
+
   private void doStop(OnStop message) {
     if (state == State.PAUSE) {
       stop();
@@ -153,7 +164,7 @@ public class Transport extends ServiceTask {
   }
 
   private void doTransposition(OnTransposition message) {
-    setCurrentTransposition(message.getTransposition());
+    currentTransposition = message.getTransposition();
     synthesizer.allNotesOff();
   }
 
@@ -185,7 +196,8 @@ public class Transport extends ServiceTask {
 
   private int getTransposedMidiNote(Note note, int channel) {
     int midiNote = note.getMidiNote();
-    if (currentTransposition != 0 && channel != Midi.DRUM) {
+    midiNote += channelTranspositions[channel];
+    if (channel != Midi.DRUM) {
       midiNote += currentTransposition;
     }
     return midiNote;
@@ -388,10 +400,6 @@ public class Transport extends ServiceTask {
     } else {
       masterProgramOverride = Musicianeer.UNSET;
     }
-  }
-
-  private void setCurrentTransposition(int currentTransposition) {
-    this.currentTransposition = currentTransposition;
   }
 
   private void setPercentGain(int gain) {

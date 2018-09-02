@@ -9,10 +9,24 @@
 
 package com.example.afs.musicianeer.analyzer;
 
+import com.example.afs.musicianeer.main.Musicianeer;
 import com.example.afs.musicianeer.midi.Midi;
 import com.example.afs.musicianeer.song.Song;
 
 public class TranspositionFinder {
+
+  public static class EasyTransposition {
+    private int songTransposition;
+    private int[] channelTranspositions;
+
+    public int[] getChannelTranspositions() {
+      return channelTranspositions;
+    }
+
+    public int getSongTransposition() {
+      return songTransposition;
+    }
+  }
 
   public static final boolean[] isWhite = new boolean[] {
       true, // C
@@ -29,7 +43,14 @@ public class TranspositionFinder {
       true, //B
   };
 
-  public static int getDistanceToWhiteKeys(Song song) {
+  public EasyTransposition findEasyTransposition(Song song) {
+    EasyTransposition easyTransposition = new EasyTransposition();
+    easyTransposition.songTransposition = getSongTransposition(song);
+    easyTransposition.channelTranspositions = getChannelTranspositions(song, easyTransposition.songTransposition, Musicianeer.LOWEST_NOTE, Musicianeer.HIGHEST_NOTE);
+    return easyTransposition;
+  }
+
+  private int getBestTransposition(Song song) {
     int bestTransposition = 0;
     int bestScore = Integer.MIN_VALUE;
     for (int transposeDistance = -6; transposeDistance < 6; transposeDistance++) {
@@ -59,7 +80,42 @@ public class TranspositionFinder {
     return bestTransposition;
   }
 
-  private static int normalize(int deltaSemitone) {
+  private int[] getChannelTranspositions(Song song, int transposition, int lowestPlayableNote, int highestPlayableNote) {
+    int[] channelTranspositions = new int[Midi.CHANNELS];
+    for (int channel : song.getActiveChannels()) {
+      int lowestMidiNote = song.getLowestMidiNote(channel);
+      int highestMidiNote = song.getHighestMidiNote(channel);
+      if (channel != Midi.DRUM) {
+        lowestMidiNote += transposition;
+        highestMidiNote += transposition;
+      }
+      if (lowestMidiNote < lowestPlayableNote) {
+        channelTranspositions[channel] = (((lowestPlayableNote - lowestMidiNote) / Midi.SEMITONES_PER_OCTAVE) + 1) * Midi.SEMITONES_PER_OCTAVE; // positive
+      } else if (highestMidiNote > highestPlayableNote) {
+        channelTranspositions[channel] = (((highestPlayableNote - highestMidiNote) / Midi.SEMITONES_PER_OCTAVE) - 1) * Midi.SEMITONES_PER_OCTAVE; // negative
+      }
+    }
+    return channelTranspositions;
+  }
+
+  private int getSongTransposition(Song song) {
+    int bestTransposition = getBestTransposition(song);
+    int songTransposition = 0;
+    if (bestTransposition < 0) {
+      int minimumTransposition = song.getMinimumTransposition();
+      if (Math.abs(bestTransposition) < Math.abs(minimumTransposition)) {
+        songTransposition = bestTransposition;
+      }
+    } else if (bestTransposition > 0) {
+      int maximumTransposition = song.getMaximumTransposition();
+      if (bestTransposition < maximumTransposition) {
+        songTransposition = bestTransposition;
+      }
+    }
+    return songTransposition;
+  }
+
+  private int normalize(int deltaSemitone) {
     return (Midi.SEMITONES_PER_OCTAVE + deltaSemitone) % Midi.SEMITONES_PER_OCTAVE;
   }
 }
