@@ -278,8 +278,13 @@ public class MusicianeerView extends ShadowDomBuilder {
     if (currentProfileElement != null) {
       removeClass(currentProfileElement, "current-measure");
     }
-    currentProfileElement = getElementById("profile-" + channel + "-" + thisMeasure);
-    addClass(currentProfileElement, "current-measure");
+    String id = "profile-" + channel + "-" + thisMeasure;
+    currentProfileElement = getElementById(id);
+    if (currentProfileElement == null) {
+      System.err.println("setMeasure: cannot find id=" + id);
+    } else {
+      addClass(currentProfileElement, "current-measure");
+    }
   }
 
   public void setMidiNoteLed(int channel, int midiNote, LedState state) {
