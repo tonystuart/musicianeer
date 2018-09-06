@@ -89,9 +89,9 @@ public class TranspositionFinder {
         lowestMidiNote += transposition;
         highestMidiNote += transposition;
       }
-      if (lowestMidiNote < lowestPlayableNote) {
+      if (lowestMidiNote < lowestPlayableNote && highestMidiNote <= highestPlayableNote) {
         channelTranspositions[channel] = (((lowestPlayableNote - lowestMidiNote) / Midi.SEMITONES_PER_OCTAVE) + 1) * Midi.SEMITONES_PER_OCTAVE; // positive
-      } else if (highestMidiNote > highestPlayableNote) {
+      } else if (highestMidiNote > highestPlayableNote && lowestMidiNote >= lowestPlayableNote) {
         channelTranspositions[channel] = (((highestPlayableNote - highestMidiNote) / Midi.SEMITONES_PER_OCTAVE) - 1) * Midi.SEMITONES_PER_OCTAVE; // negative
       }
     }
