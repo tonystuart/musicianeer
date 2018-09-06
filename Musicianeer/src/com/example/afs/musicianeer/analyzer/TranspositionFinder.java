@@ -11,6 +11,7 @@ package com.example.afs.musicianeer.analyzer;
 
 import com.example.afs.musicianeer.main.Musicianeer;
 import com.example.afs.musicianeer.midi.Midi;
+import com.example.afs.musicianeer.song.Note;
 import com.example.afs.musicianeer.song.Song;
 
 public class TranspositionFinder {
@@ -82,6 +83,19 @@ public class TranspositionFinder {
 
   private int[] getChannelTranspositions(Song song, int transposition, int lowestPlayableNote, int highestPlayableNote) {
     int[] channelTranspositions = new int[Midi.CHANNELS];
+    int[] direction = new int[Midi.CHANNELS];
+    for (Note note : song.getNotes()) {
+      int midiNote = note.getMidiNote();
+      int channel = note.getChannel();
+      if (channel != Midi.DRUM) {
+        midiNote += transposition;
+      }
+      if (midiNote < lowestPlayableNote) {
+        direction[channel]--;
+      } else if (midiNote > highestPlayableNote) {
+        direction[channel]++;
+      }
+    }
     for (int channel : song.getActiveChannels()) {
       int lowestMidiNote = song.getLowestMidiNote(channel);
       int highestMidiNote = song.getHighestMidiNote(channel);
@@ -89,9 +103,9 @@ public class TranspositionFinder {
         lowestMidiNote += transposition;
         highestMidiNote += transposition;
       }
-      if (lowestMidiNote < lowestPlayableNote && highestMidiNote <= highestPlayableNote) {
+      if (direction[channel] < 0) {
         channelTranspositions[channel] = (((lowestPlayableNote - lowestMidiNote) / Midi.SEMITONES_PER_OCTAVE) + 1) * Midi.SEMITONES_PER_OCTAVE; // positive
-      } else if (highestMidiNote > highestPlayableNote && lowestMidiNote >= lowestPlayableNote) {
+      } else if (direction[channel] > 0) {
         channelTranspositions[channel] = (((highestPlayableNote - highestMidiNote) / Midi.SEMITONES_PER_OCTAVE) - 1) * Midi.SEMITONES_PER_OCTAVE; // negative
       }
     }
