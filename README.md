@@ -4,6 +4,8 @@ Welcome to Musicianeer, the fourth generation in a line of music projects that i
 
 With Musicianeer, you play a piano or MIDI keyboard that features an LED strip that shows you what keys to press, when to press them and how long to hold them.
 
+![Basic Setup](README/BasicSetup.jpg "Basic Setup")
+
 # Features
 
 Musicianeer features a server based application that you connect to using a standard browser. The main features include:
@@ -15,6 +17,8 @@ Musicianeer features a server based application that you connect to using a stan
 * On-Screen Mini Piano Keyboard
 
 Each of these features is described in more detail below.
+
+![Musicianeer User Interface](README/MusicianeerUserInterface.jpg "Musicianeer User Interface")
 
 # MIDI Library Browser
 
@@ -29,6 +33,8 @@ You begin by selecting a song from the MIDI library. Each row in the MIDI librar
 * Complexity
 * EZKey Transposition (to play on mainly the white keys)
 
+![Library Browser](README/LibraryBrowser.jpg "Library Browser")
+
 # Channel / Part Selector
 
 Once you've selected a song, you can then pick a channel. Channels generally represent the different parts, or instruments in the song. Each row in the channel selector includes:
@@ -42,6 +48,8 @@ Once you've selected a song, you can then pick a channel. Channels generally rep
 * Mute checkbox (to silence background for this part)
 * Solo checkbox (to silence background for other parts)
 
+![Channel Selector](README/ChannelSelector.jpg "Channel Selector")
+
 # Music Notator
 
 After you select a channel, the notes in the channel are displayed in conventional music notation in a window that scrolls horizontally as the song plays. This includes:
@@ -51,6 +59,8 @@ After you select a channel, the notes in the channel are displayed in convention
 * Lyrics (if present) between bass and treble cleff
 * Drum names for drum channel (channel 10)
 * Scrollbar to view music and select a playback point
+
+![Music Notator](README/MusicNotator.jpg "Music Notator")
 
 # Control Area
 
@@ -74,6 +84,8 @@ Below the music notator is the control area. It includes:
     * Rhythm (just drums and bass guitars)
     * Drums (just drums).
 
+![Control Area](README/ControlArea.jpg "Control Area")
+
 # On-Screen Keyboard
 
 The bottom part of the screen displays the on-screen keyboard. It features 49 keys, where each key displays:
@@ -83,6 +95,8 @@ The bottom part of the screen displays the on-screen keyboard. It features 49 ke
 * PC keyboard shortcut (if you don't have a piano or MIDI keyboard)
 
 The keys on the on-screen keyboard are highlighted when you play them on the attached MIDI device.
+
+![OnScreen Keyboard](README/OnScreenKeyboard.jpg "OnScreen Keyboard")
 
 # Installation
 
@@ -100,6 +114,42 @@ Musicianeer uses either regular MIDI files or MIDI karaoke files. MIDI Karaoke f
 
 No MIDI files are included with Musicianeer, so use Google to search for midi karaoke files and download some to a handy place so that you can subsequently import them into Musicianeer using the IMPORT button.
 
+# LED Strip
+
+Musicianeer uses an external LED strip to show you what keys to press, when to press them, and when to release them.
+
+Musicianeer includes a simple Arduino program to receive MIDI messages from the Musicianeer Server and turn on and off the appropriate LEDs. It uses a Pro Micro ATmega32U4 to drive the LED strip.
+
+https://www.amazon.com/gp/product/B01MTU9GOB
+
+One of the benefits of the Pro Micro is that it includes a builtin software controlled USB port that can be used with the MIDI library to make the Pro Micro look like a MIDI device to the Linux operating system.
+
+You will also need a string of LEDs. Musicianeer provides sample programs for two types of LED strips: a string of 50 individually addressable WS2801 LEDs:
+
+https://www.amazon.com/gp/product/B0192VUDNG
+
+As well as a string of individually addressable SK9822 LEDs (which are similar to APA102C or WS2812B). 
+
+https://www.amazon.com/gp/product/B07BPX2KFD
+
+This LED strip is recommended because it features a self adhesive backing, which sticks easily to your keyboard. If you want, you can cut this LED strip to size. Be sure to cut the correct end. See the source for information on the number of LEDs it expects to control.
+
+In addition, you will need a power supply to provide sufficient current for the LEDs.
+
+The next step is to breadboard the Pro Micro, the connectors for the LED strip and the external power supply. This step assumes you have experience with safely building electronic circuits for use with the Arduino IDE. If you don't, consult another source before proceeding.
+
+Although you may be tempted to connect the LED strip directly to the Pro Micro and skip the external power supply, the LEDs consume a lot of power and you risk burning out the Pro Micro. Also, be sure to connect the GND output of the power supply to the GND of the Pro Micro so that all components are at the same electrical potential.
+
+If you've never used a Pro Micro ATmega32U4 with the Arduino IDE before, you'll need to install the Pro Micro board support for the Arduino IDE:
+
+https://learn.sparkfun.com/tutorials/pro-micro--fio-v3-hookup-guide/all
+
+Once the circuit is breadboarded, open a recent version of the Arduino IDE, load PianoBar-WS2801.ino or PianoBar-SK9822.ino (depending on which type of LEDs you have), configure the processor type (Tools -> Board) and port (Tools -> Port), and upload the sketch to the Pro Micro.
+
+Be sure to configure the board before uploading the sketch because it is easy to brick the Pro Micro ATMega32u4 if you try to download to it as another board (e.g. an Arduino UNO). Fortunately, there are unbricking procedures available on the web. They work, but they require that you jumper pins at just right the moment during the Arduino upload process. It's much better not to have to do this.
+
+Musicianeer also works without an LED strip. You can use the mock LEDs (filled circles) on the bottom part of the user interface to see which keys to press. These mock LEDs light up like the actual LEDs on the LED strip.
+
 # Startup
 
 To run Musicianeer, open a shell prompt / command line window and navigate to the MusicPad folder that was created when you unzipped the release image.
@@ -109,7 +159,7 @@ Then enter ./Musicianeer.bash to start the server.
 Next, from a browser window, open the Musicianeer window. If you do this on the server, the address will be localhost.
 
 ```
-http://localhsot:8080/Musicianeer.html
+http://localhost:8080/Musicianeer.html
 ```
 From another client, you will need to replace localhost with the hostname or IP address of the server.
 
@@ -122,6 +172,8 @@ For best results, put your browser window into full screen mode (generally F11, 
 # 2018 Seattle Mini Maker Faire
 
 Hundreds of visitors got a chance to play with Musicianeer at the 2018 Seattle Mini Maker Faire.
+
+![Seattle Mini Maker Faire](README/SeattleMiniMakerFaire.jpg "Seattle Mini Maker Faire")
 
 https://seattle.makerfaire.com/maker/entry/480/
 
@@ -143,6 +195,5 @@ In addition, the demonstration included an LED lighting controller that demonstr
 
 When you press or release keys on the keyboard, the server publishes messages to topics on a Message Queue Telemetry Transport (MQTT) server. 
 
-![Seattle Mini Maker Faire](README/06-SeattleMiniMakerFaire.jpg "Seattle Mini Maker Faire")
 
 
